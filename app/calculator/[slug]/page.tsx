@@ -19,15 +19,25 @@ import { dedupeFaqs, getCorridorContent } from "@/lib/corridorContent";
 import { computeSparklineStats, getCorridorHistory } from "@/lib/history";
 import { getComplianceGuide } from "@/data/complianceGuides";
 import { hreflangMap } from "@/lib/localizedCorridors";
+import { getAeoFaqEntries } from "@/lib/aeoFaqs";
+import {
+  BREADCRUMB_ORIGIN,
+  SITE_URL,
+  buildAeoFaqSchema,
+  buildBreadcrumbLd,
+  buildFinancialServiceSchema,
+  buildServiceLd,
+  buildWaterfallHowToSchema,
+  buildWebApplicationLd,
+  serializeSchemaGraph,
+} from "@/lib/seoSchemas";
+import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
 import Calculator from "@/components/Calculator";
 import FaqAccordion from "@/components/FaqAccordion";
 import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
 import AeoFaqSection from "@/components/AeoFaqSection";
 import ComplianceGuide from "@/components/ComplianceGuide";
-
-const SITE_URL = "https://payoutdelta.com";
-const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
 
 interface CorridorPageProps {
   params: Promise<{ slug: string }>;
@@ -100,147 +110,88 @@ export async function generateMetadata({
   };
 }
 
-function buildJsonLd(slug: string) {
+/**
+ * Phase 5 — single canonical JSON-LD `@graph` per corridor route.
+ *
+ * Every entity (BreadcrumbList, WebApplication, CurrencyConversionService +
+ * per-rail FinancialProducts, Service, the 7-layer HowTo waterfall, and a
+ * FAQPage mirroring the programmatic AEO Q&As) is emitted through the
+ * dedicated builders in `lib/seoSchemas.ts`. Long-tail platform corridors
+ * resolve pricing/conversion data from their underlying currency corridor
+ * while keeping their own route slug in URLs and copy.
+ */
+function buildJsonLd(slug: string): string[] {
   const longTail = getLongTailBySlug(slug);
   const corridor = getCorridorBySlug(longTail ? longTail.baseSlug : slug);
-  if (!corridor) return null;
+  if (!corridor) return [];
   const content = getCorridorContent(corridor.slug);
   const guide = getComplianceGuide(corridor.slug);
   const channels = getChannels();
+  const platforms = getPlatforms();
   const corridorPair = longTail
     ? `${longTail.label} ${corridor.from}→${corridor.to}`
     : `${corridor.from}→${corridor.to}`;
   const corridorUrl = `${SITE_URL}/calculator/${slug}/`;
 
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: `${BREADCRUMB_ORIGIN}/`,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Corridors",
-        item: `${BREADCRUMB_ORIGIN}/calculator/`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: longTail
-          ? `${longTail.label} ${corridor.from} to ${corridor.to} (${corridor.country})`
-          : `${corridor.from} to ${corridor.to} (${corridor.country})`,
-        item: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
-      },
-    ],
-  };
+  const platform =
+    platforms.find((item) => item.id === (longTail?.platformId ?? "upwork")) ??
+    platforms[0];
+  const bestQuote = computeRoute(
+    DEFAULT_GROSS_USD,
+    platform,
+    corridor,
+    channels,
+  ).verdict.best;
+  const platformName = longTail?.label ?? platform.name;
 
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    url: corridorUrl,
-    inLanguage: "en",
-    mainEntity: dedupeFaqs([...content.faqs, ...guide.faqs]).map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
+  const breadcrumbLd = buildBreadcrumbLd([
+    { name: "Home", url: `${BREADCRUMB_ORIGIN}/` },
+    { name: "Corridors", url: `${BREADCRUMB_ORIGIN}/calculator/` },
+    {
+      name: longTail
+        ? `${longTail.label} ${corridor.from} to ${corridor.to} (${corridor.country})`
+        : `${corridor.from} to ${corridor.to} (${corridor.country})`,
+      url: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
+    },
+  ]);
 
-  const appLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "PayoutDelta",
-    operatingSystem: "Web (React, static export)",
-    applicationCategory: "FinanceApplication",
-    url: corridorUrl,
-    description:
-      "Zero-signup auditor of freelance payout fees for the " +
-      `${corridor.from}-to-${corridor.to} (${corridor.country}) corridor.`,
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
+  const faqLd = buildAeoFaqSchema(
+    dedupeFaqs([
+      ...getAeoFaqEntries({
+        corridor,
+        channels,
+        platform,
+        lang: "en",
+        platformLabel: longTail?.label,
+      }).map((entry) => ({ q: entry.q, a: entry.aText })),
+      ...content.faqs,
+      ...guide.faqs,
+    ]),
+    {
+      url: corridorUrl,
+      inLanguage: "en",
     },
-    aggregateRating: undefined,
-  };
+  );
 
-  const serviceLd = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: `PayoutDelta Cross-Border Freelance Remittance (${corridorPair})`,
-    serviceType: "Cross-border freelance payout fee audit",
-    url: corridorUrl,
-    provider: {
-      "@type": "Organization",
-      name: "PayoutDelta",
-      url: `${SITE_URL}/`,
-    },
-    areaServed: {
-      "@type": "Country",
-      name: corridor.country,
-      identifier: corridor.countryCode,
-    },
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: `${corridorPair} withdrawal channels`,
-      itemListElement: channels.map((channel) => ({
-        "@type": "Offer",
-        name: `${channel.name} — ${channel.fixedFeeUSD} USD fixed + ${(
-          channel.fxSpread * 100
-        ).toFixed(2)}% FX spread`,
-        category: `Cross-border remittance (${corridorPair})`,
-        price: String(channel.fixedFeeUSD),
-        priceCurrency: corridor.from,
-        seller: { "@type": "Organization", name: channel.name },
-      })),
-    },
-  };
+  const appLd = buildWebApplicationLd({ corridor, corridorPair, corridorUrl });
 
-  const productLds = channels.map((channel) => ({
-    "@context": "https://schema.org",
-    "@type": "FinancialProduct",
-    name: `${channel.name} Cross-Border Freelance Remittance`,
-    category: `Cross-border remittance (${corridorPair})`,
-    provider: { "@type": "Organization", name: channel.name },
-    areaServed: {
-      "@type": "Country",
-      name: corridor.country,
-      identifier: corridor.countryCode,
-    },
-    feesAndCommissionsSpecification: [
-      {
-        "@type": "MonetaryAmount",
-        name: "Fixed transferring fee (USD)",
-        value: channel.fixedFeeUSD,
-        currency: corridor.from,
-      },
-      {
-        "@type": "QuantitativeValue",
-        name: "FX spread markup on interbank reference",
-        value: channel.fxSpread,
-        unitText: "fraction of mid-market rate",
-      },
-    ],
-    amount: {
-      "@type": "MonetaryAmount",
-      name: `Reference settlement rate (${corridor.from} to ${corridor.to})`,
-      value: corridor.rate,
-      currency: corridor.to,
-    },
-  }));
+  const serviceLd = buildServiceLd({
+    corridor,
+    corridorPair,
+    corridorUrl,
+    channels,
+  });
 
   return [
-    breadcrumbLd,
-    faqLd,
-    appLd,
-    serviceLd,
-    ...productLds,
-  ].map((block) => JSON.stringify(block).replace(/</g, "\\u003c"));
+    serializeSchemaGraph([
+      breadcrumbLd,
+      appLd,
+      ...buildFinancialServiceSchema(corridor, platform, bestQuote, channels),
+      serviceLd,
+      buildWaterfallHowToSchema(corridor.from, corridor.to, platformName),
+      faqLd,
+    ]),
+  ];
 }
 
 export default async function CorridorPage({ params }: CorridorPageProps) {

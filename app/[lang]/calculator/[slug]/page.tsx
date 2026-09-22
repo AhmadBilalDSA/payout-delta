@@ -9,13 +9,23 @@ import {
   hreflangMap,
   LOCALIZED_CORRIDORS,
 } from "@/lib/localizedCorridors";
+import { dedupeFaqs } from "@/lib/corridorContent";
+import { getAeoFaqEntries } from "@/lib/aeoFaqs";
+import {
+  BREADCRUMB_ORIGIN,
+  buildAeoFaqSchema,
+  buildBreadcrumbLd,
+  buildFinancialServiceSchema,
+  buildServiceLd,
+  buildWaterfallHowToSchema,
+  buildWebApplicationLd,
+  serializeSchemaGraph,
+} from "@/lib/seoSchemas";
+import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
 import Calculator from "@/components/Calculator";
 import BlufSummary from "@/components/BlufSummary";
 import FaqAccordion from "@/components/FaqAccordion";
 import AeoFaqSection from "@/components/AeoFaqSection";
-import { dedupeFaqs } from "@/lib/corridorContent";
-
-const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
 
 interface LocalizedCorridorPageProps {
   params: Promise<{ lang: string; slug: string }>;
@@ -60,51 +70,65 @@ export async function generateMetadata({
   };
 }
 
-function buildJsonLd(lang: string, slug: string) {
+function buildJsonLd(lang: string, slug: string): string[] {
   const localized = getLocalizedCorridor(lang, slug);
   if (!localized) return [];
   const corridor = getCorridorBySlug(slug);
   if (!corridor) return [];
 
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: `${BREADCRUMB_ORIGIN}/`,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Corridors",
-        item: `${BREADCRUMB_ORIGIN}/calculator/`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: localized.headline,
-        item: `${BREADCRUMB_ORIGIN}/${lang}/calculator/${slug}/`,
-      },
-    ],
-  };
+  const channels = getChannels();
+  const platforms = getPlatforms();
+  const corridorUrl = `${BREADCRUMB_ORIGIN}/${lang}/calculator/${slug}/`;
+  const corridorPair = `${corridor.from}→${corridor.to}`;
 
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    inLanguage: lang,
-    mainEntity: dedupeFaqs(localized.faqs).map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
+  const platform =
+    platforms.find((item) => item.id === "upwork") ?? platforms[0];
+  const bestQuote = computeRoute(
+    DEFAULT_GROSS_USD,
+    platform,
+    corridor,
+    channels,
+  ).verdict.best;
 
-  return [breadcrumbLd, faqLd].map((block) =>
-    JSON.stringify(block).replace(/</g, "\\u003c"),
+  const breadcrumbLd = buildBreadcrumbLd([
+    { name: "Home", url: `${BREADCRUMB_ORIGIN}/` },
+    { name: "Corridors", url: `${BREADCRUMB_ORIGIN}/calculator/` },
+    { name: localized.headline, url: corridorUrl },
+  ]);
+
+  const aeoEntries = getAeoFaqEntries({
+    corridor,
+    channels,
+    platform,
+    lang: "en",
+  });
+
+  const faqLd = buildAeoFaqSchema(
+    dedupeFaqs([
+      ...aeoEntries.map((entry) => ({ q: entry.q, a: entry.aText })),
+      ...localized.faqs,
+    ]),
+    { url: corridorUrl, inLanguage: lang },
   );
+
+  const appLd = buildWebApplicationLd({ corridor, corridorPair, corridorUrl });
+  const serviceLd = buildServiceLd({
+    corridor,
+    corridorPair,
+    corridorUrl,
+    channels,
+  });
+
+  return [
+    serializeSchemaGraph([
+      breadcrumbLd,
+      appLd,
+      ...buildFinancialServiceSchema(corridor, platform, bestQuote, channels),
+      serviceLd,
+      buildWaterfallHowToSchema(corridor.from, corridor.to, platform.name),
+      faqLd,
+    ]),
+  ];
 }
 
 export default async function LocalizedCorridorPage({

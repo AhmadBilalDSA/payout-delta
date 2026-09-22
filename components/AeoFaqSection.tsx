@@ -2,25 +2,10 @@
 
 import * as Accordion from "@radix-ui/react-accordion";
 import { useState } from "react";
-import type { ReactNode } from "react";
 
 import type { Corridor, Platform, WithdrawalChannel } from "@/lib/types";
-import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
-import { formatLocal } from "@/utils/format";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import { platformUiKey } from "@/lib/i18n/helpers";
-import { DICTIONARIES } from "@/lib/i18n/dictionaries";
-import { getRegulatoryBanking } from "@/data/regulatoryBanking";
-import {
-  fillTemplate,
-  formatTaxPct,
-  renderTemplate,
-} from "@/components/aeoTemplate";
-
-interface AeoFaqItem {
-  q: string;
-  a: ReactNode;
-}
+import { getAeoFaqEntries } from "@/lib/aeoFaqs";
 
 /**
  * Phase 2 — targeted AEO audit FAQ.
@@ -36,8 +21,11 @@ interface AeoFaqItem {
  *   Q3  "What statutory purpose code / exemption applies to freelance income?"
  *       → named regulator, tier, rate and export purpose code.
  *
- * The questions and answers are wired into the 7-language dictionary; the
- * English copy is baked during prerender so answer engines strike raw markup.
+ * Phase 5 — the Q&A generation now lives in `lib/aeoFaqs.ts` so the same
+ * entries (question, emphasis-rendered answer and plain text) feed both the
+ * on-page accordion and the FAQPage JSON-LD; drift is impossible by
+ * construction. The English copy is baked during prerender so answer engines
+ * strike raw markup, while the runtime dictionary keeps the UI localized.
  */
 export default function AeoFaqSection({
   corridor,
@@ -61,77 +49,16 @@ export default function AeoFaqSection({
     platforms.find((item) => item.id === platformId) ??
     platforms.find((item) => item.id === "upwork") ??
     platforms[0];
-  const route = computeRoute(DEFAULT_GROSS_USD, platform, corridor, channels);
-  const best = route.verdict.best;
-  const worst = route.verdict.worst;
-  if (best === null || worst === null || route.quotes.length === 0) {
+  const items = getAeoFaqEntries({
+    corridor,
+    channels,
+    platform,
+    lang,
+    platformLabel,
+  });
+  if (items.length === 0) {
     return null;
   }
-
-  const regulation = getRegulatoryBanking(corridor.slug);
-  const bank = regulation.banks[0];
-  const tier = regulation.tiers[0];
-  const wireQuote =
-    route.quotes.find((quote) => quote.channelId === "swift") ?? worst;
-  const dict = DICTIONARIES[lang]?.strings ?? DICTIONARIES.en.strings;
-
-  const providerName = best.channelName;
-  const gross = `$${DEFAULT_GROSS_USD.toLocaleString("en-US")}`;
-  const platformName = platformLabel ?? t(platformUiKey(platform.id));
-  const net = formatLocal(best.localAmount, corridor);
-  const wireNet = formatLocal(wireQuote.localAmount, corridor);
-  const delta = formatLocal(
-    Math.max(0, best.localAmount - wireQuote.localAmount),
-    corridor,
-  );
-  const swift = `$${Number(bank.intermediaryUSD.toFixed(2))}`;
-  const tax = formatTaxPct(tier.rate);
-
-  const q1 = fillTemplate(t("aeoQ1"), {
-    platform: platformName,
-    country: corridor.country,
-  });
-  const a1 = renderTemplate(dict.aeoQ1A, {
-    provider: providerName,
-    platform: platformName,
-    gross,
-    country: corridor.country,
-    net,
-    wireNet,
-    delta,
-    swift,
-    tax,
-  });
-
-  const q2 = fillTemplate(t("aeoQ2"), { bank: bank.name });
-  const band =
-    bank.intermediaryMinUSD === bank.intermediaryMaxUSD
-      ? `$${bank.intermediaryMinUSD}`
-      : `$${bank.intermediaryMinUSD}–$${bank.intermediaryMaxUSD}`;
-  const a2 = renderTemplate(dict.aeoQ2A, {
-    bank: bank.name,
-    band,
-    fee: String(bank.localFeeDefault),
-    symbol: corridor.currencySymbol,
-    clearance: bank.clearance,
-  });
-
-  const q3 = t("aeoQ3");
-  const a3: ReactNode = regulation.generic
-    ? renderTemplate(dict.aeoQ3ACompliance, { note: tier.note })
-    : renderTemplate(dict.aeoQ3A, {
-        authority: regulation.authority,
-        tier: tier.name,
-        rate: tax,
-        code: tier.purposeCode ? ` with purpose code ${tier.purposeCode}` : "",
-        note: tier.note,
-      });
-
-  const items: AeoFaqItem[] = [
-    { q: q1, a: a1 },
-    { q: q2, a: a2 },
-    { q: q3, a: a3 },
-  ];
 
   return (
     <section

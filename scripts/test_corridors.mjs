@@ -6,7 +6,9 @@
  * Crawls ./out after `npm run build` and verifies, for every currency
  * corridor:
  *   - the static HTML page exists on disk
- *   - JSON-LD exposes SoftwareApplication + FAQPage schemas
+ *   - JSON-LD is emitted as ONE valid schema.org @graph exposing the full
+ *     Phase 6 schema set (WebApplication, CurrencyConversionService,
+ *     FinancialProduct, Service, HowTo, FAQPage, BreadcrumbList)
  *   - every _next/ asset URL is basePath-prefixed (/payout-delta/_next/...)
  *     and resolves to a real file under ./out
  *   - every internal link is basePath-prefixed and maps to an exported file
@@ -20,8 +22,9 @@
  *     routes) exports a real HTML page that loads with dir/lang attribution
  *   - every JSON-LD block on every exported HTML page parses cleanly as valid
  *     JSON (no unescaped quotes, no broken objects)
- *   - corridor pages expose the full Phase 5 schema set (BreadcrumbList,
- *     FinancialProduct, Service, FAQPage, SoftwareApplication)
+ *   - corridor pages expose the full Phase 6 schema set (BreadcrumbList,
+ *     WebApplication, CurrencyConversionService, FinancialProduct, Service,
+ *     HowTo, FAQPage)
  *   - English corridor pages with a localized twin emit hreflang alternates
  *     pointing at the localized sub-paths
  *
@@ -76,13 +79,29 @@ const EXPECTED_LOCALIZED = [
   { lang: "pt", slug: "usd-to-brl", dir: "ltr" },
 ];
 
-/** Phase 5 schema set required on every corridor page. */
+/**
+ * Phase 5/6 — full schema set required on every corridor page: the financial
+ * JSON-LD dominance entities (CurrencyConversionService + per-rail
+ * FinancialProduct), the WebApplication rich result, the HowTo realization
+ * waterfall, the FAQPage and the BreadcrumbList — all inside one @graph.
+ */
 const REQUIRED_CORRIDOR_SCHEMA = [
-  "SoftwareApplication",
-  "FAQPage",
   "BreadcrumbList",
-  "Service",
+  "WebApplication",
+  "CurrencyConversionService",
   "FinancialProduct",
+  "Service",
+  "HowTo",
+  "FAQPage",
+];
+
+/** Required schema set on localized corridor pages (subset of the corridor set). */
+const REQUIRED_LOCALIZED_SCHEMA = [
+  "BreadcrumbList",
+  "WebApplication",
+  "CurrencyConversionService",
+  "HowTo",
+  "FAQPage",
 ];
 
 const ASSET_HREF_RE = /(?:href|src)="(\/(?:payout-delta\/)?_next\/[^"]*)"/g;
@@ -143,6 +162,48 @@ function countBrokenLdBlocks(html) {
     }
   }
   return { blocks, broken };
+}
+
+/**
+ * Phase 6 — verifies the page's JSON-LD is consolidated into exactly one
+ * top-level schema.org `@graph` (the financial JSON-LD dominance pattern:
+ * every page entity in one context-scoped graph instead of fragmented
+ * scripts). Site-wide blocks from the root layout (e.g. `WebSite`) are
+ * allowed alongside it; any second `@graph` or a graph missing the required
+ * corridor entity set fails the check.
+ */
+function auditJsonLdHeader(html) {
+  let graphs = 0;
+  const types = new Set();
+  let match;
+  while ((match = LD_JSON_RE.exec(html)) !== null) {
+    let parsed;
+    try {
+      parsed = JSON.parse(match[1]);
+    } catch {
+      continue;
+    }
+    if (parsed && typeof parsed === "object" && Array.isArray(parsed["@graph"])) {
+      graphs += 1;
+      const collect = (node) => {
+        if (Array.isArray(node)) {
+          node.forEach(collect);
+        } else if (node && typeof node === "object") {
+          if (typeof node["@type"] === "string") {
+            types.add(node["@type"]);
+          } else if (Array.isArray(node["@type"])) {
+            node["@type"].forEach((t) => types.add(t));
+          }
+          collect(Object.values(node));
+        }
+      };
+      collect(parsed["@graph"]);
+    }
+  }
+  return {
+    singleGraph:
+      graphs === 1 && REQUIRED_CORRIDOR_SCHEMA.every((t) => types.has(t)),
+  };
 }
 
 const HREFLANG_RE = /<link[^>]*rel=["']alternate["'][^>]*hreflang=["']([^"']+)["'][^>]*>/gi;
@@ -256,6 +317,8 @@ function auditCorridor(slug) {
   row.ldBlocks = blocks;
   row.ldParse = broken === 0;
 
+  row.singleGraph = auditJsonLdHeader(html).singleGraph;
+
   const { checked, bad } = verifyAssets(html);
   row.assets = checked > 0 && bad === 0;
   row.assetDetails = { checked, bad };
@@ -332,11 +395,14 @@ function auditLocalized(lang, slug, dir) {
   row.dirLang = hasLang && (!dirLangOk || hasDirRtl);
 
   const types = collectTypes(html);
-  row.schema = types.has("BreadcrumbList") && types.has("FAQPage");
+  row.schema = REQUIRED_LOCALIZED_SCHEMA.every((t) => types.has(t));
+  row.missingSchema = REQUIRED_LOCALIZED_SCHEMA.filter((t) => !types.has(t));
 
   const { blocks, broken } = countBrokenLdBlocks(html);
   row.ldBlocks = blocks;
   row.ldParse = broken === 0;
+
+  row.singleGraph = auditJsonLdHeader(html).singleGraph;
 
   const { checked, bad } = verifyAssets(html);
   row.assets = checked > 0 && bad === 0;
@@ -386,6 +452,9 @@ for (const row of report) {
   if (!row.ldParse) {
     fail("malformed JSON-LD", row.slug);
   }
+  if (!row.singleGraph) {
+    fail("JSON-LD not a single schema.org @graph", row.slug);
+  }
   if (row.assetDetails && row.assetDetails.bad > 0) {
     fail("asset errors", row.slug);
   }
@@ -403,7 +472,7 @@ let localizedFailures = 0;
 for (const row of localizedRows) {
   const flag = (ok) => (ok ? "PASS" : "FAIL");
   const detail = row.html
-    ? `${flag(row.dirLang)} dir/lang · ${flag(row.schema)} BreadcrumbList+FAQ · ${row.assetDetails ? `${row.assetDetails.checked} assets` : "-"} · ${row.links ? `${row.links.total} links` : "-"}`
+    ? `${flag(row.dirLang)} dir/lang · ${flag(row.schema)} Phase6 schema · ${flag(row.singleGraph)} @graph · ${row.assetDetails ? `${row.assetDetails.checked} assets` : "-"} · ${row.links ? `${row.links.total} links` : "-"}`
     : "page not exported";
   console.log(`  ${`${row.slug}/index.html`.padEnd(38)}${detail}`);
   if (!row.html) {
@@ -416,7 +485,11 @@ for (const row of localizedRows) {
   }
   if (row.html && !row.schema) {
     localizedFailures += 1;
-    fail("schema missing", `${row.slug}: BreadcrumbList + FAQPage required`);
+    fail("schema missing", `${row.slug}: requires ${(row.missingSchema ?? []).join(", ")}`);
+  }
+  if (row.html && !row.singleGraph) {
+    localizedFailures += 1;
+    fail("JSON-LD not a single schema.org @graph", row.slug);
   }
   if (row.html && !row.ldParse) {
     localizedFailures += 1;
@@ -608,7 +681,12 @@ if (ldBroken > 0) {
 }
 
 const pageFailures = report.filter(
-  (r) => !r.html || !r.schema || !r.assets || !r.ldParse
+  (r) =>
+    !r.html ||
+    !r.schema ||
+    !r.assets ||
+    !r.ldParse ||
+    (r.html && !r.singleGraph)
 ).length;
 const linkFailures = report.reduce((sum, r) => sum + (r.links ? r.links.bad : 0), 0);
 const linkTotal = report.reduce((sum, r) => sum + (r.links ? r.links.total : 0), 0);

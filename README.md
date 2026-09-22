@@ -92,6 +92,18 @@ static file under `./out`. Corridors are declared in
 [`data/corridors.ts`](data/corridors.ts) and pre-set the calculator on mount
 with `?gross=` deep-link sharing intact.
 
+### 🧬 Financial JSON-LD Schema Dominance
+Every corridor route (17 English + 5 localized) emits **one** top-level
+schema.org `@graph` per page: a `CurrencyConversionService` with live
+`ExchangeRateSpecification`, a `FinancialProduct` per compared rail with its
+fixed fee & FX-spread structure, a seven-layer `HowTo` realization waterfall,
+and the programmatic `FAQPage` that mirrors the rendered AEO blocks — all
+budded with `WebApplication`, `Service` and `BreadcrumbList`. Fee/rate queries
+now resolve to structured entities instead of prose. Builders live in
+[`lib/seoSchemas.ts`](lib/seoSchemas.ts); the Q&A shares one generator
+([`lib/aeoFaqs.ts`](lib/aeoFaqs.ts)) with the on-page accordion, so
+structured data never drifts from the markup.
+
 ---
 
 ## Who it's for
@@ -138,6 +150,8 @@ npm run lint      # ESLint
 | `data/regulatoryBanking.ts` | Statutory law & local bank clearing database |
 | `data/affiliatePartners.ts` | Central partner & affiliate directory (referral routing) |
 | `data/corridors.ts` | Programmatic long-tail platform corridor registry |
+| `lib/seoSchemas.ts` | Dedicated financial Schema.org builders (one `@graph` per corridor) |
+| `lib/aeoFaqs.ts` | Shared AEO FAQ generator (accordion + FAQPage JSON-LD) |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -153,7 +167,7 @@ npm run lint      # ESLint
 | 2 | AEO/GEO direct-answer snippets & statutory citations | Shipped |
 | 3 | High-intent affiliate engine, partner referral cards & trust micro-badges | Shipped |
 | 4 | Programmatic long-tail platform corridors (Upwork / Fiverr / Deel) | Shipped |
-| 5 | Financial JSON-LD schema dominance | Planned |
+| 5 | Financial JSON-LD schema dominance | Shipped |
 | 6 | GitHub community engine & full developer API docs | Planned |
 | 7 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 

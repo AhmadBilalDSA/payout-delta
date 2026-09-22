@@ -168,7 +168,7 @@ because they share the same dataset and quote math.
 | 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | **Shipped** (`c081371`) |
 | 3 | **High-Intent Affiliate Engine, Partner Referral Cards & Trust Micro-Badges** — privacy-safe provider routing, sponsored disclosure CTAs, wire-penalty callouts | **Shipped** (`d51faba`) |
 | 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes | **Shipped** (`6a71b4e`) |
-| 5 | **Financial JSON-LD Schema Dominance** — rich result takeover for fee/rate queries | Planned |
+| 5 | **Financial JSON-LD Schema Dominance** — one top-level `@graph` per corridor route (`CurrencyConversionService` + live `ExchangeRateSpecification`, per-rail `FinancialProduct`, 7-layer `HowTo` waterfall, programmatic `FAQPage` mirroring AEO Q&As, `WebApplication`, `Service`, `BreadcrumbList`) via `lib/seoSchemas.ts` | **Shipped** |
 | 6 | **GitHub Community Engine & Developer API Documentation** — onboarding, issues, full `edge-api` reference | Planned |
 | 7 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 
@@ -178,8 +178,8 @@ because they share the same dataset and quote math.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # all 29 static routes → ./out
-node scripts/test_corridors.mjs  # 0 broken links, valid JSON-LD, exit 0
+npm run build                 # 36 static routes → ./out
+node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, exit 0
 ```
 
 Commit convention follows the project template
