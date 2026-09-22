@@ -5,7 +5,7 @@
 > codebase inventory, the architecture matrix, the fee-calculus identity and
 > the 7-phase dominance roadmap the repository executes against.
 
-Last reviewed: 2026 (Roadmap Phase 1). Live at
+Last reviewed: 2026 (Roadmap Phase 3). Live at
 `https://ahmadbilaldsa.github.io/payout-delta/`.
 
 ---
@@ -164,12 +164,12 @@ because they share the same dataset and quote math.
 
 | # | Phase | Status |
 | --- | --- | --- |
-| 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Current** |
-| 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | Planned |
-| 3 | **Programmatic Long-Tail Corridor Engine** — Upwork/Fiverr/Deel pay-cycle corridors generated from `data/fees.json` | Planned |
-| 4 | **Financial JSON-LD Schema Dominance** — rich result takeover for fee/rate queries | Planned |
-| 5 | **GitHub Community Engine & Developer API Documentation** — onboarding, issues, full `edge-api` reference | Planned |
-| 6 | **Contextual Fintech Affiliate Routing & Monetization** — privacy-safe provider links | Planned |
+| 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Shipped** (`92f8f7f`) |
+| 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | **Shipped** (`c081371`) |
+| 3 | **High-Intent Affiliate Engine, Partner Referral Cards & Trust Micro-Badges** — privacy-safe provider routing, sponsored disclosure CTAs, wire-penalty callouts | **Shipped** (`d51faba`) |
+| 4 | **Programmatic Long-Tail Corridor Engine** — Upwork/Fiverr/Deel pay-cycle corridors generated from `data/fees.json` | Planned |
+| 5 | **Financial JSON-LD Schema Dominance** — rich result takeover for fee/rate queries | Planned |
+| 6 | **GitHub Community Engine & Developer API Documentation** — onboarding, issues, full `edge-api` reference | Planned |
 | 7 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 
 ---
@@ -190,6 +190,9 @@ compatibility is a merge blocker.
 
 ## 7. Existing Commits That Anchor This Spec
 
+- `92f8f7f` — Phase 1: full repo audit, system spec, open-source showcase README.
+- `c081371` — Phase 2: AEO/GEO structured answer engine, statutory citation blocks, targeted audit FAQs (`aeoTemplate`, `AeoFaqSection`, `regulatoryBanking.citations`).
+- `d51faba` — Phase 3: high-intent affiliate engine, partner referral cards, trust micro-badges, regulatory disclosures (`data/affiliatePartners.ts`, `VerdictCard` CTA panel + 6 i18n keys ×7 languages).
 - `d74a248` — i18n: dictionary, auto-locale detection, trust badges, corridor selector.
 - `a66422c` — sitemap `/api-access/` entry.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.

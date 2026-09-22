@@ -70,6 +70,19 @@ A Cloudflare Worker **rate router** (`edge-api/`) serving the same versioned
 fee snapshot with sliding-window rate limiting — explorable live in the
 [developer playground](app/api-access).
 
+### 🔎 AEO/GEO Direct-Answer Engine
+Every corridor page answers its money question **directly at the top** — "how
+much of $1,000 actually lands in PKR?" — with a bolded takeaway, statutory
+regulation chips (SBP Ch. 13, RBI AP DIR 46, BIR 8%) and programmatic FAQ
+blocks, baked into static HTML for position-0 snippets across all 7 languages.
+
+### 🔗 Affiliate Routing & Trust Micro-Badges
+The verdict card on the winning rail now converts: a sponsored, disclosure-
+carrying referral CTA (zero cost to you), `✓ Zero Hidden Markup / ✓ Regulated
+Settlement / ✓ Direct Payout` pills, a "save vs. the traditional wire" penalty
+callout, and an FTC-grade affiliate disclaimer — routed through a central
+partner directory ([`data/affiliatePartners.ts`](data/affiliatePartners.ts)).
+
 ---
 
 ## Who it's for
@@ -114,6 +127,7 @@ npm run lint      # ESLint
 | --- | --- |
 | `data/fees.json` | Versioned fees/rates snapshot (source of truth) |
 | `data/regulatoryBanking.ts` | Statutory law & local bank clearing database |
+| `data/affiliatePartners.ts` | Central partner & affiliate directory (referral routing) |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -123,13 +137,15 @@ npm run lint      # ESLint
 
 ### Roadmap
 
-- **Phase 1** — Codebase audit, system spec, this showcase *(current)*
-- **Phase 2** — AEO/GEO direct-answer snippets & statutory citations
-- **Phase 3** — Programmatic long-tail corridor engine (Upwork / Fiverr / Deel)
-- **Phase 4** — Financial JSON-LD schema dominance
-- **Phase 5** — GitHub community engine & full developer API docs
-- **Phase 6** — Contextual fintech affiliate routing & monetization
-- **Phase 7** — Automated edge cache sync & dynamic OpenGraph social engine
+| # | Phase | Status |
+| --- | --- | --- |
+| 1 | Codebase audit, system spec & GitHub showcase | Shipped |
+| 2 | AEO/GEO direct-answer snippets & statutory citations | Shipped |
+| 3 | High-intent affiliate engine, partner referral cards & trust micro-badges | Shipped |
+| 4 | Programmatic long-tail corridor engine (Upwork / Fiverr / Deel) | Planned |
+| 5 | Financial JSON-LD schema dominance | Planned |
+| 6 | GitHub community engine & full developer API docs | Planned |
+| 7 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 
 ---
 
