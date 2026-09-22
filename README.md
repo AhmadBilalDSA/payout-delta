@@ -1,98 +1,146 @@
 # PayoutDelta
 
-A free, zero-signup auditor of freelance payout fees. PayoutDelta decomposes
-every client payment into the three leaks that eat earnings — **platform
-commission**, **channel fixed fee** and **FX spread** — across 10 currency
-corridors, and ranks 5 withdrawal channels by the local currency you actually
-receive.
+**The payout auditor that tells you how much actually reaches your bank — after every hidden fee.**
 
-Phase 1 is a **fully static export** (`next build` → `out/`) deployed to
-GitHub Pages. There is no server, no database, no tracking: every calculation
-runs in your browser. Phase 2 B2B hooks are scaffolded as commented stubs.
+> After the platform cut, the SWIFT intermediaries, the real conversion, the
+> local landing fee and the statutory tax — **how much of your client's payment
+> lands in your bank account?** PayoutDelta answers exactly that, for 10
+> corridors, in your browser, with zero cost and zero tracking.
 
-## Stack
+[![Live](https://img.shields.io/badge/Live-GitHub%20Pages-1f6feb?style=flat-square)](https://ahmadbilaldsa.github.io/payout-delta/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square)](https://www.typescriptlang.org)
+[![Zero-Telemetry](https://img.shields.io/badge/100%25-Client%20Side-10b981?style=flat-square)](#architecture--security)
+[![Languages](https://img.shields.io/badge/7%20Languages-RTL%20ready-6366f1?style=flat-square)](lib/i18n/dictionaries.ts)
+[![Cloud Cost](https://img.shields.io/badge/Cloud-USD%200-16a34a?style=flat-square)](#architecture--security)
 
-- Next.js 16.3.5 (App Router, `output: "export"`, `trailingSlash: true`)
-- React 19 · TypeScript 5 (strict) · Tailwind CSS v4
-- Radix UI primitives (accordion, slider, toggle-group)
-- CI/CD: GitHub Actions → static GitHub Pages (branch `master`)
+---
 
-## Commands
+## The pitch: why Wise, XE & Remitly don't give you the real number
+
+Traditional payout tools quote a **mid-market rate** minus *their own* fee. Then
+a chain of invisible costs eats the rest:
+
+- **Intermediary correspondent SWIFT cuts** ($5–$45 per wire depend on the
+  receiving bank's routing),
+- **Platform fees** (Upwork 10%, Fiverr 20% — before the money even moves),
+- **Local receiving / landing fees** (₹75–₹150 FIRC/e-BRC, Raast or PESONet
+  clearing charges),
+- **Statutory withholding taxes** (PSEB 0.25% wr. ITO §154A, RBI LUT under
+  Rule 96A, BIR 8% flat on freelancers).
+
+Wise tells you what leaves your client. **PayoutDelta tells you what lands in
+your account.**
+
+---
+
+## Features
+
+### 🧮 Cross-Border Payout Auditor
+10 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR) with
+live comparison between **Wise, Payoneer, Direct Wire, Remitly and local bank
+rails** — a best-verdict ranking of the **local currency you actually
+receive**, not the one quoted mid-market.
+
+### 🏦 Local Banking & Compliance Directory
+Real domestic banks with their exact SWIFT/BIC codes (MZNBPKKA, HABBPNKA,
+HDFCINBB, BNORPHMM…), intermediary benchmarks, PRC/FIRC turnaround, and the
+**governing statute per tier** — SBP Foreign Exchange Manual Ch. 13 & ITO
+§154A (PKR), RBI AP (DIR Series) No. 46 + GST LUT under Rule 96A (INR), BSP
+Circular 980 + BIR 8% (PHP).
+
+### 💧 Dynamic 7-Step Costing Waterfall
+A live, granular breakdown with sliders for **intermediary SWIFT cut ($0–40)**,
+**local landing fee**, **custom surcharge / client retainer (0–15%)** and
+statutory withholding tiers — recomputed instantly to the **real bank
+take-home**.
+
+### 📄 Invoice Studio
+Professional A4 **freelance invoice generator** with per-line GST (zero-rated
+export default), banking & clearing details, **statutory tax & purpose-code
+addendum** (PRC 9111 / P0802 legalese), and print-isolated clean PDF export.
+Calculator ↔ invoice **sync with one click**.
+
+### 🌍 Global Localization
+Fully translated UI in **7 languages (EN, UR, HI, FIL, ES, PT, AR)** with
+automatic **RTL + Nastaliq** layout handling and zero-latency switching.
+
+### ⚡ Developer Edge API
+A Cloudflare Worker **rate router** (`edge-api/`) serving the same versioned
+fee snapshot with sliding-window rate limiting — explorable live in the
+[developer playground](app/api-access).
+
+---
+
+## Who it's for
+
+- **Global freelancers** — Upwork, Fiverr and direct clients; see the real
+  take-home before you send a milestone invoice.
+- **Remote contractors & agencies** — cross-border payroll via Deel and local
+  EOR rails, with clean statutory paper trail.
+- **Export businesses & tax filers** — accurate FIRC / e-PRC / LUT context for
+  filings and zero-rated export claims.
+
+---
+
+## Quickstart
 
 ```bash
-npm run dev       # local dev server (localhost:3000)
-npm run build     # static export to ./out
-npm run lint      # ESLint (flat config; run `npx eslint .` to lint all)
+git clone https://github.com/AhmadBilalDSA/payout-delta.git
+cd payout-delta
+npm install
+npm run dev       # local dev server → http://localhost:3000
+npm run build     # full static export → ./out
+npm run lint      # ESLint
 ```
 
-## Data: `data/fees.json`
+---
 
-The dataset is the single source of truth for every fee shown on the site,
-and the only thing that changes between revisions.
+## Architecture & Security
 
-```jsonc
-{
-  "schemaVersion": 1,
-  "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-22",        // bump on every rate/fee change
-  "currency": { "base": "USD" },
-  "platforms": [
-    { "id": "upwork", "name": "Upwork", "feePercent": 10 },
-    { "id": "fiverr", "name": "Fiverr", "feePercent": 20 },
-    { "id": "direct", "name": "Direct Client Invoice", "feePercent": 0 }
-  ],
-  "channels": [
-    // fixedFeeUSD = flat deduction · fxSpread = fraction off the mid rate
-    { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.99, "fxSpread": 0.0045 }
-  ],
-  "corridors": [
-    { "slug": "usd-to-pkr", "from": "USD", "to": "PKR", "rate": 278.5, ... }
-  ]
-}
-```
+- **Framework** — Next.js 16 App Router with `output: 'export'` +
+  `trailingSlash: true`; deployed to GitHub Pages under `/payout-delta`.
+- **100% client-side calculation** — pure TypeScript math modules, no server,
+  no database, no API dependency in the app.
+- **Zero telemetry, zero tracking, zero data retention** — every input stays
+  on-device. The only "storage" is your browser's own `localStorage`
+  (draft invoice, language preference, bank-sync).
+- **Versioned fee dataset** — `data/fees.json` is the single source of truth;
+  corridor pages, sitemap and static JSON regenerate from one snapshot.
 
-Rules for updating fees:
-
-1. Edit `data/fees.json` and bump `updatedAt` to today.
-2. Re-run `npm run build` — every corridor page, sitemap entry and static
-   JSON regenerates from the new snapshot. No other code changes.
-3. Commit, push to `master`; the GitHub Actions workflow builds and deploys.
-
-`lib/db.ts` is the only consumer of the JSON (backed by a documented Phase 2
-star-schema migration plan); `scripts/playwright_scraper.py` is the Phase 2
-ETL that will eventually replace manual edits.
-
-## Project layout
+### Repo layout at a glance
 
 | Path | Purpose |
 | --- | --- |
-| `data/fees.json` | Versioned fee/rate snapshot (the source of truth) |
-| `lib/types.ts` | Domain types shared by data + UI |
-| `lib/db.ts` | Data-access seam over the JSON (Phase 2 star-schema notes) |
-| `lib/corridorContent.ts` | Per-corridor editorial prose + FAQs (SEO, ≥60% unique) |
-| `utils/calculateRoute.ts` | Pure fee mathematics (clamped, finite-guarded) |
-| `app/calculator/[slug]/page.tsx` | Dynamic corridor auditor pages (`dynamicParams = false`) |
-| `components/Calculator.tsx` | Client calculator island (Radix slider + toggle) |
-| `middleware.ts` | Pass-through placeholder (unsupported in static export; see file) |
-| `app/api/v1/rates/route.ts` | Phase 2 API stub — returns 501 |
-| `.github/workflows/deploy.yml` | Build + deploy to GitHub Pages on `master` |
+| `data/fees.json` | Versioned fees/rates snapshot (source of truth) |
+| `data/regulatoryBanking.ts` | Statutory law & local bank clearing database |
+| `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine |
+| `components/invoice/` | Invoice Studio (editor, preview, addendums) |
+| `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
+| `edge-api/` | Cloudflare Worker rate router |
+| `app/api-access/` | Developer playground |
+| `scripts/test_corridors.mjs` | Link + JSON-LD integrity audit |
 
-## SEO / content notes
+### Roadmap
 
-- Each corridor page ships unique editorial copy (local tax considerations,
-  clearance times, SWIFT rules) from `lib/corridorContent.ts` to stay >60%
-  unique per page.
-- Per-page `FAQPage` + `SoftwareApplication` JSON-LD is emitted as raw
-  `<script>` tags (Metadata APIs cannot inject into `<head>`).
-- `metadataBase` is pinned to `https://payoutdelta.com` so canonical/OG URLs
-  resolve correctly on GitHub Pages.
+- **Phase 1** — Codebase audit, system spec, this showcase *(current)*
+- **Phase 2** — AEO/GEO direct-answer snippets & statutory citations
+- **Phase 3** — Programmatic long-tail corridor engine (Upwork / Fiverr / Deel)
+- **Phase 4** — Financial JSON-LD schema dominance
+- **Phase 5** — GitHub community engine & full developer API docs
+- **Phase 6** — Contextual fintech affiliate routing & monetization
+- **Phase 7** — Automated edge cache sync & dynamic OpenGraph social engine
 
-## Privacy
+---
 
-No accounts, no analytics, no server-side persistence. Calculator inputs stay
-on-device. Details in `app/privacy-policy/page.tsx`.
+## Contributing
 
-## Disclaimer
+Help make the take-home number trustworthy everywhere:
 
-Fee tables are indicative aggregates from public rate cards — not quotes,
-quotes-quality nor financial/tax advice. See `app/disclaimer/page.tsx`.
+- Open an issue for a **real bank credit advice** correction (SWIFT cut, landing
+  fee, clearance time) on any corridor.
+- Add a language, a corridor tier, or a statutory citation.
+- Extend the edge API or the invoice addendum library.
+
+PayoutDelta is informational tooling — **not financial, tax or legal advice.**
+Fee tables are indicative public benchmarks, not quotes. See the [disclaimer](app/disclaimer) and [privacy policy](app/privacy-policy).

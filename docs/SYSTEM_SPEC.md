@@ -1,0 +1,196 @@
+# PayoutDelta — Permanent System Specification
+
+> Single source of truth for human engineers and AI sessions. Read this before
+> any structural change. It documents the executive vision, the audited
+> codebase inventory, the architecture matrix, the fee-calculus identity and
+> the 7-phase dominance roadmap the repository executes against.
+
+Last reviewed: 2026 (Roadmap Phase 1). Live at
+`https://ahmadbilaldsa.github.io/payout-delta/`.
+
+---
+
+## 1. Executive Vision
+
+PayoutDelta is a **zero-cost, high-precision cross-border remittance,
+statutory fee-auditing and invoice-compliance suite** for global freelancers,
+remote contractors and export businesses.
+
+Traditional payout tools (Wise, XE, Remitly, Payoneer) quote a mid-market rate
+plus *their own* fee, then let the intermediary SWIFT chain, the local
+receiving bank and the destination withholding regime silently eat the rest.
+PayoutDelta answers the question none of them do:
+
+> *After the platform cut, the wire intermediaries, the real conversion, the
+> landing fee and the statutory tax — what money actually lands in my local
+> bank account?*
+
+The entire product runs **100% client-side in the reader's browser** and is
+deployed as a static export to GitHub Pages at zero cloud cost, with a
+Cloudflare Worker edge API layered on for developer access. Zero telemetry,
+zero tracking, zero data retention, zero sign-up.
+
+---
+
+## 2. Codebase Audit — Permanent Inventory
+
+### 2.1 Corridors (10 standard, `data/fees.json`)
+
+| Slug | From → To | Country / Currency |
+| --- | --- | --- |
+| `usd-to-pkr` | USD → PKR | Pakistan |
+| `usd-to-inr` | USD → INR | India |
+| `usd-to-php` | USD → PHP | Philippines |
+| `usd-to-brl` | USD → BRL | Brazil |
+| `usd-to-gbp` | USD → GBP | United Kingdom |
+| `usd-to-eur` | USD → EUR | Eurozone |
+| `usd-to-ngn` | USD → NGN | Nigeria |
+| `usd-to-bdt` | USD → BDT | Bangladesh |
+| `usd-to-egp` | USD → EGP | Egypt |
+| `usd-to-zar` | USD → ZAR | South Africa |
+
+Authoring of banks & statutory tiers (`data/regulatoryBanking.ts`): **PKR, INR,
+PHP are fully audited**; all other corridors run the global fallback engine
+(standard $15–$25 intermediary band + national clearing rail). Localized
+route pairs (`app/[lang]/calculator/[slug]/`): `ur→pkr`, `hi→inr`, `fil→php`,
+`pt→brl`, `es→eur` (built statically; all other pairs 404 via
+`dynamicParams = false`).
+
+### 2.2 Languages (7, `lib/i18n/dictionaries.ts`)
+
+`en`, `ur`, `hi`, `fil`, `es`, `pt`, `ar`. Right-to-left: `ur`, `ar`
+(Nastaliq-first font stack for Urdu). The TypeScript `UiKey` type is derived
+from `enStrings`; every catalog is a `Record<UiKey, string>`, so a missing
+translation is a **compile-time error**. Interpolation uses `{curly}` variables
+that every language must preserve verbatim.
+
+### 2.3 Payment platforms & channels (5 + 3)
+
+- Platforms (percentage take): `upwork` 10%, `fiverr` 20%, `direct` 0%.
+- Channels (`fixedFeeUSD` / `fxSpread`): `swift` 45 / 3.5%, `local-bank`
+  0.99 / 3.5%, `wise` 2.99 / 0.45%, `payoneer` 2 / 2%, `remitly` 1.99 / 1.2%.
+
+### 2.4 Interactive surfaces
+
+- **Calculator** (`components/Calculator.tsx`) — platform toggle + amount input,
+  live channel ranking (best verdict), sparkline, tax impact card, and the
+  Phase 8/9 **Transaction Costing Widget** mounted below the tax card on both
+  the standard and localized corridor pages.
+- **7-step liquid waterfall** (`components/TransactionCostingWidget.tsx`) —
+  bank selector, statutory tier selector (purpose code chips), SWIFT slider
+  ($0–$40), local clearing fee, custom surcharge/retainer slider (0–15%), and
+  the live waterfall rows: Gross → Platform → Intermediary → Net converted →
+  Landing fee → Withholding → **Real bank take-home**. "Sync to Invoice"
+  persists bank/purpose/tier to `localStorage`.
+- **Invoice Studio** (`components/invoice/InvoiceEditor.tsx` + `InvoicePreview`)
+  — A4 `aspect-[210/297]` doc, `@page { size: A4 portrait; margin: 0 }`,
+  print isolation (`no-print`, `#invoice-document`), logo upload via FileReader,
+  per-line GST %, bank-clearing section auto-filled from the widget sync,
+  statutory addendum, local persistence under `payoutdelta_draft_invoice`.
+
+### 2.5 Statutory & banking database (`data/regulatoryBanking.ts`)
+
+- PKR — SBP Foreign Exchange Manual Ch. 13 & ITO §154A; banks MZNBPKKA,
+  HABBPNKA, SCBLPKKA, ALFHPKKA; tiers PSEB 0.25% / Filer 1% / Non-Filer 2%
+  (Purpose Code 9111; PRA/SRB/KPRA exemption note).
+- INR — RBI AP (DIR Series) No. 46 & §194S; banks HDFCINBB, ICICINBB,
+  SBININBB; tiers GST LUT zero-rated (Rule 96A CGST), §44ADA presumptive,
+  1% u/s 194J/194C (Purpose Code P0802).
+- PHP — BSP Circular 980 & BIR 8% freelance gross tax; banks BNORPHMM,
+  BOFIPHMM, UBPHPHMM; tiers 8% flat / graduated + OSD.
+- Fallback engine — SEPA, BACS/FPS, PIX, NIBSS, BEFTN, InstaPay/ACH rails.
+
+### 2.6 Edge API & developer surface
+
+- `edge-api/` — Cloudflare Worker "rate router", **sliding-window rate
+  limiting** (60 req/min per `cf-connecting-ip`; in-memory bucket for the
+  free-tier singleton). Endpoints: `/`, `/health`, `/v1/dataset`,
+  `/v1/corridors`, `/v1/corridors/:slug`, `/v1/rates` (FIFO-style
+  `?corridor&gross&platform`). Quote math mirrors `utils/calculateRoute.ts`.
+- `app/api-access/` — developer playground page, live API explorer.
+
+---
+
+## 3. Architecture Matrix
+
+| Layer | Decision | Why |
+| --- | --- | --- |
+| Framework | Next.js 16.3.5, App Router, `output: "export"`, `trailingSlash: true`, `images: { unoptimized: true }` | Zero-cost static hosting on GitHub Pages |
+| Runtime | React 19 · TypeScript 5 (strict) · Tailwind v4 · Radix primitives | Type safety + native-feeling controls |
+| Subpath | `next.config.mjs`: `basePath`/`assetPrefix = "/payout-delta"` in production (`USE_CUSTOM_DOMAIN = false`) | Correct assets on `ahmadbilaldsa.github.io/payout-delta` |
+| Routes | `generateStaticParams` + `dynamicParams = false` | Exact pre-rendered HTML, no runtime negotiation |
+| Translation | Client-side `LanguageProvider`; SSR is always English (hydration-safe); stored/browser locale applied post-mount; flips `document.documentElement` `lang`/`dir` | Zero-latency switching, no network |
+| RTL | `[dir="rtl"]` Nastaliq-first stack + looser line-height; mono stays LTR for numerics | Urdu/Arabic legibility |
+| Finance | Pure math modules (`utils/calculateRoute.ts`, `lib/invoiceTypes.ts`) with finite guards + clamps | Deterministic, SSR-safe, no server needed |
+| Persistence | `localStorage` only (`payoutdelta_draft_invoice`, `payoutdelta_lang`, `payoutdelta_banksync`) | Zero-server promise |
+| CI/CD | GitHub Actions `.github/workflows/deploy.yml` on `main`; nightly rates sync (`workflow_run`) | Fully automated deploys |
+
+**Static-export hard rules:**
+
+1. No server runtime, no middleware, no DB — any CSR feature must be
+   delegation-safe (SSR English → client flip) and guard `window`.
+2. `next.config.mjs` keeps `USE_CUSTOM_DOMAIN = false`; prod basePath stays
+   `/payout-delta`.
+3. Print path leaves `@page { size: A4 portrait; margin: 0 }` untouched; the
+   invoice document owns its own padding; `.no-print` chrome is `display: none`.
+
+---
+
+## 4. Fee Calculus — the 7-step Waterfall Identity
+
+**Conceptual engine identity** (Phase 1 spec form):
+
+```
+Net = ((Gross − PlatformTakeRate − IntermediarySWIFT) · (1 − FXSpread) − LocalLandingFee) · (1 − WithholdingTax)
+```
+
+**Runtime decomposition** (as implemented in `TransactionCostingWidget`):
+
+```
+platformCutUSD  = platformFeeUSD + grossUSD · (surchargePct / 100)      // 0–15% retainer
+netAfterWireUSD = max(0, grossUSD − platformCutUSD − wireUSD)           // wire $0–$40
+convertedLocal  = netAfterWireUSD · effectiveRate                       // effectiveRate already nets channel FX spread off mid
+landedLocal     = max(0, convertedLocal − localLandingFee)              // local currency
+takeHomeLocal   = max(0, landedLocal · (1 − withholdingTax))            // statutory tier rate, clamped 0–15%
+```
+
+Ranking on the calculator uses the first two terms plus channel
+`fxSpread`; the widget layers the receiving side on top. Both stay in sync
+because they share the same dataset and quote math.
+
+---
+
+## 5. Seven-Phase Dominance Roadmap
+
+| # | Phase | Status |
+| --- | --- | --- |
+| 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Current** |
+| 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | Planned |
+| 3 | **Programmatic Long-Tail Corridor Engine** — Upwork/Fiverr/Deel pay-cycle corridors generated from `data/fees.json` | Planned |
+| 4 | **Financial JSON-LD Schema Dominance** — rich result takeover for fee/rate queries | Planned |
+| 5 | **GitHub Community Engine & Developer API Documentation** — onboarding, issues, full `edge-api` reference | Planned |
+| 6 | **Contextual Fintech Affiliate Routing & Monetization** — privacy-safe provider links | Planned |
+| 7 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
+
+---
+
+## 6. Verification Gates (run before every commit)
+
+```bash
+npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
+npm run build                 # all 29 static routes → ./out
+node scripts/test_corridors.mjs  # 0 broken links, valid JSON-LD, exit 0
+```
+
+Commit convention follows the project template
+`feat(scope): summary of what actually changed`. Subpath/static-export
+compatibility is a merge blocker.
+
+---
+
+## 7. Existing Commits That Anchor This Spec
+
+- `d74a248` — i18n: dictionary, auto-locale detection, trust badges, corridor selector.
+- `a66422c` — sitemap `/api-access/` entry.
+- `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.
+- `acf8c60` — statutory settlement engine, dynamic waterfall, invoice sync, UI stabilization.
