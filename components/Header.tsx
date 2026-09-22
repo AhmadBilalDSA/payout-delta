@@ -34,7 +34,7 @@ export default function Header() {
 
         <div className="flex items-center justify-end gap-4">
           <Link
-            href="/invoice"
+            href="/invoice/"
             className="text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900"
           >
             Invoice Studio
