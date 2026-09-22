@@ -5,6 +5,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  basePath: '/payout-delta',
+  assetPrefix: '/payout-delta',
 };
 
 export default nextConfig;
