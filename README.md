@@ -204,7 +204,7 @@ npm run lint      # ESLint
 | 5 | Financial JSON-LD schema dominance | Shipped |
 | 6 | GitHub community engine & developer API docs | Shipped |
 | 7 | UI anti-collapse grid overhaul, currency pair switcher & 5 high-volume corridors (VND / KES / IDR / COP / TRY) | Shipped |
-| 8 | 50-country expansion — Batch 1: 10 high-demand corridors across LatAm, Europe, MEA & APAC (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR) | Shipped |
+| 8 | 50-country expansion — Batch 1: 10 high-demand corridors across LatAm, Europe, MEA & APAC (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR) | Shipped (`38b4e97`) |
 | 9 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 
 ---
