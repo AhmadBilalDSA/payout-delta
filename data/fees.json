@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-23T04:20:00Z",
+  "updatedAt": "2026-09-23T12:30:00Z",
   "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per USD corridor.",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
@@ -210,6 +210,106 @@
       "countryCode": "TR",
       "currencyName": "Turkish Lira",
       "currencySymbol": "₺"
+    },
+    {
+      "slug": "usd-to-mxn",
+      "from": "USD",
+      "to": "MXN",
+      "rate": 19.8,
+      "country": "Mexico",
+      "countryCode": "MX",
+      "currencyName": "Mexican Peso",
+      "currencySymbol": "Mex$"
+    },
+    {
+      "slug": "usd-to-ars",
+      "from": "USD",
+      "to": "ARS",
+      "rate": 1020,
+      "country": "Argentina",
+      "countryCode": "AR",
+      "currencyName": "Argentine Peso",
+      "currencySymbol": "AR$"
+    },
+    {
+      "slug": "usd-to-pln",
+      "from": "USD",
+      "to": "PLN",
+      "rate": 3.95,
+      "country": "Poland",
+      "countryCode": "PL",
+      "currencyName": "Polish Złoty",
+      "currencySymbol": "zł"
+    },
+    {
+      "slug": "usd-to-ron",
+      "from": "USD",
+      "to": "RON",
+      "rate": 4.58,
+      "country": "Romania",
+      "countryCode": "RO",
+      "currencyName": "Romanian Leu",
+      "currencySymbol": "lei"
+    },
+    {
+      "slug": "usd-to-czk",
+      "from": "USD",
+      "to": "CZK",
+      "rate": 23.2,
+      "country": "Czechia",
+      "countryCode": "CZ",
+      "currencyName": "Czech Koruna",
+      "currencySymbol": "Kč"
+    },
+    {
+      "slug": "usd-to-thb",
+      "from": "USD",
+      "to": "THB",
+      "rate": 33.5,
+      "country": "Thailand",
+      "countryCode": "TH",
+      "currencyName": "Thai Baht",
+      "currencySymbol": "฿"
+    },
+    {
+      "slug": "usd-to-myr",
+      "from": "USD",
+      "to": "MYR",
+      "rate": 4.35,
+      "country": "Malaysia",
+      "countryCode": "MY",
+      "currencyName": "Malaysian Ringgit",
+      "currencySymbol": "RM"
+    },
+    {
+      "slug": "usd-to-ghs",
+      "from": "USD",
+      "to": "GHS",
+      "rate": 15.8,
+      "country": "Ghana",
+      "countryCode": "GH",
+      "currencyName": "Ghanaian Cedi",
+      "currencySymbol": "GH₵"
+    },
+    {
+      "slug": "usd-to-aed",
+      "from": "USD",
+      "to": "AED",
+      "rate": 3.6725,
+      "country": "UAE",
+      "countryCode": "AE",
+      "currencyName": "UAE Dirham",
+      "currencySymbol": "AED"
+    },
+    {
+      "slug": "usd-to-sar",
+      "from": "USD",
+      "to": "SAR",
+      "rate": 3.75,
+      "country": "Saudi Arabia",
+      "countryCode": "SA",
+      "currencyName": "Saudi Riyal",
+      "currencySymbol": "SAR"
     }
   ]
 }

@@ -7,11 +7,11 @@
  * intermediary cuts and local clearing rails), and the statutory withholding /
  * exemption tiers used to compute the "real bank take-home".
  *
- * The eight fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP, TRY)
- * reference the underlying legislation by section; every remaining corridor
- * falls back to accurate standard intermediary bands ($15–$25) plus its
- * national clearing network identifier so the engine never renders empty on
- * any audited route.
+ * The eighteen fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
+ * TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR) reference the
+ * underlying legislation by section; every remaining corridor falls back to
+ * accurate standard intermediary bands ($15–$25) plus its national clearing
+ * network identifier so the engine never renders empty on any audited route.
  *
  * All monetary figures are informational benchmarks — the actual deduction
  * lands on the bank's credit advice (CRF) and must be verified before
@@ -592,6 +592,540 @@ const tryBanks: RegulatoryBank[] = [
 ];
 
 /* ---------------------------------------------------------------------------
+ * Mexico — USD → MXN
+ * SAT Código Fiscal de la Federación Art. 29 & RESICO simplified regime (1.5%).
+ * ------------------------------------------------------------------------- */
+
+const mxnTiers: StatutoryTier[] = [
+  {
+    id: "mexico-resico",
+    name: "RESICO Simplified Taxpayer",
+    authority: "SAT CFF Art. 29 · RESICO",
+    rate: 0.015,
+    purposeCode: "ISR / IVA monthly",
+    note: "1.5% ISR advance under the Régimen Simplificado de Confianza on received digital-services income.",
+  },
+  {
+    id: "mexico-standard",
+    name: "Standard Business Regime",
+    authority: "LISR graduated rates",
+    rate: 0,
+    purposeCode: "Actividad Empresarial",
+    note: "Graduated individual rates on services income — confirm RFC / provisional ISR with your contador.",
+  },
+];
+
+const mxnBanks: RegulatoryBank[] = [
+  {
+    id: "bbva-mx",
+    name: "BBVA México",
+    displayName: "BBVA México (Mexico)",
+    swiftCode: "BCMRMXMM",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SPEI instant · DIA libra ACH 1 day",
+    localCurrency: "MXN",
+  },
+  {
+    id: "banorte",
+    name: "Banorte",
+    displayName: "Banorte (Mexico)",
+    swiftCode: "MENOMXMT",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SPEI instant · CODI instant (QR)",
+    localCurrency: "MXN",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Argentina — USD → ARS
+ * BCRA Comunicación A 7518 — freelancer export-earnings FX access exemption.
+ * ------------------------------------------------------------------------- */
+
+const arsTiers: StatutoryTier[] = [
+  {
+    id: "argentina-export",
+    name: "Freelance Export Earnings Access",
+    authority: "BCRA Comunicación A 7518",
+    rate: 0,
+    purposeCode: "Export earnings",
+    exemption: true,
+    note: "Export earnings over USD 7,561/yr may clear to local ARS at the official exchange without prior clearing obligation.",
+  },
+  {
+    id: "argentina-standard",
+    name: "Standard local income",
+    authority: "IG Ley 20.628",
+    rate: 0,
+    purposeCode: "Local services",
+    note: "Local ARS services income taxed under standard individual brackets.",
+  },
+];
+
+const arsBanks: RegulatoryBank[] = [
+  {
+    id: "galicia",
+    name: "Banco Galicia",
+    displayName: "Banco Galicia (Argentina)",
+    swiftCode: "GABAARBA",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "CBU transfer instant · COELSA clearing 1 day",
+    localCurrency: "ARS",
+  },
+  {
+    id: "santander-ar",
+    name: "Santander",
+    displayName: "Santander (Argentina)",
+    swiftCode: "BSARARBA",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "CBU transfer instant · alto riesgo FX advisory",
+    localCurrency: "ARS",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Poland — USD → PLN
+ * Ustawa o zryczałtowanym podatku — 8.5% flat IT-services rate.
+ * ------------------------------------------------------------------------- */
+
+const plnTiers: StatutoryTier[] = [
+  {
+    id: "poland-ryczalt",
+    name: "IT Services Ryczłt (8.5%)",
+    authority: "Ustawa o zryczałtowanym podatku",
+    rate: 0.085,
+    purposeCode: "PKWiU 62/63",
+    note: "8.5% flat registered-revenue tax on freelancing income under PKWiU section 62/63.",
+  },
+  {
+    id: "poland-standard",
+    name: "Standard PIT Scale",
+    authority: "Ustawa o PIT",
+    rate: 0,
+    purposeCode: "NIP taxpayer",
+    note: "Graduated PIT scale if the flat regime is not elected.",
+  },
+];
+
+const plnBanks: RegulatoryBank[] = [
+  {
+    id: "pkobp",
+    name: "PKO Bank Polski",
+    displayName: "PKO Bank Polski (Poland)",
+    swiftCode: "BPKOPLPW",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Elixir same-day · SORBNET2 large-value",
+    localCurrency: "PLN",
+  },
+  {
+    id: "mbank",
+    name: "mBank",
+    displayName: "mBank (Poland)",
+    swiftCode: "BREXPLPW",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Elixir same-day · FX margin transparent",
+    localCurrency: "PLN",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Romania — USD → RON
+ * Codul Fiscal Art. 69 — microenterprise export regime.
+ * ------------------------------------------------------------------------- */
+
+const ronTiers: StatutoryTier[] = [
+  {
+    id: "romania-micro",
+    name: "Microenterprise Export Regime",
+    authority: "Codul Fiscal Art. 69",
+    rate: 0.01,
+    purposeCode: "Export services",
+    note: "1% tax on turnover where the company is a microenterprise under the income-tax exclusion for export income.",
+  },
+  {
+    id: "romania-standard",
+    name: "Standard PIT / CASS",
+    authority: "Codul Fiscal Art. 68",
+    rate: 0,
+    purposeCode: "PFA freelancer",
+    note: "PFA freelancers pay income tax + CASS social contributions on the basis of the daň normă.",
+  },
+];
+
+const ronBanks: RegulatoryBank[] = [
+  {
+    id: "transilvania",
+    name: "Banca Transilvania",
+    displayName: "Banca Transilvania (Romania)",
+    swiftCode: "BTRLRO22",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "SENT 1 day · TransFond large-value",
+    localCurrency: "RON",
+  },
+  {
+    id: "bcr",
+    name: "BCR",
+    displayName: "BCR (Romania)",
+    swiftCode: "RNCBROBU",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "SENT 1 day · welcome-package FX margin",
+    localCurrency: "RON",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Czechia — USD → CZK
+ * Zákon o daních z příjmů — paušální daň (flat-rate tax on side income).
+ * ------------------------------------------------------------------------- */
+
+const czkTiers: StatutoryTier[] = [
+  {
+    id: "czechia-flat",
+    name: "Paušální daň (Flat-rate tax)",
+    authority: "Zákon o daních z příjmů",
+    rate: 0.15,
+    purposeCode: "Živnost 62",
+    note: "Provided the flat-rate advance (paušální režim) is elected; otherwise standard 15% base rate.",
+  },
+  {
+    id: "czechia-standard",
+    name: "Standard 15% Base Rate",
+    authority: "ZDP §16",
+    rate: 0,
+    purposeCode: "Živnost 62",
+    note: "15% base savings rate applies when no flat-rate advance is active.",
+  },
+];
+
+const czkBanks: RegulatoryBank[] = [
+  {
+    id: "csas",
+    name: "Česká spořitelna",
+    displayName: "Česká spořitelna (Czechia)",
+    swiftCode: "GIBACZPX",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "CZERTIS instant · CERTIS clearing 1 day",
+    localCurrency: "CZK",
+  },
+  {
+    id: "csob",
+    name: "ČSOB",
+    displayName: "ČSOB (Czechia)",
+    swiftCode: "CEKOCZPP",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "CZERTIS instant · immediate FX",
+    localCurrency: "CZK",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Thailand — USD → THB
+ * Revenue Code Section 40(2)/(8) relief for foreign-source professional income.
+ * ------------------------------------------------------------------------- */
+
+const thbTiers: StatutoryTier[] = [
+  {
+    id: "thailand-export",
+    name: "Foreign-Source Export Relief",
+    authority: "Revenue Code Sec. 40(8)",
+    rate: 0,
+    purposeCode: "40(8) freelance income",
+    exemption: true,
+    note: "Assessable income 40(8) from foreign clients — relief applies where the income is not remitted into Thailand in the same tax year.",
+  },
+  {
+    id: "thailand-standard",
+    name: "Standard PND 90 filing",
+    authority: "Revenue Code Sec. 40(2)",
+    rate: 0,
+    purposeCode: "40(2) professional fees",
+    note: "Graduated 0–35% personal rates apply on remitted assessable income.",
+  },
+];
+
+const thbBanks: RegulatoryBank[] = [
+  {
+    id: "bbl",
+    name: "Bangkok Bank",
+    displayName: "Bangkok Bank (Thailand)",
+    swiftCode: "BKKBSHTH",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "PromptPay instant · BAHTNET large-value",
+    localCurrency: "THB",
+  },
+  {
+    id: "kbank",
+    name: "Kasikornbank",
+    displayName: "Kasikornbank (Thailand)",
+    swiftCode: "KASITHBK",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "PromptPay instant · BAHTNET large-value",
+    localCurrency: "THB",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Malaysia — USD → MYR
+ * Income Tax Act 1967 Schedule 6 — foreign-source income exemption.
+ * ------------------------------------------------------------------------- */
+
+const myrTiers: StatutoryTier[] = [
+  {
+    id: "malaysia-schedule6",
+    name: "Foreign-Source Income Exemption",
+    authority: "ITA 1967 Schedule 6",
+    rate: 0,
+    purposeCode: "Foreign source",
+    exemption: true,
+    note: "Foreign-sourced income exemption para 28 Schedule 6 on remitted export income.",
+  },
+  {
+    id: "malaysia-standard",
+    name: "Standard Be-5 filing",
+    authority: "ITA 1967",
+    rate: 0,
+    purposeCode: "Resident individual",
+    note: "Graduated resident rates apply to non-exempt gross income.",
+  },
+];
+
+const myrBanks: RegulatoryBank[] = [
+  {
+    id: "maybank",
+    name: "Maybank",
+    displayName: "Maybank (Malaysia)",
+    swiftCode: "MBBEMYKL",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "DuitNow instant · MEPS 1 day",
+    localCurrency: "MYR",
+  },
+  {
+    id: "cimb",
+    name: "CIMB",
+    displayName: "CIMB (Malaysia)",
+    swiftCode: "CIBBMYKL",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "DuitNow instant · MEPS 1 day",
+    localCurrency: "MYR",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Ghana — USD → GHS
+ * Internal Revenue Act (Act 592) Section 114 — withholding on services.
+ * ------------------------------------------------------------------------- */
+
+const ghsTiers: StatutoryTier[] = [
+  {
+    id: "ghana-resident",
+    name: "Resident Service Withholding",
+    authority: "IRA (Act 592) Sec 114",
+    rate: 0.05,
+    purposeCode: "Service income",
+    note: "5% withholding on services for resident recipients holding a TIN.",
+  },
+  {
+    id: "ghana-nonresident",
+    name: "Non-Resident Service Withholding",
+    authority: "IRA (Act 592) Sec 114",
+    rate: 0.15,
+    purposeCode: "Non-resident service",
+    note: "15% final withholding on service payments to non-residents of Ghana.",
+  },
+];
+
+const ghsBanks: RegulatoryBank[] = [
+  {
+    id: "gcb",
+    name: "GCB Bank",
+    displayName: "GCB Bank (Ghana)",
+    swiftCode: "GHCBGACX",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "GhIPSS Instant Pay instant · ACH 1 day",
+    localCurrency: "GHS",
+  },
+  {
+    id: "ecobank",
+    name: "Ecobank",
+    displayName: "Ecobank (Ghana)",
+    swiftCode: "ECOCGHAC",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "GhIPSS Instant Pay instant · mobile money rails",
+    localCurrency: "GHS",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * UAE — USD → AED
+ * Federal Decree-Law No. 47 (Corporate Tax) — 0% individual income tax.
+ * ------------------------------------------------------------------------- */
+
+const aedTiers: StatutoryTier[] = [
+  {
+    id: "uae-individual",
+    name: "0% Personal Income Tax",
+    authority: "Federal Decree-Law No. 47",
+    rate: 0,
+    purposeCode: "Individual",
+    exemption: true,
+    note: "No tax on personal income; corporate tax 9% applies to corporate taxable income above AED 375,000.",
+  },
+  {
+    id: "uae-corporate",
+    name: "Corporate Tax 9% (if incorporated)",
+    authority: "Federal Decree-Law No. 47",
+    rate: 0.09,
+    purposeCode: "Taxable entity",
+    note: "9% federal CIT above the AED 375,000 threshold for incorporated structures.",
+  },
+];
+
+const aedBanks: RegulatoryBank[] = [
+  {
+    id: "emiratesnbd",
+    name: "Emirates NBD",
+    displayName: "Emirates NBD (UAE)",
+    swiftCode: "EBILAEAD",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "IPS instant · ACH 1 day",
+    localCurrency: "AED",
+  },
+  {
+    id: "fab",
+    name: "FAB",
+    displayName: "First Abu Dhabi Bank (UAE)",
+    swiftCode: "NBADAEAD",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "IPS instant · ACH 1 day",
+    localCurrency: "AED",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Saudi Arabia — USD → SAR
+ * ZATCA Withholding Tax Regulation Art. 68 — payments to non-residents.
+ * ------------------------------------------------------------------------- */
+
+const sarTiers: StatutoryTier[] = [
+  {
+    id: "saudi-nonresident",
+    name: "Non-Resident Service WHT",
+    authority: "ZATCA WHT Reg. Art. 68",
+    rate: 0.05,
+    purposeCode: "Non-resident services",
+    note: "5% withholding tax on service payments made to non-residents by Saudi payers.",
+  },
+  {
+    id: "saudi-resident",
+    name: "Resident / Tax Resident",
+    authority: "ZATCA normal regime",
+    rate: 0,
+    purposeCode: "Resident individual",
+    note: "No personal income tax for resident individuals on Saudi-source income.",
+  },
+];
+
+const sarBanks: RegulatoryBank[] = [
+  {
+    id: "alrajhi",
+    name: "Al Rajhi Bank",
+    displayName: "Al Rajhi Bank (Saudi Arabia)",
+    swiftCode: "RJHIBARI",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "mada instant · SARIE same-day",
+    localCurrency: "SAR",
+  },
+  {
+    id: "snb",
+    name: "SNB",
+    displayName: "Saudi National Bank (Saudi Arabia)",
+    swiftCode: "NCBKSARI",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "mada instant · SARIE same-day",
+    localCurrency: "SAR",
+  },
+];
+
+/* ---------------------------------------------------------------------------
  * Global fallback engine — EUR / GBP / BRL / NGN / BDT / EGP / ZAR.
  * Standard intermediary deduction $15–$25, national clearing network, and a
  * statutory export-tax compliance notice.
@@ -744,6 +1278,126 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     ],
     banks: tryBanks,
     tiers: tryTiers,
+    generic: false,
+  },
+  "usd-to-mxn": {
+    slug: "usd-to-mxn",
+    authority: "SAT Código Fiscal Art. 29 · RESICO 1.5%",
+    clearingNetwork: "SPEI",
+    citations: [
+      "SAT CFF Art. 29 · RESICO 1.5%",
+      "SPEI instant clearing · CODI QR",
+    ],
+    banks: mxnBanks,
+    tiers: mxnTiers,
+    generic: false,
+  },
+  "usd-to-ars": {
+    slug: "usd-to-ars",
+    authority: "BCRA Comunicación A 7518 freelance exemption",
+    clearingNetwork: "CBU / COELSA",
+    citations: [
+      "BCRA Comunicación A 7518 · export earnings FX access",
+      "Official-rate clearing · no prior liquidation obligation",
+    ],
+    banks: arsBanks,
+    tiers: arsTiers,
+    generic: false,
+  },
+  "usd-to-pln": {
+    slug: "usd-to-pln",
+    authority: "Ustawa o zryczałtowanym podatku (8.5% IT rate)",
+    clearingNetwork: "Elixir / SORBNET2",
+    citations: [
+      "Ustawa o zryczałtowanym podatku · 8.5% IT ryczałt",
+      "PKWiU 62/63 flat registered-revenue tax",
+    ],
+    banks: plnBanks,
+    tiers: plnTiers,
+    generic: false,
+  },
+  "usd-to-ron": {
+    slug: "usd-to-ron",
+    authority: "Codul Fiscal Art. 69 Microenterprise export",
+    clearingNetwork: "SENT / TransFond",
+    citations: [
+      "Codul Fiscal Art. 69 · microenterprise export",
+      "1% turnover tax · PFA normă alternative",
+    ],
+    banks: ronBanks,
+    tiers: ronTiers,
+    generic: false,
+  },
+  "usd-to-czk": {
+    slug: "usd-to-czk",
+    authority: "Zákon o daních z příjmů (Paušální daň)",
+    clearingNetwork: "CERTIS / CZERTIS",
+    citations: [
+      "ZDP · paušální daň flat-rate tax",
+      "15% base rate when flat-rate advance inactive",
+    ],
+    banks: czkBanks,
+    tiers: czkTiers,
+    generic: false,
+  },
+  "usd-to-thb": {
+    slug: "usd-to-thb",
+    authority: "Revenue Code Section 40(2)/(8) export relief",
+    clearingNetwork: "PromptPay / BAHTNET",
+    citations: [
+      "Revenue Code Sec. 40(8) · foreign-source relief",
+      "Sec. 40(2) professional fees on remittance",
+    ],
+    banks: thbBanks,
+    tiers: thbTiers,
+    generic: false,
+  },
+  "usd-to-myr": {
+    slug: "usd-to-myr",
+    authority: "Income Tax Act 1967 Schedule 6 exemption",
+    clearingNetwork: "DuitNow / MEPS",
+    citations: [
+      "ITA 1967 Schedule 6 · para 28 exemption",
+      "DuitNow instant · MEPS 1 day",
+    ],
+    banks: myrBanks,
+    tiers: myrTiers,
+    generic: false,
+  },
+  "usd-to-ghs": {
+    slug: "usd-to-ghs",
+    authority: "Internal Revenue Act Sec 114 withholding",
+    clearingNetwork: "GhIPSS / Instant Pay",
+    citations: [
+      "IRA (Act 592) Sec 114 · service WHT",
+      "5% resident / 15% non-resident",
+    ],
+    banks: ghsBanks,
+    tiers: ghsTiers,
+    generic: false,
+  },
+  "usd-to-aed": {
+    slug: "usd-to-aed",
+    authority: "Federal Decree-Law No. 47 on Corporate Tax / 0% Individual",
+    clearingNetwork: "IPS / ACH",
+    citations: [
+      "Federal Decree-Law No. 47 · 0% personal income tax",
+      "9% CIT above AED 375,000 for corporates",
+    ],
+    banks: aedBanks,
+    tiers: aedTiers,
+    generic: false,
+  },
+  "usd-to-sar": {
+    slug: "usd-to-sar",
+    authority: "ZATCA Withholding Tax Regulation Art. 68",
+    clearingNetwork: "mada / SARIE",
+    citations: [
+      "ZATCA WHT Reg. Art. 68 · 5% non-resident WHT",
+      "mada instant · SARIE same-day",
+    ],
+    banks: sarBanks,
+    tiers: sarTiers,
     generic: false,
   },
 };

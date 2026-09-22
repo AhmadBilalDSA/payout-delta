@@ -15,7 +15,7 @@ import type { Corridor } from "@/lib/types";
  * island).
  *
  * `[🌐 USD → PKR ▾][⇄]` capsule set in the header that jumps straight to any
- * of the 15 audited corridors' live calculation page. The dropdown groups the
+ * of the 25 audited corridors' live calculation page. The dropdown groups the
  * target currencies by receiving region (South Asia / Southeast Asia / East
  * Africa & EMEA / Latin America / Europe & UK) so high-volume markets are
  * reachable in one glance.
@@ -40,10 +40,10 @@ import type { Corridor } from "@/lib/types";
  */
 const REGIONS: { label: string; currencies: string[] }[] = [
   { label: "South Asia", currencies: ["PKR", "INR", "BDT"] },
-  { label: "Southeast Asia", currencies: ["PHP", "VND", "IDR"] },
-  { label: "East Africa & EMEA", currencies: ["KES", "NGN", "EGP", "ZAR", "TRY"] },
-  { label: "Latin America", currencies: ["BRL", "COP"] },
-  { label: "Europe & UK", currencies: ["EUR", "GBP"] },
+  { label: "Southeast Asia", currencies: ["PHP", "VND", "IDR", "THB", "MYR"] },
+  { label: "East Africa & EMEA", currencies: ["KES", "NGN", "EGP", "ZAR", "TRY", "GHS", "AED", "SAR"] },
+  { label: "Latin America", currencies: ["BRL", "COP", "MXN", "ARS"] },
+  { label: "Europe & UK", currencies: ["EUR", "GBP", "PLN", "RON", "CZK"] },
 ];
 
 const NEW_CORRIDOR_ISSUE_URL =

@@ -34,7 +34,7 @@ zero tracking, zero data retention, zero sign-up.
 
 ## 2. Codebase Audit — Permanent Inventory
 
-### 2.1 Corridors (15 standard, `data/fees.json`)
+### 2.1 Corridors (25 standard, `data/fees.json`)
 
 | Slug | From → To | Country / Currency |
 | --- | --- | --- |
@@ -53,11 +53,22 @@ zero tracking, zero data retention, zero sign-up.
 | `usd-to-idr` | USD → IDR | Indonesia |
 | `usd-to-cop` | USD → COP | Colombia |
 | `usd-to-try` | USD → TRY | Türkiye |
+| `usd-to-mxn` | USD → MXN | Mexico |
+| `usd-to-ars` | USD → ARS | Argentina |
+| `usd-to-pln` | USD → PLN | Poland |
+| `usd-to-ron` | USD → RON | Romania |
+| `usd-to-czk` | USD → CZK | Czechia |
+| `usd-to-thb` | USD → THB | Thailand |
+| `usd-to-myr` | USD → MYR | Malaysia |
+| `usd-to-ghs` | USD → GHS | Ghana |
+| `usd-to-aed` | USD → AED | UAE |
+| `usd-to-sar` | USD → SAR | Saudi Arabia |
 
 Authoring of banks & statutory tiers (`data/regulatoryBanking.ts`): **PKR, INR,
-PHP, VND, KES, IDR, COP, TRY are fully audited**; all other corridors run the
-global fallback engine (standard $15–$25 intermediary band + national clearing
-rail). Localized route pairs (`app/[lang]/calculator/[slug]/`): `ur→pkr`,
+PHP, VND, KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED,
+SAR are fully audited** (18); all other corridors run the global fallback
+engine (standard $15–$25 intermediary band + national clearing rail).
+Localized route pairs (`app/[lang]/calculator/[slug]/`): `ur→pkr`,
 `hi→inr`, `fil→php`, `pt→brl`, `es→eur` (built statically; all other pairs 404
 via `dynamicParams = false`).
 
@@ -119,6 +130,26 @@ that every language must preserve verbatim.
 - TRY — CBRT Circular on Invisible Transactions & Income Tax Law Art. 89/13
   (80% software earnings exemption); banks TGBATRIS (Garanti BBVA), ISBKTRIS
   (İşbank); tiers 0% software exemption / 15% indicative standard slab.
+- MXN — SAT CFF Art. 29 & RESICO 1.5%; banks BCMRMXMM (BBVA México),
+  MENOMXMT (Banorte); SPEI.
+- ARS — BCRA Comunicación A 7518 freelance export-earnings FX exemption; banks
+  GABAARBA (Banco Galicia), BSARARBA (Santander); CBU / COELSA.
+- PLN — Ustawa o zryczałtowanym podatku 8.5% IT rate; banks BPKOPLPW (PKO BP),
+  BREXPLPW (mBank); Elixir / SORBNET2.
+- RON — Codul Fiscal Art. 69 Microenterprise export; banks BTRLRO22 (Banca
+  Transilvania), RNCBROBU (BCR); SENT / TransFond.
+- CZK — Zákon o daních z příjmů Paušální daň; banks GIBACZPX (Česká
+  spořitelna), CEKOCZPP (ČSOB); CERTIS / CZERTIS.
+- THB — Revenue Code Sec. 40(2)/(8) export relief; banks BKKBSHTH (Bangkok
+  Bank), KASITHBK (Kasikornbank); PromptPay / BAHTNET.
+- MYR — ITA 1967 Schedule 6 foreign-source exemption; banks MBBEMYKL
+  (Maybank), CIBBMYKL (CIMB); DuitNow / MEPS.
+- GHS — Internal Revenue Act Sec 114 withholding; banks GHCBGACX (GCB Bank),
+  ECOCGHAC (Ecobank); GhIPSS / Instant Pay (5% resident / 15% non-resident).
+- AED — Federal Decree-Law No. 47 on Corporate Tax / 0% Individual; banks
+  EBILAEAD (Emirates NBD), NBADAEAD (FAB); IPS / ACH.
+- SAR — ZATCA WHT Reg. Art. 68; banks RJHIBARI (Al Rajhi), NCBKSARI (SNB);
+  mada / SARIE (5% non-resident WHT).
 - Fallback engine — SEPA, BACS/FPS, PIX, NIBSS, BEFTN, InstaPay/ACH,
   NAPAS/CVQ, PesaLink/EFT, BI-RTGS/BI-FAST, SEBRA/ACH, FAST/EFT rails.
 
@@ -182,18 +213,19 @@ because they share the same dataset and quote math.
 
 ---
 
-## 5. Seven-Phase Dominance Roadmap
+## 5. Nine-Phase Dominance Roadmap
 
 | # | Phase | Status |
 | --- | --- | --- |
 | 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Shipped** (`92f8f7f`) |
 | 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | **Shipped** (`c081371`) |
 | 3 | **High-Intent Affiliate Engine, Partner Referral Cards & Trust Micro-Badges** — privacy-safe provider routing, sponsored disclosure CTAs, wire-penalty callouts | **Shipped** (`d51faba`) |
-| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes (est. Phase 4; expanded to 32 in Phase 7) | **Shipped** (`6a71b4e`) |
+| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes (est. Phase 4; expanded to 32 in Phase 7, 62 in Phase 8) | **Shipped** (`6a71b4e`) |
 | 5 | **Financial JSON-LD Schema Dominance** — one top-level `@graph` per corridor route (`CurrencyConversionService` + live `ExchangeRateSpecification`, per-rail `FinancialProduct`, 7-layer `HowTo` waterfall, programmatic `FAQPage` mirroring AEO Q&As, `WebApplication`, `Service`, `BreadcrumbList`) via `lib/seoSchemas.ts` | **Shipped** (`5e68dc0`) |
 | 6 | **GitHub Community Engine & Developer API Documentation** — 1-click viral Reddit/X/LinkedIn audit export on the verdict card, full API reference (cURL / TypeScript / Python quick-start, response-schema & SLA panels, static feed + edge worker), structured `.github/ISSUE_TEMPLATE` forms, `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed | **Shipped** (`9ef48f6`) |
 | 7 | **UI Anti-Collapse Grid Overhaul, Currency Pair Switcher & 5 High-Volume Corridors (VND / KES / IDR / COP / TRY)** — two-rail anti-collapse corridor grid (interactive waterfall left, sticky AEO + verdict + FAQ right, `min-w-0` guards, enforced 1.8 RTL line-height), header currency capsule grouped by region + one-tap `⇄` invert with "not audited" status pill, five new fully-audited corridors with real banks/SWIFT/statutory tiers (15 base + 17 long-tail → 32 English corridor routes), corpus & long-tail audit expanded | **Shipped** (`8fc8730`) |
-| 8 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
+| 8 | **50-Country Expansion — Batch 1: 10 High-Demand International Corridors (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR)** — LatAm, Europe, MEA & APAC authored statutory/bank records (10 new base corridors + 20 long-tail → 25 base & 62 English corridor pages; regional currency capsule regrouped), corpus & long-tail audit extended | **Shipped** (`@@FEATURE_HASH@@`) |
+| 9 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 
 ---
 
@@ -201,7 +233,7 @@ because they share the same dataset and quote math.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # 51 static routes → ./out
+npm run build                 # 81 static routes → ./out
 node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, exit 0
 ```
 
@@ -220,6 +252,7 @@ compatibility is a merge blocker.
 - `5e68dc0` — Phase 5: financial JSON-LD schema dominance (`lib/seoSchemas.ts` builders + `lib/aeoFaqs.ts` shared generator → one top-level `@graph` on every corridor & localized route; audit requires the full entity set + single-graph consolidation).
 - `9ef48f6` — Phase 6: GitHub community engine & developer API docs (`AuditExportMenu` Reddit/X/LinkedIn exporters, expanded `/api-access` reference with cURL/TS/Python quick-start + SLA, `.github/ISSUE_TEMPLATE` forms + `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed via `prebuild`/`sync_api_feed.mjs`).
 - `8fc8730` — Phase 7: UI anti-collapse grid overhaul, currency pair switcher & 5 high-volume corridors (`Calculator.tsx` two-rail shell with `bluf`/`faq` slots, anti-collapse `min-w-0` guards across verdict/costing/BLUF/FAQ cards + 1.8 RTL line-height, `CorridorSwitcher` regional capsule + `⇄` invert + status pill, 5 fully-audited corridors in `fees.json` + `regulatoryBanking.ts` + 10 new long-tail routes in `corridors.ts`, corpus/long-tail audit extended).
+- `@@FEATURE_HASH@@` — Phase 8 (Batch 1 of 50): 10 high-demand corridors MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR (`data/fees.json` rates, authored statutory & bank records in `regulatoryBanking.ts`, 20 new long-tail slugs in `corridors.ts` → 25 base & 62 English corridor routes, regional `CorridorSwitcher` capsule regrouped, corpus/long-tail audit + docs totals updated).
 - `d74a248` — i18n: dictionary, auto-locale detection, trust badges, corridor selector.
 - `a66422c` — sitemap `/api-access/` entry.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.
