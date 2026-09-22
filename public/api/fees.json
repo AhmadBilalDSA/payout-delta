@@ -219,7 +219,12 @@
       "country": "Mexico",
       "countryCode": "MX",
       "currencyName": "Mexican Peso",
-      "currencySymbol": "Mex$"
+      "currencySymbol": "Mex$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.65, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.025 }
+      ]
     },
     {
       "slug": "usd-to-ars",
@@ -229,7 +234,12 @@
       "country": "Argentina",
       "countryCode": "AR",
       "currencyName": "Argentine Peso",
-      "currencySymbol": "AR$"
+      "currencySymbol": "AR$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.2, "fxSpread": 0.0085 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.022 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.035 }
+      ]
     },
     {
       "slug": "usd-to-pln",
@@ -239,7 +249,12 @@
       "country": "Poland",
       "countryCode": "PL",
       "currencyName": "Polish Złoty",
-      "currencySymbol": "zł"
+      "currencySymbol": "zł",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.5, "fxSpread": 0.0038 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.018 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.021 }
+      ]
     },
     {
       "slug": "usd-to-ron",
@@ -249,7 +264,12 @@
       "country": "Romania",
       "countryCode": "RO",
       "currencyName": "Romanian Leu",
-      "currencySymbol": "lei"
+      "currencySymbol": "lei",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0042 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 14, "fxSpread": 0.024 }
+      ]
     },
     {
       "slug": "usd-to-czk",
@@ -259,7 +279,12 @@
       "country": "Czechia",
       "countryCode": "CZ",
       "currencyName": "Czech Koruna",
-      "currencySymbol": "Kč"
+      "currencySymbol": "Kč",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.55, "fxSpread": 0.004 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.022 }
+      ]
     },
     {
       "slug": "usd-to-thb",
@@ -269,7 +294,12 @@
       "country": "Thailand",
       "countryCode": "TH",
       "currencyName": "Thai Baht",
-      "currencySymbol": "฿"
+      "currencySymbol": "฿",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.8, "fxSpread": 0.0055 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.028 }
+      ]
     },
     {
       "slug": "usd-to-myr",
@@ -279,7 +309,12 @@
       "country": "Malaysia",
       "countryCode": "MY",
       "currencyName": "Malaysian Ringgit",
-      "currencySymbol": "RM"
+      "currencySymbol": "RM",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.7, "fxSpread": 0.0048 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0195 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.025 }
+      ]
     },
     {
       "slug": "usd-to-ghs",
@@ -289,7 +324,12 @@
       "country": "Ghana",
       "countryCode": "GH",
       "currencyName": "Ghanaian Cedi",
-      "currencySymbol": "GH₵"
+      "currencySymbol": "GH₵",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.1, "fxSpread": 0.0095 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.025 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.032 }
+      ]
     },
     {
       "slug": "usd-to-aed",
@@ -299,7 +339,12 @@
       "country": "UAE",
       "countryCode": "AE",
       "currencyName": "UAE Dirham",
-      "currencySymbol": "AED"
+      "currencySymbol": "AED",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.65, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.018 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.02 }
+      ]
     },
     {
       "slug": "usd-to-sar",
@@ -309,7 +354,12 @@
       "country": "Saudi Arabia",
       "countryCode": "SA",
       "currencyName": "Saudi Riyal",
-      "currencySymbol": "SAR"
+      "currencySymbol": "SAR",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.7, "fxSpread": 0.0048 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0185 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.021 }
+      ]
     }
   ]
 }

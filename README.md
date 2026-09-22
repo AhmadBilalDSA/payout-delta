@@ -44,7 +44,9 @@ rails** — a best-verdict ranking of the **local currency you actually
 receive**, not the one quoted mid-market. Batch 1 of the 50-country expansion
 added ten high-demand jurisdictions across LatAm (Mexico, Argentina), Europe
 (Poland, Romania, Czechia), MEA (Ghana, UAE, Saudi Arabia) and APAC
-(Thailand, Malaysia) — each with authored statutory & bank records.
+(Thailand, Malaysia) — each with authored statutory & bank records and
+**per-corridor provider fee models** (Wise / Payoneer / Direct Wire fixed
+fees + FX spreads registered in `data/fees.json`).
 
 ### 🧭 Currency Pair Switcher & Anti-Collapse Grid
 The header carries a tactile `USD → PKR` capsule grouped by receiving region

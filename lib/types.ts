@@ -12,6 +12,13 @@ export interface WithdrawalChannel {
   fxSpread: number;
 }
 
+export interface ProviderFee {
+  id: string;
+  name: string;
+  fixedFeeUSD: number;
+  fxSpread: number;
+}
+
 export interface Corridor {
   slug: string;
   from: string;
@@ -21,6 +28,8 @@ export interface Corridor {
   countryCode: string;
   currencyName: string;
   currencySymbol: string;
+  /** Corridor-specific provider fee models (Wise / Payoneer / Direct Wire). */
+  providers?: ProviderFee[];
 }
 
 export interface FeesDataset {

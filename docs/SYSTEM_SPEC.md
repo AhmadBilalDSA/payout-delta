@@ -130,26 +130,38 @@ that every language must preserve verbatim.
 - TRY — CBRT Circular on Invisible Transactions & Income Tax Law Art. 89/13
   (80% software earnings exemption); banks TGBATRIS (Garanti BBVA), ISBKTRIS
   (İşbank); tiers 0% software exemption / 15% indicative standard slab.
-- MXN — SAT CFF Art. 29 & RESICO 1.5%; banks BCMRMXMM (BBVA México),
-  MENOMXMT (Banorte); SPEI.
-- ARS — BCRA Comunicación A 7518 freelance export-earnings FX exemption; banks
-  GABAARBA (Banco Galicia), BSARARBA (Santander); CBU / COELSA.
-- PLN — Ustawa o zryczałtowanym podatku 8.5% IT rate; banks BPKOPLPW (PKO BP),
-  BREXPLPW (mBank); Elixir / SORBNET2.
-- RON — Codul Fiscal Art. 69 Microenterprise export; banks BTRLRO22 (Banca
-  Transilvania), RNCBROBU (BCR); SENT / TransFond.
-- CZK — Zákon o daních z příjmů Paušální daň; banks GIBACZPX (Česká
-  spořitelna), CEKOCZPP (ČSOB); CERTIS / CZERTIS.
-- THB — Revenue Code Sec. 40(2)/(8) export relief; banks BKKBSHTH (Bangkok
-  Bank), KASITHBK (Kasikornbank); PromptPay / BAHTNET.
-- MYR — ITA 1967 Schedule 6 foreign-source exemption; banks MBBEMYKL
-  (Maybank), CIBBMYKL (CIMB); DuitNow / MEPS.
-- GHS — Internal Revenue Act Sec 114 withholding; banks GHCBGACX (GCB Bank),
-  ECOCGHAC (Ecobank); GhIPSS / Instant Pay (5% resident / 15% non-resident).
-- AED — Federal Decree-Law No. 47 on Corporate Tax / 0% Individual; banks
-  EBILAEAD (Emirates NBD), NBADAEAD (FAB); IPS / ACH.
-- SAR — ZATCA WHT Reg. Art. 68; banks RJHIBARI (Al Rajhi), NCBKSARI (SNB);
-  mada / SARIE (5% non-resident WHT).
+- MXN — SAT · Ley del IVA Art. 29-D & LISR Art. 113-E; banks BCMRMXMM (BBVA
+  México), MENOMXMT (Banorte), BSMXMXMM (Santander México); SPEI (RESICO 1.5% /
+  Actividad Empresarial 10% ISR, IVA 0% export).
+- ARS — BCRA Com. A 7518 & AFIP Resolución 1415; banks GABAARBA (Galicia),
+  BSARARBA (Santander Argentina), BBAAARBA (BBVA Argentina); MEP / Transferencias
+  3.0 / BCRA MULC (export regime 0% to $12k USD, Monotributo Factura E 0%).
+- PLN — Ministerstwo Finansów · Ustawa o zryczałtowanym podatku dochodowym &
+  Ustawa o VAT; banks BPKOPLPW (PKO BP), BREXPLPW (mBank), WBKAPLPW (Santander
+  Bank Polska); ELIXIR / Express ELIXIR / KIR (Ryczałt 8.5%, Podatek liniowy
+  19%, VAT 0% reverse charge).
+- RON — ANAF · Codul Fiscal Legea 227/2015 Art. 47 & Scutire Export Servicii;
+  banks BTRLRO22 (Banca Transilvania), RNCBROBU (BCR), RZBRROBU (Raiffeisen);
+  Transfond SENT / ReGIS (microenterprise IT 1% / 3%, PFA sistem real 10% +
+  CAS/CASS).
+- CZK — Finanční správa · Zákon č. 586/1992 Sb. § 7a; banks GIBACZPX (Česká
+  spořitelna), CEKOCZPP (ČSOB), KOBACZPP (Komerční banka); ČNB CERTIS (Paušální
+  daň Band 1, OSVČ 60% lump-sum base 15%).
+- THB — Revenue Code Sec. 40(2)/(8) & Departmental Order Paw. 161/2566; banks
+  BKKBSHTH (Bangkok Bank), KASITHBK (Kasikornbank), SICOTHBK (SCB); PromptPay /
+  BAHTNET (foreign freelance remittance exemption / 3% domestic freelance WHT).
+- MYR — LHDN ITA 1967 Schedule 6 & Public Ruling 5/2022; banks MBBEMYKL
+  (Maybank), CIBBMYKL (CIMB), PBBEMYKL (Public Bank); RENTAS / DuitNow (FSIE,
+  resident graduated Form B/BE).
+- GHS — GRA Act 896 § 114 & Bank of Ghana FX repatriation rules; banks GHCBGACX
+  (GCB), ECOCGHAC (Ecobank Ghana), SBICGHAC (Stanbic); GhIPSS / ACH (export
+  exemption, 5% resident rate).
+- AED — FTA Federal Decree-Law No. 47 of 2022; banks EBILAEAD (Emirates NBD),
+  NBADAEAD (FAB), ADCBAEAA (ADCB); UAEFTS / IPI (0% individual, AED 375k Small
+  Business Relief, QFZP 0%).
+- SAR — ZATCA VAT Implementing Regs Art. 33 & Income Tax Law Art. 68; banks
+  RJHIBARI (Al Rajhi), NCBKSARI (SNB), RIBLSARI (Riyad Bank); SARIE (Wathiqa
+  0% PIT, non-resident withholding relief).
 - Fallback engine — SEPA, BACS/FPS, PIX, NIBSS, BEFTN, InstaPay/ACH,
   NAPAS/CVQ, PesaLink/EFT, BI-RTGS/BI-FAST, SEBRA/ACH, FAST/EFT rails.
 
