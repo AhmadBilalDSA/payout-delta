@@ -1,69 +1,103 @@
-import Image from "next/image";
+import Link from "next/link";
+import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
+import CorridorCard from "@/components/CorridorCard";
 
 export default function Home() {
+  const corridors = getCorridors();
+  const platforms = getPlatforms();
+  const channels = getChannels();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      <section className="text-center">
+        <p className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+          Free · No signup · Static (nothing sent to a server)
+        </p>
+        <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+          See exactly what a freelance payout actually costs you
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
+          PayoutDelta decomposes every withdrawal into the three leaks that
+          eat your earnings — platform commission, channel fixed fees and FX
+          spread — across 10 currency corridors on Upwork, Fiverr and direct
+          invoices.
+        </p>
+        <a
+          href="#corridors"
+          className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+        >
+          Pick your corridor
+        </a>
+      </section>
+
+      <section
+        id="corridors"
+        aria-labelledby="corridor-heading"
+        className="mt-14 scroll-mt-20"
+      >
+        <h2
+          id="corridor-heading"
+          className="text-2xl font-bold text-slate-900"
+        >
+          Audited corridors
+        </h2>
+        <p className="mt-2 text-slate-600">
+          {corridors.length} corridors, {platforms.length} client platforms,{" "}
+          {channels.length} withdrawal channels — every combination priced in
+          the receiving currency.
+        </p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {corridors.map((corridor) => (
+            <CorridorCard key={corridor.slug} corridor={corridor} />
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      <section
+        aria-labelledby="how-it-works"
+        className="mt-14 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8"
+      >
+        <h2 id="how-it-works" className="text-2xl font-bold text-slate-900">
+          How the audit works
+        </h2>
+        <ol className="mt-4 grid gap-6 sm:grid-cols-3">
+          <li className="rounded-xl bg-white p-4 shadow-sm">
+            <p className="font-semibold text-slate-900">1. Pick the amount</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Slide $100 to $100,000. Fixed fees amortize while spreads scale —
+              the best channel flips as you grow.
+            </p>
+          </li>
+          <li className="rounded-xl bg-white p-4 shadow-sm">
+            <p className="font-semibold text-slate-900">2. Choose the client</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Upwork (10%), Fiverr (20%) or a direct invoice (0%) sets the
+              first deduction before any conversion.
+            </p>
+          </li>
+          <li className="rounded-xl bg-white p-4 shadow-sm">
+            <p className="font-semibold text-slate-900">3. Compare channels</p>
+            <p className="mt-1 text-sm text-slate-600">
+              SWIFT, local bank, Wise, Payoneer and Remitly are ranked by the
+              local currency you actually receive.
+            </p>
+          </li>
+        </ol>
+        <p className="mt-6 text-sm text-slate-500">
+          All fee tables ship in the open dataset{" "}
+          <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-xs">
+            data/fees.json
+          </code>{" "}
+          (revision 2026-09-22) and are auditable in the{" "}
+          <Link
+            href="/about"
+            className="underline underline-offset-2 hover:text-slate-700"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            about
+          </Link>{" "}
+          page.
+        </p>
+      </section>
     </div>
   );
 }
