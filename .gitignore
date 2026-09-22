@@ -33,6 +33,9 @@ yarn-error.log*
 # local dev server logs
 .dev-server.err
 .dev-server.log
+.dev-server.*
+*.log
+*.err
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -47,3 +50,9 @@ next-env.d.ts
 # python (scripts/playwright_scraper.py)
 __pycache__/
 *.py[cod]
+
+# build outputs
+dist/
+
+# phase 6 backup archives (kept local, ignored)
+backups/
