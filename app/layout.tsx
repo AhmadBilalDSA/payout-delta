@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdSlot from "@/components/AdSlot";
+import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -71,7 +72,7 @@ function ThemeBootstrap() {
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: `(()=>{try{var t=localStorage.getItem("payoutdelta-theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.setAttribute("data-theme","dark")}catch(e){}})();`,
+        __html: `(()=>{try{var t=localStorage.getItem("payoutdelta-theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.setAttribute("data-theme","dark")}catch(e){}try{var L=[["en","en-US"],["ur","ur-PK"],["hi","hi-IN"],["fil","fil-PH"],["es","es-ES"],["pt","pt-BR"],["ar","ar-SA"]],R=["ur","ar"],s="";try{s=(localStorage.getItem("payoutdelta_lang")||"").toLowerCase()}catch(e){}var f=null;for(var i=0;i<L.length;i++){if(L[i][0]===s){f=L[i];break}}if(!f){var b=(navigator.language||"en").toLowerCase().slice(0,2);for(var j=0;j<L.length;j++){if(L[j][0]===b){f=L[j];break}}}if(f){document.documentElement.lang=f[1];document.documentElement.dir=R.indexOf(f[0])>=0?"rtl":"ltr"}}catch(e){}})();`,
       }}
     />
   );
@@ -94,10 +95,12 @@ export default function RootLayout({
             __html: JSON.stringify(orgJsonLd).replace(/</g, "\\u003c"),
           }}
         />
-        <Header />
-        <AdSlot />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <LanguageProvider>
+          <Header />
+          <AdSlot />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

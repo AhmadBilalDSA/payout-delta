@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { ChannelQuote, Corridor } from "@/lib/types";
 import { formatLocal, formatUSD } from "@/utils/format";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
  * Ranked, expandable disclosure cards for the per-channel fee math. The
@@ -28,6 +29,7 @@ export default function FeeBreakdownList({
   corridor: Corridor;
   onExport: (quote: ChannelQuote) => void;
 }) {
+  const { t } = useLanguage();
   const [openChannelId, setOpenChannelId] = useState<string | null>(null);
 
   return (
@@ -68,7 +70,7 @@ export default function FeeBreakdownList({
                     <div className="flex items-center gap-2">
                       {index === 0 && (
                         <span className="shrink-0 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600 ring-1 ring-emerald-500/20">
-                          Best value
+                          {t("bestValue")}
                         </span>
                       )}
                       <p className="truncate font-semibold text-black dark:text-white">
@@ -77,7 +79,7 @@ export default function FeeBreakdownList({
                     </div>
                     <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
                       {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
-                      {spreadPercent.toFixed(2)}% spread
+                      {t("spreadLabel", { pct: spreadPercent.toFixed(2) })}
                     </p>
                   </div>
                 </div>
@@ -91,7 +93,7 @@ export default function FeeBreakdownList({
                       <span className={index === 0 ? "text-emerald-600" : ""}>
                         {quote.totalCostPercent.toFixed(1)}%
                       </span>{" "}
-                      all-in cost
+                      {t("allInCost")}
                     </p>
                   </div>
                   <svg
@@ -124,7 +126,7 @@ export default function FeeBreakdownList({
                 <dl className="divide-y divide-black/[0.06] border-t border-black/[0.06] bg-neutral-50/70 px-5 py-2 text-sm dark:divide-white/[0.08] dark:border-white/[0.08] dark:bg-white/[0.03]">
                   <div className="flex items-baseline justify-between gap-4 py-2.5">
                     <dt className="text-black/55 dark:text-white/55">
-                      1. Platform cut
+                      1. {t("platformCut")}
                     </dt>
                     <dd className="tabular-nums font-medium text-black dark:text-white">
                       − {formatUSD(quote.platformFeeUSD)}
@@ -132,7 +134,7 @@ export default function FeeBreakdownList({
                   </div>
                   <div className="flex items-baseline justify-between gap-4 py-2.5">
                     <dt className="text-black/55 dark:text-white/55">
-                      2. Fixed clearing / wire fee
+                      2. {t("fixedClearingFee")}
                     </dt>
                     <dd className="tabular-nums font-medium text-black dark:text-white">
                       − {formatUSD(quote.feeDeductedUSD)}
@@ -140,7 +142,7 @@ export default function FeeBreakdownList({
                   </div>
                   <div className="flex items-baseline justify-between gap-4 py-2.5">
                     <dt className="text-black/55 dark:text-white/55">
-                      3. Hidden FX spread markup
+                      3. {t("hiddenFxSpread")}
                     </dt>
                     <dd className="tabular-nums font-medium text-black dark:text-white">
                       {spreadPercent.toFixed(2)}% · −{" "}
@@ -152,7 +154,7 @@ export default function FeeBreakdownList({
                   </div>
                   <div className="flex items-baseline justify-between gap-4 py-2.5">
                     <dt className="font-semibold text-black/80 dark:text-white/80">
-                      4. Net received in domestic bank
+                      4. {t("netReceived")}
                     </dt>
                     <dd className="font-bold tabular-nums text-emerald-600">
                       + {formatLocal(quote.localAmount, corridor)}
@@ -165,7 +167,7 @@ export default function FeeBreakdownList({
                       onClick={() => onExport(quote)}
                       className="rounded-full bg-black px-4 py-1.5 text-xs font-semibold text-white transition-all duration-200 ease-out hover:bg-neutral-800 dark:bg-white dark:text-black"
                     >
-                      Export Invoice Justification PDF
+                      {t("exportInvoicePdf")}
                     </button>
                     <Link
                       href={`/invoice/?gross=${Math.round(
@@ -175,7 +177,7 @@ export default function FeeBreakdownList({
                       )}`}
                       className="rounded-full border border-black/[0.14] bg-white px-4 py-1.5 text-xs font-semibold text-black transition-all duration-200 ease-out hover:border-black/30 hover:bg-neutral-50 dark:border-white/20 dark:bg-transparent dark:text-white dark:hover:bg-white/10"
                     >
-                      Open in Invoice Studio
+                      {t("openInInvoice")}
                     </Link>
                     {/*
                       PHASE 2 — RATE-DROP ALERT (requires the managed backend

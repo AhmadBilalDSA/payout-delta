@@ -1,137 +1,25 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useDismissable } from "@/components/useDismissable";
-import { localizedCorridorHref } from "@/lib/localizedCorridors";
+import { LANG_META, SUPPORTED_LANGS } from "@/lib/i18n/dictionaries";
 
 /**
- * Phase 7 — persistent global language switcher (client island).
+ * Phase 7 refresh — persistent global language switcher (client island).
  *
- * Always visible in the header on every route — home, corridor pages,
- * localized sub-paths and the Invoice Studio. Unlike the phase-6 capsule it
- * does not rely on a corridor slug existing to render: on corridor routes it
- * translates the current corridor into each authored language (falling back
- * to the English page when the pair isn't authored), and on non-corridor
- * routes it routes each language to that language's authored anchor guide.
- *
- * `next/link` applies the `/payout-delta` production `basePath` to every href
- * automatically, and `usePathname()` returns the path without it, so the
- * switcher stays glued to the same corridor while hopping languages on GitHub
- * Pages without ever 404-ing.
+ * Always visible in the header on every route. Unlike the phase-6/7 capsule it
+ * no longer navigates: selecting a language swaps the provider dictionary and
+ * every wired component re-renders inline with the new catalog instantly, so
+ * switching can never 404 or leave the current corridor. Route-localized
+ * content (the five authored corridor articles) remains on its static sub-path
+ * and is reached through the corridor selector.
  */
 
-interface LanguageOption {
-  code: string;
-  englishName: string;
-  nativeName: string;
-  shortLabel: string;
-  /** Signed corridor shown for non-corridor routes (the language's guide). */
-  anchorSlug?: string;
-}
-
-const LANGUAGES: readonly LanguageOption[] = [
-  {
-    code: "en",
-    englishName: "English",
-    nativeName: "English",
-    shortLabel: "EN",
-  },
-  {
-    code: "ur",
-    englishName: "Urdu",
-    nativeName: "اردو",
-    shortLabel: "اردو",
-    anchorSlug: "usd-to-pkr",
-  },
-  {
-    code: "hi",
-    englishName: "Hindi",
-    nativeName: "हिन्दी",
-    shortLabel: "हिन्दी",
-    anchorSlug: "usd-to-inr",
-  },
-  {
-    code: "fil",
-    englishName: "Filipino",
-    nativeName: "Filipino",
-    shortLabel: "FIL",
-    anchorSlug: "usd-to-php",
-  },
-  {
-    code: "es",
-    englishName: "Spanish",
-    nativeName: "Español",
-    shortLabel: "ES",
-    anchorSlug: "usd-to-eur",
-  },
-  {
-    code: "pt",
-    englishName: "Portuguese",
-    nativeName: "Português",
-    shortLabel: "PT",
-    anchorSlug: "usd-to-brl",
-  },
-];
-
-interface ParsedRoute {
-  /** Corridor slug when the current route is a calculator page. */
-  slug?: string;
-  /** Language prefix of the current route (defaults to English). */
-  lang: string;
-}
-
-function parseRoute(pathname: string): ParsedRoute {
-  const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
-  if (segments[0] === "calculator" && segments[1]) {
-    return { slug: segments[1], lang: "en" };
-  }
-  if (segments[1] === "calculator" && segments[2]) {
-    return { slug: segments[2], lang: segments[0] };
-  }
-  return { lang: "en" };
-}
-
 export default function LanguageSwitcher() {
-  const pathname = usePathname();
+  const { lang, setLanguage } = useLanguage();
   const { open, setOpen, containerRef } = useDismissable();
 
-  // Close the panel whenever SPA navigation lands on a new route.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname, setOpen]);
-
-  if (pathname === null) {
-    return null;
-  }
-
-  const { slug, lang } = parseRoute(pathname);
-  const current = LANGUAGES.find((item) => item.code === lang) ?? LANGUAGES[0];
-
-  const options = LANGUAGES.map((language) => {
-    let href: string;
-    let fallback = false;
-    if (slug) {
-      // Corridor route → translate the same corridor, or fall back to the
-      // English page when that language pair isn't authored (never 404).
-      href = localizedCorridorHref(language.code, slug);
-      fallback = language.code !== "en" && href === `/calculator/${slug}/`;
-    } else {
-      // Home / invoice / static pages → route to the language's anchor guide.
-      href =
-        language.code === "en"
-          ? pathname
-          : `/${language.code}/calculator/${language.anchorSlug}/`;
-    }
-    return {
-      ...language,
-      href,
-      fallback,
-      active: language.code === current.code,
-    };
-  });
+  const current = LANG_META[lang];
 
   return (
     <div ref={containerRef} className="relative">
@@ -168,47 +56,53 @@ export default function LanguageSwitcher() {
           aria-label="Site language"
           className="absolute left-0 top-full z-50 mt-2 w-56 origin-top-left animate-[dropdown-in_130ms_ease-out] rounded-2xl bg-white/95 p-1.5 shadow-[var(--apple-glass-shadow)] ring-1 ring-black/[0.06] backdrop-blur-xl dark:bg-neutral-900/95 dark:ring-white/[0.1]"
         >
-          {options.map((option) => (
-            <Link
-              key={option.code}
-              href={option.href}
-              lang={option.code === "en" || option.fallback ? undefined : option.code}
-              role="menuitem"
-              aria-current={option.active ? "true" : undefined}
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-[13px] transition-colors duration-150 ease-out ${
-                option.active
-                  ? "bg-black/[0.05] dark:bg-white/[0.08]"
-                  : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/[0.05] text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-white/60"
+          {SUPPORTED_LANGS.map((code) => {
+            const meta = LANG_META[code];
+            const active = code === lang;
+            return (
+              <button
+                key={code}
+                type="button"
+                lang={code}
+                role="menuitemradio"
+                aria-checked={active}
+                onClick={() => {
+                  setLanguage(code);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-[13px] transition-colors duration-150 ease-out ${
+                  active
+                    ? "bg-black/[0.05] dark:bg-white/[0.08]"
+                    : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                }`}
               >
-                {option.code === "en"
-                  ? "EN"
-                  : option.code === "fil"
-                    ? "FIL"
-                    : option.code.toUpperCase()}
-              </span>
-              <span className="min-w-0 flex-1 leading-none">
-                <span className="block text-slate-800 dark:text-white/90">
-                  {option.nativeName}
-                </span>
-                <span className="mt-0.5 block text-[11px] text-slate-400 dark:text-white/40">
-                  {option.englishName}
-                  {option.fallback ? " · via English" : ""}
-                </span>
-              </span>
-              {option.active && (
                 <span
                   aria-hidden="true"
-                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
-                />
-              )}
-            </Link>
-          ))}
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/[0.05] text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-white/60"
+                >
+                  {code === "en"
+                    ? "EN"
+                    : code === "fil"
+                      ? "FIL"
+                      : code.toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1 leading-none">
+                  <span className="block text-slate-800 dark:text-white/90">
+                    {meta.nativeName}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-slate-400 dark:text-white/40">
+                    {meta.englishName}
+                  </span>
+                </span>
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

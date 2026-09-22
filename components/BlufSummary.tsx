@@ -1,20 +1,21 @@
+"use client";
+
 import type { Corridor, Platform, WithdrawalChannel } from "@/lib/types";
 import { getDataset } from "@/lib/db";
-import {
-  computeRoute,
-  DEFAULT_GROSS_USD,
-} from "@/utils/calculateRoute";
+import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
 import { formatLocal } from "@/utils/format";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
  * Phase 3 — Bottom Line Up Front (BLUF) answer card.
  *
  * Renders a dense, factual one-sentence answer below the corridor `<h1>` and
- * above the calculator. This is a SERVER component: at build time the static
- * export bakes the full sentence (bold entities, providers, amounts, rate and
- * as-of date) into the HTML, so AI answer engines that index raw markup —
- * Perplexity, ChatGPT, Claude, Google AI Overviews — can parse the takeaway
- * without executing a single byte of client JavaScript.
+ * above the calculator. The provider seeds English during prerender, so the
+ * static export still bakes the full sentence (bold entities, providers,
+ * amounts, rate and as-of date) into the HTML — AI answer engines that index
+ * raw markup (Perplexity, ChatGPT, Claude, Google AI Overviews) keep parsing
+ * the takeaway without executing JavaScript; the same card then re-renders in
+ * the visitor's language once the provider mounts.
  *
  * The math reuses the exact production pipeline (computeRoute at the default
  * $1,000 invoice on a 0% direct invoice) so the blurb always agrees with the
@@ -29,6 +30,7 @@ export default function BlufSummary({
   channels: WithdrawalChannel[];
   platforms: Platform[];
 }) {
+  const { t } = useLanguage();
   const platform = platforms.find((item) => item.id === "direct") ?? platforms[0];
   const route = computeRoute(DEFAULT_GROSS_USD, platform, corridor, channels);
   const best = route.verdict.best;
@@ -41,11 +43,9 @@ export default function BlufSummary({
   const rateLabel = corridor.rate.toLocaleString("en-US", {
     maximumFractionDigits: 4,
   });
-  const savingsLabel = formatLocal(
-    route.verdict.savingsLocal,
-    corridor
-  );
+  const savingsLabel = formatLocal(route.verdict.savingsLocal, corridor);
   const netLabel = formatLocal(best.localAmount, corridor);
+  const amountLabel = `$${DEFAULT_GROSS_USD.toLocaleString("en-US")}`;
 
   return (
     <section
@@ -57,41 +57,33 @@ export default function BlufSummary({
         data-bluf="key-takeaway"
       >
         <strong className="font-bold text-black dark:text-white">
-          Key Takeaway:
+          {t("keyTakeaway")}
         </strong>{" "}
-        To receive{" "}
+        {t("blufToReceive")}{" "}
         <strong className="font-semibold text-emerald-700 dark:text-emerald-400">
           {netLabel}
         </strong>{" "}
-        on a standard{" "}
-        <strong className="font-semibold text-black dark:text-white">
-          $1,000 USD
-        </strong>{" "}
-        freelance invoice,{" "}
+        {t("blufOnInvoice", { amount: amountLabel })}{" "}
         <strong className="font-semibold text-black dark:text-white">
           {best.channelName}
         </strong>{" "}
-        yields{" "}
+        {t("blufYields")}{" "}
         <strong className="font-semibold text-emerald-700 dark:text-emerald-400">
           {netLabel}
         </strong>{" "}
-        (effective fee{" "}
-        <strong className="font-semibold text-black dark:text-white">
-          {best.totalCostPercent.toFixed(2)}%
-        </strong>
-        ), saving{" "}
+        ({t("blufEffectiveFee", {
+          pct: best.totalCostPercent.toFixed(2),
+        })}
+        ), {t("blufSaving")}{" "}
         <strong className="font-semibold text-black dark:text-white">
           {savingsLabel}
         </strong>{" "}
-        compared to{" "}
+        {t("blufComparedTo")}{" "}
         <strong className="font-semibold text-black dark:text-white">
           {worst.channelName}
         </strong>
-        . Interbank rate benchmarked at{" "}
-        <strong className="font-semibold text-black dark:text-white">
-          {rateLabel}
-        </strong>{" "}
-        as of{" "}
+        . {t("referenceRate")} {t("blufBenchmarkedAt", { rate: rateLabel })}{" "}
+        {t("auditedAgainst")}{" "}
         <strong className="font-semibold text-black dark:text-white">
           {asOf}
         </strong>

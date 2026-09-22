@@ -1,19 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import CorridorSwitcher from "@/components/CorridorSwitcher";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
 /**
  * Frosted navigation header — Apple HIG. Sticky, backdrop-blurred, hairline-
- * bordered. The three global controls (persistent language switcher, currency
- * corridor selector, iOS theme toggle) are client islands; the rest stays
- * server-rendered so the static export keeps zero JS payload for nav links.
- * Every `next/link` href is server paths-based — basePath (`/payout-delta` in
- * production) is re-applied automatically on output and navigation.
+ * bordered. Ties the three global controls (language, corridor, theme) to the
+ * provider dictionary: copy re-renders instantly when the visitor switches
+ * language, no navigation. Every `next/link` href is server paths-based —
+ * `basePath` (`/payout-delta` in production) is re-applied automatically.
  */
 export default function Header() {
+  const { t } = useLanguage();
+
   return (
     <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl dark:border-white/[0.08] dark:bg-black/60">
       <nav
@@ -36,12 +40,28 @@ export default function Header() {
         </div>
 
         <div className="flex items-center justify-end gap-2 sm:gap-3">
+          <span
+            aria-hidden="true"
+            className="hidden items-center gap-1.5 lg:inline-flex"
+            title={t("clientSideBadge")}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span className="text-[10px] font-semibold text-slate-500 dark:text-white/50">
+              {t("clientSideBadge")}
+            </span>
+          </span>
           <ThemeToggle />
+          <Link
+            href="/"
+            className="hidden text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900 sm:inline dark:text-white/70 dark:hover:text-white"
+          >
+            {t("calculator")}
+          </Link>
           <Link
             href="/invoice/"
             className="hidden text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900 sm:inline dark:text-white/70 dark:hover:text-white"
           >
-            Invoice Studio
+            {t("invoiceStudio")}
           </Link>
           <Link
             href={GITHUB_URL}
@@ -49,16 +69,16 @@ export default function Header() {
             rel="noopener noreferrer"
             className="hidden text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900 lg:inline dark:text-white/70 dark:hover:text-white"
           >
-            Open dataset
+            {t("openDataset")}
             <span aria-hidden="true" className="ml-0.5 opacity-50">
               ↗
             </span>
           </Link>
           <Link
-            href="/contact"
+            href="/api-access/"
             className="hidden rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:bg-neutral-800 md:inline sm:px-4 dark:bg-white dark:text-black dark:hover:bg-white/90"
           >
-            API Access
+            {t("apiAccess")}
           </Link>
         </div>
       </nav>

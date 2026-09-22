@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import { useDismissable } from "@/components/useDismissable";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { localizedCorridorHref } from "@/lib/localizedCorridors";
 import rawFees from "@/data/fees.json";
 import type { Corridor } from "@/lib/types";
@@ -42,21 +43,22 @@ const corridorByOrder: Corridor[] = CORRIDOR_ORDER.map(
 /** Shown while not on a calculator page — the site's hero corridor. */
 const FALLBACK_SLUG = "usd-to-pkr";
 
-type Route = { lang: string; slug?: string };
+type Route = { slug?: string };
 
 function parseRoute(pathname: string): Route {
   const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
   if (segments[0] === "calculator" && segments[1]) {
-    return { lang: "en", slug: segments[1] };
+    return { slug: segments[1] };
   }
   if (segments[1] === "calculator" && segments[2]) {
-    return { lang: segments[0], slug: segments[2] };
+    return { slug: segments[2] };
   }
-  return { lang: "en" };
+  return {};
 }
 
 export default function CorridorSwitcher() {
   const pathname = usePathname();
+  const { lang } = useLanguage();
   const { open, setOpen, containerRef } = useDismissable();
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function CorridorSwitcher() {
     return null;
   }
 
-  const { lang, slug } = parseRoute(pathname);
+  const { slug } = parseRoute(pathname);
   const current =
     corridorByOrder.find((corridor) => corridor.slug === slug) ??
     corridorByOrder.find((corridor) => corridor.slug === FALLBACK_SLUG)!;

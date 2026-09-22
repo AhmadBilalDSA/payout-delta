@@ -101,6 +101,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Right-to-left locales (Urdu / Arabic) need the Nastaliq-capable typefaces
+   plus extra breathing room for the deeper glyph stack. Kept in one cascade
+   layer so SaaS tooling and dark-mode overrides still apply cleanly. */
+[dir="rtl"] {
+  font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq",
+    "Urdu Typesetting", var(--font-geist-sans), "Segoe UI", Tahoma, sans-serif;
+  line-height: 1.7;
+}
+
+[dir="rtl"] .tabular-nums,
+[dir="rtl"] input,
+[dir="rtl"] textarea {
+  font-family: var(--font-geist-mono), "Segoe UI", Tahoma, sans-serif;
+}
+
 /* Radix slider / toggle / accordion focus rings stay visible on a light page */
 :focus-visible {
   outline: 2px solid var(--accent, #10b981);

@@ -26,6 +26,7 @@ import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
 import TaxImpactCard from "@/components/TaxImpactCard";
 import AuditReceipt from "@/components/AuditReceipt";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
  * Interactive payout auditor (client island) — Apple-grade, iOS-feel.
@@ -62,6 +63,7 @@ export default function Calculator({
   history: HistoryPoint[];
   sparklineStats: SparklineStats;
 }) {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<CalcMode>("gross-to-net");
   const [amount, setAmount] = useState<number>(DEFAULT_GROSS_USD);
   const [targetNet, setTargetNet] = useState<number>(() =>
@@ -117,6 +119,36 @@ export default function Calculator({
 
   const targetBounds = useMemo(() => localSliderBounds(corridor), [corridor]);
 
+  // Phase 7 refresh — "Share calculation" deep-link hydration. When the page
+  // loads with `?mode=&platform=&gross=` / `?mode=&platform=&target=` query
+  // params (copied from the VerdictCard share button), restore that exact
+  // operating state once on mount.
+  useEffect(() => {
+    const hydrate = () => {
+      const params = new URLSearchParams(window.location.search);
+      const modeParam = params.get("mode");
+      if (modeParam === "quote") {
+        setMode("gross-to-net");
+      } else if (modeParam === "target") {
+        setMode("net-to-gross");
+      }
+      const platformParam = params.get("platform");
+      if (platformParam && platforms.some((item) => item.id === platformParam)) {
+        setPlatformId(platformParam);
+      }
+      const grossParam = Number(params.get("gross"));
+      if (Number.isFinite(grossParam) && grossParam > 0) {
+        setAmount(clampGrossUSD(grossParam));
+      }
+      const targetParam = Number(params.get("target"));
+      if (Number.isFinite(targetParam) && targetParam > 0) {
+        setTargetNet(clampLocalTarget(targetParam, localSliderBounds(corridor)));
+      }
+    };
+    const id = window.setTimeout(hydrate, 0);
+    return () => window.clearTimeout(id);
+  }, [corridor, platforms]);
+
   // When an export is requested, give the print-only receipt one frame to
   // mount, then open the native Save-as-PDF dialog. After the dialog closes,
   // tear the receipt back down so the screen DOM returns to normal.
@@ -167,7 +199,7 @@ export default function Calculator({
             id="required-invoice-breakdown"
             className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
           >
-            Required invoice by channel
+            {t("requiredInvoiceTitle")}
           </h2>
           <div className="mt-3 flex flex-col gap-3">
             {inverseRoute.quotes.map((quote, index) => (
@@ -188,12 +220,14 @@ export default function Calculator({
                     </p>
                     <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
                       {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
-                      {quote.totalCostPercent.toFixed(2)}% all-in cost
+                      {t("allInCostPercent", {
+                        pct: quote.totalCostPercent.toFixed(2),
+                      })}
                     </p>
                   </div>
                 </div>
                 <p className="shrink-0 text-sm font-bold tabular-nums text-black dark:text-white sm:text-right">
-                  Invoice {formatUSD(quote.grossRequired)}
+                  {t("invoiceRequired", { amount: formatUSD(quote.grossRequired) })}
                 </p>
               </div>
             ))}
@@ -205,7 +239,7 @@ export default function Calculator({
             id="fee-breakdown"
             className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
           >
-            Ranked fee breakdown
+            {t("feeBreakdownTitle")}
           </h2>
           <div className="mt-3">
             <FeeBreakdownList
@@ -242,10 +276,7 @@ export default function Calculator({
 
       {/* Nominative fair use — mandatory legal line. */}
       <p className="text-xs leading-relaxed text-black/[0.45] dark:text-white/[0.45]">
-        All brand names, trademarks, and registered trademarks are the property
-        of their respective owners. Used strictly for comparative cost
-        calculation purposes under Nominative Fair Use. PayoutDelta is an
-        independent auditing tool.
+        {t("legalLine")}
       </p>
 
       {/* Print-only audit receipt, mounted the instant an export is asked for

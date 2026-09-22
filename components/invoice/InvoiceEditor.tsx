@@ -22,6 +22,7 @@ import {
 } from "@/lib/invoiceTypes";
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
  * Freelance Invoice Studio — editor + persistence (client island).
@@ -39,6 +40,7 @@ export default function InvoiceEditor({
 }: {
   channels: WithdrawalChannel[];
 }) {
+  const { t } = useLanguage();
   const [draft, setDraft] = useState<InvoiceDraft>(() => loadInvoiceDraft());
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);
@@ -127,52 +129,52 @@ export default function InvoiceEditor({
           #invoice-editor-controls / .no-print print rules, so the form inputs
           allocate no page height in the Save-as-PDF dialog). */}
       <div id="invoice-editor-controls" className="no-print flex flex-col gap-5">
-        <Section title="Identity & client">
+        <Section title={t("identityClient")}>
           <div className="grid gap-3">
-            <FieldGroupTitle>Your details</FieldGroupTitle>
+            <FieldGroupTitle>{t("yourDetails")}</FieldGroupTitle>
             <Field
-              label="Freelancer name"
+              label={t("freelancerName")}
               value={draft.identity.freelancerName}
               onChange={(value) => patchIdentity({ freelancerName: value })}
               placeholder="Alex Rivera"
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <Field
-                label="Email"
+                label={t("email")}
                 type="email"
                 value={draft.identity.freelancerEmail}
                 onChange={(value) => patchIdentity({ freelancerEmail: value })}
                 placeholder="you@studio.com"
               />
               <Field
-                label="Tax ID"
+                label={t("taxId")}
                 value={draft.identity.freelancerTaxId}
                 onChange={(value) => patchIdentity({ freelancerTaxId: value })}
                 placeholder="VAT / EIN (optional)"
               />
             </div>
             <Field
-              label="Address"
+              label={t("address")}
               value={draft.identity.freelancerAddress}
               onChange={(value) => patchIdentity({ freelancerAddress: value })}
               placeholder="City, Country"
             />
-            <FieldGroupTitle>Client</FieldGroupTitle>
+            <FieldGroupTitle>{t("clientGroup")}</FieldGroupTitle>
             <Field
-              label="Client name"
+              label={t("clientName")}
               value={draft.identity.clientName}
               onChange={(value) => patchIdentity({ clientName: value })}
               placeholder="Jamie Chen"
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <Field
-                label="Client company"
+                label={t("clientCompanyLbl")}
                 value={draft.identity.clientCompany}
                 onChange={(value) => patchIdentity({ clientCompany: value })}
                 placeholder="Acme Inc."
               />
               <Field
-                label="Client email"
+                label={t("clientEmail")}
                 type="email"
                 value={draft.identity.clientEmail}
                 onChange={(value) => patchIdentity({ clientEmail: value })}
@@ -182,10 +184,10 @@ export default function InvoiceEditor({
           </div>
         </Section>
 
-        <Section title="Document metadata">
+        <Section title={t("docMeta")}>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field
-              label="Invoice number"
+              label={t("invoiceNumber")}
               value={draft.meta.number}
               onChange={(value) => patchMeta({ number: value })}
               placeholder="INV-2026-001"
@@ -196,13 +198,13 @@ export default function InvoiceEditor({
               onChange={(value) => patchMeta({ currency: value })}
             />
             <Field
-              label="Issue date"
+              label={t("issueDate")}
               type="date"
               value={draft.meta.issueDate}
               onChange={(value) => patchMeta({ issueDate: value })}
             />
             <Field
-              label="Due date"
+              label={t("dueDate")}
               type="date"
               value={draft.meta.dueDate}
               onChange={(value) => patchMeta({ dueDate: value })}
@@ -210,7 +212,7 @@ export default function InvoiceEditor({
           </div>
         </Section>
 
-        <Section title="Line items">
+        <Section title={t("lineItems")}>
           <div className="flex flex-col gap-3">
             {draft.lineItems.map((item, index) => (
               <div
@@ -219,7 +221,7 @@ export default function InvoiceEditor({
               >
                 <div className="grid gap-2 sm:grid-cols-[1fr_76px_96px]">
                   <Field
-                    label={`Item ${index + 1} description`}
+                    label={t("itemDesc", { n: String(index + 1) })}
                     value={item.description}
                     onChange={(value) =>
                       updateItem(item.id, { description: value })
@@ -228,7 +230,7 @@ export default function InvoiceEditor({
                     className="sm:col-span-full"
                   />
                   <Field
-                    label="Qty / Hrs"
+                    label={t("qtyHours")}
                     inputMode="decimal"
                     value={item.quantity}
                     onChange={(value) =>
@@ -237,7 +239,7 @@ export default function InvoiceEditor({
                     className="font-mono"
                   />
                   <Field
-                    label="Unit rate"
+                    label={t("unitRate")}
                     inputMode="decimal"
                     value={item.unitRate}
                     onChange={(value) =>
@@ -248,7 +250,7 @@ export default function InvoiceEditor({
                 </div>
                 <div className="mt-2 flex items-center justify-between border-t border-black/[0.06] pt-2">
                   <span className="text-xs tabular-nums text-slate-500">
-                    Line total{" "}
+                    {t("lineTotal")}{" "}
                     <span className="font-mono font-medium text-slate-900">
                       {formatCurrency(lineTotal(item), ccy)}
                     </span>
@@ -259,7 +261,7 @@ export default function InvoiceEditor({
                     disabled={draft.lineItems.length === 1}
                     className="rounded-full px-3 py-1 text-xs font-medium text-red-600 transition-colors duration-200 ease-out hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                   >
-                    Remove item
+                    {t("removeItem")}
                   </button>
                 </div>
               </div>
@@ -269,15 +271,15 @@ export default function InvoiceEditor({
               onClick={addItem}
               className="rounded-full border border-black/[0.12] bg-white px-4 py-2 text-xs font-semibold text-slate-900 transition-all duration-200 ease-out hover:border-black/25 hover:bg-neutral-50"
             >
-              + Add item
+              {t("addItem")}
             </button>
           </div>
         </Section>
 
-        <Section title="Summary & tax">
+        <Section title={t("summaryTax")}>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field
-              label="Tax / VAT %"
+              label={t("taxVat")}
               inputMode="decimal"
               value={draft.taxPercent}
               onChange={(value) =>
@@ -288,14 +290,14 @@ export default function InvoiceEditor({
             />
             <div className="rounded-xl bg-[#F5F5F7] p-3">
               <div className="flex items-baseline justify-between text-sm text-slate-500">
-                <span>Subtotal</span>
+                <span>{t("subtotal")}</span>
                 <span className="font-mono tabular-nums text-slate-900">
                   {formatCurrency(sub, ccy)}
                 </span>
               </div>
               {tax > 0 && (
                 <div className="flex items-baseline justify-between text-sm text-slate-500">
-                  <span>Tax</span>
+                  <span>{t("tax")}</span>
                   <span className="font-mono tabular-nums text-slate-900">
                     {formatCurrency(tax, ccy)}
                   </span>
@@ -303,7 +305,7 @@ export default function InvoiceEditor({
               )}
               <div className="mt-1 flex items-baseline justify-between border-t border-black/10 pt-1 text-sm">
                 <span className="font-semibold text-slate-900">
-                  Invoice total
+                  {t("invoiceTotal")}
                 </span>
                 <span
                   className="font-mono text-base font-bold tabular-nums"
@@ -320,7 +322,7 @@ export default function InvoiceEditor({
           </div>
           <div className="mt-3">
             <Field
-              label="Invoice note"
+              label={t("note")}
               value={draft.note}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, note: value }))
@@ -330,15 +332,15 @@ export default function InvoiceEditor({
           </div>
         </Section>
 
-        <Section title="Customizer">
+        <Section title={t("customizer")}>
           <div className="grid gap-3">
             <div>
               <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-400">
-                Accent palette
+                {t("accentPalette")}
               </p>
               <div
                 role="group"
-                aria-label="Accent color"
+                aria-label={t("accentPalette")}
                 className="grid grid-cols-4 gap-2"
               >
                 {ACCENT_PALETTES.map((palette) => {
@@ -378,7 +380,7 @@ export default function InvoiceEditor({
 
             <div>
               <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-400">
-                Logo
+                {t("logo")}
               </p>
               <div className="flex items-center gap-3">
                 {draft.logoDataUrl ? (
@@ -405,7 +407,7 @@ export default function InvoiceEditor({
                       void handleLogoFile(event.target.files?.[0])
                     }
                   />
-                  {draft.logoDataUrl ? "Replace logo" : "Upload logo"}
+                  {draft.logoDataUrl ? t("replaceLogo") : t("uploadLogo")}
                 </label>
                 {draft.logoDataUrl && (
                   <button
@@ -418,7 +420,7 @@ export default function InvoiceEditor({
                     }
                     className="rounded-full px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors duration-200 ease-out hover:text-red-600"
                   >
-                    Remove
+                    {t("removeLogo")}
                   </button>
                 )}
               </div>
@@ -428,8 +430,9 @@ export default function InvoiceEditor({
                 </p>
               )}
               <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
-                Max {Math.round(INVOICE_LOGO_LIMIT_BYTES / 1024)}KB · stays
-                locally in your draft, never uploaded.
+                {t("logoLimitNote", {
+                  kb: String(Math.round(INVOICE_LOGO_LIMIT_BYTES / 1024)),
+                })}
               </p>
             </div>
           </div>
@@ -456,14 +459,14 @@ export default function InvoiceEditor({
                 savedAt !== null ? "bg-emerald-500" : "bg-slate-300"
               }`}
             />
-            {savedAt !== null ? "Saved locally" : "Draft is ready to edit"}
+            {savedAt !== null ? t("savedLocally") : t("draftReady")}
           </span>
           <button
             type="button"
             onClick={resetForm}
             className="rounded-full border border-black/[0.12] bg-white px-4 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-200 ease-out hover:border-red-300 hover:text-red-600"
           >
-            Reset form
+            {t("resetForm")}
           </button>
         </div>
       </div>
@@ -473,10 +476,10 @@ export default function InvoiceEditor({
         <div className="no-print flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">
-              Live document preview
+              {t("livePreview")}
             </h2>
             <p className="text-xs text-slate-500">
-              1:1 A4 · print-safe · updates instantly
+              {t("livePreviewSub")}
             </p>
           </div>
           <button
@@ -498,7 +501,7 @@ export default function InvoiceEditor({
                 strokeLinejoin="round"
               />
             </svg>
-            Download PDF / Print Invoice
+            {t("downloadPdf")}
           </button>
         </div>
         <InvoicePreview draft={draft} channels={channels} />
@@ -593,10 +596,11 @@ function CurrencySelect({
   value: InvoiceDraft["meta"]["currency"];
   onChange: (value: InvoiceDraft["meta"]["currency"]) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <label className="block">
       <span className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-slate-400">
-        Currency
+        {t("currency")}
       </span>
       <select
         value={value}

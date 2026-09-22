@@ -13,19 +13,20 @@ import type {
 } from "@/lib/types";
 import { formatLocal, formatUSD } from "@/utils/format";
 import RateSparkline from "@/components/RateSparkline";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { platformUiKey } from "@/lib/i18n/helpers";
 
 /**
  * Obsidian hero verdict card — an Apple Wallet / dark macOS-widget look.
  *
  * Phase 3 adds the "Target Goal" (net → gross) operating mode on top of the
- * original quote-audit hero:
- *   - Quote Audit   — cheapest provider + net take-home from a USD invoice.
- *   - Target Goal   — the exact USD invoice required per platform/channel to
- *                     net a target local deposit, plus how much less you bill
- *                     than the worst channel.
- * A 14-day rate sparkline (pure inline SVG, zero chart deps) ships alongside
- * the alpha pill. Provider names appear strictly under nominative fair use for
- * factual cost comparison; no third-party logos.
+ * original quote-audit hero. Phase 7 refresh binds every string to the global
+ * dictionary and adds a "Share calculation" deep link that encodes the exact
+ * operating state (mode, platform, amount/target) so `Calculator` can hydrate
+ * from the URL query on arrival.
+ *
+ * Provider identities appear strictly under nominative fair use for factual
+ * cost comparison; no third-party logos.
  */
 export default function VerdictCard({
   verdict,
@@ -46,7 +47,9 @@ export default function VerdictCard({
   history: HistoryPoint[];
   sparklineStats: SparklineStats;
 }) {
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const [copiedShare, setCopiedShare] = useState(false);
 
   async function copyAudit(): Promise<void> {
     if (typeof navigator === "undefined" || !navigator.clipboard) {
@@ -65,6 +68,19 @@ export default function VerdictCard({
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+    }
+  }
+
+  async function copyShareLink(): Promise<void> {
+    if (typeof window === "undefined" || !navigator.clipboard) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(buildShareLink(mode, platform, verdict, inverseVerdict));
+      setCopiedShare(true);
+      window.setTimeout(() => setCopiedShare(false), 2000);
+    } catch {
+      setCopiedShare(false);
     }
   }
 
@@ -93,29 +109,27 @@ export default function VerdictCard({
               aria-hidden="true"
               className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse"
             />
-            Invoice requirement ·{" "}
+            {t("invoiceRequirement")}{" "}
             <span className="tabular-nums">
               {corridor.from} → {corridor.to}
             </span>
           </p>
 
           <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Quote{" "}
-            <span className="tabular-nums">
-              {formatUSD(best.grossRequired)}
-            </span>{" "}
-            on {platform.name}
+            {t("quoteRequired", {
+              invoice: formatUSD(best.grossRequired),
+              platform: t(platformUiKey(platform.id)),
+            })}
           </h2>
           <p className="mt-1 text-sm text-white/50">
-            to net exactly{" "}
-            <span className="tabular-nums">
-              {formatLocal(best.targetNetLocal, corridor)}
-            </span>{" "}
-            in your bank account · via {best.channelName}
+            {t("toNetExactly", {
+              amount: formatLocal(best.targetNetLocal, corridor),
+              channel: best.channelName,
+            })}
           </p>
 
           <p className="mt-5 text-xs font-medium uppercase tracking-widest text-white/40">
-            Target net deposit
+            {t("targetNetDeposit")}
           </p>
           <p className="mt-1 font-mono text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
             {formatLocal(best.targetNetLocal, corridor)}
@@ -124,12 +138,14 @@ export default function VerdictCard({
           <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full bg-violet-500/15 px-3 py-1 text-xs font-semibold tabular-nums text-violet-300 ring-1 ring-violet-400/20">
-                Requires {formatUSD(inverseVerdict.savingsUSD)} less than
-                billing via {worst.channelName}
+                {t("requiresLess", {
+                  savings: formatUSD(inverseVerdict.savingsUSD),
+                  channel: worst.channelName,
+                })}
               </span>
               {inverseVerdict.outOfBounds && (
                 <span className="inline-flex items-center rounded-full bg-amber-400/15 px-3 py-1 text-xs font-semibold tabular-nums text-amber-300 ring-1 ring-amber-400/20">
-                  Outside $100–$100,000 invoice range
+                  {t("outsideRange")}
                 </span>
               )}
             </div>
@@ -140,20 +156,40 @@ export default function VerdictCard({
               </div>
             )}
 
-            <button
-              type="button"
-              aria-live="polite"
-              onClick={() => {
-                void copyAudit();
-              }}
-              className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-                copied
-                  ? "border-violet-400/40 bg-violet-400/20 text-violet-300"
-                  : "bg-white/[0.08] hover:bg-white/[0.16]"
-              }`}
-            >
-              {copied ? "Copied!" : "Copy Audit"}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                aria-live="polite"
+                onClick={() => {
+                  void copyAudit();
+                }}
+                className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
+                  copied
+                    ? "border-violet-400/40 bg-violet-400/20 text-violet-300"
+                    : "bg-white/[0.08] hover:bg-white/[0.16]"
+                }`}
+              >
+                {copied ? t("copied") : t("copyAudit")}
+              </button>
+              <button
+                type="button"
+                aria-live="polite"
+                onClick={() => {
+                  void copyShareLink();
+                }}
+                title={t("shareLink")}
+                className={`inline-flex h-10 items-center rounded-full border border-white/[0.12] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out ${
+                  copiedShare
+                    ? "border-violet-400/40 bg-violet-400/20 text-violet-300"
+                    : "bg-white/[0.08] hover:bg-white/[0.16]"
+                }`}
+              >
+                <span aria-hidden="true" className="mr-1.5 text-base leading-none">
+                  {copiedShare ? "✓" : "⧉"}
+                </span>
+                {copiedShare ? t("copied") : t("shareLink")}
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -183,7 +219,7 @@ export default function VerdictCard({
             aria-hidden="true"
             className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"
           />
-          Recommended route ·{" "}
+          {t("recommendedRoute")}{" "}
           <span className="tabular-nums">
             {corridor.from} → {corridor.to}
           </span>
@@ -193,15 +229,14 @@ export default function VerdictCard({
           {best.channelName}
         </h2>
         <p className="mt-1 text-sm text-white/50">
-          nets you the most for a {formatUSD(best.grossUSD)} payout ·{" "}
-          <span className="tabular-nums">
-            {best.totalCostPercent.toFixed(1)}%
-          </span>{" "}
-          all-in cost
+          {t("netsYouTheMost", {
+            amount: formatUSD(best.grossUSD),
+            pct: best.totalCostPercent.toFixed(1),
+          })}
         </p>
 
         <p className="mt-5 text-xs font-medium uppercase tracking-widest text-white/40">
-          Net take-home
+          {t("netTakeHome")}
         </p>
         <p className="mt-1 font-mono text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
           {formatLocal(best.localAmount, corridor)}
@@ -210,10 +245,10 @@ export default function VerdictCard({
         <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold tabular-nums text-emerald-400 ring-1 ring-emerald-400/20">
-              +{formatUSD(verdict.savingsUSD)} saved
+              {t("savedAmount", { savings: formatUSD(verdict.savingsUSD) })}
             </span>
             <span className="text-xs text-white/40">
-              vs {worst.channelName}
+              {t("vsChannel", { channel: worst.channelName })}
             </span>
           </div>
 
@@ -223,24 +258,74 @@ export default function VerdictCard({
             </div>
           )}
 
-          <button
-            type="button"
-            aria-live="polite"
-            onClick={() => {
-              void copyAudit();
-            }}
-            className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-              copied
-                ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
-                : "bg-white/[0.08] hover:bg-white/[0.16]"
-            }`}
-          >
-            {copied ? "Copied!" : "Copy Audit"}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              aria-live="polite"
+              onClick={() => {
+                void copyAudit();
+              }}
+              className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
+                copied
+                  ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
+                  : "bg-white/[0.08] hover:bg-white/[0.16]"
+              }`}
+            >
+              {copied ? t("copied") : t("copyAudit")}
+            </button>
+            <button
+              type="button"
+              aria-live="polite"
+              onClick={() => {
+                void copyShareLink();
+              }}
+              title={t("shareLink")}
+              className={`inline-flex h-10 items-center rounded-full border border-white/[0.12] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out ${
+                copiedShare
+                  ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
+                  : "bg-white/[0.08] hover:bg-white/[0.16]"
+              }`}
+            >
+              <span aria-hidden="true" className="mr-1.5 text-base leading-none">
+                {copiedShare ? "✓" : "⧉"}
+              </span>
+              {copiedShare ? t("copied") : t("shareLink")}
+            </button>
+          </div>
         </div>
       </div>
     </section>
   );
+}
+
+function buildShareLink(
+  mode: CalcMode,
+  platform: Platform,
+  verdict: Verdict,
+  inverseVerdict: InverseVerdict
+): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  const params = new URLSearchParams();
+  if (mode === "net-to-gross") {
+    const best = inverseVerdict.best;
+    if (!best) {
+      return "";
+    }
+    params.set("mode", "target");
+    params.set("platform", platform.id);
+    params.set("target", String(Math.round(best.targetNetLocal)));
+  } else {
+    const best = verdict.best;
+    if (!best) {
+      return "";
+    }
+    params.set("mode", "quote");
+    params.set("platform", platform.id);
+    params.set("gross", String(Math.round(best.grossUSD)));
+  }
+  return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
 }
 
 function buildQuoteAudit(

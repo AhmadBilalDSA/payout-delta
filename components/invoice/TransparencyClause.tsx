@@ -2,6 +2,7 @@
 
 import type { WithdrawalChannel } from "@/lib/types";
 import { formatUSD } from "@/utils/format";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
  * Phase 4 — Payout Transparency & Gross-Up Clause addendum.
@@ -36,6 +37,7 @@ export default function TransparencyClause({
   enabled: boolean;
   onToggle: (next: boolean) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/[0.06] bg-white p-4 transition-colors duration-200 ease-out hover:border-black/[0.15]">
       <input
@@ -68,11 +70,10 @@ export default function TransparencyClause({
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-semibold text-slate-900">
-          Attach Remittance Transparency Addendum
+          {t("addendumToggle")}
         </span>
         <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">
-          Appends a net-deliverables remittance clause and PayoutDelta fee
-          benchmark to the printed invoice.
+          {t("addendumHint")}
         </span>
       </span>
     </label>

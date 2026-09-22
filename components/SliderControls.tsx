@@ -10,6 +10,8 @@ import {
   SLIDER_STEP_USD,
 } from "@/utils/calculateRoute";
 import { localSliderBounds } from "@/utils/inverseMath";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { platformUiKey } from "@/lib/i18n/helpers";
 
 const PRESET_AMOUNTS: readonly number[] = [500, 1000, 2500, 5000, 10000];
 const HIGH_PRESETS: readonly number[] = [50000, 150000, 300000, 500000];
@@ -50,6 +52,7 @@ export default function SliderControls({
   platforms: Platform[];
   corridor: Corridor;
 }) {
+  const { t } = useLanguage();
   const isTargetGoal = mode === "net-to-gross";
   const bounds = localSliderBounds(corridor);
 
@@ -105,21 +108,21 @@ export default function SliderControls({
           id="audit-inputs"
           className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
         >
-          Audit inputs
+          {t("auditInputs")}
         </h2>
 
         {/* iOS-style operating-mode capsule */}
         <div
           role="group"
-          aria-label="Calculator mode"
+          aria-label={t("calculatorMode")}
           className="inline-flex gap-1 rounded-full bg-[#F2F2F7] p-1 dark:bg-neutral-900"
         >
           {(
             [
-              ["gross-to-net", "Gross → Net (Quote Audit)"],
-              ["net-to-gross", "Net → Gross (Target Goal)"],
+              ["gross-to-net", "modeQuoteAudit"],
+              ["net-to-gross", "modeTargetGoal"],
             ] as const
-          ).map(([value, label]) => {
+          ).map(([value, key]) => {
             const isActive = mode === value;
             return (
               <button
@@ -133,7 +136,7 @@ export default function SliderControls({
                     : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
                 }`}
               >
-                {label}
+                {t(key)}
               </button>
             );
           })}
@@ -144,7 +147,7 @@ export default function SliderControls({
         <fieldset>
           <legend className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-black/70 dark:text-white/70">
             <span>
-              {isTargetGoal ? "Target local payout" : "Gross client payment"}
+              {isTargetGoal ? t("targetLocalPayout") : t("grossClientPayment")}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-xl border border-black/10 bg-black/[0.04] px-3 py-1.5 transition focus-within:ring-2 focus-within:ring-emerald-500/50 dark:border-white/10 dark:bg-white/[0.06]">
               <span
@@ -159,8 +162,8 @@ export default function SliderControls({
                 enterKeyHint="done"
                 aria-label={
                   isTargetGoal
-                    ? `Target payout in ${corridor.to}`
-                    : "Gross client payment in USD"
+                    ? t("payoutInCurrency", { currency: corridor.to })
+                    : t("payoutInUsd")
                 }
                 onFocus={startEditing}
                 onBlur={stopEditing}
@@ -205,8 +208,8 @@ export default function SliderControls({
             type="range"
             aria-label={
               isTargetGoal
-                ? `Target payout in ${corridor.to}`
-                : "Gross client payment in USD"
+                ? t("payoutInCurrency", { currency: corridor.to })
+                : t("payoutInUsd")
             }
             min={isTargetGoal ? bounds.min : MIN_GROSS_USD}
             max={isTargetGoal ? bounds.max : MAX_GROSS_USD}
@@ -238,11 +241,11 @@ export default function SliderControls({
 
         <fieldset className="mt-8 lg:mt-0">
           <legend className="text-sm font-medium text-black/70 dark:text-white/70">
-            Client platform
+            {t("clientPlatform")}
           </legend>
           <div
             role="group"
-            aria-label="Client platform"
+            aria-label={t("clientPlatform")}
             className="mt-4 flex gap-1 rounded-2xl bg-[#F2F2F7] p-1.5 dark:bg-neutral-900"
           >
             {platforms.map((item) => {
@@ -259,7 +262,7 @@ export default function SliderControls({
                       : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
                   }`}
                 >
-                  {item.name}
+                  {t(platformUiKey(item.id))}
                   <span className="ml-1.5 text-xs opacity-60">
                     {item.feePercent}%
                   </span>
@@ -270,9 +273,7 @@ export default function SliderControls({
 
           {isTargetGoal && (
             <p className="mt-3 text-xs leading-relaxed text-black/[0.45] dark:text-white/[0.45]">
-              The inverse solver shows the exact USD invoice required to net{" "}
-              <span className="tabular-nums font-medium">{formatLocal(targetNet)}</span>{" "}
-              after the platform cut, fixed clearing fee and FX spread.
+              {t("inverseSolverNote", { amount: formatLocal(targetNet) })}
             </p>
           )}
         </fieldset>
