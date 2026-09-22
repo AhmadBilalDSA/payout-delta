@@ -1,71 +1,144 @@
 "use client";
 
-import type { Platform } from "@/lib/types";
+import type { CalcMode, Corridor, Platform } from "@/lib/types";
 import {
   clampGrossUSD,
   MAX_GROSS_USD,
   MIN_GROSS_USD,
   SLIDER_STEP_USD,
 } from "@/utils/calculateRoute";
+import { localSliderBounds } from "@/utils/inverseMath";
 
 const PRESET_AMOUNTS: readonly number[] = [500, 1000, 2500, 5000, 10000];
+const HIGH_PRESETS: readonly number[] = [50000, 150000, 300000, 500000];
+const LOW_PRESETS: readonly number[] = [500, 1000, 2500, 5000];
 
 /**
- * iOS-style audit inputs: quick-select amount pills, a native-feel slider,
- * and a segmented platform switcher. Pure presentational client island — all
- * state lives in the parent `Calculator`, so this component re-renders in
- * O(1) against memoized math and never pulls in network or animation deps.
+ * iOS-style audit inputs — Phase 3 adds the operating-mode capsule:
+ *
+ *   [ Gross → Net (Quote Audit) ]   computes net local from a USD invoice
+ *   [ Net → Gross (Target Goal) ]   computes the exact USD invoice to net a
+ *                                   target local payout (inverse solver)
+ *
+ * In "Target Goal" mode the amount control swaps to the corridor's destination
+ * currency symbol and corridor-appropriate preset pills; the slider then drives
+ * the target local payout and the parent recalculates in O(1) via `useMemo`.
+ * Pure presentational client island — all state lives in the parent Calculator.
  */
 export default function SliderControls({
+  mode,
+  onModeChange,
   amount,
   onAmountChange,
+  targetNet,
+  onTargetNetChange,
   platformId,
   onPlatformChange,
   platforms,
+  corridor,
 }: {
+  mode: CalcMode;
+  onModeChange: (mode: CalcMode) => void;
   amount: number;
   onAmountChange: (value: number) => void;
+  targetNet: number;
+  onTargetNetChange: (value: number) => void;
   platformId: string;
   onPlatformChange: (id: string) => void;
   platforms: Platform[];
+  corridor: Corridor;
 }) {
+  const isTargetGoal = mode === "net-to-gross";
+  const bounds = localSliderBounds(corridor);
+
+  const formatLocal = (value: number) =>
+    `${corridor.currencySymbol} ${Math.round(value).toLocaleString("en-US")}`;
+
+  const localPresets =
+    corridor.rate >= 10 ? HIGH_PRESETS : LOW_PRESETS;
+
   return (
     <section
       aria-labelledby="audit-inputs"
       className="rounded-3xl border border-black/[0.06] bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#121216] sm:p-8"
     >
-      <h2
-        id="audit-inputs"
-        className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
-      >
-        Audit inputs
-      </h2>
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <h2
+          id="audit-inputs"
+          className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
+        >
+          Audit inputs
+        </h2>
+
+        {/* iOS-style operating-mode capsule */}
+        <div
+          role="group"
+          aria-label="Calculator mode"
+          className="inline-flex gap-1 rounded-full bg-[#F2F2F7] p-1 dark:bg-neutral-900"
+        >
+          {(
+            [
+              ["gross-to-net", "Gross → Net (Quote Audit)"],
+              ["net-to-gross", "Net → Gross (Target Goal)"],
+            ] as const
+          ).map(([value, label]) => {
+            const isActive = mode === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => onModeChange(value)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ease-out ${
+                  isActive
+                    ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                    : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="mt-5 gap-8 lg:grid lg:grid-cols-2">
         <fieldset>
           <legend className="flex items-baseline justify-between gap-2 text-sm font-medium text-black/70 dark:text-white/70">
-            <span>Gross client payment</span>
+            <span>{isTargetGoal ? "Target local payout" : "Gross client payment"}</span>
             <span className="font-bold tabular-nums text-black dark:text-white">
-              ${amount.toLocaleString("en-US")}
+              {isTargetGoal
+                ? formatLocal(targetNet)
+                : `$${amount.toLocaleString("en-US")}`}
             </span>
           </legend>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {PRESET_AMOUNTS.map((preset) => {
-              const isActive = amount === preset;
+            {(isTargetGoal ? localPresets : PRESET_AMOUNTS).map((preset) => {
+              const active = isTargetGoal
+                ? Math.round(targetNet) === preset
+                : amount === preset;
               return (
                 <button
                   key={preset}
                   type="button"
-                  aria-pressed={isActive}
-                  onClick={() => onAmountChange(clampGrossUSD(preset))}
+                  aria-pressed={active}
+                  onClick={() => {
+                    if (isTargetGoal) {
+                      onTargetNetChange(clampLocalTarget(preset, bounds));
+                    } else {
+                      onAmountChange(clampGrossUSD(preset));
+                    }
+                  }}
                   className={`rounded-full px-3.5 py-1.5 text-sm font-medium tabular-nums transition-all duration-200 ease-out ${
-                    isActive
+                    active
                       ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
                       : "bg-[#F2F2F7] text-black/60 hover:text-black dark:bg-neutral-800 dark:text-white/60 dark:hover:text-white"
                   }`}
                 >
-                  ${preset.toLocaleString("en-US")}
+                  {isTargetGoal
+                    ? formatLocal(preset).replace(/\s/g, " ")
+                    : `$${preset.toLocaleString("en-US")}`}
                 </button>
               );
             })}
@@ -73,19 +146,36 @@ export default function SliderControls({
 
           <input
             type="range"
-            min={MIN_GROSS_USD}
-            max={MAX_GROSS_USD}
-            step={SLIDER_STEP_USD}
-            value={amount}
-            onChange={(event) =>
-              onAmountChange(clampGrossUSD(Number(event.currentTarget.value)))
+            aria-label={
+              isTargetGoal
+                ? `Target payout in ${corridor.to}`
+                : "Gross client payment in USD"
             }
-            aria-label="Gross client payment in USD"
+            min={isTargetGoal ? bounds.min : MIN_GROSS_USD}
+            max={isTargetGoal ? bounds.max : MAX_GROSS_USD}
+            step={isTargetGoal ? bounds.step : SLIDER_STEP_USD}
+            value={isTargetGoal ? targetNet : amount}
+            onChange={(event) => {
+              const value = Number(event.currentTarget.value);
+              if (isTargetGoal) {
+                onTargetNetChange(clampLocalTarget(value, bounds));
+              } else {
+                onAmountChange(clampGrossUSD(value));
+              }
+            }}
             className="mt-5 h-2 w-full cursor-pointer rounded-lg bg-neutral-100 accent-emerald-600 dark:bg-neutral-800"
           />
           <div className="mt-2 flex justify-between text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
-            <span>${MIN_GROSS_USD.toLocaleString("en-US")}</span>
-            <span>${MAX_GROSS_USD.toLocaleString("en-US")}</span>
+            <span>
+              {isTargetGoal
+                ? formatLocal(bounds.min)
+                : `$${MIN_GROSS_USD.toLocaleString("en-US")}`}
+            </span>
+            <span>
+              {isTargetGoal
+                ? formatLocal(bounds.max)
+                : `$${MAX_GROSS_USD.toLocaleString("en-US")}`}
+            </span>
           </div>
         </fieldset>
 
@@ -120,8 +210,32 @@ export default function SliderControls({
               );
             })}
           </div>
+
+          {isTargetGoal && (
+            <p className="mt-3 text-xs leading-relaxed text-black/[0.45] dark:text-white/[0.45]">
+              The inverse solver shows the exact USD invoice required to net{" "}
+              <span className="tabular-nums font-medium">{formatLocal(targetNet)}</span>{" "}
+              after the platform cut, fixed clearing fee and FX spread.
+            </p>
+          )}
         </fieldset>
       </div>
     </section>
   );
+}
+
+/** Clamps a local-currency target into the corridor's inverse slider bounds. */
+function clampLocalTarget(
+  value: number,
+  bounds: { min: number; max: number; step: number }
+): number {
+  if (!Number.isFinite(value)) {
+    return bounds.min;
+  }
+  const clamped = Math.min(bounds.max, Math.max(bounds.min, Math.round(value)));
+  const stepped =
+    bounds.step > 0
+      ? bounds.min + Math.round((clamped - bounds.min) / bounds.step) * bounds.step
+      : clamped;
+  return Math.min(bounds.max, Math.max(bounds.min, stepped));
 }

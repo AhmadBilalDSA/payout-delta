@@ -11,9 +11,11 @@ import {
   getPlatforms,
 } from "@/lib/db";
 import { getCorridorContent } from "@/lib/corridorContent";
+import { computeSparklineStats, getCorridorHistory } from "@/lib/history";
 import Calculator from "@/components/Calculator";
 import FaqAccordion from "@/components/FaqAccordion";
 import CorridorCard from "@/components/CorridorCard";
+import BlufSummary from "@/components/BlufSummary";
 
 const SITE_URL = "https://payoutdelta.com";
 
@@ -104,6 +106,8 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
   const related = getCorridors()
     .filter((item) => item.slug !== corridor.slug)
     .slice(0, 3);
+  const history = getCorridorHistory(corridor.slug);
+  const sparklineStats = computeSparklineStats(history, channels);
   const jsonLd = buildJsonLd(corridor.slug) ?? [];
 
   return (
@@ -133,11 +137,22 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         browser; nothing is tracked.
       </p>
 
+      {/* Phase 3 — BLUF answer card (server-rendered, indexer-parseable). */}
+      <div className="mt-6">
+        <BlufSummary
+          corridor={corridor}
+          channels={channels}
+          platforms={platforms}
+        />
+      </div>
+
       <div className="mt-6">
         <Calculator
           corridor={corridor}
           platforms={platforms}
           channels={channels}
+          history={history}
+          sparklineStats={sparklineStats}
         />
       </div>
 

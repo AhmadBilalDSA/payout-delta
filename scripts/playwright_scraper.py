@@ -31,10 +31,13 @@ Hard stops (`PipelineAbort` -> exit code 0, `data/fees.json` untouched)
 - Any single source fails after retries.
 
 Atomic write
-------------
+-----------
 - Merge new rates into the loaded snapshot, stamp `updatedAt` as ISO-8601 UTC,
   validate, write `data/fees.json.tmp`, then `os.replace()` it over the real
   file. A crash mid-run leaves the last good revision in place.
+- Each run also appends today's validated rate to each corridor's 14-day
+  sparkline ledger in `data/history.json` (oldest entry rolls off) through the
+  same temp-file + `os.replace()` atomic pattern.
 
 Run
 ---
@@ -61,11 +64,16 @@ from typing import Any, Dict, List, Optional, Tuple
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_FILE = REPO_ROOT / "data" / "fees.json"
 TMP_FILE = DATA_FILE.with_name(DATA_FILE.name + ".tmp")
+HISTORY_FILE = REPO_ROOT / "data" / "history.json"
+HISTORY_TMP_FILE = HISTORY_FILE.with_name(HISTORY_FILE.name + ".tmp")
 
 SUPPORTED_CORRIDORS: List[str] = [
     "usd-to-pkr", "usd-to-inr", "usd-to-php", "usd-to-brl", "usd-to-gbp",
     "usd-to-eur", "usd-to-ngn", "usd-to-bdt", "usd-to-egp", "usd-to-zar",
 ]
+
+# Sparkline window size — the oldest daily point rolls off each run.
+HISTORY_WINDOW = 14
 
 # Realistic day-range tolerance per corridor (positive, finite, and sane).
 # Kept deliberately wide so genuine interbank jitter never trips the gate,
@@ -173,6 +181,79 @@ def publish_snapshot(snapshot: Dict[str, Any]) -> None:
     payload = json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n"
     TMP_FILE.write_text(payload, encoding="utf-8")
     os.replace(TMP_FILE, DATA_FILE)
+
+
+# ---------------------------------------------------------------------------
+# 14-day rate history (Phase 3 sparkline companion to data/history.json)
+# ---------------------------------------------------------------------------
+
+def load_current_history() -> Dict[str, Any]:
+    """Loads data/history.json or bootstraps an empty, schema-valid document."""
+    if not HISTORY_FILE.exists():
+        return {
+            "schemaVersion": 1,
+            "dataset": "payoutdelta-sparkline-history",
+            "updatedAt": "",
+            "description": (
+                "14-day interbank mid-rate trajectory per audit corridor, "
+                "appended daily by scripts/playwright_scraper.py (oldest entry "
+                "rolls off atomically)."
+            ),
+            "history": {},
+        }
+    with HISTORY_FILE.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def validate_history(history: Dict[str, Any], today: str) -> None:
+    """Safety gate for the sparkline ledger — never publish corrupt points."""
+    required = {"schemaVersion", "dataset", "updatedAt", "history"}
+    missing = required - set(history)
+    if missing:
+        raise PipelineAbort(f"history missing keys: {sorted(missing)}")
+    for slug, series in history["history"].items():
+        if slug not in SUPPORTED_CORRIDORS:
+            raise PipelineAbort(f"history has unsupported corridor {slug}")
+        if not isinstance(series, list) or len(series) > HISTORY_WINDOW:
+            raise PipelineAbort(
+                f"history {slug} not a list within {HISTORY_WINDOW} points"
+            )
+        for point in series:
+            if point.get("date") and str(point["date"]) > today:
+                raise PipelineAbort(
+                    f"history {slug} has future date {point.get('date')}"
+                )
+            if not _is_finite_number(point.get("rate")) or point["rate"] <= 0:
+                raise PipelineAbort(
+                    f"history {slug} has non-positive rate {point.get('rate')}"
+                )
+
+
+def update_history(snapshot: Dict[str, Any], rates: Dict[str, float]) -> None:
+    """Appends today's validated rate to each corridor ledger and rolls the
+    oldest entry off (atomic write via tmp file + os.replace)."""
+    history = load_current_history()
+    today = snapshot["updatedAt"][:10]
+
+    for slug, rate in rates.items():
+        if not _is_finite_number(rate) or rate <= 0:
+            raise PipelineAbort(
+                f"refusing to history non-positive rate for {slug}: {rate}"
+            )
+        series = history["history"].get(slug, [])
+        if series and series[-1].get("date") == today:
+            # Idempotent re-run on the same day: replace, never duplicate.
+            series[-1] = {"date": today, "rate": round(float(rate), 6)}
+        else:
+            series.append({"date": today, "rate": round(float(rate), 6)})
+        history["history"][slug] = series[-HISTORY_WINDOW:]
+
+    history["updatedAt"] = snapshot["updatedAt"]
+    validate_history(history, today)
+
+    payload = json.dumps(history, indent=2, ensure_ascii=False) + "\n"
+    HISTORY_TMP_FILE.write_text(payload, encoding="utf-8")
+    os.replace(HISTORY_TMP_FILE, HISTORY_FILE)
 
 
 # ---------------------------------------------------------------------------
@@ -412,12 +493,34 @@ def main(argv: List[str]) -> int:
 
         if args.dry_run:
             print(json.dumps(merged, indent=2, ensure_ascii=False) + "\n")
+            # Preview the would-be sparkline ledger without touching the file.
+            history = load_current_history()
+            today = merged["updatedAt"][:10]
+            for slug, rate in rates.items():
+                series = history["history"].get(slug, [])
+                if series and series[-1].get("date") == today:
+                    series[-1] = {"date": today, "rate": round(float(rate), 6)}
+                else:
+                    series.append({"date": today, "rate": round(float(rate), 6)})
+                history["history"][slug] = series[-HISTORY_WINDOW:]
+            history["updatedAt"] = merged["updatedAt"]
+            print(
+                "[scraper] dry-run history tail (would commit to "
+                "data/history.json):"
+            )
+            for slug in sorted(rates):
+                print(f"  {slug}: {history['history'][slug][-1]}")
             return 0
 
         publish_snapshot(merged)
+        update_history(merged, rates)
         print(
             f"[scraper] published {len(slugs)} corridor rates to "
             f"data/fees.json (updatedAt={merged['updatedAt']})"
+        )
+        print(
+            "[scraper] appended 14-day rate history to data/history.json "
+            f"(window={HISTORY_WINDOW} points, oldest rolled off)"
         )
         return 0
 

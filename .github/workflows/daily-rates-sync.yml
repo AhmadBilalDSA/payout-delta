@@ -37,9 +37,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain data/fees.json)" ]; then
-            git add data/fees.json
-            git commit -m "chore(data): daily rate sync [skip ci]"
+          if [ -n "$(git status --porcelain data/fees.json data/history.json)" ]; then
+            git add data/fees.json data/history.json
+            git commit -m "chore(data): daily rate sync + sparkline history [skip ci]"
             git push origin main
           else
             echo "No rate changes detected. Working tree clean."
