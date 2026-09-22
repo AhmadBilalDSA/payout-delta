@@ -17,7 +17,7 @@
  * Exit:  0 when every check passes, 1 otherwise.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { extname, join } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -43,15 +43,10 @@ const LD_JSON_RE =
 const HREF_RE = /href="([^"]*)"/g;
 
 let failures = 0;
-let passed = 0;
 
 function fail(label, detail) {
   failures += 1;
   console.log(`  FAIL  ${label} — ${detail}`);
-}
-
-function pass(label) {
-  passed += 1;
 }
 
 function collectTypes(html) {
@@ -212,13 +207,11 @@ for (const row of report) {
   if (!row.schema) {
     fail("schema missing", `${row.slug}: SoftwareApplication + FAQPage required`);
   }
-  if (row.assetDetails) {
-    if (row.assetDetails.bad === 0) pass(`assets on ${row.slug}`);
-    else fail("asset errors", row.slug);
+  if (row.assetDetails && row.assetDetails.bad > 0) {
+    fail("asset errors", row.slug);
   }
-  if (row.links) {
-    if (row.links.bad === 0) pass(`internal links on ${row.slug}`);
-    else fail("internal links broken", row.slug);
+  if (row.links && row.links.bad > 0) {
+    fail("internal links broken", row.slug);
   }
 }
 console.log("-".repeat(header.length));
