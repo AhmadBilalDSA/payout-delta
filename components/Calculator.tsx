@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import type {
   CalcMode,
@@ -58,6 +58,8 @@ export default function Calculator({
   history,
   sparklineStats,
   platformPreset,
+  bluf,
+  faq,
 }: {
   corridor: Corridor;
   platforms: Platform[];
@@ -66,6 +68,13 @@ export default function Calculator({
   sparklineStats: SparklineStats;
   /** Long-tail platform preset (e.g. `upwork`), optional for generic routes. */
   platformPreset?: string;
+  /** Server-rendered AEO answer citation box — analytical rail slot (above the
+      verdict). Rendered by the page (server component), passed as a slot so the
+      client island can place it beside the live verdict without losing state. */
+  bluf?: ReactNode;
+  /** Server-rendered AEO audit FAQ accordion — analytical rail slot (below the
+      verdict). Same child-as-slot pattern as `bluf`. */
+  faq?: ReactNode;
 }) {
   const { t } = useLanguage();
   const [mode, setMode] = useState<CalcMode>("gross-to-net");
@@ -197,129 +206,143 @@ export default function Calculator({
   }, [printQuote]);
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      {/* BLUF verdict sits ABOVE the inputs — answer first, knobs second. */}
-      <VerdictCard
-        verdict={route.verdict}
-        corridor={corridor}
-        quotes={route.quotes}
-        platform={platform}
-        mode={mode}
-        inverseVerdict={inverseRoute.verdict}
-        history={history}
-        sparklineStats={sparklineStats}
-      />
-
-      {/* iOS-style amount pills, slider, mode capsule & platform switcher. */}
-      <SliderControls
-        mode={mode}
-        onModeChange={setMode}
-        amount={amount}
-        onAmountChange={(value) => setAmount(clampGrossUSD(value))}
-        targetNet={targetNet}
-        onTargetNetChange={setTargetNet}
-        platformId={platformId}
-        onPlatformChange={setPlatformId}
-        platforms={platforms}
-        corridor={corridor}
-      />
-
-      {isTarget ? (
-        <section aria-labelledby="required-invoice-breakdown">
-          <h2
-            id="required-invoice-breakdown"
-            className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
-          >
-            {t("requiredInvoiceTitle")}
-          </h2>
-          <div className="mt-3 flex flex-col gap-3">
-            {inverseRoute.quotes.map((quote, index) => (
-              <div
-                key={quote.channelId}
-                className="flex flex-col gap-3 rounded-2xl border border-black/[0.06] bg-white p-4 dark:border-white/[0.08] dark:bg-[#15151A] sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-xs font-bold text-black/60 ring-1 ring-black/[0.06] dark:bg-neutral-800 dark:text-white/70 dark:ring-white/[0.08]"
-                  >
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-black dark:text-white">
-                      {quote.channelName}
-                    </p>
-                    <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
-                      {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
-                      {t("allInCostPercent", {
-                        pct: quote.totalCostPercent.toFixed(2),
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <p className="shrink-0 text-sm font-bold tabular-nums text-black dark:text-white sm:text-right">
-                  {t("invoiceRequired", { amount: formatUSD(quote.grossRequired) })}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : (
-        <section aria-labelledby="fee-breakdown">
-          <h2
-            id="fee-breakdown"
-            className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
-          >
-            {t("feeBreakdownTitle")}
-          </h2>
-          <div className="mt-3">
-            <FeeBreakdownList
-              quotes={route.quotes}
-              corridor={corridor}
-              onExport={setPrintQuote}
-            />
-          </div>
-        </section>
-      )}
-
-      {/* Interactive tax & net take-home impact — beneath the verdict and the
-          ranked breakdown. Binds live to the parent amount/target state. */}
-      {taxSnapshot !== null && (
-        <TaxImpactCard
-          corridor={corridor}
+    <div className="grid w-full grid-cols-1 items-start gap-8 lg:grid-cols-12">
+      {/* Primary Interactive Rail — calculator input card, ranked breakdown and
+          the 7-step waterfall engine + bank/tax addendum selectors. Every
+          flex child carries `min-w-0` so wide numbers can never compress the
+          column (anti-collapse guard against flex sizing overflow). */}
+      <div className="flex w-full min-w-0 flex-col gap-6 lg:col-span-7">
+        <SliderControls
           mode={mode}
-          invoiceValue={isTarget ? targetNet : amount}
-          onInvoiceChange={(value) => {
-            if (isTarget) {
-              setTargetNet(clampLocalTarget(value, targetBounds));
-            } else {
-              setAmount(clampGrossUSD(value));
-            }
-          }}
-          grossUSD={taxSnapshot.grossUSD}
-          grossLocal={taxSnapshot.grossLocal}
-          netLocalPreTax={taxSnapshot.netLocalPreTax}
-          channelCutUSD={taxSnapshot.channelCutUSD}
-          channelName={taxSnapshot.channelName}
-          effectiveRate={taxSnapshot.effectiveRate}
+          onModeChange={setMode}
+          amount={amount}
+          onAmountChange={(value) => setAmount(clampGrossUSD(value))}
+          targetNet={targetNet}
+          onTargetNetChange={setTargetNet}
+          platformId={platformId}
+          onPlatformChange={setPlatformId}
+          platforms={platforms}
+          corridor={corridor}
         />
-      )}
 
-      {/* Phase 8 — local bank settlement & custom costing under the ranked
-          breakdown and tax card, shared by every corridor page variant. */}
-      {costingAnchor !== null && (
-        <TransactionCostingWidget corridor={corridor} {...costingAnchor} />
-      )}
+        {isTarget ? (
+          <section aria-labelledby="required-invoice-breakdown">
+            <h2
+              id="required-invoice-breakdown"
+              className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
+            >
+              {t("requiredInvoiceTitle")}
+            </h2>
+            <div className="mt-3 flex flex-col gap-3">
+              {inverseRoute.quotes.map((quote, index) => (
+                <div
+                  key={quote.channelId}
+                  className="flex flex-col gap-3 rounded-2xl border border-black/[0.06] bg-white p-4 dark:border-white/[0.08] dark:bg-[#15151A] sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-xs font-bold text-black/60 ring-1 ring-black/[0.06] dark:bg-neutral-800 dark:text-white/70 dark:ring-white/[0.08]"
+                    >
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-black dark:text-white">
+                        {quote.channelName}
+                      </p>
+                      <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
+                        {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
+                        {t("allInCostPercent", {
+                          pct: quote.totalCostPercent.toFixed(2),
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="shrink-0 text-sm font-bold tabular-nums text-black dark:text-white sm:text-right">
+                    {t("invoiceRequired", { amount: formatUSD(quote.grossRequired) })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : (
+          <section aria-labelledby="fee-breakdown">
+            <h2
+              id="fee-breakdown"
+              className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
+            >
+              {t("feeBreakdownTitle")}
+            </h2>
+            <div className="mt-3">
+              <FeeBreakdownList
+                quotes={route.quotes}
+                corridor={corridor}
+                onExport={setPrintQuote}
+              />
+            </div>
+          </section>
+        )}
 
-      {/* Nominative fair use — mandatory legal line. */}
-      <p className="text-xs leading-relaxed text-black/[0.45] dark:text-white/[0.45]">
-        {t("legalLine")}
-      </p>
+        {/* Interactive tax & net take-home impact — beneath the verdict and the
+            ranked breakdown. Binds live to the parent amount/target state. */}
+        {taxSnapshot !== null && (
+          <TaxImpactCard
+            corridor={corridor}
+            mode={mode}
+            invoiceValue={isTarget ? targetNet : amount}
+            onInvoiceChange={(value) => {
+              if (isTarget) {
+                setTargetNet(clampLocalTarget(value, targetBounds));
+              } else {
+                setAmount(clampGrossUSD(value));
+              }
+            }}
+            grossUSD={taxSnapshot.grossUSD}
+            grossLocal={taxSnapshot.grossLocal}
+            netLocalPreTax={taxSnapshot.netLocalPreTax}
+            channelCutUSD={taxSnapshot.channelCutUSD}
+            channelName={taxSnapshot.channelName}
+            effectiveRate={taxSnapshot.effectiveRate}
+          />
+        )}
+
+        {/* Phase 8 — local bank settlement & custom costing under the ranked
+            breakdown and tax card, shared by every corridor page variant. */}
+        {costingAnchor !== null && (
+          <TransactionCostingWidget corridor={corridor} {...costingAnchor} />
+        )}
+
+        {/* Nominative fair use — mandatory legal line. */}
+        <p className="text-xs leading-relaxed text-black/[0.45] dark:text-white/[0.45]">
+          {t("legalLine")}
+        </p>
+      </div>
+
+      {/* Analytical & Verification Rail — AEO answer citation box, the live
+          verdict card with the partner CTA, and the AEO audit FAQ. Sticky from
+          the `lg` breakpoint; `order-first lg:order-none` keeps the "answer
+          first" reading order on mobile while the two rails sit side-by-side
+          on desktop. All slots carry `min-w-0` so long citation chips / FAQ
+          copy cannot compress the rail. */}
+      <div className="flex w-full min-w-0 flex-col gap-6 order-first lg:order-none lg:sticky lg:top-20 lg:col-span-5">
+        {bluf}
+        <VerdictCard
+          verdict={route.verdict}
+          corridor={corridor}
+          quotes={route.quotes}
+          platform={platform}
+          mode={mode}
+          inverseVerdict={inverseRoute.verdict}
+          history={history}
+          sparklineStats={sparklineStats}
+        />
+        {faq}
+      </div>
 
       {/* Print-only audit receipt, mounted the instant an export is asked for
           (becomes the sole visible content inside the Save-as-PDF dialog). */}
       {printQuote !== null && (
-        <div className="hidden print:block">
+        <div className="hidden print:block lg:col-span-12">
           <AuditReceipt
             quote={printQuote}
             corridor={corridor}

@@ -4,7 +4,7 @@
 
 > After the platform cut, the SWIFT intermediaries, the real conversion, the
 > local landing fee and the statutory tax — **how much of your client's payment
-> lands in your bank account?** PayoutDelta answers exactly that, for 10
+> lands in your bank account?** PayoutDelta answers exactly that, for 15
 > corridors, in your browser, with zero cost and zero tracking.
 
 [![Live](https://img.shields.io/badge/Live-GitHub%20Pages-1f6feb?style=flat-square)](https://ahmadbilaldsa.github.io/payout-delta/)
@@ -37,10 +37,22 @@ your account.**
 ## Features
 
 ### 🧮 Cross-Border Payout Auditor
-10 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR) with
-live comparison between **Wise, Payoneer, Direct Wire, Remitly and local bank
-rails** — a best-verdict ranking of the **local currency you actually
-receive**, not the one quoted mid-market.
+15 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR, VND,
+KES, IDR, COP, TRY) with live comparison between **Wise, Payoneer, Direct
+Wire, Remitly and local bank rails** — a best-verdict ranking of the
+**local currency you actually receive**, not the one quoted mid-market. The
+2026 expansion added five high-volume earning markets (Vietnam, Kenya,
+Indonesia, Colombia, Türkiye) with authored statutory & bank records.
+
+### 🧭 Currency Pair Switcher & Anti-Collapse Grid
+The header carries a tactile `USD → PKR` capsule grouped by receiving region
+(South Asia / Southeast Asia / East Africa & EMEA / Latin America / Europe &
+UK) plus a one-tap `⇄` invert — when the inverted pair isn't audited a clear
+status pill offers a structured GitHub request instead of a 404. Corridor
+pages now run a two-rail anti-collapse grid: interactive inputs + the 7-step
+waterfall on the left, and the AEO answer box + live verdict + audit FAQ
+pinned sticky on the right — `min-w-0` guards keep wide numbers from ever
+compressing the layout, and RTL locales get enforced 1.8 line-height.
 
 ### 🏦 Local Banking & Compliance Directory
 Real domestic banks with their exact SWIFT/BIC codes (MZNBPKKA, HABBPNKA,
@@ -84,16 +96,17 @@ callout, and an FTC-grade affiliate disclaimer — routed through a central
 partner directory ([`data/affiliatePartners.ts`](data/affiliatePartners.ts)).
 
 ### 🧩 Programmatic Long-Tail Platform Corridors
-17 statically exported corridor pages — every currency corridor plus
-`upwork-*`, `fiverr-*` and `deel-*` permutations for PKR / INR / PHP. Each
-long-tail route pre-selects its platform (Upwork 10%, Fiverr 20%, Deel 0%),
-rewrites its title/H1/AEO answer-block for that platform, and stays a plain
-static file under `./out`. Corridors are declared in
+32 statically exported corridor pages — every currency corridor plus
+`upwork-*`, `fiverr-*` and `deel-*` permutations for all 15 base slugs
+(Upwork/Fiverr cover PKR / INR / PHP / VND / KES / IDR / COP / TRY, Deel runs
+PKR). Each long-tail route pre-selects its platform (Upwork 10%, Fiverr 20%,
+Deel 0%), rewrites its title/H1/AEO answer-block for that platform, and stays
+a plain static file under `./out`. Corridors are declared in
 [`data/corridors.ts`](data/corridors.ts) and pre-set the calculator on mount
 with `?gross=` deep-link sharing intact.
 
 ### 🧬 Financial JSON-LD Schema Dominance
-Every corridor route (17 English + 5 localized) emits **one** top-level
+Every corridor route (32 English + 5 localized) emits **one** top-level
 schema.org `@graph` per page: a `CurrencyConversionService` with live
 `ExchangeRateSpecification`, a `FinancialProduct` per compared rail with its
 fixed fee & FX-spread structure, a seven-layer `HowTo` realization waterfall,
@@ -186,7 +199,8 @@ npm run lint      # ESLint
 | 4 | Programmatic long-tail platform corridors (Upwork / Fiverr / Deel) | Shipped |
 | 5 | Financial JSON-LD schema dominance | Shipped |
 | 6 | GitHub community engine & developer API docs | Shipped |
-| 7 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
+| 7 | UI anti-collapse grid overhaul, currency pair switcher & 5 high-volume corridors (VND / KES / IDR / COP / TRY) | Shipped |
+| 8 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 
 ---
 

@@ -34,7 +34,7 @@ zero tracking, zero data retention, zero sign-up.
 
 ## 2. Codebase Audit — Permanent Inventory
 
-### 2.1 Corridors (10 standard, `data/fees.json`)
+### 2.1 Corridors (15 standard, `data/fees.json`)
 
 | Slug | From → To | Country / Currency |
 | --- | --- | --- |
@@ -48,13 +48,18 @@ zero tracking, zero data retention, zero sign-up.
 | `usd-to-bdt` | USD → BDT | Bangladesh |
 | `usd-to-egp` | USD → EGP | Egypt |
 | `usd-to-zar` | USD → ZAR | South Africa |
+| `usd-to-vnd` | USD → VND | Vietnam |
+| `usd-to-kes` | USD → KES | Kenya |
+| `usd-to-idr` | USD → IDR | Indonesia |
+| `usd-to-cop` | USD → COP | Colombia |
+| `usd-to-try` | USD → TRY | Türkiye |
 
 Authoring of banks & statutory tiers (`data/regulatoryBanking.ts`): **PKR, INR,
-PHP are fully audited**; all other corridors run the global fallback engine
-(standard $15–$25 intermediary band + national clearing rail). Localized
-route pairs (`app/[lang]/calculator/[slug]/`): `ur→pkr`, `hi→inr`, `fil→php`,
-`pt→brl`, `es→eur` (built statically; all other pairs 404 via
-`dynamicParams = false`).
+PHP, VND, KES, IDR, COP, TRY are fully audited**; all other corridors run the
+global fallback engine (standard $15–$25 intermediary band + national clearing
+rail). Localized route pairs (`app/[lang]/calculator/[slug]/`): `ur→pkr`,
+`hi→inr`, `fil→php`, `pt→brl`, `es→eur` (built statically; all other pairs 404
+via `dynamicParams = false`).
 
 ### 2.2 Languages (7, `lib/i18n/dictionaries.ts`)
 
@@ -74,8 +79,11 @@ that every language must preserve verbatim.
 
 - **Calculator** (`components/Calculator.tsx`) — platform toggle + amount input,
   live channel ranking (best verdict), sparkline, tax impact card, and the
-  Phase 8/9 **Transaction Costing Widget** mounted below the tax card on both
-  the standard and localized corridor pages.
+  Phase 8/9 **Transaction Costing Widget** mounted below the tax card. Since
+  Phase 7 it owns the two-rail anti-collapse grid: left rail carries the
+  interactive inputs + waterfall, the right rail (sticky `lg:top-20`,
+  `order-first` on mobile) hosts the server-rendered `bluf`/`faq` slot props
+  around the live verdict card.
 - **7-step liquid waterfall** (`components/TransactionCostingWidget.tsx`) —
   bank selector, statutory tier selector (purpose code chips), SWIFT slider
   ($0–$40), local clearing fee, custom surcharge/retainer slider (0–15%), and
@@ -98,7 +106,21 @@ that every language must preserve verbatim.
   1% u/s 194J/194C (Purpose Code P0802).
 - PHP — BSP Circular 980 & BIR 8% freelance gross tax; banks BNORPHMM,
   BOFIPHMM, UBPHPHMM; tiers 8% flat / graduated + OSD.
-- Fallback engine — SEPA, BACS/FPS, PIX, NIBSS, BEFTN, InstaPay/ACH rails.
+- VND — SBV Circular 32/2013/TT-NHNN & Circular 111/2013 (2% IT flat rate);
+  banks BFTVVNVX (Vietcombank), TCBVVNVX (Techcombank), VPBKVNVX (VPBank);
+  tiers 2% export presumptive / 0% zero-rated software service.
+- KES — CBK Prudential Guidelines & KRA ITO Sec 35; banks EQBLKENA (Equity),
+  KCBLKENX (KCB); tiers 5% non-resident withholding / resident standard.
+- IDR — Bank Indonesia Reg. 16/21/PBI & PPh 21 IT presumptive; banks CENAIDJA
+  (BCA), BMRIIDJA (Bank Mandiri); tiers 5% presumptive / 0% certificate-held.
+- COP — Banco de la República Circular DCIN-83 (Formulario 5) & DIAN Art. 392;
+  banks COLOCOBM (Bancolombia), CAVHCOBM (Davivienda); tiers 1% retención / 0%
+  export certificate.
+- TRY — CBRT Circular on Invisible Transactions & Income Tax Law Art. 89/13
+  (80% software earnings exemption); banks TGBATRIS (Garanti BBVA), ISBKTRIS
+  (İşbank); tiers 0% software exemption / 15% indicative standard slab.
+- Fallback engine — SEPA, BACS/FPS, PIX, NIBSS, BEFTN, InstaPay/ACH,
+  NAPAS/CVQ, PesaLink/EFT, BI-RTGS/BI-FAST, SEBRA/ACH, FAST/EFT rails.
 
 ### 2.6 Edge API & developer surface
 
@@ -167,10 +189,11 @@ because they share the same dataset and quote math.
 | 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Shipped** (`92f8f7f`) |
 | 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | **Shipped** (`c081371`) |
 | 3 | **High-Intent Affiliate Engine, Partner Referral Cards & Trust Micro-Badges** — privacy-safe provider routing, sponsored disclosure CTAs, wire-penalty callouts | **Shipped** (`d51faba`) |
-| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes | **Shipped** (`6a71b4e`) |
+| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes (est. Phase 4; expanded to 32 in Phase 7) | **Shipped** (`6a71b4e`) |
 | 5 | **Financial JSON-LD Schema Dominance** — one top-level `@graph` per corridor route (`CurrencyConversionService` + live `ExchangeRateSpecification`, per-rail `FinancialProduct`, 7-layer `HowTo` waterfall, programmatic `FAQPage` mirroring AEO Q&As, `WebApplication`, `Service`, `BreadcrumbList`) via `lib/seoSchemas.ts` | **Shipped** (`5e68dc0`) |
 | 6 | **GitHub Community Engine & Developer API Documentation** — 1-click viral Reddit/X/LinkedIn audit export on the verdict card, full API reference (cURL / TypeScript / Python quick-start, response-schema & SLA panels, static feed + edge worker), structured `.github/ISSUE_TEMPLATE` forms, `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed | **Shipped** (`9ef48f6`) |
-| 7 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
+| 7 | **UI Anti-Collapse Grid Overhaul, Currency Pair Switcher & 5 High-Volume Corridors (VND / KES / IDR / COP / TRY)** — two-rail anti-collapse corridor grid (interactive waterfall left, sticky AEO + verdict + FAQ right, `min-w-0` guards, enforced 1.8 RTL line-height), header currency capsule grouped by region + one-tap `⇄` invert with "not audited" status pill, five new fully-audited corridors with real banks/SWIFT/statutory tiers (15 base + 17 long-tail → 32 English corridor routes), corpus & long-tail audit expanded | **Shipped** (`@@FEATURE_HASH@@`) |
+| 8 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 
 ---
 
@@ -178,7 +201,7 @@ because they share the same dataset and quote math.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # 36 static routes → ./out
+npm run build                 # 51 static routes → ./out
 node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, exit 0
 ```
 
@@ -196,6 +219,7 @@ compatibility is a merge blocker.
 - `6a71b4e` — Phase 4: programmatic long-tail platform corridors for Upwork/Fiverr/Deel (`data/corridors.ts`, 7 extra static routes → 17 corridor pages, platform pre-set + tailored metadata/AEO copy, audit extended).
 - `5e68dc0` — Phase 5: financial JSON-LD schema dominance (`lib/seoSchemas.ts` builders + `lib/aeoFaqs.ts` shared generator → one top-level `@graph` on every corridor & localized route; audit requires the full entity set + single-graph consolidation).
 - `9ef48f6` — Phase 6: GitHub community engine & developer API docs (`AuditExportMenu` Reddit/X/LinkedIn exporters, expanded `/api-access` reference with cURL/TS/Python quick-start + SLA, `.github/ISSUE_TEMPLATE` forms + `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed via `prebuild`/`sync_api_feed.mjs`).
+- `@@FEATURE_HASH@@` — Phase 7: UI anti-collapse grid overhaul, currency pair switcher & 5 high-volume corridors (`Calculator.tsx` two-rail shell with `bluf`/`faq` slots, anti-collapse `min-w-0` guards across verdict/costing/BLUF/FAQ cards + 1.8 RTL line-height, `CorridorSwitcher` regional capsule + `⇄` invert + status pill, 5 fully-audited corridors in `fees.json` + `regulatoryBanking.ts` + 10 new long-tail routes in `corridors.ts`, corpus/long-tail audit extended).
 - `d74a248` — i18n: dictionary, auto-locale detection, trust badges, corridor selector.
 - `a66422c` — sitemap `/api-access/` entry.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.

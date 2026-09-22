@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-22T12:40:57Z",
+  "updatedAt": "2026-09-23T04:20:00Z",
   "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per USD corridor.",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
@@ -160,6 +160,56 @@
       "countryCode": "ZA",
       "currencyName": "South African Rand",
       "currencySymbol": "R"
+    },
+    {
+      "slug": "usd-to-vnd",
+      "from": "USD",
+      "to": "VND",
+      "rate": 25450,
+      "country": "Vietnam",
+      "countryCode": "VN",
+      "currencyName": "Vietnamese Dong",
+      "currencySymbol": "₫"
+    },
+    {
+      "slug": "usd-to-kes",
+      "from": "USD",
+      "to": "KES",
+      "rate": 129.5,
+      "country": "Kenya",
+      "countryCode": "KE",
+      "currencyName": "Kenyan Shilling",
+      "currencySymbol": "KSh"
+    },
+    {
+      "slug": "usd-to-idr",
+      "from": "USD",
+      "to": "IDR",
+      "rate": 15800,
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "currencyName": "Indonesian Rupiah",
+      "currencySymbol": "Rp"
+    },
+    {
+      "slug": "usd-to-cop",
+      "from": "USD",
+      "to": "COP",
+      "rate": 4180,
+      "country": "Colombia",
+      "countryCode": "CO",
+      "currencyName": "Colombian Peso",
+      "currencySymbol": "COL$"
+    },
+    {
+      "slug": "usd-to-try",
+      "from": "USD",
+      "to": "TRY",
+      "rate": 34.2,
+      "country": "Turkey",
+      "countryCode": "TR",
+      "currencyName": "Turkish Lira",
+      "currencySymbol": "₺"
     }
   ]
 }

@@ -157,7 +157,7 @@ export default async function LocalizedCorridorPage({
     <div
       dir={localized.dir}
       lang={localized.lang}
-      className="mx-auto max-w-5xl px-4 py-10 sm:px-6"
+      className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6"
     >
       {jsonLd.map((block) => (
         <script
@@ -178,16 +178,9 @@ export default async function LocalizedCorridorPage({
         {datasetRevision}.
       </p>
 
-      {/* Phase 6 — same BLUF answer card as the English corridor, so localized
-          pages carry the indexer-parseable one-sentence takeaway too. */}
-      <div className="mt-6">
-        <BlufSummary
-          corridor={corridor}
-          channels={channels}
-          platforms={platforms}
-        />
-      </div>
-
+      {/* Phase 7 — the same anti-collapse 12-column rail shell as the English
+          corridor page: interactive inputs / waterfall on the left, the AEO
+          answer box + verdict + audit FAQ pinned on the right. */}
       <div className="mt-6">
         <Calculator
           corridor={corridor}
@@ -195,15 +188,22 @@ export default async function LocalizedCorridorPage({
           channels={channels}
           history={history}
           sparklineStats={sparklineStats}
+          bluf={
+            <BlufSummary
+              corridor={corridor}
+              channels={channels}
+              platforms={platforms}
+            />
+          }
+          faq={
+            <AeoFaqSection
+              corridor={corridor}
+              channels={channels}
+              platforms={platforms}
+            />
+          }
         />
       </div>
-
-      {/* Phase 2 — localized pages carry the same programmatic audit FAQ. */}
-      <AeoFaqSection
-        corridor={corridor}
-        channels={channels}
-        platforms={platforms}
-      />
 
       <div className="mt-10 space-y-8">
         <section aria-labelledby="localized-faq">

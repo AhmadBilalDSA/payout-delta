@@ -331,7 +331,7 @@ export default function TaxImpactCard({
   return (
     <section
       aria-labelledby="tax-impact"
-      className="rounded-3xl border border-white/[0.08] bg-[#16161B] p-6 text-white shadow-2xl sm:p-6"
+      className="w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#16161B] p-6 text-white shadow-2xl sm:p-6"
     >
       <div className="flex items-center justify-between gap-3">
         <h2

@@ -101,7 +101,7 @@ export default function SliderControls({
   return (
     <section
       aria-labelledby="audit-inputs"
-      className="rounded-3xl border border-black/[0.06] bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#121216] sm:p-8"
+      className="w-full min-w-0 rounded-3xl border border-black/[0.06] bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#121216] sm:p-8"
     >
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h2

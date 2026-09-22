@@ -58,6 +58,11 @@ const EXPECTED_SLUGS = [
   "usd-to-bdt",
   "usd-to-egp",
   "usd-to-zar",
+  "usd-to-vnd",
+  "usd-to-kes",
+  "usd-to-idr",
+  "usd-to-cop",
+  "usd-to-try",
 ];
 
 /** Phase 4 — programmatic long-tail platform corridors (Upwork/Fiverr/Deel). */
@@ -69,6 +74,16 @@ const EXPECTED_LONG_TAIL_SLUGS = [
   "fiverr-usd-to-inr",
   "upwork-usd-to-php",
   "fiverr-usd-to-php",
+  "upwork-usd-to-vnd",
+  "fiverr-usd-to-vnd",
+  "upwork-usd-to-kes",
+  "fiverr-usd-to-kes",
+  "upwork-usd-to-idr",
+  "fiverr-usd-to-idr",
+  "upwork-usd-to-cop",
+  "fiverr-usd-to-cop",
+  "upwork-usd-to-try",
+  "fiverr-usd-to-try",
 ];
 
 const EXPECTED_LOCALIZED = [

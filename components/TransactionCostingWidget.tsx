@@ -123,7 +123,7 @@ export default function TransactionCostingWidget({
     <section
       id="transaction-costing"
       aria-labelledby="transaction-costing-title"
-      className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm transition-colors duration-200 hover:border-black/[0.12] dark:border-white/[0.08] dark:bg-zinc-900/80 dark:shadow-none dark:backdrop-blur-md dark:hover:border-zinc-700"
+      className="w-full min-w-0 overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm transition-colors duration-200 hover:border-black/[0.12] dark:border-white/[0.08] dark:bg-zinc-900/80 dark:shadow-none dark:backdrop-blur-md dark:hover:border-zinc-700"
     >
       <h2
         id="transaction-costing-title"
@@ -237,7 +237,7 @@ export default function TransactionCostingWidget({
             {t("localClearingFee")}
           </span>
           <div className="mt-1.5 flex items-center gap-2">
-            <span className="text-sm font-semibold text-black/50 dark:text-white/50">
+            <span className="text-sm font-semibold tabular-nums text-black/50 dark:text-white/50">
               {corridor.currencySymbol}
             </span>
             <input

@@ -108,12 +108,30 @@ body {
 
 /* Right-to-left locales (Urdu / Arabic) need the Nastaliq-capable typefaces
    plus extra breathing room for the deeper glyph stack. Kept in one cascade
-   layer so SaaS tooling and dark-mode overrides still apply cleanly. */
+   layer so SaaS tooling and dark-mode overrides still apply cleanly.
+   `!important` on body, headings and card copy guarantees the loose
+   line-height can never be overridden back into a tight value that clips
+   Nastaliq diacritics against card boundaries. */
 [dir="rtl"] {
   font-family: "Noto Nastaliq Urdu", "Noto Sans Arabic", "Jameel Noori Nastaleeq",
     "Urdu Typesetting", var(--font-geist-sans), "Segoe UI", Tahoma, sans-serif;
-  line-height: 1.7;
+  line-height: 1.8;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+}
+
+[dir="rtl"] body,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+[dir="rtl"] p,
+[dir="rtl"] li,
+[dir="rtl"] .rounded-xl p,
+[dir="rtl"] .rounded-2xl p,
+[dir="rtl"] .rounded-3xl p {
+  line-height: 1.8 !important;
 }
 
 [dir="rtl"] .tabular-nums,

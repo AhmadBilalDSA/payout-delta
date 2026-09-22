@@ -7,10 +7,11 @@
  * intermediary cuts and local clearing rails), and the statutory withholding /
  * exemption tiers used to compute the "real bank take-home".
  *
- * The three fully-audited corridors (PKR, INR, PHP) reference the underlying
- * legislation by section; every remaining corridor falls back to accurate
- * standard intermediary bands ($15–$25) plus its national clearing network
- * identifier so the engine never renders empty on any audited route.
+ * The eight fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP, TRY)
+ * reference the underlying legislation by section; every remaining corridor
+ * falls back to accurate standard intermediary bands ($15–$25) plus its
+ * national clearing network identifier so the engine never renders empty on
+ * any audited route.
  *
  * All monetary figures are informational benchmarks — the actual deduction
  * lands on the bank's credit advice (CRF) and must be verified before
@@ -303,6 +304,294 @@ const phpBanks: RegulatoryBank[] = [
 ];
 
 /* ---------------------------------------------------------------------------
+ * Vietnam — USD → VND
+ * State Bank of Vietnam Circular 32/2013/TT-NHNN (fund transfer rules) &
+ * Circular 111/2013/TT-BTC (2% flat rate on IT services).
+ * ------------------------------------------------------------------------- */
+
+const vndTiers: StatutoryTier[] = [
+  {
+    id: "vietnam-export",
+    name: "Software / IT Export Presumptive",
+    authority: "Circular 111/2013/TT-BTC",
+    rate: 0.02,
+    purposeCode: "SW / IT services",
+    note: "2% flat rate on cross-border IT / software service income from foreign clients.",
+  },
+  {
+    id: "vietnam-exempt",
+    name: "Zero-Rated Software Service",
+    authority: "Circular 111/2013/TT-BTC · 0% VAT export",
+    rate: 0,
+    purposeCode: "Software export",
+    exemption: true,
+    note: "0% VAT on exported software / IT services — confirm with the servicing bank.",
+  },
+];
+
+const vndBanks: RegulatoryBank[] = [
+  {
+    id: "vcb",
+    name: "Vietcombank",
+    displayName: "Vietcombank (Vietnam)",
+    swiftCode: "BFTVVNVX",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 12,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "NAPAS instant · CVQ inward 1 day",
+    localCurrency: "VND",
+  },
+  {
+    id: "tcb",
+    name: "Techcombank",
+    displayName: "Techcombank (Vietnam)",
+    swiftCode: "TCBVVNVX",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 10,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "NAPAS instant · CVQ inward 1 day",
+    localCurrency: "VND",
+  },
+  {
+    id: "vpb",
+    name: "VPBank",
+    displayName: "VPBank (Vietnam)",
+    swiftCode: "VPBKVNVX",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 12,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "NAPAS clearing 1 day",
+    localCurrency: "VND",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Kenya — USD → KES
+ * Central Bank of Kenya Prudential Guidelines & KRA Income Tax Act Section 35
+ * (5% non-resident withholding on SWIFT service remittances).
+ * ------------------------------------------------------------------------- */
+
+const kesTiers: StatutoryTier[] = [
+  {
+    id: "kenya-nonresident",
+    name: "Non-Resident Service Withholding",
+    authority: "KRA ITO Section 35",
+    rate: 0.05,
+    purposeCode: "SWIFT service remittance",
+    note: "5% non-resident tax on service payments from foreign clients.",
+  },
+  {
+    id: "kenya-resident",
+    name: "Resident Freelancer",
+    authority: "KRA ITO normal rates",
+    rate: 0,
+    purposeCode: "Resident individual",
+    exemption: true,
+    note: "Standard resident rates / P.A.Y.E. on local remittances.",
+  },
+];
+
+const kesBanks: RegulatoryBank[] = [
+  {
+    id: "equity",
+    name: "Equity Bank",
+    displayName: "Equity Bank (Kenya)",
+    swiftCode: "EQBLKENA",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "PesaLink instant · EFT 1 day",
+    localCurrency: "KES",
+  },
+  {
+    id: "kcb",
+    name: "KCB Bank",
+    displayName: "KCB Bank (Kenya)",
+    swiftCode: "KCBLKENX",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "PesaLink instant · EFT 1 day",
+    localCurrency: "KES",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Indonesia — USD → IDR
+ * Bank Indonesia Regulation No. 16/21/PBI (BI-FAST) & PPh 21 presumptive
+ * export tax on IT income.
+ * ------------------------------------------------------------------------- */
+
+const idrTiers: StatutoryTier[] = [
+  {
+    id: "indonesia-pph21",
+    name: "PPh 21 IT Presumptive Export",
+    authority: "PPh Pasal 21",
+    rate: 0.05,
+    purposeCode: "IT service export",
+    note: "5% presumptive income tax on IT service export income.",
+  },
+  {
+    id: "indonesia-exempt",
+    name: "Zero-Rated Export Service",
+    authority: "PPh Pasal 21 · export certificate",
+    rate: 0,
+    purposeCode: "IT service export",
+    exemption: true,
+    note: "0% where an export service certificate (PEB / PPJK) is held.",
+  },
+];
+
+const idrBanks: RegulatoryBank[] = [
+  {
+    id: "bca",
+    name: "Bank Central Asia",
+    displayName: "BCA (Indonesia)",
+    swiftCode: "CENAIDJA",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 12,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "BI-FAST instant · BI-RTGS 1 day",
+    localCurrency: "IDR",
+  },
+  {
+    id: "mandiri",
+    name: "Bank Mandiri",
+    displayName: "Bank Mandiri (Indonesia)",
+    swiftCode: "BMRIIDJA",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "BI-FAST instant · BI-RTGS 1 day",
+    localCurrency: "IDR",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Colombia — USD → COP
+ * Banco de la República Circular DCIN-83 Formulario 5 (declaración de cambio)
+ * & DIAN Article 392 retención en la fuente.
+ * ------------------------------------------------------------------------- */
+
+const copTiers: StatutoryTier[] = [
+  {
+    id: "colombia-dian",
+    name: "DIAN Retención — Export Services",
+    authority: "DIAN Art. 392",
+    rate: 0.01,
+    purposeCode: "Declaración de cambio",
+    note: "1% source withholding on foreign-currency export service income.",
+  },
+  {
+    id: "colombia-exempt",
+    name: "Zero-Rated Export Service",
+    authority: "DIAN Art. 392 · export certificate",
+    rate: 0,
+    purposeCode: "Declaración de cambio",
+    exemption: true,
+    note: "0% where the exporter holds a valid export-services certificate.",
+  },
+];
+
+const copBanks: RegulatoryBank[] = [
+  {
+    id: "bancolombia",
+    name: "Bancolombia",
+    displayName: "Bancolombia (Colombia)",
+    swiftCode: "COLOCOBM",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 14,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "SEBRA 1 day · ACH same-day",
+    localCurrency: "COP",
+  },
+  {
+    id: "davivienda",
+    name: "Davivienda",
+    displayName: "Davivienda (Colombia)",
+    swiftCode: "CAVHCOBM",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "SEBRA 1 day · domiciliação 1–2 days",
+    localCurrency: "COP",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Turkey — USD → TRY
+ * CBRT Circular on Invisible Transactions & Income Tax Law Article 89/13
+ * (80% software earnings exemption).
+ * ------------------------------------------------------------------------- */
+
+const tryTiers: StatutoryTier[] = [
+  {
+    id: "turkey-software",
+    name: "Software Earnings Exemption",
+    authority: "GVK Art. 89/13",
+    rate: 0,
+    purposeCode: "Software / IT export",
+    exemption: true,
+    note: "80% of software-production income exempt under Art. 89/13.",
+  },
+  {
+    id: "turkey-standard",
+    name: "Standard Slab",
+    authority: "GVK normal rates",
+    rate: 0.15,
+    purposeCode: "Non-exempt income",
+    note: "Indicative 15% standard band when the software exemption does not apply.",
+  },
+];
+
+const tryBanks: RegulatoryBank[] = [
+  {
+    id: "garanti",
+    name: "Garanti BBVA",
+    displayName: "Garanti BBVA (Turkey)",
+    swiftCode: "TGBATRIS",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "FAST instant · EFT 1 day",
+    localCurrency: "TRY",
+  },
+  {
+    id: "isbank",
+    name: "İşbank",
+    displayName: "İşbank (Turkey)",
+    swiftCode: "ISBKTRIS",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 12,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "FAST instant · EFT 1 day",
+    localCurrency: "TRY",
+  },
+];
+
+/* ---------------------------------------------------------------------------
  * Global fallback engine — EUR / GBP / BRL / NGN / BDT / EGP / ZAR.
  * Standard intermediary deduction $15–$25, national clearing network, and a
  * statutory export-tax compliance notice.
@@ -395,6 +684,66 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     ],
     banks: phpBanks,
     tiers: phpTiers,
+    generic: false,
+  },
+  "usd-to-vnd": {
+    slug: "usd-to-vnd",
+    authority: "State Bank of Vietnam Circular 32/2013/TT-NHNN · Circular 111/2013 (2% IT flat rate)",
+    clearingNetwork: "NAPAS / CVQ",
+    citations: [
+      "SBV Circular 32",
+      "Circular 111/2013/TT-BTC",
+    ],
+    banks: vndBanks,
+    tiers: vndTiers,
+    generic: false,
+  },
+  "usd-to-kes": {
+    slug: "usd-to-kes",
+    authority: "Central Bank of Kenya Prudential Guidelines · KRA Withholding Sec 35 (5% non-resident rate)",
+    clearingNetwork: "PesaLink / EFT",
+    citations: [
+      "CBK Guidelines",
+      "KRA ITO Sec 35",
+    ],
+    banks: kesBanks,
+    tiers: kesTiers,
+    generic: false,
+  },
+  "usd-to-idr": {
+    slug: "usd-to-idr",
+    authority: "Bank Indonesia Regulation No. 16/21/PBI · PPh 21 IT Presumptive Export",
+    clearingNetwork: "BI-RTGS / BI-FAST",
+    citations: [
+      "PBI 16/21/2014",
+      "PPh Pasal 21",
+    ],
+    banks: idrBanks,
+    tiers: idrTiers,
+    generic: false,
+  },
+  "usd-to-cop": {
+    slug: "usd-to-cop",
+    authority: "Banco de la República Circular DCIN-83 (Formulario 5) · DIAN Retención",
+    clearingNetwork: "SEBRA / ACH",
+    citations: [
+      "DCIN-83 Form 5",
+      "DIAN Art. 392",
+    ],
+    banks: copBanks,
+    tiers: copTiers,
+    generic: false,
+  },
+  "usd-to-try": {
+    slug: "usd-to-try",
+    authority: "CBRT Circular on Invisible Transactions · Income Tax Law Art. 89/13 (80% software earnings exemption)",
+    clearingNetwork: "FAST / EFT",
+    citations: [
+      "CBRT Invisible Trans",
+      "GVK Art. 89/13",
+    ],
+    banks: tryBanks,
+    tiers: tryTiers,
     generic: false,
   },
 };

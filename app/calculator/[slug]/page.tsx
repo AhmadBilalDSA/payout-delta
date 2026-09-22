@@ -240,7 +240,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
   const jsonLd = buildJsonLd(slug) ?? [];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6">
       {jsonLd.map((block) => (
         <script
           key={block}
@@ -271,17 +271,10 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           : "Every calculation runs in your browser; nothing is tracked."}
       </p>
 
-      {/* Phase 3 — BLUF answer card (server-rendered, indexer-parseable). */}
-      <div className="mt-6">
-        <BlufSummary
-          corridor={corridor}
-          channels={channels}
-          platforms={platforms}
-          platformId={parsed.platform ?? undefined}
-          platformLabel={longTail?.label}
-        />
-      </div>
-
+      {/* UI anti-collapse grid — Calculator renders the 12-column rail shell
+          (interactive inputs / waterfall left, analytical AEO + verdict + FAQ
+          right) and mounts the server-rendered BLUF + AEO FAQ slots beside the
+          live verdict card. */}
       <div className="mt-6">
         <Calculator
           corridor={corridor}
@@ -290,17 +283,26 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           history={history}
           sparklineStats={sparklineStats}
           platformPreset={parsed.platform ?? undefined}
+          bluf={
+            <BlufSummary
+              corridor={corridor}
+              channels={channels}
+              platforms={platforms}
+              platformId={parsed.platform ?? undefined}
+              platformLabel={longTail?.label}
+            />
+          }
+          faq={
+            <AeoFaqSection
+              corridor={corridor}
+              channels={channels}
+              platforms={platforms}
+              platformId={parsed.platform ?? undefined}
+              platformLabel={longTail?.label}
+            />
+          }
         />
       </div>
-
-      {/* Phase 2 — targeted AEO audit FAQ driven by the live corridor dataset. */}
-      <AeoFaqSection
-        corridor={corridor}
-        channels={channels}
-        platforms={platforms}
-        platformId={parsed.platform ?? undefined}
-        platformLabel={longTail?.label}
-      />
 
       {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}
       <div className="mt-8">

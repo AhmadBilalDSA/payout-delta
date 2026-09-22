@@ -29,7 +29,7 @@ export default function AboutPage() {
         <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs dark:bg-white/[0.12]">
           data/fees.json
         </code>{" "}
-        — a versioned, machine-readable snapshot of 10 corridors, 3 client
+        — a versioned, machine-readable snapshot of 15 corridors, 3 client
         platforms and 5 withdrawal channels, carrying an{" "}
         <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs dark:bg-white/[0.12]">
           updatedAt
