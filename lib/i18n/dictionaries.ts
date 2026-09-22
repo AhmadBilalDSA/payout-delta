@@ -204,6 +204,33 @@ export const enStrings = {
   livePreviewSub: "1:1 A4 · print-safe · updates instantly",
   logoLimitNote: "Max {kb}KB · stays locally in your draft, never uploaded.",
 
+  // ── Transaction Costing Widget (Phase 8) ──────────────────────────────
+  txCostingTitle: "Local Bank Settlement & Custom Costing",
+  txCostingLead:
+    "Model the wire from the payout platform into your bank account, then layer your regional tax tier on top.",
+  bankSelector: "Recipient bank",
+  jurisdictionSelector: "Jurisdiction / tax tier",
+  swiftDeduction: "Intermediary SWIFT deduction",
+  localBankFee: "Local receiving bank fee",
+  withholdingSlider: "Custom withholding tax",
+  withholdingApplied: "{pct}% applied to the landed balance",
+  waterfallTitle: "Real settlement waterfall",
+  bankSwift: "SWIFT {code}",
+  bankClearance: "{time} clearance",
+  bankIntermediaryBand: "Benchmark {min}–{max} deduction",
+  rowGross: "Gross client bill",
+  rowPlatformCut: "Platform cut",
+  rowIntermediary: "Intermediary wire cut",
+  rowConversion: "Real conversion (lowest fee provider rate)",
+  rowLandingFee: "Local bank landing fee",
+  rowWithholding: "Net withholding tax",
+  rowTakeHome: "True liquid take-home",
+  txNote:
+    "Informational estimates — confirm the exact intermediary deduction on the bank credit advice and verify your registered tax tier before invoicing.",
+  invoiceBankToggle: "Include Bank Settlement & Tax Breakdown in Addendum",
+  invoiceBankToggleHint:
+    "Appends the bank settlement & tax note matched to the invoice currency on the printed invoice.",
+
   // ── Legal / footer ───────────────────────────────────────────────────
   legalLine:
     "All brand names and trademarks belong to their respective owners. Used strictly for cost comparison under Nominative Fair Use. PayoutDelta is an independent audit tool.",
@@ -364,6 +391,33 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       livePreviewSub: "1:1 A4 · پرنٹ سیف · فوری اپ ڈیٹ",
       logoLimitNote: "زیادہ سے زیادہ {kb}KB · آپ کے ڈرافٹ میں مقامی رہتا ہے، کبھی اپ لوڈ نہیں ہوتا۔",
 
+      // ── Transaction Costing Widget (Phase 8) ──
+      txCostingTitle: "مقامی بینک تصفیہ اور حسب ضرورت لاگت",
+      txCostingLead:
+        "پی آؤٹ پلیٹ فارم سے اپنے بینک اکاؤنٹ تک وائر کے پورے سفر کو ناپیں، پھر اوپر اپنا علاقائی ٹیکس ٹائر شامل کریں۔",
+      bankSelector: "وصول کنندہ بینک",
+      jurisdictionSelector: "دائرہ اختیار / ٹیکس ٹائر",
+      swiftDeduction: "انٹرمیڈیری SWIFT کٹوتی",
+      localBankFee: "مقامی وصول کنندہ بینک فیس",
+      withholdingSlider: "حسب ضرورت ٹیکس کٹوتی",
+      withholdingApplied: "زمین تک پہنچنے والی رقم پر {pct}% لاگو",
+      waterfallTitle: "حقیقی تصفیہ کا سلسلہ",
+      bankSwift: "SWIFT {code}",
+      bankClearance: "{time} کلیئرنس",
+      bankIntermediaryBand: "بینچ مارک {min}–{max} کٹوتی",
+      rowGross: "کلائنٹ کا مجموعی بل",
+      rowPlatformCut: "پلیٹ فارم کٹوتی",
+      rowIntermediary: "انٹرمیڈیری وائر کٹوتی",
+      rowConversion: "حقیقی تبادلہ (کم سے کم فیس والے فراہم کنندہ کی شرح)",
+      rowLandingFee: "مقامی بینک میں جمع ہونے کی فیس",
+      rowWithholding: "خالص ٹیکس کٹوتی",
+      rowTakeHome: "بینک میں اصل کیش",
+      txNote:
+        "صرف تخمینی معلومات — بینک اکاؤنٹ اسٹیٹمنٹ پر قطعی انٹرمیڈیری کٹوتی اور اپنا رجسٹرڈ ٹیکس ٹائر بل بنانے سے پہلے تصدیق کریں۔",
+      invoiceBankToggle: "بینک تصفیہ اور ٹیکس خرابی کو اڈنڈم میں شامل کریں",
+      invoiceBankToggleHint:
+        "طلب کے مطابق انوائس کرنسی کا بینک تصفیہ اور ٹیکس نوٹ چھپی ہوئی انوائس پر شامل کرتا ہے۔",
+
       legalLine:
         "تمام برانڈ نام اور ٹریڈ مارکس اپنے مالکان کی ملکیت ہیں۔ صرف نومینیٹیو فیئر یوز کے تحت لاگت کے موازنے کے لیے استعمال۔ PayoutDelta ایک آزاد آڈٹ ٹول ہے۔",
     },
@@ -512,6 +566,32 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       livePreview: "लाइव दस्तावेज़ पूर्वावलोकन",
       livePreviewSub: "1:1 A4 · प्रिंट-सुरक्षित · तुरंत अपडेट",
       logoLimitNote: "अधिकतम {kb}KB · आपके ड्राफ्ट में स्थानीय रहता है, कभी अपलोड नहीं होता।",
+
+      // ── Transaction Costing Widget (Phase 8) ──
+      txCostingTitle: "स्थानीय बैंक निपटान और कस्टम कॉस्टिंग",
+      txCostingLead:
+        "पेआउट प्लेटफ़ॉर्म से अपने बैंक खाते तक वायर की पूरी यात्रा को मॉडल करें, फिर ऊपर अपना क्षेत्रीय टैक्स टियर जोड़ें।",
+      bankSelector: "प्राप्तकर्ता बैंक",
+      jurisdictionSelector: "अधिकार क्षेत्र / टैक्स टियर",
+      swiftDeduction: "इंटरमीडियरी SWIFT कटौती",
+      localBankFee: "स्थानीय प्राप्तकर्ता बैंक शुल्क",
+      withholdingSlider: "कस्टम कर कटौती",
+      withholdingApplied: "लैंडेड राशि पर {pct}% लागू",
+      waterfallTitle: "वास्तविक निपटान क्रम",
+      bankSwift: "SWIFT {code}",
+      bankClearance: "{time} क्लियरेंस",
+      bankIntermediaryBand: "बेंचमार्क {min}–{max} कटौती",
+      rowGross: "क्लाइंट का कुल बिल",
+      rowPlatformCut: "प्लेटफ़ॉर्म कटौती",
+      rowIntermediary: "इंटरमीडियरी वायर कटौती",
+      rowConversion: "वास्तविक रूपांतरण (सबसे कम फीस दर)",
+      rowLandingFee: "स्थानीय बैंक जमा शुल्क",
+      rowWithholding: "शुद्ध कर कटौती",
+      rowTakeHome: "बैंक में असली टेक-होम",
+      txNote:
+        "सूचनात्मक अनुमान — बैंक क्रेडिट सलाह पर सटीक इंटरमीडियरी कटौती और अपना पंजीकृत टैक्स टियर इनवॉइस करने से पहले सत्यापित करें।",
+      invoiceBankToggle: "अडेंडम में बैंक निपटान और कर विवरण शामिल करें",
+      invoiceBankToggleHint: "इनवॉइस मुद्रा से मेल खाता बैंक निपटान और कर नोट मुद्रित इनवॉइस पर जोड़ता है।",
 
       legalLine:
         "सभी ब्रांड नाम और ट्रेडमार्क उनके संबंधित मालिकों की संपत्ति हैं। नॉमिनेटिव फेयर यूज़ के तहत केवल लागत तुलना के लिए उपयोग। PayoutDelta एक स्वतंत्र ऑडिट टूल है।",
@@ -663,6 +743,33 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       livePreviewSub: "1:1 A4 · print-safe · mabilis mag-update",
       logoLimitNote: "Max {kb}KB · nananatili lang sa iyong draft, hindi na-upload.",
 
+      // ── Transaction Costing Widget (Phase 8) ──
+      txCostingTitle: "Local Bank Settlement & Custom Costing",
+      txCostingLead:
+        "I-model ang wire mula sa payout platform papunta sa iyong bank account, at ilatag ang regional tax tier sa itaas.",
+      bankSelector: "Recipient bank",
+      jurisdictionSelector: "Jurisdiction / tax tier",
+      swiftDeduction: "Intermediary SWIFT deduction",
+      localBankFee: "Local receiving bank fee",
+      withholdingSlider: "Custom withholding tax",
+      withholdingApplied: "{pct}% applied to the landed balance",
+      waterfallTitle: "Real settlement waterfall",
+      bankSwift: "SWIFT {code}",
+      bankClearance: "{time} clearance",
+      bankIntermediaryBand: "Benchmark {min}–{max} deduction",
+      rowGross: "Gross client bill",
+      rowPlatformCut: "Platform cut",
+      rowIntermediary: "Intermediary wire cut",
+      rowConversion: "Real conversion (lowest fee provider rate)",
+      rowLandingFee: "Local bank landing fee",
+      rowWithholding: "Net withholding tax",
+      rowTakeHome: "True liquid take-home",
+      txNote:
+        "Informational estimates — confirm the exact intermediary deduction on the bank credit advice and verify your registered tax tier before invoicing.",
+      invoiceBankToggle: "Include Bank Settlement & Tax Breakdown in Addendum",
+      invoiceBankToggleHint:
+        "Appends the bank settlement & tax note matched to the invoice currency on the printed invoice.",
+
       legalLine:
         "Lahat ng brand name at trademark ay pag-aari ng kani-kanilang may-ari. Ginagamit lamang para sa cost comparison sa ilalim ng Nominative Fair Use. Ang PayoutDelta ay isang independiyenteng audit tool.",
     },
@@ -812,6 +919,33 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       livePreview: "Vista previa en vivo",
       livePreviewSub: "A4 1:1 · listo para imprimir · se actualiza al instante",
       logoLimitNote: "Máx. {kb}KB · permanece local en tu borrador, nunca se sube.",
+
+      // ── Transaction Costing Widget (Phase 8) ──
+      txCostingTitle: "Liquidación Bancaria Local y Costeo Personalizado",
+      txCostingLead:
+        "Modela la transferencia desde la plataforma de pagos hasta tu cuenta bancaria y agrega tu nivel impositivo regional encima.",
+      bankSelector: "Banco receptor",
+      jurisdictionSelector: "Jurisdicción / nivel impositivo",
+      swiftDeduction: "Deducción SWIFT intermediaria",
+      localBankFee: "Comisión receptora bancaria local",
+      withholdingSlider: "Retención de impuestos personalizada",
+      withholdingApplied: "{pct}% aplicado al saldo acreditado",
+      waterfallTitle: "Cascada de liquidación real",
+      bankSwift: "SWIFT {code}",
+      bankClearance: "Compensación en {time}",
+      bankIntermediaryBand: "Deducción de referencia {min}–{max}",
+      rowGross: "Factura bruta del cliente",
+      rowPlatformCut: "Comisión de la plataforma",
+      rowIntermediary: "Corte de transferencia intermediaria",
+      rowConversion: "Conversión real (tasa del proveedor más barato)",
+      rowLandingFee: "Comisión de acreditación bancaria",
+      rowWithholding: "Retención de impuestos neta",
+      rowTakeHome: "Líquido real en tu banco",
+      txNote:
+        "Estimaciones informativas: confirma la deducción intermediaria exacta en el aviso de acreditación y verifica tu nivel impositivo registrado antes de facturar.",
+      invoiceBankToggle: "Incluir Liquidación Bancaria y Desglose de Impuestos en el Anexo",
+      invoiceBankToggleHint:
+        "Agrega la nota bancaria y tributaria según la moneda de la factura en el documento impreso.",
 
       legalLine:
         "Todas las marcas y nombres comerciales pertenecen a sus respectivos dueños. Se usan estrictamente para comparación de costes bajo uso justo nominativo. PayoutDelta es una herramienta de auditoría independiente.",
@@ -963,6 +1097,33 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       livePreviewSub: "A4 1:1 · pronto para imprimir · atualiza na hora",
       logoLimitNote: "Máx. {kb}KB · permanece local no rascunho, nunca é enviado.",
 
+      // ── Transaction Costing Widget (Phase 8) ──
+      txCostingTitle: "Liquidação Bancária Local e Custeio Personalizado",
+      txCostingLead:
+        "Modele a transferência da plataforma de pagamento até sua conta bancária e adicione seu enquadramento tributário regional por cima.",
+      bankSelector: "Banco receptor",
+      jurisdictionSelector: "Jurisdição / faixa tributária",
+      swiftDeduction: "Dedução SWIFT intermediária",
+      localBankFee: "Tarifa bancária receptora local",
+      withholdingSlider: "Retenção de impostos personalizada",
+      withholdingApplied: "{pct}% aplicado ao saldo creditado",
+      waterfallTitle: "Cascata de liquidação real",
+      bankSwift: "SWIFT {code}",
+      bankClearance: "Compensação em {time}",
+      bankIntermediaryBand: "Dedução de referência {min}–{max}",
+      rowGross: "Fatura bruta do cliente",
+      rowPlatformCut: "Corte da plataforma",
+      rowIntermediary: "Corte de transferência intermediária",
+      rowConversion: "Conversão real (taxa do provedor mais barato)",
+      rowLandingFee: "Tarifa de acreditação bancária",
+      rowWithholding: "Retenção de impostos líquida",
+      rowTakeHome: "Líquido real no banco",
+      txNote:
+        "Estimativas informativas — confirme a dedução intermediária exata no aviso de crédito e verifique sua faixa tributária antes de faturar.",
+      invoiceBankToggle: "Incluir Liquidação Bancária e Detalhamento de Impostos no Anexo",
+      invoiceBankToggleHint:
+        "Adiciona a nota bancária e tributária conforme a moeda da fatura no documento impresso.",
+
       legalLine:
         "Todas as marcas e nomes comerciais pertencem aos seus respectivos donos. Usados estritamente para comparação de custos sob uso justo nominativo. PayoutDelta é uma ferramenta de auditoria independente.",
     },
@@ -1112,6 +1273,33 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       livePreview: "معاينة مباشرة للوثيقة",
       livePreviewSub: "1:1 A4 · آمن للطباعة · تحديث فوري",
       logoLimitNote: "الحد الأقصى {kb} كيلوبايت · يبقى محليًا في مسودتك، لا يُرفع أبدًا.",
+
+      // ── Transaction Costing Widget (Phase 8) ──
+      txCostingTitle: "التسوية المصرفية المحلية والتكلفة المخصصة",
+      txCostingLead:
+        "نموذج الحوالة من منصة الدفع إلى حسابك المصرفي، ثم أضف الفئة الضريبية الإقليمية فوق ذلك.",
+      bankSelector: "البنك المستلم",
+      jurisdictionSelector: "الاختصاص / الفئة الضريبية",
+      swiftDeduction: "خصم الوسيط عبر سويفت",
+      localBankFee: "رسوم البنك المحلي المستلم",
+      withholdingSlider: "ضريبة الخصم المخصصة",
+      withholdingApplied: "يُطبق {pct}% على الرصيد المستحق",
+      waterfallTitle: "تسلسل التسوية الفعلي",
+      bankSwift: "سويفت {code}",
+      bankClearance: "إنجاز خلال {time}",
+      bankIntermediaryBand: "خصم مرجعي {min}–{max}",
+      rowGross: "الفاتورة الإجمالية للعميل",
+      rowPlatformCut: "رسوم المنصة",
+      rowIntermediary: "خصم الحوالة الوسيط",
+      rowConversion: "التحويل الفعلي (سعر الأقل رسومًا)",
+      rowLandingFee: "رسوم الإيداع المصرفي المحلي",
+      rowWithholding: "صافي ضريبة الخصم",
+      rowTakeHome: "صافي الاستلام في البنك",
+      txNote:
+        "تقديرات إرشادية — تحقق من خصم الوسيط الفعلي على إشعار الائتمان وفئتك الضريبية المسجلة قبل إصدار الفاتورة.",
+      invoiceBankToggle: "إدراج التسوية المصرفية وتفصيل الضرائب في الملحق",
+      invoiceBankToggleHint:
+        "يضيف ملاحظة التسوية المصرفية والضريبية المطابقة لعملة الفاتورة في المستند المطبوع.",
 
       legalLine:
         "جميع الأسماء والعلامات التجارية ملك لأصحابها. تستخدم حصريًا للمقارنة تحت مبدأ الاستخدام العادل الاسمي. PayoutDelta أداة تدقيق مستقلة.",

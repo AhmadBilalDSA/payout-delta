@@ -25,6 +25,7 @@ import VerdictCard from "@/components/VerdictCard";
 import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
 import TaxImpactCard from "@/components/TaxImpactCard";
+import TransactionCostingWidget from "@/components/TransactionCostingWidget";
 import AuditReceipt from "@/components/AuditReceipt";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -118,6 +119,30 @@ export default function Calculator({
   }, [isTarget, inverseRoute, route, amount, corridor]);
 
   const targetBounds = useMemo(() => localSliderBounds(corridor), [corridor]);
+
+  // Phase 8 — the TransactionCostingWidget anchors its 7-step settlement
+  // waterfall on whatever quote the active mode already declared "best"
+  // (matching the TaxImpactCard), so every figure agrees with the verdict.
+  const costingAnchor = useMemo(() => {
+    if (isTarget) {
+      const quote = inverseRoute.verdict.best ?? inverseRoute.quotes[0];
+      if (!quote) return null;
+      return {
+        grossUSD: quote.grossRequired,
+        platformFeeUSD: quote.platformFeeUSD,
+        effectiveRate: quote.effectiveRate,
+        channelName: quote.channelName,
+      };
+    }
+    const quote = route.verdict.best ?? route.quotes[0];
+    if (!quote) return null;
+    return {
+      grossUSD: amount,
+      platformFeeUSD: quote.platformFeeUSD,
+      effectiveRate: quote.effectiveRate,
+      channelName: quote.channelName,
+    };
+  }, [isTarget, inverseRoute, route, amount]);
 
   // Phase 7 refresh — "Share calculation" deep-link hydration. When the page
   // loads with `?mode=&platform=&gross=` / `?mode=&platform=&target=` query
@@ -272,6 +297,12 @@ export default function Calculator({
           channelName={taxSnapshot.channelName}
           effectiveRate={taxSnapshot.effectiveRate}
         />
+      )}
+
+      {/* Phase 8 — local bank settlement & custom costing under the ranked
+          breakdown and tax card, shared by every corridor page variant. */}
+      {costingAnchor !== null && (
+        <TransactionCostingWidget corridor={corridor} {...costingAnchor} />
       )}
 
       {/* Nominative fair use — mandatory legal line. */}

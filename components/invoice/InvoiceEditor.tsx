@@ -448,6 +448,16 @@ export default function InvoiceEditor({
           }
         />
 
+        <Phase8BankTaxToggle
+          enabled={draft.includeBankTaxNote}
+          onToggle={(next) =>
+            setDraft((current) => ({
+              ...current,
+              includeBankTaxNote: next,
+            }))
+          }
+        />
+
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.06] pt-4">
           <span
             className="inline-flex items-center gap-1.5 text-xs text-slate-500"
@@ -513,6 +523,57 @@ export default function InvoiceEditor({
 /* ---------------------------------------------------------------------------
  * Local primitives — editorial, native-feeling inputs.
  * ------------------------------------------------------------------------- */
+
+/** Phase 8 — bank settlement & tax breakdown addendum toggle. */
+function Phase8BankTaxToggle({
+  enabled,
+  onToggle,
+}: {
+  enabled: boolean;
+  onToggle: (next: boolean) => void;
+}) {
+  const { t } = useLanguage();
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/[0.06] bg-white p-4 transition-colors duration-200 ease-out hover:border-black/[0.15]">
+      <input
+        type="checkbox"
+        className="peer sr-only"
+        checked={enabled}
+        onChange={(event) => onToggle(event.target.checked)}
+      />
+      <span
+        aria-hidden="true"
+        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ease-out peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 peer-focus-visible:ring-offset-2 ${
+          enabled
+            ? "border-emerald-600 bg-emerald-600 text-white"
+            : "border-black/20 bg-white text-transparent"
+        }`}
+      >
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          className="h-3 w-3"
+        >
+          <path
+            d="m3 8.5 3.2 3L13 4.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-slate-900">
+          {t("invoiceBankToggle")}
+        </span>
+        <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">
+          {t("invoiceBankToggleHint")}
+        </span>
+      </span>
+    </label>
+  );
+}
 
 function Section({
   title,

@@ -29,6 +29,38 @@ export const TRANSPARENCY_CORRIDORS: readonly string[] = [
   "Upwork Direct",
 ];
 
+/**
+ * Phase 8 — currency-matched bank settlement & tax note appended to the printed
+ * invoice when `includeBankTaxNote` is on. Print documents stay English, so
+ * these templates are intentionally untranslated.
+ */
+export const BANK_TAX_NOTES: Record<string, string> = {
+  USD: "Intermediary clearing banks may apply OUR/EWI deductions before credit. Confirm the exact deduction on the bank credit advice; local withholding applies per the recipient's registered tax tier.",
+  EUR: "SEPA inbound transfers normally credit without intermediary deductions, but correspondent banks may still apply OUR/EWI charges. Confirm on the bank credit advice and verify your VAT / withholding registration.",
+  GBP: "FPS inbound transfers normally credit same-day without intermediary deductions. Some correspondent routes still apply a small OUR charge — confirm on the bank credit advice.",
+  CAD: "Inbound EFT clearing is typically free of intermediary deductions; correspondent banks may still apply OUR/EWI charges. Confirm on the bank credit advice and verify your withholding registration.",
+  AUD: "Inbound EFT clearing is typically free of intermediary deductions; correspondent banks may still apply OUR/EWI charges. Confirm on the bank credit advice and verify your withholding registration.",
+};
+
+/** Print/preview block rendered when the Phase 8 toggle is enabled. */
+export function BankSettlementBlock({ currency }: { currency: string }) {
+  const note = BANK_TAX_NOTES[currency] ?? BANK_TAX_NOTES.USD;
+  return (
+    <section
+      aria-label="Bank settlement and tax note"
+      className="invoice-addendum mt-8 rounded-lg border border-slate-200 p-4"
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+        Bank Settlement &amp; Tax Note
+      </p>
+      <p className="mt-2 text-[11px] leading-relaxed text-slate-600">{note}</p>
+      <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        {currency} settlement
+      </p>
+    </section>
+  );
+}
+
 /** Editor toggle — `[✓] Attach Remittance Transparency Addendum`. */
 export default function TransparencyClause({
   enabled,

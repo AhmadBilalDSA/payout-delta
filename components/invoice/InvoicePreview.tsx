@@ -2,7 +2,10 @@
 
 import type { CSSProperties } from "react";
 import type { WithdrawalChannel } from "@/lib/types";
-import { TransparencyClauseBlock } from "@/components/invoice/TransparencyClause";
+import {
+  TransparencyClauseBlock,
+  BankSettlementBlock,
+} from "@/components/invoice/TransparencyClause";
 import type { InvoiceDraft } from "@/lib/invoiceTypes";
 import {
   accentByKey,
@@ -217,6 +220,10 @@ export default function InvoicePreview({
 
         {draft.includeTransparencyClause && (
           <TransparencyClauseBlock channels={channels} />
+        )}
+
+        {draft.includeBankTaxNote && (
+          <BankSettlementBlock currency={draft.meta.currency} />
         )}
 
         <div className="mt-8 border-t border-slate-200 pt-3 text-[10px] leading-relaxed text-slate-400">

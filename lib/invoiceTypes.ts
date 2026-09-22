@@ -86,6 +86,8 @@ export interface InvoiceDraft {
   accent: AccentKey;
   logoDataUrl: string | null;
   includeTransparencyClause: boolean;
+  /** Phase 8 — append the currency-matched bank settlement & tax note. */
+  includeBankTaxNote: boolean;
 }
 
 /** `INV-2026-001` — default invoice numbering, editable in the studio. */
@@ -148,6 +150,7 @@ export function createEmptyDraft(): InvoiceDraft {
     accent: "emerald",
     logoDataUrl: null,
     includeTransparencyClause: true,
+    includeBankTaxNote: false,
   };
 }
 
@@ -304,6 +307,10 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
       typeof parsed.includeTransparencyClause === "boolean"
         ? parsed.includeTransparencyClause
         : fallback.includeTransparencyClause,
+    includeBankTaxNote:
+      typeof parsed.includeBankTaxNote === "boolean"
+        ? parsed.includeBankTaxNote
+        : fallback.includeBankTaxNote,
   };
 }
 
