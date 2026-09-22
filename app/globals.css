@@ -98,16 +98,22 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 /* Right-to-left locales (Urdu / Arabic) need the Nastaliq-capable typefaces
    plus extra breathing room for the deeper glyph stack. Kept in one cascade
    layer so SaaS tooling and dark-mode overrides still apply cleanly. */
 [dir="rtl"] {
-  font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq",
+  font-family: "Noto Nastaliq Urdu", "Noto Sans Arabic", "Jameel Noori Nastaleeq",
     "Urdu Typesetting", var(--font-geist-sans), "Segoe UI", Tahoma, sans-serif;
   line-height: 1.7;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
 }
 
 [dir="rtl"] .tabular-nums,

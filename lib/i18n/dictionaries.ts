@@ -231,6 +231,29 @@ export const enStrings = {
   invoiceBankToggleHint:
     "Appends the bank settlement & tax note matched to the invoice currency on the printed invoice.",
 
+  // ── Statutory Costing Engine (Phase 9) ────────────────────────────────
+  rowNetConverted: "Net converted via best provider",
+  platformSurcharge: "Custom platform surcharge / client retainer",
+  platformSurchargeApplied: "{pct}% surcharge layered on the gross bill",
+  localClearingFee: "Local clearing / landing fee",
+  syncToInvoice: "Sync to Invoice",
+  syncedTick: "Synced to Invoice",
+  syncHint:
+    "Your bank, purpose code and tax tier are saved locally and auto-fill the Invoice Studio.",
+  purposeCodeLabel: "Purpose code {code}",
+  statutoryAuthority: "Statutory basis",
+  bankClearingDetails: "Banking & clearing details",
+  beneficiaryAccount: "Beneficiary account / IBAN",
+  receivingBank: "Receiving bank",
+  swiftBic: "SWIFT / BIC code",
+  intermediaryNote: "Intermediary correspondent routing note",
+  statutoryAddendumToggle: "Include Statutory Tax & Purpose Code Addendum",
+  statutoryAddendumHint:
+    "Appends the statutory purpose code, withholding basis and legal reference to the printed invoice.",
+  gstPct: "GST %",
+  gstLine: "Line-item GST",
+  lineItemsGstNote: "Zero-rated on export — set per line item.",
+
   // ── Legal / footer ───────────────────────────────────────────────────
   legalLine:
     "All brand names and trademarks belong to their respective owners. Used strictly for cost comparison under Nominative Fair Use. PayoutDelta is an independent audit tool.",
@@ -418,6 +441,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       invoiceBankToggleHint:
         "طلب کے مطابق انوائس کرنسی کا بینک تصفیہ اور ٹیکس نوٹ چھپی ہوئی انوائس پر شامل کرتا ہے۔",
 
+      rowNetConverted: "بہترین فراہم کنندہ کے ذریعے خالص رقم",
+      platformSurcharge: "اپنی مرضی کا پلیٹ فارم سرچارج / کلائنٹ ریٹینر",
+      platformSurchargeApplied: "مجموعی بل پر {pct}% سرچارج لاگو",
+      localClearingFee: "مقامی کلیئرنگ / اکاؤنٹ میں جمع ہونے کی فیس",
+      syncToInvoice: "انوائس پر منتقل کریں",
+      syncedTick: "انوائس پر منتقل ہو گیا",
+      syncHint:
+        "آپ کے بینک، پرپز کوڈ اور ٹیکس ٹائر آپ کی ڈیوائس پر محفوظ ہیں اور انوائس اسٹوڈیو میں خودکار طور پر شامل ہوں گے۔",
+      purposeCodeLabel: "پرپز کوڈ {code}",
+      statutoryAuthority: "قانونی بنیاد",
+      bankClearingDetails: "بینکاری اور کلیئرنگ کی تفصیلات",
+      beneficiaryAccount: "فائدہ اٹھانے والے کا اکاؤنٹ / IBAN",
+      receivingBank: "وصول کنندہ بینک",
+      swiftBic: "SWIFT / BIC کوڈ",
+      intermediaryNote: "انٹرمیڈیری کارسپانڈنٹ روٹنگ نوٹ",
+      statutoryAddendumToggle: "قانونی ٹیکس اور پرپز کوڈ اڈنڈم شامل کریں",
+      statutoryAddendumHint:
+        "چھپی ہوئی انوائس پر قانونی پرپز کوڈ، ٹیکس کی بنیاد اور حوالہ شامل کرتا ہے۔",
+      gstPct: "GST %",
+      gstLine: "لائن آئٹم GST",
+      lineItemsGstNote: "برآمد پر زیرو ریٹڈ — ہر آئٹم کے لیے الگ سیٹ کریں۔",
+
       legalLine:
         "تمام برانڈ نام اور ٹریڈ مارکس اپنے مالکان کی ملکیت ہیں۔ صرف نومینیٹیو فیئر یوز کے تحت لاگت کے موازنے کے لیے استعمال۔ PayoutDelta ایک آزاد آڈٹ ٹول ہے۔",
     },
@@ -592,6 +637,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "सूचनात्मक अनुमान — बैंक क्रेडिट सलाह पर सटीक इंटरमीडियरी कटौती और अपना पंजीकृत टैक्स टियर इनवॉइस करने से पहले सत्यापित करें।",
       invoiceBankToggle: "अडेंडम में बैंक निपटान और कर विवरण शामिल करें",
       invoiceBankToggleHint: "इनवॉइस मुद्रा से मेल खाता बैंक निपटान और कर नोट मुद्रित इनवॉइस पर जोड़ता है।",
+
+      rowNetConverted: "सर्वश्रेष्ठ प्रदाता के माध्यम से शुद्ध राशि",
+      platformSurcharge: "कस्टम प्लेटफ़ॉर्म शुल्क / क्लाइंट रिटेनर",
+      platformSurchargeApplied: "कुल बिल पर {pct}% शुल्क लागू",
+      localClearingFee: "स्थानीय क्लियरिंग / जमा शुल्क",
+      syncToInvoice: "इनवॉइस में सिंक करें",
+      syncedTick: "इनवॉइस में सिंक हुआ",
+      syncHint:
+        "आपका बैंक, पर्पस कोड और टैक्स टियर स्थानीय रूप से सहेजे जाते हैं और इनवॉइस स्टूडियो में स्वतः भर जाते हैं।",
+      purposeCodeLabel: "पर्पस कोड {code}",
+      statutoryAuthority: "सांविधिक आधार",
+      bankClearingDetails: "बैंकिंग और क्लियरिंग विवरण",
+      beneficiaryAccount: "लाभार्थी खाता / IBAN",
+      receivingBank: "प्राप्तकर्ता बैंक",
+      swiftBic: "SWIFT / BIC कोड",
+      intermediaryNote: "इंटरमीडियरी संवाददाता रूटिंग नोट",
+      statutoryAddendumToggle: "सांविधिक कर और पर्पस कोड अडेंडम शामिल करें",
+      statutoryAddendumHint:
+        "मुद्रित इनवॉइस पर सांविधिक पर्पस कोड, कर आधार और कानूनी संदर्भ जोड़ता है।",
+      gstPct: "GST %",
+      gstLine: "लाइन-आइटम GST",
+      lineItemsGstNote: "निर्यात पर शून्य-दर — प्रति आइटम सेट करें।",
 
       legalLine:
         "सभी ब्रांड नाम और ट्रेडमार्क उनके संबंधित मालिकों की संपत्ति हैं। नॉमिनेटिव फेयर यूज़ के तहत केवल लागत तुलना के लिए उपयोग। PayoutDelta एक स्वतंत्र ऑडिट टूल है।",
@@ -770,6 +837,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       invoiceBankToggleHint:
         "Appends the bank settlement & tax note matched to the invoice currency on the printed invoice.",
 
+      rowNetConverted: "Net converted via best provider",
+      platformSurcharge: "Custom platform surcharge / client retainer",
+      platformSurchargeApplied: "{pct}% surcharge layered on the gross bill",
+      localClearingFee: "Local clearing / landing fee",
+      syncToInvoice: "Sync to Invoice",
+      syncedTick: "Synced to Invoice",
+      syncHint:
+        "Your bank, purpose code and tax tier are saved locally and auto-fill the Invoice Studio.",
+      purposeCodeLabel: "Purpose code {code}",
+      statutoryAuthority: "Statutory basis",
+      bankClearingDetails: "Banking & clearing details",
+      beneficiaryAccount: "Beneficiary account / IBAN",
+      receivingBank: "Receiving bank",
+      swiftBic: "SWIFT / BIC code",
+      intermediaryNote: "Intermediary correspondent routing note",
+      statutoryAddendumToggle: "Include Statutory Tax & Purpose Code Addendum",
+      statutoryAddendumHint:
+        "Appends the statutory purpose code, withholding basis and legal reference to the printed invoice.",
+      gstPct: "GST %",
+      gstLine: "Line-item GST",
+      lineItemsGstNote: "Zero-rated on export — set per line item.",
+
       legalLine:
         "Lahat ng brand name at trademark ay pag-aari ng kani-kanilang may-ari. Ginagamit lamang para sa cost comparison sa ilalim ng Nominative Fair Use. Ang PayoutDelta ay isang independiyenteng audit tool.",
     },
@@ -946,6 +1035,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       invoiceBankToggle: "Incluir Liquidación Bancaria y Desglose de Impuestos en el Anexo",
       invoiceBankToggleHint:
         "Agrega la nota bancaria y tributaria según la moneda de la factura en el documento impreso.",
+
+      rowNetConverted: "Neto convertido vía mejor proveedor",
+      platformSurcharge: "Recargo de plataforma / retenedor de cliente",
+      platformSurchargeApplied: "{pct}% de recargo sobre la factura bruta",
+      localClearingFee: "Comisión local de compensación / abono",
+      syncToInvoice: "Sincronizar con la factura",
+      syncedTick: "Sincronizado con la factura",
+      syncHint:
+        "Tu banco, código de propósito y tramo fiscal se guardan localmente y se completan solos en el Estudio de facturas.",
+      purposeCodeLabel: "Código de propósito {code}",
+      statutoryAuthority: "Base legal",
+      bankClearingDetails: "Datos bancarios y de compensación",
+      beneficiaryAccount: "Cuenta del beneficiario / IBAN",
+      receivingBank: "Banco receptor",
+      swiftBic: "Código SWIFT / BIC",
+      intermediaryNote: "Nota de ruta del corresponsal intermediario",
+      statutoryAddendumToggle: "Incluir Anexo de Impuestos Estatutarios y Código de Propósito",
+      statutoryAddendumHint:
+        "Agrega el código de propósito, la base de retención y la referencia legal a la factura impresa.",
+      gstPct: "GST %",
+      gstLine: "GST por línea",
+      lineItemsGstNote: "Cero impuesto por exportación — se fija por línea.",
 
       legalLine:
         "Todas las marcas y nombres comerciales pertenecen a sus respectivos dueños. Se usan estrictamente para comparación de costes bajo uso justo nominativo. PayoutDelta es una herramienta de auditoría independiente.",
@@ -1124,6 +1235,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       invoiceBankToggleHint:
         "Adiciona a nota bancária e tributária conforme a moeda da fatura no documento impresso.",
 
+      rowNetConverted: "Líquido convertido via melhor provedor",
+      platformSurcharge: "Sobretaxa de plataforma / retenção de cliente",
+      platformSurchargeApplied: "{pct}% de sobretaxa sobre a fatura bruta",
+      localClearingFee: "Taxa local de compensação / crédito",
+      syncToInvoice: "Sincronizar com a fatura",
+      syncedTick: "Sincronizado com a fatura",
+      syncHint:
+        "Seu banco, código de propósito e faixa fiscal são salvos localmente e preenchem o Estúdio de faturas automaticamente.",
+      purposeCodeLabel: "Código de propósito {code}",
+      statutoryAuthority: "Base legal",
+      bankClearingDetails: "Dados bancários e de compensação",
+      beneficiaryAccount: "Conta do beneficiário / IBAN",
+      receivingBank: "Banco receptor",
+      swiftBic: "Código SWIFT / BIC",
+      intermediaryNote: "Nota de rota do correspondente intermediário",
+      statutoryAddendumToggle: "Incluir Anexo de Impostos Legais e Código de Propósito",
+      statutoryAddendumHint:
+        "Adiciona o código de propósito, a base de retenção e a referência legal à fatura impressa.",
+      gstPct: "GST %",
+      gstLine: "GST por item",
+      lineItemsGstNote: "Isento na exportação — definido por item.",
+
       legalLine:
         "Todas as marcas e nomes comerciais pertencem aos seus respectivos donos. Usados estritamente para comparação de custos sob uso justo nominativo. PayoutDelta é uma ferramenta de auditoria independente.",
     },
@@ -1300,6 +1433,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       invoiceBankToggle: "إدراج التسوية المصرفية وتفصيل الضرائب في الملحق",
       invoiceBankToggleHint:
         "يضيف ملاحظة التسوية المصرفية والضريبية المطابقة لعملة الفاتورة في المستند المطبوع.",
+
+      rowNetConverted: "صافي المحوّل عبر أفضل مزود",
+      platformSurcharge: "رسوم منصة مخصصة / رسم عميل",
+      platformSurchargeApplied: "{pct}% رسوم إضافية على الفاتورة الإجمالية",
+      localClearingFee: "رسوم المقاصة / الإيداع المحلية",
+      syncToInvoice: "مزامنة مع الفاتورة",
+      syncedTick: "تمت المزامنة مع الفاتورة",
+      syncHint:
+        "يُحفظ مصرفك ورمز الغرض وفئتك الضريبية محليًا وتُعبأ تلقائيًا في استوديو الفواتير.",
+      purposeCodeLabel: "رمز الغرض {code}",
+      statutoryAuthority: "الأساس القانوني",
+      bankClearingDetails: "تفاصيل مصرفية والمقاصة",
+      beneficiaryAccount: "حساب المستفيد / IBAN",
+      receivingBank: "المصرف المستقبِل",
+      swiftBic: "رمز SWIFT / BIC",
+      intermediaryNote: "ملاحظة توجيه المراسل الوسيط",
+      statutoryAddendumToggle: "تضمين ملحق الضرائب القانونية ورمز الغرض",
+      statutoryAddendumHint:
+        "يضيف رمز الغرض وأساس الخصم والمرجع القانوني إلى الفاتورة المطبوعة.",
+      gstPct: "GST %",
+      gstLine: "GST لكل بند",
+      lineItemsGstNote: "معفى عند التصدير — يُحدد لكل بند.",
 
       legalLine:
         "جميع الأسماء والعلامات التجارية ملك لأصحابها. تستخدم حصريًا للمقارنة تحت مبدأ الاستخدام العادل الاسمي. PayoutDelta أداة تدقيق مستقلة.",

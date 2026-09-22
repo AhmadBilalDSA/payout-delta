@@ -2,6 +2,7 @@
 
 import type { WithdrawalChannel } from "@/lib/types";
 import { formatUSD } from "@/utils/format";
+import type { InvoiceBanking } from "@/lib/invoiceTypes";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
@@ -57,6 +58,62 @@ export function BankSettlementBlock({ currency }: { currency: string }) {
       <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
         {currency} settlement
       </p>
+    </section>
+  );
+}
+
+/**
+ * Phase 9 — Statutory Tax & Purpose Code Addendum. Rendered on the printed
+ * invoice when `includeStatutoryAddendum` is on, carrying the exact bank,
+ * purpose code and statutory basis synced from the calculator. English only —
+ * stays consistent with the print document's language contract.
+ */
+export function StatutoryComplianceBlock({
+  banking,
+}: {
+  banking: InvoiceBanking;
+}) {
+  return (
+    <section
+      aria-label="Statutory tax and purpose code addendum"
+      className="invoice-addendum mt-8 rounded-lg border border-slate-200 p-4"
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+        Statutory Tax &amp; Purpose Code Addendum
+      </p>
+      <dl className="mt-2 divide-y divide-slate-100 border-t border-slate-100 text-[11px]">
+        {(
+          [
+            [banking.receivingBank, "Receiving bank", false],
+            [banking.swiftCode, "SWIFT / BIC code", true],
+            [banking.beneficiaryAccount, "Beneficiary account / IBAN", true],
+            [banking.purposeCode, "Statutory purpose code", true],
+            [banking.tierLabel, "Tax tier", false],
+            [banking.authority, "Statutory basis", false],
+          ] as [string, string, boolean][]
+        )
+          .filter(([value]) => value.trim() !== "")
+          .map(([value, label, mono]) => (
+            <div
+              key={label}
+              className="flex items-baseline justify-between gap-4 py-1.5"
+            >
+              <dt className="text-slate-500">{label}</dt>
+              <dd
+                className={`text-right font-medium text-slate-800 ${
+                  mono ? "font-mono tabular-nums" : ""
+                }`}
+              >
+                {value}
+              </dd>
+            </div>
+          ))}
+      </dl>
+      {banking.correspondentNote && (
+        <p className="mt-2 text-[11px] leading-relaxed text-slate-600">
+          {banking.correspondentNote}
+        </p>
+      )}
     </section>
   );
 }

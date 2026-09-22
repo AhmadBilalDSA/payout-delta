@@ -5,6 +5,7 @@ import type { WithdrawalChannel } from "@/lib/types";
 import {
   TransparencyClauseBlock,
   BankSettlementBlock,
+  StatutoryComplianceBlock,
 } from "@/components/invoice/TransparencyClause";
 import type { InvoiceDraft } from "@/lib/invoiceTypes";
 import {
@@ -12,11 +13,12 @@ import {
   createInvoiceNumber,
   formatCurrency,
   formatHumanDate,
+  globalTaxAmount,
   grandTotal,
   lineTotal,
   parseAmount,
   subtotal,
-  taxAmount,
+  totalLineGst,
 } from "@/lib/invoiceTypes";
 
 /**
@@ -38,8 +40,12 @@ export default function InvoicePreview({
   const accent = accentByKey(draft.accent);
   const ccy = draft.meta.currency;
   const sub = subtotal(draft);
-  const tax = taxAmount(draft);
+  const lineGst = totalLineGst(draft);
+  const globalTax = globalTaxAmount(draft);
   const total = grandTotal(draft);
+  const anyLineGst = draft.lineItems.some(
+    (item) => parseAmount(item.gstPercent) > 0
+  );
   const fmt = (value: number) => formatCurrency(value, ccy);
 
   return (
@@ -164,6 +170,9 @@ export default function InvoicePreview({
                 <th className="py-2 pr-2 font-semibold">Description</th>
                 <th className="px-2 py-2 text-right font-semibold">Qty / Hrs</th>
                 <th className="px-2 py-2 text-right font-semibold">Unit rate</th>
+                {anyLineGst && (
+                  <th className="px-2 py-2 text-right font-semibold">GST %</th>
+                )}
                 <th className="py-2 pl-2 text-right font-semibold">Amount</th>
               </tr>
             </thead>
@@ -179,6 +188,13 @@ export default function InvoicePreview({
                   <td className="px-2 py-2.5 text-right font-mono tabular-nums text-slate-700">
                     {fmt(parseAmount(item.unitRate))}
                   </td>
+                  {anyLineGst && (
+                    <td className="px-2 py-2.5 text-right font-mono tabular-nums text-slate-700">
+                      {parseAmount(item.gstPercent) > 0
+                        ? `${parseAmount(item.gstPercent)}%`
+                        : "0%"}
+                    </td>
+                  )}
                   <td className="py-2.5 pl-2 text-right font-mono tabular-nums font-medium text-slate-900">
                     {fmt(lineTotal(item))}
                   </td>
@@ -192,10 +208,18 @@ export default function InvoicePreview({
               <span>Subtotal</span>
               <span className="font-mono tabular-nums">{fmt(sub)}</span>
             </div>
-            {tax > 0 && (
+            {lineGst > 0 && (
+              <div className="flex items-baseline justify-between py-1 text-xs text-slate-500">
+                <span>Line-item GST</span>
+                <span className="font-mono tabular-nums">{fmt(lineGst)}</span>
+              </div>
+            )}
+            {globalTax > 0 && (
               <div className="flex items-baseline justify-between py-1 text-xs text-slate-500">
                 <span>Tax / VAT ({draft.taxPercent || "0"}%)</span>
-                <span className="font-mono tabular-nums">{fmt(tax)}</span>
+                <span className="font-mono tabular-nums">
+                  {fmt(globalTax)}
+                </span>
               </div>
             )}
             <div
@@ -224,6 +248,10 @@ export default function InvoicePreview({
 
         {draft.includeBankTaxNote && (
           <BankSettlementBlock currency={draft.meta.currency} />
+        )}
+
+        {draft.includeStatutoryAddendum && (
+          <StatutoryComplianceBlock banking={draft.banking} />
         )}
 
         <div className="mt-8 border-t border-slate-200 pt-3 text-[10px] leading-relaxed text-slate-400">

@@ -12,6 +12,8 @@
  */
 
 export const INVOICE_STORAGE_KEY = "payoutdelta_draft_invoice";
+/** Phase 9 — calculator → Invoice Studio bank-sync bridge (localStorage). */
+export const BANK_SYNC_KEY = "payoutdelta_banksync";
 export const INVOICE_LOGO_LIMIT_BYTES = 500 * 1024;
 
 export type CurrencyCode = "USD" | "EUR" | "GBP" | "CAD" | "AUD";
@@ -75,6 +77,26 @@ export interface InvoiceLineItem {
   description: string;
   quantity: string;
   unitRate: string;
+  /**
+   * Per line-item GST/VAT percentage (default "0" — zero-rated export).
+   * Layers on top of the invoice-level `taxPercent` so export invoices stay
+   * 0% while a domestic line can carry its own rate.
+   */
+  gstPercent: string;
+}
+
+/** Phase 9 — banking & clearing details synced from the calculator. */
+export interface InvoiceBanking {
+  beneficiaryAccount: string;
+  receivingBank: string;
+  swiftCode: string;
+  correspondentNote: string;
+  /** Statutory export purpose code, e.g. "9111" / "P0802". */
+  purposeCode: string;
+  /** Governing statutory authority / tax basis, e.g. "ITO Section 154A". */
+  authority: string;
+  /** Human tier label, e.g. "PSEB Registered IT Exporter · 0.25%". */
+  tierLabel: string;
 }
 
 export interface InvoiceDraft {
@@ -88,6 +110,9 @@ export interface InvoiceDraft {
   includeTransparencyClause: boolean;
   /** Phase 8 — append the currency-matched bank settlement & tax note. */
   includeBankTaxNote: boolean;
+  /** Phase 9 — banking, purpose code & statutory withholding addendum. */
+  banking: InvoiceBanking;
+  includeStatutoryAddendum: boolean;
 }
 
 /** `INV-2026-001` — default invoice numbering, editable in the studio. */
@@ -123,6 +148,7 @@ export function createLineItem(
     description,
     quantity,
     unitRate,
+    gstPercent: "0",
   };
 }
 
@@ -151,6 +177,16 @@ export function createEmptyDraft(): InvoiceDraft {
     logoDataUrl: null,
     includeTransparencyClause: true,
     includeBankTaxNote: false,
+    banking: {
+      beneficiaryAccount: "",
+      receivingBank: "",
+      swiftCode: "",
+      correspondentNote: "",
+      purposeCode: "",
+      authority: "",
+      tierLabel: "",
+    },
+    includeStatutoryAddendum: false,
   };
 }
 
@@ -169,12 +205,32 @@ export function lineTotal(item: InvoiceLineItem): number {
   return parseAmount(item.quantity) * parseAmount(item.unitRate);
 }
 
+/** Per line-item GST/VAT as a clamped decimal fraction (0–100%). */
+export function lineGstFraction(item: InvoiceLineItem): number {
+  return Math.min(100, Math.max(0, parseAmount(item.gstPercent))) / 100;
+}
+
+/** Per line-item GST/VAT in the invoice currency. */
+export function lineGst(item: InvoiceLineItem): number {
+  return lineTotal(item) * lineGstFraction(item);
+}
+
+/** Sum of every line-item's GST/VAT. */
+export function totalLineGst(draft: InvoiceDraft): number {
+  return draft.lineItems.reduce((sum, item) => sum + lineGst(item), 0);
+}
+
 export function subtotal(draft: InvoiceDraft): number {
   return draft.lineItems.reduce((sum, item) => sum + lineTotal(item), 0);
 }
 
-export function taxAmount(draft: InvoiceDraft): number {
+/** Invoice-level tax/VAT applied on the subtotal (`draft.taxPercent`). */
+export function globalTaxAmount(draft: InvoiceDraft): number {
   return subtotal(draft) * (parseAmount(draft.taxPercent) / 100);
+}
+
+export function taxAmount(draft: InvoiceDraft): number {
+  return totalLineGst(draft) + globalTaxAmount(draft);
 }
 
 export function grandTotal(draft: InvoiceDraft): number {
@@ -231,6 +287,14 @@ function asDataUrl(value: unknown): string | null {
   return typeof value === "string" && value.trim() !== "" ? value : null;
 }
 
+/** Normalize a line-item GST % string to a clamped numeric string. */
+function asGstPercent(value: unknown): string {
+  if (typeof value !== "string") return "0";
+  const n = Number.parseFloat(value.replace(/,/g, "").trim());
+  if (!Number.isFinite(n)) return "0";
+  return String(Math.min(100, Math.max(0, n)));
+}
+
 export function persistInvoiceDraft(draft: InvoiceDraft): void {
   if (typeof window === "undefined") return;
   try {
@@ -279,8 +343,10 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
           description: asString(item.description, ""),
           quantity: asString(item.quantity, "1"),
           unitRate: asString(item.unitRate, ""),
+          gstPercent: asGstPercent(item.gstPercent),
         }))
       : [createLineItem()];
+  const banking = isRecord(parsed.banking) ? parsed.banking : {};
 
   return {
     identity: {
@@ -311,6 +377,19 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
       typeof parsed.includeBankTaxNote === "boolean"
         ? parsed.includeBankTaxNote
         : fallback.includeBankTaxNote,
+    banking: {
+      beneficiaryAccount: asString(banking.beneficiaryAccount, fallback.banking.beneficiaryAccount),
+      receivingBank: asString(banking.receivingBank, fallback.banking.receivingBank),
+      swiftCode: asString(banking.swiftCode, fallback.banking.swiftCode),
+      correspondentNote: asString(banking.correspondentNote, fallback.banking.correspondentNote),
+      purposeCode: asString(banking.purposeCode, fallback.banking.purposeCode),
+      authority: asString(banking.authority, fallback.banking.authority),
+      tierLabel: asString(banking.tierLabel, fallback.banking.tierLabel),
+    },
+    includeStatutoryAddendum:
+      typeof parsed.includeStatutoryAddendum === "boolean"
+        ? parsed.includeStatutoryAddendum
+        : fallback.includeStatutoryAddendum,
   };
 }
 
@@ -360,4 +439,75 @@ export function loadInvoiceDraft(): InvoiceDraft {
     // fall through to URL prefill / empty draft
   }
   return draftFromUrlParams() ?? fallback;
+}
+
+/* ---------------------------------------------------------------------------
+ * Calculator → Invoice Studio sync bridge (Phase 9).
+ *
+ * The costing widget's "Sync to Invoice" button persists the selected bank,
+ * purpose code and statutory tier here; the Invoice Studio auto-fills its
+ * Banking & Clearing section on the next visit. Payload stays on-device.
+ * ------------------------------------------------------------------------- */
+
+export interface BankSyncPayload {
+  bankName: string;
+  swiftCode: string;
+  bankSpeed: string;
+  intermediaryUSD: number;
+  clearingFee: number;
+  currency: string;
+  tierName: string;
+  tierRate: number;
+  purposeCode: string | null;
+  authority: string;
+  corridorSlug: string;
+  savedAt: string;
+}
+
+function sanitizeBankSync(parsed: unknown): BankSyncPayload | null {
+  if (!isRecord(parsed)) return null;
+  if (parsed.savedAt !== null && typeof parsed.savedAt !== "string") return null;
+  if (typeof parsed.bankName !== "string" || parsed.bankName.trim() === "") return null;
+  const toNumber = (value: unknown, fallback: number): number => {
+    const n = typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
+    return Number.isFinite(n) ? n : fallback;
+  };
+  const toNullableString = (value: unknown): string | null =>
+    typeof value === "string" && value.trim() !== "" ? value : null;
+  return {
+    bankName: parsed.bankName,
+    swiftCode: typeof parsed.swiftCode === "string" ? parsed.swiftCode : "",
+    bankSpeed: typeof parsed.bankSpeed === "string" ? parsed.bankSpeed : "",
+    intermediaryUSD: toNumber(parsed.intermediaryUSD, 0),
+    clearingFee: toNumber(parsed.clearingFee, 0),
+    currency: typeof parsed.currency === "string" ? parsed.currency : "USD",
+    tierName: typeof parsed.tierName === "string" ? parsed.tierName : "",
+    tierRate: toNumber(parsed.tierRate, 0),
+    purposeCode: toNullableString(parsed.purposeCode),
+    authority: typeof parsed.authority === "string" ? parsed.authority : "",
+    corridorSlug: typeof parsed.corridorSlug === "string" ? parsed.corridorSlug : "",
+    savedAt: typeof parsed.savedAt === "string" ? parsed.savedAt : "",
+  };
+}
+
+/** Persist a calculator "Sync to Invoice" payload. Client-only. */
+export function writeBankSync(payload: BankSyncPayload): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(BANK_SYNC_KEY, JSON.stringify(payload));
+  } catch {
+    // Storage unavailable — sync silently degrades to a manual fill-in.
+  }
+}
+
+/** Read the latest calculator bank-sync payload, or `null`. Client-only. */
+export function readBankSync(): BankSyncPayload | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(BANK_SYNC_KEY);
+    if (!raw) return null;
+    return sanitizeBankSync(JSON.parse(raw));
+  } catch {
+    return null;
+  }
 }

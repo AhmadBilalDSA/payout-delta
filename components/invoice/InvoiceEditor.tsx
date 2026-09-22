@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { WithdrawalChannel } from "@/lib/types";
 import type { InvoiceDraft, InvoiceLineItem } from "@/lib/invoiceTypes";
@@ -12,13 +12,15 @@ import {
   createEmptyDraft,
   createLineItem,
   formatCurrency,
+  globalTaxAmount,
   grandTotal,
   lineTotal,
   loadInvoiceDraft,
   persistInvoiceDraft,
+  readBankSync,
   readDataUrl,
   subtotal,
-  taxAmount,
+  totalLineGst,
 } from "@/lib/invoiceTypes";
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
@@ -44,6 +46,8 @@ export default function InvoiceEditor({
   const [draft, setDraft] = useState<InvoiceDraft>(() => loadInvoiceDraft());
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);
+  const [syncedBank, setSyncedBank] = useState<string | null>(null);
+  const appliedSyncRef = useRef(false);
 
   // Debounced auto-save on every change; the "Saved locally" badge refreshes.
   // `loadInvoiceDraft()` is safe to call during prerender (returns a pristine
@@ -56,15 +60,51 @@ export default function InvoiceEditor({
     return () => window.clearTimeout(timer);
   }, [draft]);
 
+  // Phase 9 — one-shot bank-sync bridge: pull the bank, purpose code and tax
+  // tier the calculator persisted and pre-fill the Banking & Clearing section
+  // (only if the user hasn't already edited it). Deferred so hydration stays
+  // deterministic and the effect does not race the state initializer.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (appliedSyncRef.current) return;
+      appliedSyncRef.current = true;
+      const payload = readBankSync();
+      if (!payload) return;
+      setDraft((current) => {
+        if (current.banking.receivingBank.trim() !== "") return current;
+        return {
+          ...current,
+          banking: {
+            ...current.banking,
+            receivingBank: payload.bankName,
+            swiftCode: payload.swiftCode,
+            purposeCode: payload.purposeCode ?? "",
+            authority: payload.authority,
+            tierLabel: `${payload.tierName} · ${Math.round(payload.tierRate * 10000) / 100}%`,
+          },
+        };
+      });
+      setSyncedBank(payload.bankName);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   const ccy = draft.meta.currency;
   const sub = subtotal(draft);
-  const tax = taxAmount(draft);
+  const lineGst = totalLineGst(draft);
+  const globalTax = globalTaxAmount(draft);
   const total = grandTotal(draft);
 
   const patchIdentity = (patch: Partial<InvoiceDraft["identity"]>) =>
     setDraft((current) => ({
       ...current,
       identity: { ...current.identity, ...patch },
+    }));
+
+  const patchBanking = (patch: Partial<InvoiceDraft["banking"]>) =>
+    setDraft((current) => ({
+      ...current,
+      banking: { ...current.banking, ...patch },
     }));
 
   const patchMeta = (patch: Partial<InvoiceDraft["meta"]>) =>
@@ -213,13 +253,16 @@ export default function InvoiceEditor({
         </Section>
 
         <Section title={t("lineItems")}>
+          <p className="-mt-2 mb-3 text-[11px] leading-relaxed text-slate-400">
+            {t("lineItemsGstNote")}
+          </p>
           <div className="flex flex-col gap-3">
             {draft.lineItems.map((item, index) => (
               <div
                 key={item.id}
-                className="rounded-xl border border-black/[0.06] bg-white p-3"
+                className="rounded-xl border border-black/[0.06] bg-white p-3 transition-colors duration-200 dark:border-white/[0.08] dark:bg-zinc-900/60"
               >
-                <div className="grid gap-2 sm:grid-cols-[1fr_76px_96px]">
+                <div className="grid gap-2 sm:grid-cols-[1fr_76px_96px_72px]">
                   <Field
                     label={t("itemDesc", { n: String(index + 1) })}
                     value={item.description}
@@ -247,6 +290,16 @@ export default function InvoiceEditor({
                     }
                     className="font-mono"
                   />
+                  <Field
+                    label={t("gstPct")}
+                    inputMode="decimal"
+                    value={item.gstPercent}
+                    onChange={(value) =>
+                      updateItem(item.id, { gstPercent: value })
+                    }
+                    placeholder="0"
+                    className="font-mono tabular-nums"
+                  />
                 </div>
                 <div className="mt-2 flex items-center justify-between border-t border-black/[0.06] pt-2">
                   <span className="text-xs tabular-nums text-slate-500">
@@ -259,7 +312,7 @@ export default function InvoiceEditor({
                     type="button"
                     onClick={() => removeItem(item.id)}
                     disabled={draft.lineItems.length === 1}
-                    className="rounded-full px-3 py-1 text-xs font-medium text-red-600 transition-colors duration-200 ease-out hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                    className="rounded-full px-3 py-1 text-xs font-medium text-red-600 transition-all duration-150 ease-out hover:bg-red-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 disabled:hover:bg-transparent"
                   >
                     {t("removeItem")}
                   </button>
@@ -269,10 +322,84 @@ export default function InvoiceEditor({
             <button
               type="button"
               onClick={addItem}
-              className="rounded-full border border-black/[0.12] bg-white px-4 py-2 text-xs font-semibold text-slate-900 transition-all duration-200 ease-out hover:border-black/25 hover:bg-neutral-50"
+              className="rounded-full border border-black/[0.12] bg-white px-4 py-2 text-xs font-semibold text-slate-900 transition-all duration-150 ease-out hover:border-black/25 hover:bg-neutral-50 active:scale-[0.98] dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:hover:border-white/25 dark:hover:bg-zinc-800"
             >
               {t("addItem")}
             </button>
+          </div>
+        </Section>
+
+        <Section title={t("bankClearingDetails")}>
+          <div className="grid gap-3">
+            <Field
+              label={t("beneficiaryAccount")}
+              value={draft.banking.beneficiaryAccount}
+              onChange={(value) => patchBanking({ beneficiaryAccount: value })}
+              placeholder="PK36 MZBN 0000 0000 0000 1234"
+              className="font-mono"
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field
+                label={t("receivingBank")}
+                value={draft.banking.receivingBank}
+                onChange={(value) => patchBanking({ receivingBank: value })}
+                placeholder="Meezan Bank"
+              />
+              <Field
+                label={t("swiftBic")}
+                value={draft.banking.swiftCode}
+                onChange={(value) => patchBanking({ swiftCode: value })}
+                placeholder="MZNBPKKA"
+                className="font-mono"
+              />
+            </div>
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                {t("intermediaryNote")}
+              </span>
+              <textarea
+                value={draft.banking.correspondentNote}
+                onChange={(event) =>
+                  patchBanking({ correspondentNote: event.target.value })
+                }
+                rows={2}
+                placeholder="Route via the bank's London / New York correspondent — OUR instruction."
+                className="w-full resize-y rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+              />
+            </label>
+            {(draft.banking.purposeCode !== "" ||
+              draft.banking.authority !== "" ||
+              syncedBank !== null) && (
+              <div className="rounded-xl bg-[#F5F5F7] p-3 transition-colors duration-200 dark:bg-white/[0.04]">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  {t("statutoryAuthority")}
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px]">
+                  {draft.banking.purposeCode !== "" && (
+                    <span className="rounded-full bg-white px-2 py-0.5 font-mono text-slate-700 ring-1 ring-black/[0.06] dark:bg-neutral-900 dark:text-white/70 dark:ring-white/10">
+                      {t("purposeCodeLabel", {
+                        code: draft.banking.purposeCode,
+                      })}
+                    </span>
+                  )}
+                  {draft.banking.tierLabel !== "" && (
+                    <span className="rounded-full bg-white px-2 py-0.5 text-slate-700 ring-1 ring-black/[0.06] dark:bg-neutral-900 dark:text-white/70 dark:ring-white/10">
+                      {draft.banking.tierLabel}
+                    </span>
+                  )}
+                  {draft.banking.authority !== "" && (
+                    <span className="rounded-full bg-white px-2 py-0.5 text-slate-600 ring-1 ring-black/[0.06] dark:bg-neutral-900 dark:text-white/60 dark:ring-white/10">
+                      {draft.banking.authority}
+                    </span>
+                  )}
+                </div>
+                {syncedBank !== null && (
+                  <p className="mt-2 text-[11px] text-emerald-600">
+                    ✓ {syncedBank} — synced from the calculator
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </Section>
 
@@ -288,18 +415,26 @@ export default function InvoiceEditor({
               placeholder="0"
               className="font-mono"
             />
-            <div className="rounded-xl bg-[#F5F5F7] p-3">
+            <div className="rounded-xl bg-[#F5F5F7] p-3 transition-colors duration-200 dark:bg-white/[0.04]">
               <div className="flex items-baseline justify-between text-sm text-slate-500">
                 <span>{t("subtotal")}</span>
                 <span className="font-mono tabular-nums text-slate-900">
                   {formatCurrency(sub, ccy)}
                 </span>
               </div>
-              {tax > 0 && (
+              {lineGst > 0 && (
+                <div className="flex items-baseline justify-between text-sm text-slate-500">
+                  <span>{t("gstLine")}</span>
+                  <span className="font-mono tabular-nums text-slate-900">
+                    {formatCurrency(lineGst, ccy)}
+                  </span>
+                </div>
+              )}
+              {globalTax > 0 && (
                 <div className="flex items-baseline justify-between text-sm text-slate-500">
                   <span>{t("tax")}</span>
                   <span className="font-mono tabular-nums text-slate-900">
-                    {formatCurrency(tax, ccy)}
+                    {formatCurrency(globalTax, ccy)}
                   </span>
                 </div>
               )}
@@ -356,10 +491,10 @@ export default function InvoiceEditor({
                           accent: palette.key,
                         }))
                       }
-                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 transition-all duration-200 ease-out ${
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 transition-all duration-150 ease-out active:scale-[0.98] ${
                         isActive
-                          ? "border-black/20 bg-[#F5F5F7] shadow-sm"
-                          : "border-black/[0.06] bg-white hover:border-black/15"
+                          ? "border-black/20 bg-[#F5F5F7] shadow-sm dark:border-white/25 dark:bg-white/[0.06]"
+                          : "border-black/[0.06] bg-white hover:border-black/15 dark:border-white/[0.08] dark:bg-zinc-900/60 dark:hover:border-white/20"
                       }`}
                     >
                       <span
@@ -398,7 +533,7 @@ export default function InvoiceEditor({
                     Δ
                   </span>
                 )}
-                <label className="cursor-pointer rounded-full border border-black/[0.12] bg-white px-4 py-1.5 text-xs font-semibold text-slate-900 transition-all duration-200 ease-out hover:border-black/25 hover:bg-neutral-50">
+                <label className="cursor-pointer rounded-full border border-black/[0.12] bg-white px-4 py-1.5 text-xs font-semibold text-slate-900 transition-all duration-150 ease-out hover:border-black/25 hover:bg-neutral-50 active:scale-[0.98] dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:hover:border-white/25 dark:hover:bg-zinc-800">
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/webp,image/svg+xml"
@@ -458,6 +593,16 @@ export default function InvoiceEditor({
           }
         />
 
+        <StatutoryAddendumToggle
+          enabled={draft.includeStatutoryAddendum}
+          onToggle={(next) =>
+            setDraft((current) => ({
+              ...current,
+              includeStatutoryAddendum: next,
+            }))
+          }
+        />
+
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.06] pt-4">
           <span
             className="inline-flex items-center gap-1.5 text-xs text-slate-500"
@@ -474,7 +619,7 @@ export default function InvoiceEditor({
           <button
             type="button"
             onClick={resetForm}
-            className="rounded-full border border-black/[0.12] bg-white px-4 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-200 ease-out hover:border-red-300 hover:text-red-600"
+            className="rounded-full border border-black/[0.12] bg-white px-4 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-150 ease-out hover:border-red-300 hover:text-red-600 active:scale-[0.98] dark:border-white/15 dark:bg-zinc-900 dark:text-white/80 dark:hover:border-red-400/60 dark:hover:text-red-300"
           >
             {t("resetForm")}
           </button>
@@ -495,7 +640,7 @@ export default function InvoiceEditor({
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 ease-out hover:bg-neutral-800"
+            className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-150 ease-out hover:bg-neutral-800 active:scale-[0.98] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
           >
             <svg
               aria-hidden="true"
@@ -534,7 +679,7 @@ function Phase8BankTaxToggle({
 }) {
   const { t } = useLanguage();
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/[0.06] bg-white p-4 transition-colors duration-200 ease-out hover:border-black/[0.15]">
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/[0.06] bg-white p-4 transition-all duration-150 ease-out hover:border-black/[0.15] active:scale-[0.99] dark:border-white/[0.08] dark:bg-zinc-900/60 dark:hover:border-zinc-700">
       <input
         type="checkbox"
         className="peer sr-only"
@@ -546,7 +691,7 @@ function Phase8BankTaxToggle({
         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ease-out peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 peer-focus-visible:ring-offset-2 ${
           enabled
             ? "border-emerald-600 bg-emerald-600 text-white"
-            : "border-black/20 bg-white text-transparent"
+            : "border-black/20 bg-white text-transparent dark:border-white/25 dark:bg-neutral-900"
         }`}
       >
         <svg
@@ -564,11 +709,62 @@ function Phase8BankTaxToggle({
         </svg>
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-semibold text-slate-900">
+        <span className="block text-sm font-semibold text-slate-900 dark:text-white">
           {t("invoiceBankToggle")}
         </span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">
+        <span className="mt-0.5 block text-xs leading-relaxed text-slate-500 dark:text-white/55">
           {t("invoiceBankToggleHint")}
+        </span>
+      </span>
+    </label>
+  );
+}
+
+/** Phase 9 — statutory tax & purpose-code compliance addendum toggle. */
+function StatutoryAddendumToggle({
+  enabled,
+  onToggle,
+}: {
+  enabled: boolean;
+  onToggle: (next: boolean) => void;
+}) {
+  const { t } = useLanguage();
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/[0.06] bg-white p-4 transition-all duration-150 ease-out hover:border-black/[0.15] active:scale-[0.99] dark:border-white/[0.08] dark:bg-zinc-900/60 dark:hover:border-zinc-700">
+      <input
+        type="checkbox"
+        className="peer sr-only"
+        checked={enabled}
+        onChange={(event) => onToggle(event.target.checked)}
+      />
+      <span
+        aria-hidden="true"
+        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ease-out peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 peer-focus-visible:ring-offset-2 ${
+          enabled
+            ? "border-emerald-600 bg-emerald-600 text-white"
+            : "border-black/20 bg-white text-transparent dark:border-white/25 dark:bg-neutral-900"
+        }`}
+      >
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          className="h-3 w-3"
+        >
+          <path
+            d="m3 8.5 3.2 3L13 4.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-slate-900 dark:text-white">
+          {t("statutoryAddendumToggle")}
+        </span>
+        <span className="mt-0.5 block text-xs leading-relaxed text-slate-500 dark:text-white/55">
+          {t("statutoryAddendumHint")}
         </span>
       </span>
     </label>
@@ -583,8 +779,8 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-black/[0.06] bg-white p-5">
-      <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
+    <section className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm transition-colors duration-200 dark:border-white/[0.08] dark:bg-zinc-900/60 dark:shadow-none dark:backdrop-blur-md">
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-white/50">
         {title}
       </h2>
       {children}
@@ -617,7 +813,7 @@ function Field({
   inputMode?: "decimal" | "text" | "email";
   className?: string;
 }) {
-  const inputClass = `w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] ${className}`;
+  const inputClass = `w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] dark:border-white/10 dark:bg-neutral-900 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/25 dark:focus:ring-white/[0.06] ${className}`;
   if (type === "date") {
     return (
       <label className="block">
@@ -668,7 +864,7 @@ function CurrencySelect({
         onChange={(event) =>
           onChange(event.target.value as InvoiceDraft["meta"]["currency"])
         }
-        className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06]"
+        className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] dark:border-white/10 dark:bg-neutral-900 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/[0.06]"
       >
         {CURRENCIES.map((currency) => (
           <option key={currency.code} value={currency.code}>
