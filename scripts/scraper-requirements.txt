@@ -1,0 +1,12 @@
+# PayoutDelta scraper runtime dependencies.
+#
+# Install with:
+#   pip install -r scripts/scraper-requirements.txt
+#   python -m playwright install --with-deps chromium
+#
+# `playwright-stealth` is optional — the scraper auto-falls back to
+# launch-args anti-detection, and then to dependency-free JSON endpoints,
+# when it is missing.
+
+playwright>=1.45
+playwright-stealth>=1.0.6

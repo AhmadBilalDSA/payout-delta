@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
+import { getChannels, getCorridors, getDataset, getPlatforms } from "@/lib/db";
 import CorridorCard from "@/components/CorridorCard";
 import Hero from "@/components/Hero";
 
@@ -7,6 +7,7 @@ export default function Home() {
   const corridors = getCorridors();
   const platforms = getPlatforms();
   const channels = getChannels();
+  const datasetRevision = getDataset().updatedAt.slice(0, 10);
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
@@ -70,7 +71,7 @@ export default function Home() {
           <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-xs">
             data/fees.json
           </code>{" "}
-          (revision 2026-09-22) and are auditable in the{" "}
+          (revision {datasetRevision}) and are auditable in the{" "}
           <Link
             href="/about"
             className="underline underline-offset-2 hover:text-slate-700"

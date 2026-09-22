@@ -1,0 +1,85 @@
+name: Daily Rates Sync
+
+on:
+  schedule:
+    # Every day at 00:00 UTC.
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+# The bot commits the refreshed snapshot; it needs write access to its own repo.
+permissions:
+  contents: write
+
+concurrency:
+  group: "daily-rates-sync"
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: scripts/scraper-requirements.txt
+
+      - name: Install scraper dependencies
+        run: |
+          pip install -r scripts/scraper-requirements.txt \
+            || pip install playwright \
+            || echo "playwright unavailable — running in fallback mode"
+
+      - name: Install chromium (playwright mode)
+        run: python -m playwright install --with-deps chromium || echo "skip browser install"
+
+      - name: Run rate scraper (auto: playwright then JSON fallback)
+        run: python scripts/playwright_scraper.py --mode auto --verbose
+
+      - name: Detect data changes
+        id: git-check
+        run: |
+          if git status --porcelain data/fees.json | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat data/fees.json
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No rate changes — snapshot equals HEAD; nothing to ship."
+          fi
+
+      - name: Commit and push refreshed rates
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config user.name "PayoutDelta Bot"
+          git config user.email "bot@payoutdelta.com"
+          git add data/fees.json
+          # [skip ci] prevents this push from re-triggering itself or the
+          # push-based deploy; the re-deploy fires via deploy.yml's
+          # `workflow_run` trigger below.
+          git commit -m "chore(data): daily rate sync [skip ci]"
+          git push origin HEAD:main
+
+      - name: Dispatch deploy workflow (credentialed fallback)
+        # Primary path: deploy.yml reacts to this run via `workflow_run`.
+        # If the repo sets a DEPLOY_PAT secret (repo + workflow scopes) this
+        # also dispatches it directly for immediate rebuild & re-export.
+        if: steps.git-check.outputs.changed == 'true'
+        env:
+          DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
+        run: |
+          if [ -n "$DEPLOY_PAT" ]; then
+            curl -fsS -X POST \
+              -H "Authorization: Bearer $DEPLOY_PAT" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches \
+              -d '{"ref":"main"}' \
+            || echo "dispatch failed — workflow_run trigger will rebuild with fresh data"
+          else
+            echo "DEPLOY_PAT not configured — deploy.yml workflow_run triggers rebuild"
+          fi

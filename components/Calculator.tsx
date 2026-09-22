@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import type { Corridor, Platform, WithdrawalChannel } from "@/lib/types";
+import type { ChannelQuote, Corridor, Platform, WithdrawalChannel } from "@/lib/types";
 import {
   clampGrossUSD,
   computeRoute,
@@ -11,6 +11,7 @@ import {
 import VerdictCard from "@/components/VerdictCard";
 import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
+import AuditReceipt from "@/components/AuditReceipt";
 
 /**
  * Interactive payout auditor (client island) — Apple-grade, iOS-feel.
@@ -30,18 +31,20 @@ import FeeBreakdownList from "@/components/FeeBreakdownList";
  * explicit disclaimer beneath the calculator.
  *
  * ---------------------------------------------------------------------------
- * PHASE 2 — COMMENTED SAAS HOOKS (do NOT implement in Phase 1)
+ * PHASE 2 — COMMENTED SAAS HOOKS (do NOT implement in Phase 1 except the
+ * Export PDF below, which is fully client-side via window.print())
  * ---------------------------------------------------------------------------
  * <button type="button">Download Invoice PDF</button>
  * <button type="button">Get Rate Drop Alerts</button>
  * <button type="button">Embed This Calculator</button>
  * <button type="button">Weekend Inflation Warning</button>
  *
- * 1) DOWNLOAD INVOICE PDF — once self-hosted, inject a button beside the
- *    verdict that POSTs {amount, platform, corridor, bestChannel} to the Phase
- *    2 API; server renders a PDF via pdf-lib/(puppeteer) and returns bytes.
- *    Static export forbids request-time render today, hence the stub UI only
- *    (see the commented hooks inside FeeBreakdownList).
+ * 1) EXPORT INVOICE PDF — ACTIVATED (client-side). "Export Invoice
+ *    Justification PDF" mounts `<AuditReceipt>` into a `hidden print:block`
+ *    node and calls `window.print()`; the browser's Save-as-PDF produces the
+ *    one-page audit receipt. No server, no runtime PDF dependency, static
+ *    export intact. (A Phase 3 server-rendered PDF variant stays stubbed until
+ *    a managed backend exists.)
  *
  * 2) GET RATE DROP ALERTS — hydrate an optional email form when the managed
  *    backend is available: subscribe → writes row in fact_rate_alerts, and
@@ -76,6 +79,7 @@ export default function Calculator({
   const [platformId, setPlatformId] = useState<string>(
     platforms[0]?.id ?? "upwork"
   );
+  const [printQuote, setPrintQuote] = useState<ChannelQuote | null>(null);
 
   const platform =
     platforms.find((item) => item.id === platformId) ?? platforms[0];
@@ -84,6 +88,22 @@ export default function Calculator({
     () => computeRoute(amount, platform, corridor, channels),
     [amount, platform, corridor, channels]
   );
+
+  // When an export is requested, give the print-only receipt one frame to
+  // mount, then open the native Save-as-PDF dialog. After the dialog closes,
+  // tear the receipt back down so the screen DOM returns to normal.
+  useEffect(() => {
+    if (printQuote === null) {
+      return;
+    }
+    const printId = window.setTimeout(() => window.print(), 60);
+    const handleAfterPrint = () => setPrintQuote(null);
+    window.addEventListener("afterprint", handleAfterPrint);
+    return () => {
+      window.clearTimeout(printId);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+  }, [printQuote]);
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -113,7 +133,11 @@ export default function Calculator({
           Ranked fee breakdown
         </h2>
         <div className="mt-3">
-          <FeeBreakdownList quotes={route.quotes} corridor={corridor} />
+          <FeeBreakdownList
+            quotes={route.quotes}
+            corridor={corridor}
+            onExport={setPrintQuote}
+          />
         </div>
       </section>
 
@@ -124,6 +148,18 @@ export default function Calculator({
         calculation purposes under Nominative Fair Use. PayoutDelta is an
         independent auditing tool.
       </p>
+
+      {/* Print-only audit receipt, mounted the instant an export is asked for
+          (becomes the sole visible content inside the Save-as-PDF dialog). */}
+      {printQuote !== null && (
+        <div className="hidden print:block">
+          <AuditReceipt
+            quote={printQuote}
+            corridor={corridor}
+            platform={platform}
+          />
+        </div>
+      )}
     </div>
   );
 }

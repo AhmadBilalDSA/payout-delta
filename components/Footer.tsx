@@ -69,7 +69,8 @@ function FooterColumn({
  * straight from data/fees.json at build time.
  */
 export default function Footer() {
-  const updatedAt = getDataset().updatedAt;
+  // ISO-8601 from the sync pipeline → render the calendar date only.
+  const updatedAt = getDataset().updatedAt.slice(0, 10);
   const year = new Date().getFullYear();
 
   return (

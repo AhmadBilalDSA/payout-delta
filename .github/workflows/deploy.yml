@@ -2,8 +2,14 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
+  # Rebuild & re-deploy whenever the nightly rate sync finishes successfully
+  # (the bot commit uses [skip ci], so the push event alone will NOT deploy).
+  workflow_run:
+    workflows: ["Daily Rates Sync"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -17,9 +23,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # For workflow_run events, build the branch the sync actually ran on
+          # (carries the freshly committed rates); otherwise the triggering ref.
+          ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4

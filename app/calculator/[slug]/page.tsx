@@ -7,6 +7,7 @@ import {
   getCorridors,
   getCorridorBySlug,
   getCorridorSlugs,
+  getDataset,
   getPlatforms,
 } from "@/lib/db";
 import { getCorridorContent } from "@/lib/corridorContent";
@@ -99,6 +100,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
   const content = getCorridorContent(corridor.slug);
   const platforms = getPlatforms();
   const channels = getChannels();
+  const datasetRevision = getDataset().updatedAt.slice(0, 10);
   const related = getCorridors()
     .filter((item) => item.slug !== corridor.slug)
     .slice(0, 3);
@@ -127,7 +129,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           {corridor.rate.toLocaleString("en-US", { maximumFractionDigits: 2 })}{" "}
           {corridor.to}
         </span>{" "}
-        per USD · fee data revision 2026-09-22. Every calculation runs in your
+        per USD · fee data revision {datasetRevision}. Every calculation runs in your
         browser; nothing is tracked.
       </p>
 

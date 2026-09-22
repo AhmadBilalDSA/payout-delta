@@ -21,9 +21,11 @@ import { formatLocal, formatUSD } from "@/utils/format";
 export default function FeeBreakdownList({
   quotes,
   corridor,
+  onExport,
 }: {
   quotes: ChannelQuote[];
   corridor: Corridor;
+  onExport: (quote: ChannelQuote) => void;
 }) {
   const [openChannelId, setOpenChannelId] = useState<string | null>(null);
 
@@ -156,15 +158,22 @@ export default function FeeBreakdownList({
                     </dd>
                   </div>
 
-                  {/*
-                    PHASE 2 — SaaS FEATURE HOOKS (do NOT implement in Phase 1;
-                    static export forbids request-time render until the managed
-                    backend ships — see lib/db.ts fact_rate_alerts).
-                    <div className="mt-3 flex flex-wrap gap-2 border-t border-black/[0.06] pt-3 dark:border-white/[0.08]">
-                      <button type="button">Export Invoice Justification PDF</button>
+                  <div className="mt-3 flex flex-wrap gap-2 border-t border-black/[0.06] pt-3 dark:border-white/[0.08]">
+                    <button
+                      type="button"
+                      onClick={() => onExport(quote)}
+                      className="rounded-full bg-black px-4 py-1.5 text-xs font-semibold text-white transition-all duration-200 ease-out hover:bg-neutral-800 dark:bg-white dark:text-black"
+                    >
+                      Export Invoice Justification PDF
+                    </button>
+                    {/*
+                      PHASE 2 — RATE-DROP ALERT (requires the managed backend
+                      + email opt-in; see lib/db.ts fact_rate_alerts and the
+                      daily-rates-sync cron).
+
                       <button type="button">Set Rate Drop Alert</button>
-                    </div>
-                  */}
+                    */}
+                  </div>
                 </dl>
               </div>
             </div>
