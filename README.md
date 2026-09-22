@@ -46,7 +46,7 @@ and the only thing that changes between revisions.
     { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.99, "fxSpread": 0.0045 }
   ],
   "corridors": [
-    { "slug": "usd-pkr", "from": "USD", "to": "PKR", "rate": 278.5, ... }
+    { "slug": "usd-to-pkr", "from": "USD", "to": "PKR", "rate": 278.5, ... }
   ]
 }
 ```

@@ -85,9 +85,9 @@ function buildJsonLd(slug: string) {
     aggregateRating: undefined,
   };
 
-  return [faqLd, appLd]
-    .map((block) => JSON.stringify(block).replace(/</g, "\\u003c"))
-    .join("\n");
+  return [faqLd, appLd].map((block) =>
+    JSON.stringify(block).replace(/</g, "\\u003c"),
+  );
 }
 
 export default async function CorridorPage({ params }: CorridorPageProps) {
@@ -102,14 +102,17 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
   const related = getCorridors()
     .filter((item) => item.slug !== corridor.slug)
     .slice(0, 3);
-  const jsonLd = buildJsonLd(corridor.slug);
+  const jsonLd = buildJsonLd(corridor.slug) ?? [];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLd ?? "" }}
-      />
+      {jsonLd.map((block) => (
+        <script
+          key={block}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: block }}
+        />
+      ))}
 
       <p className="text-sm font-medium text-slate-500">
         Payout corridor · {corridor.from} → {corridor.to} ·{" "}

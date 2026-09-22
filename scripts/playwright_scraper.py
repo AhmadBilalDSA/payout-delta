@@ -50,7 +50,7 @@ Non-destructive overwrite guards
 Run (Phase 2 wiring)
 --------------------
     pip install playwright  && playwright install chromium
-    python scripts/playwright_scraper.py --corridors usd-pkr usd-inr
+    python scripts/playwright_scraper.py --corridors usd-to-pkr usd-to-inr
 """
 
 from __future__ import annotations
@@ -67,8 +67,8 @@ from typing import Any, Dict, List
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_FILE = REPO_ROOT / "data" / "fees.json"
 SUPPORTED_CORRIDORS: List[str] = [
-    "usd-pkr", "usd-inr", "usd-php", "usd-brl", "usd-gbp",
-    "usd-eur", "usd-ngn", "usd-bdt", "usd-egp", "usd-zar",
+    "usd-to-pkr", "usd-to-inr", "usd-to-php", "usd-to-brl", "usd-to-gbp",
+    "usd-to-eur", "usd-to-ngn", "usd-to-bdt", "usd-to-egp", "usd-to-zar",
 ]
 
 

@@ -65,7 +65,7 @@ const DEFAULT_CONTENT: CorridorContent = {
 };
 
 const corridorContent: Record<string, CorridorContent> = {
-  'usd-pkr': {
+  'usd-to-pkr': {
     pageHeadline: 'Getting paid in PKR: audit every 10% and every spread',
     overview:
       'Pakistani freelancers overwhelmingly invoice in USD and convert back through bank transfers, wallet providers and licensed money-transfer operators. Because the State Bank of Pakistan (SBP) publishes an official interbank reference while commercial desks quote narrower buy rates, the effective rate you receive can sit a hair below the headline 278.50 figure — and platform commissions are taken before any conversion happens. This page isolates those two leaks so you can see, in rupees, what a $10,000 Upwork payout actually preserves.',
@@ -93,7 +93,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-inr': {
+  'usd-to-inr': {
     pageHeadline: 'INR payouts: FEMA disclosures and the bank margin no one quotes',
     overview:
       'Indian freelancers operate inside the Foreign Exchange Management Act (FEMA), which channels export proceeds through eligible banks. The Reserve Bank of India (RBI) explicitly monitors rupee-dollar conversion margins, yet payment providers still price a shadow spread that balloons on $10,000+ invoices. With 83.40 as the reference, this audit ranks each of the five channels by the rupees actually landing in your account — before your NRE or domestic account has its say.',
@@ -121,7 +121,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-php': {
+  'usd-to-php': {
     pageHeadline: 'PHP take-home math for Filipino remote workers',
     overview:
       'Filipino freelancers get paid through a dense network of banks, e-wallets and remittance operators registered with the Bangko Sentral ng Pilipinas (BSP). With the peso reference pinned at 56.80, the race between a "$2.99 Wise-style" markup and a bank wire shows up as hundreds of pesos per transfer. This corridor audit converts the full commission chain into pesos so you can compare providers honestly — including the days they hold your funds in transit.',
@@ -145,7 +145,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-brl': {
+  'usd-to-brl': {
     pageHeadline: 'Real receipts: IOF, PIX and the BRL corridor',
     overview:
       'Brazilian freelancers receiving earnings from aboard typically convert USD through licensed currency brokers or the local bank desk. Two taxes shadow every transaction — the Taxa sobre Operações de Câmbio (IOF) on FX conversion and IRRF withholding on certain foreign-earned income — so the headline number, 5.45, is never what you actually receive. This page ranks the five channel options in reais after IOF-style deductions and measures the true damage of platform commission at scale.',
@@ -169,7 +169,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-gbp': {
+  'usd-to-gbp': {
     pageHeadline: 'Pounds in hand: Faster Payments, SWIFT and the UK audit',
     overview:
       'UK-based freelancers have the rare luxury of mature domestic plumbing: once USD lands and converts, pounds move by Faster Payment in seconds or CHAPS same-day for specials. The British market also quotes tight spreads, so the difference between channels is dominated by the platform cut and flat fees rather than FX slippage. With 0.79 as the reference, this page ranks all five withdrawal routes by the pounds that settle in your account after tax withholdings are later accounted in your Self Assessment.',
@@ -193,7 +193,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-eur': {
+  'usd-to-eur': {
     pageHeadline: 'Eurozone payouts: SEPA overnight — or seconds — after the FX leak',
     overview:
       'Freelancers seated in the Eurozone receive client USD that must cross to EUR before any of SEPA\u2019s famous rails apply. PSD2 and MiFID-style transparency make providers publish markups, yet the effective rate still wanders from the 0.92 reference depending on the desk. Because SEPA Instant tames the domestic leg, the entire audit here comes down to conversion discipline — the fixed fee and spread you tolerate before your euro is spendable.',
@@ -217,7 +217,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-ngn': {
+  'usd-to-ngn': {
     pageHeadline: 'Naira reality check: the 1550 reference and who quotes it',
     overview:
       'Nigerian freelancers face the most volatile gulf in this dataset: the official reference (1550) versus the parallel street rate that informal operators quote can move materially within weeks. CBN-permitted channels convert through official (NAFEM-adjacent) windows or licensed fintech rails, each posting a slightly different naira crisis of trust. This page quantifies the honest five-way comparison at the official rate and flags the discipline required to audit FX timing instead of chasing arbitrage — neither legal nor this tool\u2019s job.',
@@ -241,7 +241,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-bdt': {
+  'usd-to-bdt': {
     pageHeadline: 'Taka transfers: Bangladesh Bank rails and the 110 reference',
     overview:
       'Bangladeshi freelancers convert USD remittances through Bangladesh Bank regulated channels — often via Payoneer-style aggregators that later sweep to a local bank account. The 110 reference rate is the official border, but aggregator receipt and local settlement each skim value the way the fee table here models. This corridor page ranks the five options in taka so the true platform-plus-conversion leak is visible before the money spends.',
@@ -265,7 +265,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-egp': {
+  'usd-to-egp': {
     pageHeadline: 'Egyptian pounds: CBE-compliant conversion and the 47.50 edge',
     overview:
       'Egyptian freelancers convert overseas earnings through CBE-supervised channels, where the official pound reference (47.50) governs bank-and-licensed-operator pricing while automated platforms quote app-to-app spreads. Because so much of the Egyptian market runs through mobile banking and the national instant rails, the user experience gap is smaller than the FX leak — this corridor audit makes that leak legible in pounds on every slider tick.',
@@ -289,7 +289,7 @@ const corridorContent: Record<string, CorridorContent> = {
       },
     ],
   },
-  'usd-zar': {
+  'usd-to-zar': {
     pageHeadline: 'Rand discipline: SARB repatriation and the 18.90 corridor',
     overview:
       'South African freelancers earning USD face the classic tightrope: undrawn foreign earnings and single discretionary allowance (SDA) rules frame what may sit offshore, while SARB-aligned rails repatriate the rest into rand through authorised dealers. At an 18.90 reference, spread and fixed fees still dwarf nothing — this page prices the five channels in rand so the repatriation decision is a financial one, not a guess.',

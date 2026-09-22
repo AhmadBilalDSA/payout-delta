@@ -10,9 +10,9 @@ interface CorridorOption {
 }
 
 const TOP_CORRIDORS: readonly CorridorOption[] = [
-  { slug: "usd-pkr", from: "USD", to: "PKR" },
-  { slug: "usd-inr", from: "USD", to: "INR" },
-  { slug: "usd-php", from: "USD", to: "PHP" },
+  { slug: "usd-to-pkr", from: "USD", to: "PKR" },
+  { slug: "usd-to-inr", from: "USD", to: "INR" },
+  { slug: "usd-to-php", from: "USD", to: "PHP" },
 ] as const;
 
 /**
