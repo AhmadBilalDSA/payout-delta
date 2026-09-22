@@ -16,11 +16,15 @@ import {
   computeRoute,
   DEFAULT_GROSS_USD,
 } from "@/utils/calculateRoute";
-import { computeInverseRoute } from "@/utils/inverseMath";
+import {
+  computeInverseRoute,
+  localSliderBounds,
+} from "@/utils/inverseMath";
 import { formatUSD } from "@/utils/format";
 import VerdictCard from "@/components/VerdictCard";
 import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
+import TaxImpactCard from "@/components/TaxImpactCard";
 import AuditReceipt from "@/components/AuditReceipt";
 
 /**
@@ -82,6 +86,36 @@ export default function Calculator({
   );
 
   const isTarget = mode === "net-to-gross";
+
+  // Live tax-impact snapshot: whatever the active mode considers "the quote"
+  // (forward best channel vs inverse cheapest invoice) becomes the input for
+  // the TaxImpactCard, so its math never disagrees with the VerdictCard.
+  const taxSnapshot = useMemo(() => {
+    if (isTarget) {
+      const quote = inverseRoute.verdict.best ?? inverseRoute.quotes[0];
+      if (!quote) return null;
+      return {
+        grossUSD: quote.grossRequired,
+        grossLocal: quote.grossRequired * corridor.rate,
+        netLocalPreTax: Math.max(0, quote.targetNetLocal),
+        channelCutUSD: quote.totalCostUSD,
+        channelName: quote.channelName,
+        effectiveRate: quote.effectiveRate,
+      };
+    }
+    const quote = route.verdict.best ?? route.quotes[0];
+    if (!quote) return null;
+    return {
+      grossUSD: amount,
+      grossLocal: amount * corridor.rate,
+      netLocalPreTax: quote.localAmount,
+      channelCutUSD: quote.totalCostUSD,
+      channelName: quote.channelName,
+      effectiveRate: quote.effectiveRate,
+    };
+  }, [isTarget, inverseRoute, route, amount, corridor]);
+
+  const targetBounds = useMemo(() => localSliderBounds(corridor), [corridor]);
 
   // When an export is requested, give the print-only receipt one frame to
   // mount, then open the native Save-as-PDF dialog. After the dialog closes,
@@ -183,6 +217,29 @@ export default function Calculator({
         </section>
       )}
 
+      {/* Interactive tax & net take-home impact — beneath the verdict and the
+          ranked breakdown. Binds live to the parent amount/target state. */}
+      {taxSnapshot !== null && (
+        <TaxImpactCard
+          corridor={corridor}
+          mode={mode}
+          invoiceValue={isTarget ? targetNet : amount}
+          onInvoiceChange={(value) => {
+            if (isTarget) {
+              setTargetNet(clampLocalTarget(value, targetBounds));
+            } else {
+              setAmount(clampGrossUSD(value));
+            }
+          }}
+          grossUSD={taxSnapshot.grossUSD}
+          grossLocal={taxSnapshot.grossLocal}
+          netLocalPreTax={taxSnapshot.netLocalPreTax}
+          channelCutUSD={taxSnapshot.channelCutUSD}
+          channelName={taxSnapshot.channelName}
+          effectiveRate={taxSnapshot.effectiveRate}
+        />
+      )}
+
       {/* Nominative fair use — mandatory legal line. */}
       <p className="text-xs leading-relaxed text-black/[0.45] dark:text-white/[0.45]">
         All brand names, trademarks, and registered trademarks are the property
@@ -204,4 +261,20 @@ export default function Calculator({
       )}
     </div>
   );
+}
+
+/** Clamps a free-typed local target into the corridor's inverse bounds. */
+function clampLocalTarget(
+  value: number,
+  bounds: { min: number; max: number; step: number }
+): number {
+  if (!Number.isFinite(value)) {
+    return bounds.min;
+  }
+  const clamped = Math.min(bounds.max, Math.max(bounds.min, Math.round(value)));
+  const stepped =
+    bounds.step > 0
+      ? bounds.min + Math.round((clamped - bounds.min) / bounds.step) * bounds.step
+      : clamped;
+  return Math.min(bounds.max, Math.max(bounds.min, stepped));
 }

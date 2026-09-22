@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
@@ -24,13 +25,16 @@ export default function Header() {
           PayoutDelta
         </Link>
 
-        <span className="hidden items-center gap-2 rounded-full bg-white/60 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-black/[0.06] md:inline-flex">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="flex items-center justify-center gap-3">
+          <LanguageSwitcher />
+          <span className="hidden items-center gap-2 rounded-full bg-white/60 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-black/[0.06] md:inline-flex">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </span>
+            Live Spread Engine
           </span>
-          Live Spread Engine
-        </span>
+        </div>
 
         <div className="flex items-center justify-end gap-4">
           <Link

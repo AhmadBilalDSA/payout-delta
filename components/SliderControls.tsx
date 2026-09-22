@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import type { CalcMode, Corridor, Platform } from "@/lib/types";
 import {
   clampGrossUSD,
@@ -57,6 +59,42 @@ export default function SliderControls({
   const localPresets =
     corridor.rate >= 10 ? HIGH_PRESETS : LOW_PRESETS;
 
+  /* Phase 6 — editable numeric input pill. Directly bound to the parent engine:
+     typing updates the slider amount / target goal immediately and is clamped
+     to the same bounds as the range control, so it can never produce NaN or
+     an out-of-range value. State lives locally only while focused; the parent
+     stays the single source of truth (derived display, zero setState-in-effect). */
+  const liveValue = isTargetGoal ? targetNet : amount;
+  const prefix = isTargetGoal ? corridor.currencySymbol : "$";
+  const [draft, setDraft] = useState<string>(String(Math.round(liveValue)));
+  const [focused, setFocused] = useState(false);
+
+  const displayValue = focused ? draft : liveValue.toLocaleString("en-US");
+
+  const startEditing = () => {
+    setFocused(true);
+    setDraft(String(Math.round(liveValue)));
+  };
+
+  const commitDraft = (raw: string) => {
+    const digits = raw.replace(/[^0-9]/g, "");
+    setDraft(digits);
+    const parsed = digits === "" ? Number.NaN : Number(digits);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return;
+    }
+    if (isTargetGoal) {
+      onTargetNetChange(clampLocalTarget(parsed, bounds));
+    } else {
+      onAmountChange(clampGrossUSD(parsed));
+    }
+  };
+
+  const stopEditing = () => {
+    setFocused(false);
+    setDraft(String(Math.round(liveValue)));
+  };
+
   return (
     <section
       aria-labelledby="audit-inputs"
@@ -104,12 +142,31 @@ export default function SliderControls({
 
       <div className="mt-5 gap-8 lg:grid lg:grid-cols-2">
         <fieldset>
-          <legend className="flex items-baseline justify-between gap-2 text-sm font-medium text-black/70 dark:text-white/70">
-            <span>{isTargetGoal ? "Target local payout" : "Gross client payment"}</span>
-            <span className="font-bold tabular-nums text-black dark:text-white">
-              {isTargetGoal
-                ? formatLocal(targetNet)
-                : `$${amount.toLocaleString("en-US")}`}
+          <legend className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-black/70 dark:text-white/70">
+            <span>
+              {isTargetGoal ? "Target local payout" : "Gross client payment"}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-black/10 bg-black/[0.04] px-3 py-1.5 transition focus-within:ring-2 focus-within:ring-emerald-500/50 dark:border-white/10 dark:bg-white/[0.06]">
+              <span
+                aria-hidden="true"
+                className="font-mono text-sm font-semibold text-black/40 tabular-nums dark:text-white/40"
+              >
+                {prefix}
+              </span>
+              <input
+                value={displayValue}
+                inputMode="decimal"
+                enterKeyHint="done"
+                aria-label={
+                  isTargetGoal
+                    ? `Target payout in ${corridor.to}`
+                    : "Gross client payment in USD"
+                }
+                onFocus={startEditing}
+                onBlur={stopEditing}
+                onChange={(event) => commitDraft(event.currentTarget.value)}
+                className="w-24 bg-transparent text-right font-mono text-lg font-bold tabular-nums text-black outline-none sm:w-32 dark:text-white"
+              />
             </span>
           </legend>
 

@@ -10,6 +10,8 @@ import {
   LOCALIZED_CORRIDORS,
 } from "@/lib/localizedCorridors";
 import Calculator from "@/components/Calculator";
+import BlufSummary from "@/components/BlufSummary";
+import FaqAccordion from "@/components/FaqAccordion";
 
 const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
 
@@ -145,6 +147,16 @@ export default async function LocalizedCorridorPage({
         {datasetRevision}.
       </p>
 
+      {/* Phase 6 — same BLUF answer card as the English corridor, so localized
+          pages carry the indexer-parseable one-sentence takeaway too. */}
+      <div className="mt-6">
+        <BlufSummary
+          corridor={corridor}
+          channels={channels}
+          platforms={platforms}
+        />
+      </div>
+
       <div className="mt-6">
         <Calculator
           corridor={corridor}
@@ -156,20 +168,6 @@ export default async function LocalizedCorridorPage({
       </div>
 
       <div className="mt-10 space-y-8">
-        <section aria-labelledby="localized-takeaways">
-          <h2
-            id="localized-takeaways"
-            className="text-xl font-bold text-slate-900"
-          >
-            {localized.localeName} compliance takeaways
-          </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-slate-700">
-            {localized.bullets.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-
         <section aria-labelledby="localized-faq">
           <h2 id="localized-faq" className="text-xl font-bold text-slate-900">
             Frequently asked questions
@@ -177,23 +175,8 @@ export default async function LocalizedCorridorPage({
               ({localized.localeName})
             </span>
           </h2>
-          <div className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
-            {localized.faqs.map((item) => (
-              <details key={item.q} className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-sm font-medium text-slate-900 select-none hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
-                  {item.q}
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 text-slate-400 transition-transform duration-200 ease-out group-open:rotate-180"
-                  >
-                    ▾
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 text-sm leading-relaxed text-slate-600">
-                  {item.a}
-                </p>
-              </details>
-            ))}
+          <div className="mt-3">
+            <FaqAccordion items={localized.faqs} />
           </div>
         </section>
 
