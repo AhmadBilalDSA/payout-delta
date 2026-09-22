@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-22T12:25:17Z",
+  "updatedAt": "2026-09-22T12:40:57Z",
   "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per USD corridor.",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
