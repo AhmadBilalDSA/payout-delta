@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * PayoutDelta static-export corridor audit (Phase 1 QA).
+ * PayoutDelta static-export corridor audit (Phase 1 QA) + Invoice Studio
+ * audit (Phase 4 QA).
  *
  * Crawls ./out after `npm run build` and verifies, for every currency
  * corridor:
@@ -9,6 +10,10 @@
  *   - every _next/ asset URL is basePath-prefixed (/payout-delta/_next/...)
  *     and resolves to a real file under ./out
  *   - every internal link is basePath-prefixed and maps to an exported file
+ *
+ * Phase 4 also verifies ./out/invoice/index.html: the route is exported, its
+ * metadata (title + description + SoftwareApplication JSON-LD) is intact, and
+ * its assets/links resolve under the /payout-delta subpath.
  *
  * Also checks ./out hygiene: index/404/sitemap/robots exist and .nojekyll is
  * present so GitHub Pages serves the bare /payout-delta subpath.
@@ -189,6 +194,41 @@ function auditCorridor(slug) {
   return row;
 }
 
+/**
+ * Phase 4 — Freelance Invoice Studio: ./out/invoice/index.html must exist,
+ * carry valid metadata (title + meta description + SoftwareApplication
+ * JSON-LD), and serve basePath-prefixed assets that resolve on disk.
+ */
+function auditInvoice() {
+  const htmlFile = join(OUT, "invoice", "index.html");
+  const row = { slug: "invoice" };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.metadata = false;
+    row.assets = false;
+    row.links = { total: 0, bad: 0 };
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const titleOk = /<title[^>]*>[^<]*Freelance Invoice Studio/i.test(html);
+  const descriptionTag =
+    html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
+  const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
+  const schemaTypes = collectTypes(html);
+  row.metadata =
+    titleOk && descriptionOk && schemaTypes.has("SoftwareApplication");
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
 console.log("\nPayoutDelta static-export corridor audit (./out)\n");
 
 const header = `${"Corridor Slug".padEnd(42)}${"HTML Exists".padEnd(14)}${"JSON-LD Present".padEnd(18)}${"Assets Verified"}`;
@@ -215,6 +255,32 @@ for (const row of report) {
   }
 }
 console.log("-".repeat(header.length));
+
+const invoice = auditInvoice();
+console.log("\nInvoice Studio audit (Phase 4):");
+const invoiceFlags = `${invoice.html ? "PASS" : "FAIL"}`;
+if (!invoice.html) {
+  fail("page not exported", "invoice/index.html");
+}
+if (invoice.html && !invoice.metadata) {
+  fail("metadata missing", "invoice: title + description + SoftwareApplication required");
+}
+if (invoice.assetDetails && invoice.assetDetails.bad > 0) {
+  fail("asset errors", "invoice");
+}
+if (invoice.links && invoice.links.bad > 0) {
+  fail("internal links broken", "invoice");
+}
+console.log(
+  `  ${"invoice/index.html".padEnd(38)}${invoiceFlags.padEnd(10)}Metadata ${invoice.html ? (invoice.metadata ? "PASS" : "FAIL") : "n/a"}`
+);
+console.log(
+  `  ${"assets".padEnd(38)}${(invoice.assets ? "PASS" : "FAIL").padEnd(10)}${`${invoice.assetDetails ? invoice.assetDetails.checked : 0} checked`}`
+);
+console.log(
+  `  ${"internal links".padEnd(38)}${(invoice.links && invoice.links.bad === 0 ? "PASS" : "FAIL").padEnd(10)}${invoice.links ? invoice.links.total : 0} verified`
+);
+
 console.log("\nGlobal ./out hygiene:");
 
 const globalFiles = [
@@ -275,13 +341,24 @@ const linkFailures = report.reduce((sum, r) => sum + (r.links ? r.links.bad : 0)
 const linkTotal = report.reduce((sum, r) => sum + (r.links ? r.links.total : 0), 0);
 const assetTotal = report.reduce((sum, r) => sum + (r.assetDetails ? r.assetDetails.checked : 0), 0);
 
-console.log(`\n${"-".repeat(header.length)}`);
-console.log(`  pages exported           ${report.length}`);
-console.log(`  assets verified          ${assetTotal}`);
-console.log(`  internal links verified  ${linkTotal}`);
-console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures}`);
+const invoiceFailures =
+  (!invoice.html ? 1 : 0) +
+  (invoice.html && !invoice.metadata ? 1 : 0) +
+  (invoice.assets ? 0 : 1) +
+  (invoice.links ? invoice.links.bad : 0);
 
-const ok = failures === 0 && globalBad === 0 && pageFailures === 0 && linkFailures === 0;
+console.log(`\n${"-".repeat(header.length)}`);
+console.log(`  pages exported           ${report.length} corridors + 1 invoice studio`);
+console.log(`  assets verified          ${assetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0)}`);
+console.log(`  internal links verified  ${linkTotal + (invoice.links ? invoice.links.total : 0)}`);
+console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures}`);
+
+const ok =
+  failures === 0 &&
+  globalBad === 0 &&
+  pageFailures === 0 &&
+  linkFailures === 0 &&
+  invoiceFailures === 0;
 if (ok) {
   console.log("\n  ALL CHECKS PASSED\n");
   process.exit(0);

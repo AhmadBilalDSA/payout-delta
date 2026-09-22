@@ -75,11 +75,15 @@ body {
  * While a print is requested the page's normal content is hidden and only the
  * `.print-area` receipt is visible, so the browser's Save-as-PDF dialog yields
  * a clean 1-page document instead of a screenshot of the app.
+ *
+ * Phase 4 — the Freelance Invoice Studio reuses the same zero-bloat strategy:
+ * `#invoice-document` becomes the sole visible node, so a native
+ * `window.print()` renders the live invoice as a crisp A4 portrait PDF.
  * ---------------------------------------------------------------------------
  */
 @page {
-  size: A4;
-  margin: 14mm;
+  size: A4 portrait;
+  margin: 12mm;
 }
 
 @media print {
@@ -93,7 +97,9 @@ body {
   }
 
   .print-area,
-  .print-area * {
+  .print-area *,
+  #invoice-document,
+  #invoice-document * {
     visibility: visible;
   }
 
@@ -102,5 +108,16 @@ body {
     inset: 0;
     width: 100%;
     margin: 0 auto;
+  }
+
+  #invoice-document {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    aspect-ratio: auto;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 }

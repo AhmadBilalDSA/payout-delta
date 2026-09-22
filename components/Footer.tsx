@@ -12,6 +12,7 @@ interface FooterLink {
 const PRODUCT_LINKS: readonly FooterLink[] = [
   { label: "Fee Auditor", href: "/" },
   { label: "Currency Corridors", href: "/#corridors" },
+  { label: "Invoice Studio", href: "/invoice" },
   { label: "API Stubs", href: "/about" },
   { label: "Rate Drops", href: "/about" },
 ] as const;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { ChannelQuote, Corridor } from "@/lib/types";
 import { formatLocal, formatUSD } from "@/utils/format";
 
@@ -166,6 +167,16 @@ export default function FeeBreakdownList({
                     >
                       Export Invoice Justification PDF
                     </button>
+                    <Link
+                      href={`/invoice/?gross=${Math.round(
+                        quote.grossUSD
+                      )}&ccy=USD&channel=${encodeURIComponent(
+                        quote.channelName
+                      )}`}
+                      className="rounded-full border border-black/[0.14] bg-white px-4 py-1.5 text-xs font-semibold text-black transition-all duration-200 ease-out hover:border-black/30 hover:bg-neutral-50 dark:border-white/20 dark:bg-transparent dark:text-white dark:hover:bg-white/10"
+                    >
+                      Open in Invoice Studio
+                    </Link>
                     {/*
                       PHASE 2 — RATE-DROP ALERT (requires the managed backend
                       + email opt-in; see lib/db.ts fact_rate_alerts and the
