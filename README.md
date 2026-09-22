@@ -4,7 +4,7 @@
 
 > After the platform cut, the SWIFT intermediaries, the real conversion, the
 > local landing fee and the statutory tax — **how much of your client's payment
-> lands in your bank account?** PayoutDelta answers exactly that, for 25
+> lands in your bank account?** PayoutDelta answers exactly that, for 35
 > corridors, in your browser, with zero cost and zero tracking.
 
 [![Live](https://img.shields.io/badge/Live-GitHub%20Pages-1f6feb?style=flat-square)](https://ahmadbilaldsa.github.io/payout-delta/)
@@ -37,20 +37,22 @@ your account.**
 ## Features
 
 ### 🧮 Cross-Border Payout Auditor
-25 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR, VND,
-KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR) with
-live comparison between **Wise, Payoneer, Direct Wire, Remitly and local bank
-rails** — a best-verdict ranking of the **local currency you actually
-receive**, not the one quoted mid-market. Batch 1 of the 50-country expansion
-added ten high-demand jurisdictions across LatAm (Mexico, Argentina), Europe
-(Poland, Romania, Czechia), MEA (Ghana, UAE, Saudi Arabia) and APAC
-(Thailand, Malaysia) — each with authored statutory & bank records and
+35 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR, VND,
+KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR, UAH,
+IQD, MAD, CLP, PEN, HUF, BGN, RSD, SGD, HKD) with live comparison between
+**Wise, Payoneer, Direct Wire, Remitly and local bank rails** — a best-verdict
+ranking of the **local currency you actually receive**, not the one quoted
+mid-market. Batches 1 & 2 of the 50-country expansion added twenty
+high-demand jurisdictions across LatAm (Mexico, Argentina, Chile, Peru),
+Europe (Poland, Romania, Czechia, Hungary, Bulgaria, Serbia, Ukraine), MEA
+(Ghana, UAE, Saudi Arabia, Iraq, Morocco) and APAC (Thailand, Malaysia,
+Singapore, Hong Kong) — each with authored statutory & bank records and
 **per-corridor provider fee models** (Wise / Payoneer / Direct Wire fixed
 fees + FX spreads registered in `data/fees.json`).
 
 ### 🧭 Currency Pair Switcher & Anti-Collapse Grid
 The header carries a tactile `USD → PKR` capsule grouped by receiving region
-(South Asia / Southeast Asia / East Africa & EMEA / Latin America / Europe &
+(South Asia / Asia Pacific / East Africa & EMEA / Latin America / Europe &
 UK) plus a one-tap `⇄` invert — when the inverted pair isn't audited a clear
 status pill offers a structured GitHub request instead of a 404. Corridor
 pages now run a two-rail anti-collapse grid: interactive inputs + the 7-step
@@ -100,8 +102,8 @@ callout, and an FTC-grade affiliate disclaimer — routed through a central
 partner directory ([`data/affiliatePartners.ts`](data/affiliatePartners.ts)).
 
 ### 🧩 Programmatic Long-Tail Platform Corridors
-62 statically exported corridor pages — every currency corridor plus
-`upwork-*`, `fiverr-*` and `deel-*` permutations across all 25 base slugs
+92 statically exported corridor pages — every currency corridor plus
+`upwork-*`, `fiverr-*` and `deel-*` permutations across all 35 base slugs
 (Upwork/Fiverr cover every corridor, Deel runs PKR). Each long-tail route
 pre-selects its platform (Upwork 10%, Fiverr 20%, Deel 0%), rewrites its
 title/H1/AEO answer-block for that platform, and stays a plain static file
@@ -110,7 +112,7 @@ under `./out`. Corridors are declared in
 with `?gross=` deep-link sharing intact.
 
 ### 🧬 Financial JSON-LD Schema Dominance
-Every corridor route (62 English + 5 localized) emits **one** top-level
+Every corridor route (92 English + 5 localized) emits **one** top-level
 schema.org `@graph` per page: a `CurrencyConversionService` with live
 `ExchangeRateSpecification`, a `FinancialProduct` per compared rail with its
 fixed fee & FX-spread structure, a seven-layer `HowTo` realization waterfall,
@@ -204,7 +206,7 @@ npm run lint      # ESLint
 | 5 | Financial JSON-LD schema dominance | Shipped |
 | 6 | GitHub community engine & developer API docs | Shipped |
 | 7 | UI anti-collapse grid overhaul, currency pair switcher & 5 high-volume corridors (VND / KES / IDR / COP / TRY) | Shipped |
-| 8 | 50-country expansion — Batch 1: 10 high-demand corridors across LatAm, Europe, MEA & APAC (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR) | Shipped (`38b4e97`) |
+| 8 | 50-country expansion — Batches 1 & 2: 20 high-demand corridors across LatAm, Europe, MEA & APAC (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR + UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD) | Shipped (`38b4e97`) |
 | 9 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 
 ---

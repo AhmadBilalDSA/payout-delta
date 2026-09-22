@@ -34,7 +34,7 @@ zero tracking, zero data retention, zero sign-up.
 
 ## 2. Codebase Audit — Permanent Inventory
 
-### 2.1 Corridors (25 standard, `data/fees.json`)
+### 2.1 Corridors (35 standard, `data/fees.json`)
 
 | Slug | From → To | Country / Currency |
 | --- | --- | --- |
@@ -63,11 +63,22 @@ zero tracking, zero data retention, zero sign-up.
 | `usd-to-ghs` | USD → GHS | Ghana |
 | `usd-to-aed` | USD → AED | UAE |
 | `usd-to-sar` | USD → SAR | Saudi Arabia |
+| `usd-to-uah` | USD → UAH | Ukraine |
+| `usd-to-iqd` | USD → IQD | Iraq |
+| `usd-to-mad` | USD → MAD | Morocco |
+| `usd-to-clp` | USD → CLP | Chile |
+| `usd-to-pen` | USD → PEN | Peru |
+| `usd-to-huf` | USD → HUF | Hungary |
+| `usd-to-bgn` | USD → BGN | Bulgaria |
+| `usd-to-rsd` | USD → RSD | Serbia |
+| `usd-to-sgd` | USD → SGD | Singapore |
+| `usd-to-hkd` | USD → HKD | Hong Kong |
 
 Authoring of banks & statutory tiers (`data/regulatoryBanking.ts`): **PKR, INR,
 PHP, VND, KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED,
-SAR are fully audited** (18); all other corridors run the global fallback
-engine (standard $15–$25 intermediary band + national clearing rail).
+SAR, UAH, IQD, MAD, CLP, PEN, HUF, BGN, RSD, SGD, HKD are fully audited**
+(28); all other corridors run the global fallback engine (standard $15–$25
+intermediary band + national clearing rail).
 Localized route pairs (`app/[lang]/calculator/[slug]/`): `ur→pkr`,
 `hi→inr`, `fil→php`, `pt→brl`, `es→eur` (built statically; all other pairs 404
 via `dynamicParams = false`).
@@ -162,6 +173,35 @@ that every language must preserve verbatim.
 - SAR — ZATCA VAT Implementing Regs Art. 33 & Income Tax Law Art. 68; banks
   RJHIBARI (Al Rajhi), NCBKSARI (SNB), RIBLSARI (Riyad Bank); SARIE (Wathiqa
   0% PIT, non-resident withholding relief).
+- UAH — Податковий кодекс України ст. 294 & 167 & ст. 6; banks PBANUA2X
+  (PrivatBank), UNJSUAUK (Monobank); SEP / IBAN · SPRINT (ФОП Group 3 єдиний
+  податок 5%, ПДФО 18% + військовий збір 1.5%, Дія City 5%).
+- IQD — CBI Banking Law No. 56 of 2004 & Income Tax Law No. 113 of 1982; banks
+  TRIQIQBA (Trade Bank of Iraq), RAFBIQBA (Rafidain), RDBAIQBB (Rasheed); CBI
+  RTGS / Clearing (0% individual export settlement at official rate).
+- MAD — DGI · Code Général des Impôts Art. 73-82; banks BCMAMAMC
+  (Attijariwafa), BMCEMAMC (Bank of Africa), BCPOMAMC (Banque Populaire); RTP
+  (Bank Al-Maghrib) / ACH (Auto-Entrepreneur 1%, IR barème 0–38%).
+- CLP — SII · Código Tributario Art. 74 No. 6 & LIR; banks BCHICLRM (Banco de
+  Chile), CREDCLRM (BCI), BSCHCLRM (Santander Chile); TEF / LCB (Boleta 10%
+  retención, Global Complementario 0–40%).
+- PEN — SUNAT · LIR Art. 34-A & Arts. 51-53; banks BCPLPEPL (BCP), BCONPEPL
+  (BBVA Perú), BINPPEPL (Interbank); RTP / PLIN (Renta 4ta 8% retención,
+  4ta/5ta progressive 0–30%).
+- HUF — NAV · Szja. törvény 15% & Katv. (2012. évi CXLVII. tv.); banks OTPVHUHB
+  (OTP), OKHBHUHB (K&H), GIBAHUHB (Erste); GIRO Instant / BKR (SZJA 15% flat,
+  KATA lump-sum).
+- BGN — НАП · ЗДДФЛ чл. 26-28 & ЗКСО; banks UNCRBGSF (UniCredit Bulbank),
+  STSABGSF (DSK), FINVBGSF (Fibank); BISRTGS / Instant (10% flat, самоосигурител).
+- RSD — Ministarstvo finansija & NBS · ZPDG; banks RZBSRSBG (Raiffeisen),
+  DBDBRSBG (Banca Intesa), AIKBRS22 (AIK); NBS IPS / RTGS (freelance 20%,
+  paušalni lump-sum).
+- SGD — IRAS · Income Tax Act 1947; banks DBSSSGSG (DBS), UOVBSGSG (UOB),
+  OCBCSGSG (OCBC); FAST / PayNow · MEPS+ (self-employed 0–24%, SGD 20k
+  threshold 0%).
+- HKD — IRD · Inland Revenue Ordinance Cap. 112; banks HSBCHKHH (HSBC),
+  BKCHHKHH (BOC HK), HASEHKHH (Hang Seng); FPS instant / CHATS RTGS (salaries
+  tax standard 15% / progressive 2–17%, profits tax 7.5%/15%).
 - Fallback engine — SEPA, BACS/FPS, PIX, NIBSS, BEFTN, InstaPay/ACH,
   NAPAS/CVQ, PesaLink/EFT, BI-RTGS/BI-FAST, SEBRA/ACH, FAST/EFT rails.
 
@@ -232,11 +272,11 @@ because they share the same dataset and quote math.
 | 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Shipped** (`92f8f7f`) |
 | 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | **Shipped** (`c081371`) |
 | 3 | **High-Intent Affiliate Engine, Partner Referral Cards & Trust Micro-Badges** — privacy-safe provider routing, sponsored disclosure CTAs, wire-penalty callouts | **Shipped** (`d51faba`) |
-| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes (est. Phase 4; expanded to 32 in Phase 7, 62 in Phase 8) | **Shipped** (`6a71b4e`) |
+| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes (est. Phase 4; expanded to 32 in Phase 7, 92 in Phase 8) | **Shipped** (`6a71b4e`) |
 | 5 | **Financial JSON-LD Schema Dominance** — one top-level `@graph` per corridor route (`CurrencyConversionService` + live `ExchangeRateSpecification`, per-rail `FinancialProduct`, 7-layer `HowTo` waterfall, programmatic `FAQPage` mirroring AEO Q&As, `WebApplication`, `Service`, `BreadcrumbList`) via `lib/seoSchemas.ts` | **Shipped** (`5e68dc0`) |
 | 6 | **GitHub Community Engine & Developer API Documentation** — 1-click viral Reddit/X/LinkedIn audit export on the verdict card, full API reference (cURL / TypeScript / Python quick-start, response-schema & SLA panels, static feed + edge worker), structured `.github/ISSUE_TEMPLATE` forms, `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed | **Shipped** (`9ef48f6`) |
 | 7 | **UI Anti-Collapse Grid Overhaul, Currency Pair Switcher & 5 High-Volume Corridors (VND / KES / IDR / COP / TRY)** — two-rail anti-collapse corridor grid (interactive waterfall left, sticky AEO + verdict + FAQ right, `min-w-0` guards, enforced 1.8 RTL line-height), header currency capsule grouped by region + one-tap `⇄` invert with "not audited" status pill, five new fully-audited corridors with real banks/SWIFT/statutory tiers (15 base + 17 long-tail → 32 English corridor routes), corpus & long-tail audit expanded | **Shipped** (`8fc8730`) |
-| 8 | **50-Country Expansion — Batch 1: 10 High-Demand International Corridors (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR)** — LatAm, Europe, MEA & APAC authored statutory/bank records (10 new base corridors + 20 long-tail → 25 base & 62 English corridor pages; regional currency capsule regrouped), corpus & long-tail audit extended | **Shipped** (`38b4e97`) |
+| 8 | **50-Country Expansion — Batches 1 & 2: 20 High-Demand International Corridors (Batch 1: MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR; Batch 2: UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD)** — LatAm, Europe, MEA & APAC authored statutory/bank records (20 new base corridors + 40 long-tail → 35 base & 92 English corridor pages; regional currency capsule regrouped, Asia Pacific relabel), corpus & long-tail audit extended | **Shipped** (`38b4e97`) |
 | 9 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 
 ---
@@ -245,7 +285,7 @@ because they share the same dataset and quote math.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # 81 static routes → ./out
+npm run build                 # 111 static routes → ./out
 node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, exit 0
 ```
 

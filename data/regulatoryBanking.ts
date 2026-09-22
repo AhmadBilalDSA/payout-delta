@@ -7,11 +7,12 @@
  * intermediary cuts and local clearing rails), and the statutory withholding /
  * exemption tiers used to compute the "real bank take-home".
  *
- * The eighteen fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
- * TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR) reference the
- * underlying legislation by section; every remaining corridor falls back to
- * accurate standard intermediary bands ($15–$25) plus its national clearing
- * network identifier so the engine never renders empty on any audited route.
+ * The twenty-eight fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
+ * TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR, UAH, IQD, MAD, CLP,
+ * PEN, HUF, BGN, RSD, SGD, HKD) reference the underlying legislation by
+ * section; every remaining corridor falls back to accurate standard
+ * intermediary bands ($15–$25) plus its national clearing network identifier
+ * so the engine never renders empty on any audited route.
  *
  * All monetary figures are informational benchmarks — the actual deduction
  * lands on the bank's credit advice (CRF) and must be verified before
@@ -1279,6 +1280,680 @@ const sarBanks: RegulatoryBank[] = [
 ];
 
 /* ---------------------------------------------------------------------------
+ * Ukraine — USD → UAH
+ * Податковий кодекс України (ПКУ) — ст. 294 (ФОП єдиний податок 5%),
+ * ст. 167 (ПДФО 18%) & ст. 6 (військовий збір 1.5%).
+ * ------------------------------------------------------------------------- */
+
+const uahTiers: StatutoryTier[] = [
+  {
+    id: "ukraine-fop",
+    name: "ФОП III група (Єдиний податок 5%)",
+    authority: "Податковий кодекс України ст. 294",
+    rate: 0.05,
+    purposeCode: "ФОП Group 3 (IT)",
+    note: "5% united tax on turnover for individual entrepreneurs (ФОП) Group 3 without VAT — the standard freelance-IT structure for inbound USD.",
+  },
+  {
+    id: "ukraine-diyacity",
+    name: "Дія City Resident / Gig Contractor (5% ПДФО)",
+    authority: "ПКУ ст. 141.9",
+    rate: 0.05,
+    purposeCode: "Diia City",
+    note: "5% reduced PIT for Diia City residents / gig contractors; social fund (ЄСВ) settled by the registered company.",
+  },
+  {
+    id: "ukraine-pit",
+    name: "ПДФО 18% + Військовий збір 1.5%",
+    authority: "ПКУ ст. 167 · ст. 6",
+    rate: 0.18,
+    purposeCode: "Standard PIT + military levy",
+    note: "Standard individual rate (18% PIT) plus the 1.5% military levy when income is taxed as personal employment income.",
+  },
+];
+
+const uahBanks: RegulatoryBank[] = [
+  {
+    id: "privat",
+    name: "PrivatBank",
+    displayName: "PrivatBank (Ukraine)",
+    swiftCode: "PBANUA2X",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "SEP same-day · uah is self-clearing via NBU SEP",
+    localCurrency: "UAH",
+  },
+  {
+    id: "monobank",
+    name: "Monobank (Universal Bank)",
+    displayName: "Monobank (Ukraine)",
+    swiftCode: "UNJSUAUK",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SEP same-day · card-to-card instant",
+    localCurrency: "UAH",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Iraq — USD → IQD
+ * Central Bank of Iraq (CBI) — Banking Law No. 56 of 2004 bank settlement;
+ * freelancers receive USD-credited IQD through CBI-cleared inward transfers.
+ * ------------------------------------------------------------------------- */
+
+const iqdTiers: StatutoryTier[] = [
+  {
+    id: "iraq-freelance",
+    name: "Individual Export Settlement (CBI)",
+    authority: "CBI Banking Law No. 56 of 2004",
+    rate: 0,
+    purposeCode: "Cross-border services",
+    exemption: true,
+    note: "0% income tax on individual cross-border service receipts settled through CBI-approved bank channels at the CBI reference rate.",
+  },
+  {
+    id: "iraq-salary",
+    name: "Salary / Payroll Regime (n/a for freelancers)",
+    authority: "Income Tax Law No. 113 of 1982",
+    rate: 0,
+    purposeCode: "Payroll only",
+    note: "Iraq's salary withholding applies to government/private payroll, not freelancer cross-border service income.",
+  },
+];
+
+const iqdBanks: RegulatoryBank[] = [
+  {
+    id: "trade-bank-of-iraq",
+    name: "Trade Bank of Iraq",
+    displayName: "Trade Bank of Iraq",
+    swiftCode: "TRIQIQBA",
+    intermediaryUSD: 18,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 25,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "CBI clearing · inward USD conversion at official rate",
+    localCurrency: "IQD",
+  },
+  {
+    id: "iraq-rafidain",
+    name: "Rafidain Bank",
+    displayName: "Al-Rafidain Bank (Iraq)",
+    swiftCode: "RAFBIQBA",
+    intermediaryUSD: 18,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 25,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "CBI clearing · official CBI FX rate",
+    localCurrency: "IQD",
+  },
+  {
+    id: "iraq-rasheed",
+    name: "Rasheed Bank",
+    displayName: "Rasheed Bank (Iraq)",
+    swiftCode: "RDBAIQBB",
+    intermediaryUSD: 18,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 25,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "CBI clearing · official CBI FX rate",
+    localCurrency: "IQD",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Morocco — USD → MAD
+ * Code Général des Impôts (CGI) — Art. 82 (Auto-Entrepreneur 1%) & the
+ * IR barème (0–38% progressive).
+ * ------------------------------------------------------------------------- */
+
+const madTiers: StatutoryTier[] = [
+  {
+    id: "morocco-auto",
+    name: "Régime Auto-Entrepreneur (1% CA)",
+    authority: "CGI Art. 82",
+    rate: 0.01,
+    purposeCode: "Auto-entrepreneur",
+    note: "1% flat on turnover (cotisation nominale) for registered auto-entrepreneurs invoicing export services.",
+  },
+  {
+    id: "morocco-bareme0",
+    name: "IR Barème — Tranche 0% (≤ DH 38,000)",
+    authority: "CGI Art. 73-82",
+    rate: 0,
+    purposeCode: "IR barème",
+    exemption: true,
+    note: "0% on the first income tranche (≤ MAD 38,000/yr) under the general IR barème.",
+  },
+  {
+    id: "morocco-bareme38",
+    name: "IR Barème — Tranche Supérieure (38%)",
+    authority: "CGI Art. 73-82",
+    rate: 0.38,
+    purposeCode: "IR barème",
+    note: "Top 38% tranche of the progressive IR barème for high net income.",
+  },
+];
+
+const madBanks: RegulatoryBank[] = [
+  {
+    id: "attijariwafa",
+    name: "Attijariwafa Bank",
+    displayName: "Attijariwafa Bank (Morocco)",
+    swiftCode: "BCMAMAMC",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RTP instant · ACH relevé 1 day",
+    localCurrency: "MAD",
+  },
+  {
+    id: "bank-of-africa",
+    name: "Bank of Africa",
+    displayName: "Bank of Africa (Morocco)",
+    swiftCode: "BMCEMAMC",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RTP instant · ACH relevé 1 day",
+    localCurrency: "MAD",
+  },
+  {
+    id: "banque-populaire",
+    name: "Banque Centrale Populaire",
+    displayName: "Banque Populaire (Morocco)",
+    swiftCode: "BCPOMAMC",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RTP instant · ACH relevé 1 day",
+    localCurrency: "MAD",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Chile — USD → CLP
+ * SII — Código Tributario Art. 74 No. 6 (10% boleta retención) & the
+ * declarative Impuesto Global Complementario.
+ * ------------------------------------------------------------------------- */
+
+const clpTiers: StatutoryTier[] = [
+  {
+    id: "chile-honorarios",
+    name: "Boleta de Honorarios — Retención 10%",
+    authority: "Código Tributario Art. 74 No. 6",
+    rate: 0.1,
+    purposeCode: "Boleta de honorarios",
+    note: "10% withholding on honorarios (renta del trabajo); net is integrated with the annual Global Complementario.",
+  },
+  {
+    id: "chile-global",
+    name: "Impuesto Global Complementario (0–40%)",
+    authority: "Ley sobre Impuesto a la Renta Arts. 20-21",
+    rate: 0,
+    purposeCode: "Global Complementario",
+    note: "Progressive annual tax on total personal income — 0% for low annual brackets, up to 40% top tranche, 10% retención credited.",
+  },
+];
+
+const clpBanks: RegulatoryBank[] = [
+  {
+    id: "banco-de-chile",
+    name: "Banco de Chile",
+    displayName: "Banco de Chile",
+    swiftCode: "BCHICLRM",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "TEF instant · LCB 1 day",
+    localCurrency: "CLP",
+  },
+  {
+    id: "bci",
+    name: "BCI",
+    displayName: "BCI (Chile)",
+    swiftCode: "CREDCLRM",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "TEF instant · LCB 1 day",
+    localCurrency: "CLP",
+  },
+  {
+    id: "santander-cl",
+    name: "Banco Santander Chile",
+    displayName: "Santander Chile",
+    swiftCode: "BSCHCLRM",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "TEF instant · LCB 1 day",
+    localCurrency: "CLP",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Peru — USD → PEN
+ * SUNAT — Ley del Impuesto a la Renta Art. 34-A (8% cuarta categoría
+ * retención) & the progressive 4ta/5ta scale.
+ * ------------------------------------------------------------------------- */
+
+const penTiers: StatutoryTier[] = [
+  {
+    id: "peru-cuarta",
+    name: "Renta 4ta Categoría — Retención 8%",
+    authority: "Ley del Impuesto a la Renta Art. 34-A",
+    rate: 0.08,
+    purposeCode: "Cuarta categoría",
+    note: "8% monthly withholding on cuarta categoría (professional service) receipts by the paying entity; credited against the annual return.",
+  },
+  {
+    id: "peru-progresivo",
+    name: "4ta/5ta Progresivo (0–30%)",
+    authority: "LIR Arts. 51-53",
+    rate: 0,
+    purposeCode: "Renta de trabajo",
+    note: "Progressive annual scale for work income — 8% retención credited; 0% below the Renta de trabajo threshold.",
+  },
+];
+
+const penBanks: RegulatoryBank[] = [
+  {
+    id: "bcp",
+    name: "Banco de Crédito del Perú",
+    displayName: "BCP (Peru)",
+    swiftCode: "BCPLPEPL",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RTP (Perú) instant · PLIN instant",
+    localCurrency: "PEN",
+  },
+  {
+    id: "bbva-pe",
+    name: "BBVA Perú",
+    displayName: "BBVA Perú",
+    swiftCode: "BCONPEPL",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RTP (Perú) instant · PLIN instant",
+    localCurrency: "PEN",
+  },
+  {
+    id: "interbank",
+    name: "Interbank",
+    displayName: "Interbank (Peru)",
+    swiftCode: "BINPPEPL",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "RTP (Perú) instant · PLIN instant",
+    localCurrency: "PEN",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Hungary — USD → HUF
+ * Szja. törvény (15% flat PIT) & Katv. — KATA monthly lump-sum regime.
+ * ------------------------------------------------------------------------- */
+
+const hufTiers: StatutoryTier[] = [
+  {
+    id: "hungary-szja",
+    name: "SZJA — 15% Flat PIT",
+    authority: "Szja. törvény · 15% kulcs",
+    rate: 0.15,
+    purposeCode: "Szja declaration",
+    note: "15% single personal income-tax rate on the taxable base; social contributions (TB) settled separately by the taxpayer.",
+  },
+  {
+    id: "hungary-kata",
+    name: "KATA Kisadózó (Lump-Sum)",
+    authority: "Katv. (2012. évi CXLVII. tv.)",
+    rate: 0,
+    purposeCode: "KATA",
+    exemption: true,
+    note: "Fixed monthly lump (50k/40k HUF, 25k student) replacing PIT+socials; 40% rate applied above the HUF 12M revenue ceiling.",
+  },
+];
+
+const hufBanks: RegulatoryBank[] = [
+  {
+    id: "otp",
+    name: "OTP Bank",
+    displayName: "OTP Bank (Hungary)",
+    swiftCode: "OTPVHUHB",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "GIRO Instant same-day · BKR RTGS",
+    localCurrency: "HUF",
+  },
+  {
+    id: "kh",
+    name: "K&H Bank",
+    displayName: "K&H Bank (Hungary)",
+    swiftCode: "OKHBHUHB",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "GIRO Instant same-day · BKR RTGS",
+    localCurrency: "HUF",
+  },
+  {
+    id: "erste-hu",
+    name: "Erste Bank Hungary",
+    displayName: "Erste Bank Hungary",
+    swiftCode: "GIBAHUHB",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "GIRO Instant same-day · BKR RTGS",
+    localCurrency: "HUF",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Bulgaria — USD → BGN
+ * ЗДДФЛ (Закон за данъците върху доходите на физическите лица) — 10% flat.
+ * ------------------------------------------------------------------------- */
+
+const bgnTiers: StatutoryTier[] = [
+  {
+    id: "bulgaria-flat",
+    name: "Плоска ставка 10% (Flat PIT)",
+    authority: "ЗДДФЛ чл. 26-28",
+    rate: 0.1,
+    purposeCode: "ФЛДД",
+    note: "10% flat income tax on annual taxable income; self-insured (самоосигуряващо се) register via НАП.",
+  },
+  {
+    id: "bulgaria-self",
+    name: "Самоосигурител (Self-Employed)",
+    authority: "ЗДДФЛ · ЗКСО",
+    rate: 0.1,
+    purposeCode: "Self-employed",
+    note: "10% income tax plus social (ЗКСО) contributions where applicable; craft patent-tax option is a lump sum.",
+  },
+];
+
+const bgnBanks: RegulatoryBank[] = [
+  {
+    id: "unicredit-bulbank",
+    name: "UniCredit Bulbank",
+    displayName: "UniCredit Bulbank (Bulgaria)",
+    swiftCode: "UNCRBGSF",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "BISRTGS same-day · Blinc instant",
+    localCurrency: "BGN",
+  },
+  {
+    id: "dsk",
+    name: "DSK Bank",
+    displayName: "DSK Bank (Bulgaria)",
+    swiftCode: "STSABGSF",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "BISRTGS same-day · Blinc instant",
+    localCurrency: "BGN",
+  },
+  {
+    id: "fibank",
+    name: "Fibank (First Investment Bank)",
+    displayName: "Fibank (Bulgaria)",
+    swiftCode: "FINVBGSF",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "BISRTGS same-day · Blinc instant",
+    localCurrency: "BGN",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Serbia — USD → RSD
+ * Zakon o porezu na dohodak građana — freelance regimen and paušalni režim.
+ * ------------------------------------------------------------------------- */
+
+const rsdTiers: StatutoryTier[] = [
+  {
+    id: "serbia-freelance",
+    name: "Porez na dohodak — Freelance 20%",
+    authority: "Zakon o porezu na dohodak građana",
+    rate: 0.2,
+    purposeCode: "Freelance income",
+    note: "20% income tax on gross freelance service income plus PIO / health contributions under the online-freelance rules.",
+  },
+  {
+    id: "serbia-pausal",
+    name: "Paušalno Oporezivanje (Lump-Sum)",
+    authority: "ZPDG · paušalni režim",
+    rate: 0,
+    purposeCode: "Paušalni",
+    exemption: true,
+    note: "Lump-sum tax quotation for craft entrepreneurs (kategorija preduzetnika) — fixed monthly amount instead of income-based tax.",
+  },
+];
+
+const rsdBanks: RegulatoryBank[] = [
+  {
+    id: "raiffeisen-rs",
+    name: "Raiffeisen banka",
+    displayName: "Raiffeisen banka (Serbia)",
+    swiftCode: "RZBSRSBG",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "NBS IPS instant · RTGS 1 day",
+    localCurrency: "RSD",
+  },
+  {
+    id: "intesa-rs",
+    name: "Banca Intesa Beograd",
+    displayName: "Banca Intesa (Serbia)",
+    swiftCode: "DBDBRSBG",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "NBS IPS instant · RTGS 1 day",
+    localCurrency: "RSD",
+  },
+  {
+    id: "aik",
+    name: "AIK Banka",
+    displayName: "AIK Banka (Serbia)",
+    swiftCode: "AIKBRS22",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Standard",
+    clearance: "NBS IPS instant · RTGS 1 day",
+    localCurrency: "RSD",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Singapore — USD → SGD
+ * IRAS — Income Tax Act 1947, self-employed assessment (0–24% bands).
+ * ------------------------------------------------------------------------- */
+
+const sgdTiers: StatutoryTier[] = [
+  {
+    id: "singapore-resident",
+    name: "Self-Employed Net Profit (0–24%)",
+    authority: "Income Tax Act 1947 · IRAS",
+    rate: 0.15,
+    purposeCode: "Self-employment income",
+    note: "No withholding at source; self-employed declare net profit and pay resident progressive bands up to 24%.",
+  },
+  {
+    id: "singapore-threshold",
+    name: "Below Threshold (≤ SGD 20,000)",
+    authority: "ITA 1947 s. 2",
+    rate: 0,
+    purposeCode: "Chargeable income",
+    exemption: true,
+    note: "0% when annual chargeable income stays within the SGD 20,000 personal allowance band.",
+  },
+];
+
+const sgdBanks: RegulatoryBank[] = [
+  {
+    id: "dbs",
+    name: "DBS / POSB",
+    displayName: "DBS (Singapore)",
+    swiftCode: "DBSSSGSG",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "FAST / PayNow instant · MEPS+ 1 day",
+    localCurrency: "SGD",
+  },
+  {
+    id: "uob",
+    name: "United Overseas Bank",
+    displayName: "UOB (Singapore)",
+    swiftCode: "UOVBSGSG",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "FAST / PayNow instant · MEPS+ 1 day",
+    localCurrency: "SGD",
+  },
+  {
+    id: "ocbc",
+    name: "OCBC Bank",
+    displayName: "OCBC (Singapore)",
+    swiftCode: "OCBCSGSG",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "FAST / PayNow instant · MEPS+ 1 day",
+    localCurrency: "SGD",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Hong Kong — USD → HKD
+ * Inland Revenue Ordinance Cap. 112 — salaries tax (2–17% / 15% standard) &
+ * two-tier profits tax for sole traders.
+ * ------------------------------------------------------------------------- */
+
+const hkdTiers: StatutoryTier[] = [
+  {
+    id: "hongkong-salaries",
+    name: "Salaries Tax — Standard 15% (YCB)",
+    authority: "IRO s. 13 & Second Schedule",
+    rate: 0.15,
+    purposeCode: "Salaries tax",
+    note: "15% standard rate on net chargeable income, or 2–17% progressive brackets — whichever is lower (Year of Assessment cap).",
+  },
+  {
+    id: "hongkong-profits",
+    name: "Profits Tax — Sole Trader 7.5% / 15%",
+    authority: "IRO Part IV",
+    rate: 0.075,
+    purposeCode: "Profits tax",
+    note: "7.5% on the first HKD 2M of assessable profits and 15% above, for unincorporated sole-proprietor business.",
+  },
+];
+
+const hkdBanks: RegulatoryBank[] = [
+  {
+    id: "hsbc-hk",
+    name: "HSBC Hong Kong",
+    displayName: "HSBC (Hong Kong)",
+    swiftCode: "HSBCHKHH",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "FPS instant · CHATS RTGS 1 day",
+    localCurrency: "HKD",
+  },
+  {
+    id: "bochk",
+    name: "Bank of China (Hong Kong)",
+    displayName: "Bank of China (HK)",
+    swiftCode: "BKCHHKHH",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "FPS instant · CHATS RTGS 1 day",
+    localCurrency: "HKD",
+  },
+  {
+    id: "hangseng",
+    name: "Hang Seng Bank",
+    displayName: "Hang Seng Bank (Hong Kong)",
+    swiftCode: "HASEHKHH",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "FPS instant · CHATS RTGS 1 day",
+    localCurrency: "HKD",
+  },
+];
+
+/* ---------------------------------------------------------------------------
  * Global fallback engine — EUR / GBP / BRL / NGN / BDT / EGP / ZAR.
  * Standard intermediary deduction $15–$25, national clearing network, and a
  * statutory export-tax compliance notice.
@@ -1571,6 +2246,146 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     ],
     banks: sarBanks,
     tiers: sarTiers,
+    generic: false,
+  },
+  "usd-to-uah": {
+    slug: "usd-to-uah",
+    authority:
+      "Державна податкова служба України · Податковий кодекс України (ПКУ) ст. 294 & 167 & ст. 6",
+    clearingNetwork: "SEP / IBAN · SPRINT",
+    citations: [
+      "ПКУ ст. 294 ФОП Group 3 · 5%",
+      "ПКУ ст. 167 ПДФО 18% · ст. 6 Військовий збір 1.5%",
+      "NBU SEP Clearing",
+    ],
+    banks: uahBanks,
+    tiers: uahTiers,
+    generic: false,
+  },
+  "usd-to-iqd": {
+    slug: "usd-to-iqd",
+    authority:
+      "Central Bank of Iraq (CBI) · Banking Law No. 56 of 2004 & Income Tax Law No. 113 of 1982",
+    clearingNetwork: "CBI RTGS / Clearing",
+    citations: [
+      "CBI FX Auction Settlement",
+      "Income Tax Law No. 113 of 1982",
+      "CBI Clearing System",
+    ],
+    banks: iqdBanks,
+    tiers: iqdTiers,
+    generic: false,
+  },
+  "usd-to-mad": {
+    slug: "usd-to-mad",
+    authority:
+      "Direction Générale des Impôts (DGI) · Code Général des Impôts Art. 73-82",
+    clearingNetwork: "RTP (Bank Al-Maghrib) / ACH",
+    citations: [
+      "CGI Art. 82 Auto-Entrepreneur 1%",
+      "CGI Barème IR 0-38%",
+      "Bank Al-Maghrib RTP Clearing",
+    ],
+    banks: madBanks,
+    tiers: madTiers,
+    generic: false,
+  },
+  "usd-to-clp": {
+    slug: "usd-to-clp",
+    authority:
+      "Servicio de Impuestos Internos (SII) · Código Tributario Art. 74 No. 6 & Ley sobre Impuesto a la Renta",
+    clearingNetwork: "TEF / LCB",
+    citations: [
+      "SII Art. 74 No. 6 Retención Honorarios",
+      "LIR Impuesto Global Complementario",
+      "SBIF/SBC Transferencias (TEF)",
+    ],
+    banks: clpBanks,
+    tiers: clpTiers,
+    generic: false,
+  },
+  "usd-to-pen": {
+    slug: "usd-to-pen",
+    authority:
+      "SUNAT · Ley del Impuesto a la Renta Art. 34-A & Arts. 51-53",
+    clearingNetwork: "RTP / PLIN",
+    citations: [
+      "LIR Art. 34-A Retención 4ta Categoría",
+      "SUNAT Renta 4ta/5ta Scale",
+      "BCRP RTP Clearing",
+    ],
+    banks: penBanks,
+    tiers: penTiers,
+    generic: false,
+  },
+  "usd-to-huf": {
+    slug: "usd-to-huf",
+    authority:
+      "Nemzeti Adó- és Vámhivatal (NAV) · Szja. törvény 15% & Katv. (2012. évi CXLVII. tv.)",
+    clearingNetwork: "GIRO Instant / BKR",
+    citations: [
+      "Szja. 15% kulcs",
+      "KATA lump-sum (Katv.)",
+      "MNB GIRO Instant",
+    ],
+    banks: hufBanks,
+    tiers: hufTiers,
+    generic: false,
+  },
+  "usd-to-bgn": {
+    slug: "usd-to-bgn",
+    authority:
+      "Национална агенция за приходите (НАП) · ЗДДФЛ чл. 26-28 & ЗКСО",
+    clearingNetwork: "BISRTGS / Instant",
+    citations: [
+      "ЗДДФЛ чл. 26-28 · 10%",
+      "ЗКСО Самоосигуряване",
+      "BNB BISRTGS / Blinc Instant",
+    ],
+    banks: bgnBanks,
+    tiers: bgnTiers,
+    generic: false,
+  },
+  "usd-to-rsd": {
+    slug: "usd-to-rsd",
+    authority:
+      "Ministarstvo finansija & NBS · Zakon o porezu na dohodak građana",
+    clearingNetwork: "NBS IPS / RTGS",
+    citations: [
+      "ZPDG Freelance 20%",
+      "Paušalni režim ZPDG",
+      "NBS IPS Instant",
+    ],
+    banks: rsdBanks,
+    tiers: rsdTiers,
+    generic: false,
+  },
+  "usd-to-sgd": {
+    slug: "usd-to-sgd",
+    authority:
+      "Inland Revenue Authority of Singapore (IRAS) · Income Tax Act 1947",
+    clearingNetwork: "FAST / PayNow · MEPS+",
+    citations: [
+      "ITA 1947 Self-Employed Assessment",
+      "IRAS Resident Bands 0-24%",
+      "MAS FAST / PayNow Instant",
+    ],
+    banks: sgdBanks,
+    tiers: sgdTiers,
+    generic: false,
+  },
+  "usd-to-hkd": {
+    slug: "usd-to-hkd",
+    authority:
+      "Inland Revenue Department (IRD) · Inland Revenue Ordinance Cap. 112",
+    clearingNetwork: "FPS (instant) / CHATS RTGS",
+    citations: [
+      "IRO s. 13 Salaries Tax Standard 15%",
+      "IRO Part IV Profits Tax 7.5%/15%",
+      "HKMA FPS Instant",
+    ],
+    banks: hkdBanks,
+    tiers: hkdTiers,
     generic: false,
   },
 };
