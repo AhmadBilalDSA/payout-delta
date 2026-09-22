@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -17,12 +18,12 @@ export default function ContactPage() {
       <p className="mt-4 leading-relaxed text-slate-700">
         Feedback keeps the fee dataset honest. Before you write, please check
         whether your question is answered by the{" "}
-        <a
+        <Link
           href="/disclaimer"
           className="underline underline-offset-2 hover:text-slate-700"
         >
           disclaimer
-        </a>{" "}
+        </Link>{" "}
         or the corridor FAQ on each calculator page.
       </p>
 
@@ -56,12 +57,12 @@ export default function ContactPage() {
       <p className="mt-6 text-sm text-slate-500">
         We reply during UK business hours and keep personal data only where a
         reply requires it — in line with the{" "}
-        <a
+        <Link
           href="/privacy-policy"
           className="underline underline-offset-2 hover:text-slate-700"
         >
           privacy policy
-        </a>
+        </Link>
         .
       </p>
     </article>

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getCorridorSlugs } from "@/lib/db";
+import { LOCALIZED_CORRIDORS } from "@/lib/localizedCorridors";
 
 const SITE_URL = "https://payoutdelta.com";
 const LAST_MODIFIED = new Date("2026-09-22");
@@ -15,6 +16,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
+
+  const localizedEntries: MetadataRoute.Sitemap = LOCALIZED_CORRIDORS.map(
+    ({ lang, slug }) => ({
+      url: `${SITE_URL}/${lang}/calculator/${slug}/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }),
+  );
 
   const staticEntries: MetadataRoute.Sitemap = [
     {
@@ -61,5 +71,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...staticEntries, ...corridorEntries];
+  return [...staticEntries, ...corridorEntries, ...localizedEntries];
 }

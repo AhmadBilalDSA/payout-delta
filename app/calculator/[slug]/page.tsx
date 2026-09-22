@@ -12,12 +12,16 @@ import {
 } from "@/lib/db";
 import { getCorridorContent } from "@/lib/corridorContent";
 import { computeSparklineStats, getCorridorHistory } from "@/lib/history";
+import { getComplianceGuide } from "@/data/complianceGuides";
+import { hreflangMap } from "@/lib/localizedCorridors";
 import Calculator from "@/components/Calculator";
 import FaqAccordion from "@/components/FaqAccordion";
 import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
+import ComplianceGuide from "@/components/ComplianceGuide";
 
 const SITE_URL = "https://payoutdelta.com";
+const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
 
 interface CorridorPageProps {
   params: Promise<{ slug: string }>;
@@ -40,11 +44,13 @@ export async function generateMetadata({
     return { title: "Corridor not found" };
   }
   const content = getCorridorContent(slug);
+  const languages = hreflangMap(slug);
   return {
     title: `${corridor.from} to ${corridor.to} — Payout Fee Audit (${corridor.country})`,
     description: `${content.overview.slice(0, 150)}`,
     alternates: {
       canonical: `/calculator/${corridor.slug}/`,
+      ...(languages ? { languages } : {}),
     },
     openGraph: {
       type: "website",
@@ -59,11 +65,42 @@ function buildJsonLd(slug: string) {
   const corridor = getCorridorBySlug(slug);
   if (!corridor) return null;
   const content = getCorridorContent(slug);
+  const guide = getComplianceGuide(slug);
+  const channels = getChannels();
+  const corridorPair = `${corridor.from}→${corridor.to}`;
+  const corridorUrl = `${SITE_URL}/calculator/${corridor.slug}/`;
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: `${BREADCRUMB_ORIGIN}/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Corridors",
+        item: `${BREADCRUMB_ORIGIN}/calculator/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${corridor.from} to ${corridor.to} (${corridor.country})`,
+        item: `${BREADCRUMB_ORIGIN}/calculator/${corridor.slug}/`,
+      },
+    ],
+  };
 
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: content.faqs.map((item) => ({
+    url: corridorUrl,
+    inLanguage: "en",
+    mainEntity: [...content.faqs, ...guide.faqs].map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -76,7 +113,7 @@ function buildJsonLd(slug: string) {
     name: "PayoutDelta",
     operatingSystem: "Web (React, static export)",
     applicationCategory: "FinanceApplication",
-    url: `${SITE_URL}/calculator/${corridor.slug}/`,
+    url: corridorUrl,
     description:
       "Zero-signup auditor of freelance payout fees for the " +
       `${corridor.from}-to-${corridor.to} (${corridor.country}) corridor.`,
@@ -88,9 +125,78 @@ function buildJsonLd(slug: string) {
     aggregateRating: undefined,
   };
 
-  return [faqLd, appLd].map((block) =>
-    JSON.stringify(block).replace(/</g, "\\u003c"),
-  );
+  const serviceLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: `PayoutDelta Cross-Border Freelance Remittance (${corridorPair})`,
+    serviceType: "Cross-border freelance payout fee audit",
+    url: corridorUrl,
+    provider: {
+      "@type": "Organization",
+      name: "PayoutDelta",
+      url: `${SITE_URL}/`,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: corridor.country,
+      identifier: corridor.countryCode,
+    },
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: `${corridorPair} withdrawal channels`,
+      itemListElement: channels.map((channel) => ({
+        "@type": "Offer",
+        name: `${channel.name} — ${channel.fixedFeeUSD} USD fixed + ${(
+          channel.fxSpread * 100
+        ).toFixed(2)}% FX spread`,
+        category: `Cross-border remittance (${corridorPair})`,
+        price: String(channel.fixedFeeUSD),
+        priceCurrency: corridor.from,
+        seller: { "@type": "Organization", name: channel.name },
+      })),
+    },
+  };
+
+  const productLds = channels.map((channel) => ({
+    "@context": "https://schema.org",
+    "@type": "FinancialProduct",
+    name: `${channel.name} Cross-Border Freelance Remittance`,
+    category: `Cross-border remittance (${corridorPair})`,
+    provider: { "@type": "Organization", name: channel.name },
+    areaServed: {
+      "@type": "Country",
+      name: corridor.country,
+      identifier: corridor.countryCode,
+    },
+    feesAndCommissionsSpecification: [
+      {
+        "@type": "MonetaryAmount",
+        name: "Fixed transferring fee (USD)",
+        value: channel.fixedFeeUSD,
+        currency: corridor.from,
+      },
+      {
+        "@type": "QuantitativeValue",
+        name: "FX spread markup on interbank reference",
+        value: channel.fxSpread,
+        unitText: "fraction of mid-market rate",
+      },
+    ],
+    amount: {
+      "@type": "MonetaryAmount",
+      name: `Reference settlement rate (${corridor.from} to ${corridor.to})`,
+      value: corridor.rate,
+      currency: corridor.to,
+    },
+  }));
+
+  return [
+    breadcrumbLd,
+    faqLd,
+    appLd,
+    serviceLd,
+    ...productLds,
+  ].map((block) => JSON.stringify(block).replace(/</g, "\\u003c"));
 }
 
 export default async function CorridorPage({ params }: CorridorPageProps) {
@@ -100,6 +206,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
     notFound();
   }
   const content = getCorridorContent(corridor.slug);
+  const guide = getComplianceGuide(corridor.slug);
   const platforms = getPlatforms();
   const channels = getChannels();
   const datasetRevision = getDataset().updatedAt.slice(0, 10);
@@ -154,6 +261,11 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           history={history}
           sparklineStats={sparklineStats}
         />
+      </div>
+
+      {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}
+      <div className="mt-8">
+        <ComplianceGuide guide={guide} />
       </div>
 
       {/* Unique editorial prose — see lib/corridorContent.ts */}
@@ -213,7 +325,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
             Frequently asked questions
           </h2>
           <div className="mt-3">
-            <FaqAccordion items={content.faqs} />
+            <FaqAccordion items={[...content.faqs, ...guide.faqs]} />
           </div>
         </section>
 

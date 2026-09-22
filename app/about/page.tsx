@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About",
@@ -64,19 +65,19 @@ export default function AboutPage() {
       <p className="mt-8 text-sm text-slate-500">
         PayoutDelta is informational tooling, not financial, tax or legal
         advice. See the{" "}
-        <a
+        <Link
           href="/disclaimer"
           className="underline underline-offset-2 hover:text-slate-700"
         >
           disclaimer
-        </a>{" "}
+        </Link>{" "}
         and{" "}
-        <a
+        <Link
           href="/terms-of-service"
           className="underline underline-offset-2 hover:text-slate-700"
         >
           terms
-        </a>
+        </Link>
         .
       </p>
     </article>

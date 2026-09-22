@@ -15,6 +15,16 @@
  * metadata (title + description + SoftwareApplication JSON-LD) is intact, and
  * its assets/links resolve under the /payout-delta subpath.
  *
+ * Phase 5 also verifies:
+ *   - every newly generated localized sub-path (ur/hi/fil/es/pt calculator
+ *     routes) exports a real HTML page that loads with dir/lang attribution
+ *   - every JSON-LD block on every exported HTML page parses cleanly as valid
+ *     JSON (no unescaped quotes, no broken objects)
+ *   - corridor pages expose the full Phase 5 schema set (BreadcrumbList,
+ *     FinancialProduct, Service, FAQPage, SoftwareApplication)
+ *   - English corridor pages with a localized twin emit hreflang alternates
+ *     pointing at the localized sub-paths
+ *
  * Also checks ./out hygiene: index/404/sitemap/robots exist and .nojekyll is
  * present so GitHub Pages serves the bare /payout-delta subpath.
  *
@@ -40,6 +50,23 @@ const EXPECTED_SLUGS = [
   "usd-to-bdt",
   "usd-to-egp",
   "usd-to-zar",
+];
+
+const EXPECTED_LOCALIZED = [
+  { lang: "ur", slug: "usd-to-pkr", dir: "rtl" },
+  { lang: "hi", slug: "usd-to-inr", dir: "ltr" },
+  { lang: "fil", slug: "usd-to-php", dir: "ltr" },
+  { lang: "es", slug: "usd-to-eur", dir: "ltr" },
+  { lang: "pt", slug: "usd-to-brl", dir: "ltr" },
+];
+
+/** Phase 5 schema set required on every corridor page. */
+const REQUIRED_CORRIDOR_SCHEMA = [
+  "SoftwareApplication",
+  "FAQPage",
+  "BreadcrumbList",
+  "Service",
+  "FinancialProduct",
 ];
 
 const ASSET_HREF_RE = /(?:href|src)="(\/(?:payout-delta\/)?_next\/[^"]*)"/g;
@@ -80,6 +107,29 @@ function collectTypes(html) {
   }
   return types;
 }
+
+/**
+ * Phase 5 — parses every JSON-LD block on a page. Returns the number of
+ * `application/ld+json` script blocks that fail `JSON.parse`, so malformed
+ * markup (unescaped quotes, truncated objects) fails the audit instead of
+ * being silently skipped by `collectTypes`.
+ */
+function countBrokenLdBlocks(html) {
+  let blocks = 0;
+  let broken = 0;
+  let match;
+  while ((match = LD_JSON_RE.exec(html)) !== null) {
+    blocks += 1;
+    try {
+      JSON.parse(match[1]);
+    } catch {
+      broken += 1;
+    }
+  }
+  return { blocks, broken };
+}
+
+const HREFLANG_RE = /<link[^>]*rel=["']alternate["'][^>]*hreflang=["']([^"']+)["'][^>]*>/gi;
 
 function diskPathForHref(relPath) {
   const withoutQuery = relPath.split(/[?#]/, 1)[0];
@@ -183,7 +233,12 @@ function auditCorridor(slug) {
 
   const html = readFileSync(htmlFile, "utf8");
   const types = collectTypes(html);
-  row.schema = types.has("SoftwareApplication") && types.has("FAQPage");
+  row.schema = REQUIRED_CORRIDOR_SCHEMA.every((t) => types.has(t));
+  row.missingSchema = REQUIRED_CORRIDOR_SCHEMA.filter((t) => !types.has(t));
+
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
 
   const { checked, bad } = verifyAssets(html);
   row.assets = checked > 0 && bad === 0;
@@ -195,7 +250,7 @@ function auditCorridor(slug) {
 }
 
 /**
- * Phase 4 — Freelance Invoice Studio: ./out/invoice/index.html must exist,
+ * Phase 5 — Freelance Invoice Studio: ./out/invoice/index.html must exist,
  * carry valid metadata (title + meta description + SoftwareApplication
  * JSON-LD), and serve basePath-prefixed assets that resolve on disk.
  */
@@ -218,8 +273,15 @@ function auditInvoice() {
     html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
   const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
   const schemaTypes = collectTypes(html);
+  row.schemaMissing = [];
+  for (const t of ["SoftwareApplication", "BreadcrumbList", "Service"]) {
+    if (!schemaTypes.has(t)) row.schemaMissing.push(t);
+  }
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
   row.metadata =
-    titleOk && descriptionOk && schemaTypes.has("SoftwareApplication");
+    titleOk && descriptionOk && row.schemaMissing.length === 0;
 
   const { checked, bad } = verifyAssets(html);
   row.assets = checked > 0 && bad === 0;
@@ -227,6 +289,61 @@ function auditInvoice() {
 
   row.links = verifyInternalLinks(html);
   return row;
+}
+
+/**
+ * Phase 5 — localized sub-path audit. Verifies each authored (lang, slug)
+ * route exported a real HTML page with correct dir/lang attribution, valid
+ * JSON-LD (incl. BreadcrumbList), prefix-intact assets and no broken links.
+ */
+function auditLocalized(lang, slug, dir) {
+  const htmlFile = join(OUT, lang, "calculator", slug, "index.html");
+  const row = { slug: `${lang}/${slug}` };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.dirLang = false;
+    row.schema = false;
+    row.assets = false;
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const dirLangOk = dir === "rtl";
+  const hasDirRtl = /dir=["']rtl["']/i.test(html);
+  const hasLang = new RegExp(`lang=["']${lang}["']`, "i").test(html);
+  row.dirLang = hasLang && (!dirLangOk || hasDirRtl);
+
+  const types = collectTypes(html);
+  row.schema = types.has("BreadcrumbList") && types.has("FAQPage");
+
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
+/**
+ * Phase 5 — hreflang audit. Every English corridor page with a localized twin
+ * must emit a rel=alternate hreflang link for that language.
+ */
+function verifyHreflang(slug, expectedLangs) {
+  const htmlFile = join(OUT, "calculator", slug, "index.html");
+  if (!existsSync(htmlFile)) return [];
+  const html = readFileSync(htmlFile, "utf8");
+  const present = new Set();
+  let match;
+  while ((match = HREFLANG_RE.exec(html)) !== null) {
+    present.add(match[1].toLowerCase());
+  }
+  return expectedLangs.filter((lang) => !present.has(lang));
 }
 
 console.log("\nPayoutDelta static-export corridor audit (./out)\n");
@@ -245,7 +362,10 @@ for (const row of report) {
     fail("page not exported", row.slug);
   }
   if (!row.schema) {
-    fail("schema missing", `${row.slug}: SoftwareApplication + FAQPage required`);
+    fail("schema missing", `${row.slug}: requires ${(row.missingSchema ?? []).join(", ")}`);
+  }
+  if (!row.ldParse) {
+    fail("malformed JSON-LD", row.slug);
   }
   if (row.assetDetails && row.assetDetails.bad > 0) {
     fail("asset errors", row.slug);
@@ -256,14 +376,74 @@ for (const row of report) {
 }
 console.log("-".repeat(header.length));
 
-const invoice = auditInvoice();
+console.log("\nLocalized sub-path audit (Phase 5):");
+const localizedRows = EXPECTED_LOCALIZED.map(({ lang, slug, dir }) =>
+  auditLocalized(lang, slug, dir)
+);
+let localizedFailures = 0;
+for (const row of localizedRows) {
+  const flag = (ok) => (ok ? "PASS" : "FAIL");
+  const detail = row.html
+    ? `${flag(row.dirLang)} dir/lang · ${flag(row.schema)} BreadcrumbList+FAQ · ${row.assetDetails ? `${row.assetDetails.checked} assets` : "-"} · ${row.links ? `${row.links.total} links` : "-"}`
+    : "page not exported";
+  console.log(`  ${`${row.slug}/index.html`.padEnd(38)}${detail}`);
+  if (!row.html) {
+    localizedFailures += 1;
+    fail("page not exported", row.slug);
+  }
+  if (row.html && !row.dirLang) {
+    localizedFailures += 1;
+    fail("dir/lang attribution missing", row.slug);
+  }
+  if (row.html && !row.schema) {
+    localizedFailures += 1;
+    fail("schema missing", `${row.slug}: BreadcrumbList + FAQPage required`);
+  }
+  if (row.html && !row.ldParse) {
+    localizedFailures += 1;
+    fail("malformed JSON-LD", row.slug);
+  }
+  if (row.assetDetails && row.assetDetails.bad > 0) {
+    localizedFailures += 1;
+    fail("asset errors", row.slug);
+  }
+  if (row.links && row.links.bad > 0) {
+    localizedFailures += 1;
+    fail("internal links broken", row.slug);
+  }
+}
+if (localizedFailures > 0) {
+  fail("localized pages incomplete", `${localizedFailures} issue(s) across localized routes`);
+}
+
+const hreflangBySlug = new Map();
+for (const { lang, slug } of EXPECTED_LOCALIZED) {
+  if (!hreflangBySlug.has(slug)) hreflangBySlug.set(slug, []);
+  hreflangBySlug.get(slug).push(lang);
+}
+let hreflangFailures = 0;
+for (const [slug, langs] of hreflangBySlug) {
+  const missing = verifyHreflang(slug, langs);
+  if (missing.length > 0) {
+    hreflangFailures += 1;
+    fail("hreflang missing", `${slug}: ${missing.join(", ")}`);
+  }
+}
+console.log(
+  `\nHreflang alternates (Phase 5): ${hreflangFailures === 0 ? `PASS — ${EXPECTED_LOCALIZED.length} localized variant(s) wired into corridor heads` : `FAIL — ${hreflangFailures} corridor(s) missing alternates`}`
+);
+
 console.log("\nInvoice Studio audit (Phase 4):");
+const invoice = auditInvoice();
 const invoiceFlags = `${invoice.html ? "PASS" : "FAIL"}`;
 if (!invoice.html) {
   fail("page not exported", "invoice/index.html");
 }
 if (invoice.html && !invoice.metadata) {
-  fail("metadata missing", "invoice: title + description + SoftwareApplication required");
+  fail("metadata missing", "invoice: title + description + SoftwareApplication/BreadcrumbList/Service required");
+}
+if (invoice.html && !invoice.ldParse) {
+  fail("malformed JSON-LD", "invoice");
 }
 if (invoice.assetDetails && invoice.assetDetails.bad > 0) {
   fail("asset errors", "invoice");
@@ -336,29 +516,77 @@ if (!corpusMatches) {
   fail("corpus drift", "data/fees.json slugs differ from EXPECTED_SLUGS");
 }
 
-const pageFailures = report.filter((r) => !r.html || !r.schema || !r.assets).length;
+/**
+ * Phase 5 — global JSON-LD integrity scan. Parses every JSON-LD block in every
+ * exported HTML page under ./out (home, legal, corridor and localized routes)
+ * and counts blocks that fail `JSON.parse`.
+ */
+function listHtmlFiles(dir) {
+  if (!existsSync(dir)) return [];
+  const files = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      files.push(...listHtmlFiles(full));
+    } else if (entry.endsWith(".html")) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+let ldScanned = 0;
+let ldBroken = 0;
+for (const file of listHtmlFiles(OUT)) {
+  const { blocks, broken } = countBrokenLdBlocks(readFileSync(file, "utf8"));
+  ldScanned += blocks;
+  ldBroken += broken;
+}
+console.log(
+  `  ${(ldBroken === 0 ? "PASS  " : "FAIL  ") + "JSON-LD parse integrity".padEnd(32)}${ldScanned} blocks scanned, ${ldBroken} malformed`
+);
+if (ldBroken > 0) {
+  globalBad += 1;
+  fail("malformed JSON-LD", "see JSON-LD parse integrity check");
+}
+
+const pageFailures = report.filter(
+  (r) => !r.html || !r.schema || !r.assets || !r.ldParse
+).length;
 const linkFailures = report.reduce((sum, r) => sum + (r.links ? r.links.bad : 0), 0);
 const linkTotal = report.reduce((sum, r) => sum + (r.links ? r.links.total : 0), 0);
 const assetTotal = report.reduce((sum, r) => sum + (r.assetDetails ? r.assetDetails.checked : 0), 0);
 
+const localizedAssetTotal = localizedRows.reduce(
+  (sum, r) => sum + (r.assetDetails ? r.assetDetails.checked : 0),
+  0
+);
+const localizedLinkTotal = localizedRows.reduce(
+  (sum, r) => sum + (r.links ? r.links.total : 0),
+  0
+);
+
 const invoiceFailures =
   (!invoice.html ? 1 : 0) +
   (invoice.html && !invoice.metadata ? 1 : 0) +
+  (invoice.html && !invoice.ldParse ? 1 : 0) +
   (invoice.assets ? 0 : 1) +
   (invoice.links ? invoice.links.bad : 0);
 
 console.log(`\n${"-".repeat(header.length)}`);
-console.log(`  pages exported           ${report.length} corridors + 1 invoice studio`);
-console.log(`  assets verified          ${assetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0)}`);
-console.log(`  internal links verified  ${linkTotal + (invoice.links ? invoice.links.total : 0)}`);
-console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures}`);
+console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio`);
+console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0)}`);
+console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0)}`);
+console.log(`  JSON-LD blocks scanned   ${ldScanned}`);
+console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures}`);
 
 const ok =
   failures === 0 &&
   globalBad === 0 &&
   pageFailures === 0 &&
   linkFailures === 0 &&
-  invoiceFailures === 0;
+  invoiceFailures === 0 &&
+  localizedFailures === 0 &&
+  hreflangFailures === 0;
 if (ok) {
   console.log("\n  ALL CHECKS PASSED\n");
   process.exit(0);

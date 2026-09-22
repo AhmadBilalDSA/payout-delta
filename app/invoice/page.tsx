@@ -3,6 +3,7 @@ import InvoiceEditor from "@/components/invoice/InvoiceEditor";
 import { getChannels } from "@/lib/db";
 
 const SITE_URL = "https://payoutdelta.com";
+const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
 
 export const metadata: Metadata = {
   title: "Freelance Invoice Studio",
@@ -37,6 +38,55 @@ const invoiceLd = {
   },
 };
 
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: `${BREADCRUMB_ORIGIN}/`,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Freelance Invoice Studio",
+      item: `${BREADCRUMB_ORIGIN}/invoice/`,
+    },
+  ],
+};
+
+const serviceLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "PayoutDelta Freelance Invoice Studio — Cross-Border Invoicing Service",
+  serviceType: "Freelance international invoicing with remittance transparency",
+  url: `${SITE_URL}/invoice/`,
+  provider: {
+    "@type": "Organization",
+    name: "PayoutDelta",
+    url: `${SITE_URL}/`,
+  },
+  areaServed: {
+    "@type": "Place",
+    name: "Worldwide",
+  },
+  feesAndCommissionsSpecification: [
+    {
+      "@type": "MonetaryAmount",
+      name: "Fixed service fee",
+      value: 0,
+      currency: "USD",
+    },
+  ],
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+
 export default function InvoicePage() {
   const channels = getChannels();
 
@@ -46,6 +96,18 @@ export default function InvoicePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(invoiceLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(serviceLd).replace(/</g, "\\u003c"),
         }}
       />
 
