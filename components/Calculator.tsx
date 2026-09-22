@@ -57,12 +57,15 @@ export default function Calculator({
   channels,
   history,
   sparklineStats,
+  platformPreset,
 }: {
   corridor: Corridor;
   platforms: Platform[];
   channels: WithdrawalChannel[];
   history: HistoryPoint[];
   sparklineStats: SparklineStats;
+  /** Long-tail platform preset (e.g. `upwork`), optional for generic routes. */
+  platformPreset?: string;
 }) {
   const { t } = useLanguage();
   const [mode, setMode] = useState<CalcMode>("gross-to-net");
@@ -70,9 +73,12 @@ export default function Calculator({
   const [targetNet, setTargetNet] = useState<number>(() =>
     defaultTargetNet(corridor)
   );
-  const [platformId, setPlatformId] = useState<string>(
-    platforms[0]?.id ?? "upwork"
-  );
+  const [platformId, setPlatformId] = useState<string>(() => {
+    if (platformPreset && platforms.some((item) => item.id === platformPreset)) {
+      return platformPreset;
+    }
+    return platforms[0]?.id ?? "upwork";
+  });
   const [printQuote, setPrintQuote] = useState<ChannelQuote | null>(null);
 
   const platform =

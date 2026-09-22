@@ -8,6 +8,7 @@ import type { Corridor, Platform, WithdrawalChannel } from "@/lib/types";
 import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
 import { formatLocal } from "@/utils/format";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { platformUiKey } from "@/lib/i18n/helpers";
 import { DICTIONARIES } from "@/lib/i18n/dictionaries";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import {
@@ -42,16 +43,24 @@ export default function AeoFaqSection({
   corridor,
   channels,
   platforms,
+  platformId,
+  platformLabel,
 }: {
   corridor: Corridor;
   channels: WithdrawalChannel[];
   platforms: Platform[];
+  /** Long-tail platform preset id (defaults to Upwork on generic routes). */
+  platformId?: string;
+  /** Display override for the platform name inside Q&A copy. */
+  platformLabel?: string;
 }) {
   const { t, lang } = useLanguage();
   const [openValues, setOpenValues] = useState<string[]>(["aeo-0"]);
 
   const platform =
-    platforms.find((item) => item.id === "upwork") ?? platforms[0];
+    platforms.find((item) => item.id === platformId) ??
+    platforms.find((item) => item.id === "upwork") ??
+    platforms[0];
   const route = computeRoute(DEFAULT_GROSS_USD, platform, corridor, channels);
   const best = route.verdict.best;
   const worst = route.verdict.worst;
@@ -68,7 +77,7 @@ export default function AeoFaqSection({
 
   const providerName = best.channelName;
   const gross = `$${DEFAULT_GROSS_USD.toLocaleString("en-US")}`;
-  const platformName = t("upwork");
+  const platformName = platformLabel ?? t(platformUiKey(platform.id));
   const net = formatLocal(best.localAmount, corridor);
   const wireNet = formatLocal(wireQuote.localAmount, corridor);
   const delta = formatLocal(

@@ -33,14 +33,22 @@ export default function BlufSummary({
   corridor,
   channels,
   platforms,
+  platformId,
+  platformLabel,
 }: {
   corridor: Corridor;
   channels: WithdrawalChannel[];
   platforms: Platform[];
+  /** Long-tail platform preset id (defaults to Upwork on generic routes). */
+  platformId?: string;
+  /** Display override for the platform name inside the AEO sentence. */
+  platformLabel?: string;
 }) {
   const { t, lang } = useLanguage();
   const platform =
-    platforms.find((item) => item.id === "upwork") ?? platforms[0];
+    platforms.find((item) => item.id === platformId) ??
+    platforms.find((item) => item.id === "upwork") ??
+    platforms[0];
   const route = computeRoute(DEFAULT_GROSS_USD, platform, corridor, channels);
   const best = route.verdict.best;
   const worst = route.verdict.worst;
@@ -67,7 +75,7 @@ export default function BlufSummary({
 
   const synthesisVars: TemplateVars = {
     gross: `$${DEFAULT_GROSS_USD.toLocaleString("en-US")}`,
-    platform: t(platformUiKey(platform.id)),
+    platform: platformLabel ?? t(platformUiKey(platform.id)),
     bank: bank.name,
     country: corridor.country,
     provider: best.channelName,

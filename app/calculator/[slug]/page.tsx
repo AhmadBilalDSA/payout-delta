@@ -10,6 +10,11 @@ import {
   getDataset,
   getPlatforms,
 } from "@/lib/db";
+import {
+  LONG_TAIL_CORRIDORS,
+  getLongTailBySlug,
+  parseCorridorSlug,
+} from "@/data/corridors";
 import { dedupeFaqs, getCorridorContent } from "@/lib/corridorContent";
 import { computeSparklineStats, getCorridorHistory } from "@/lib/history";
 import { getComplianceGuide } from "@/data/complianceGuides";
@@ -28,9 +33,16 @@ interface CorridorPageProps {
   params: Promise<{ slug: string }>;
 }
 
-/** Statically generates every corridor page at build time. */
+/**
+ * Statically generates every corridor page at build time — the ten base
+ * currency corridors plus the programmatic long-tail platform corridors
+ * (Upwork / Fiverr / Deel permutations).
+ */
 export function generateStaticParams(): { slug: string }[] {
-  return getCorridorSlugs().map((slug) => ({ slug }));
+  return [
+    ...getCorridorSlugs(),
+    ...LONG_TAIL_CORRIDORS.map((spec) => spec.slug),
+  ].map((slug) => ({ slug }));
 }
 
 /** On-demand pages outside the static param set are 404s, not SSR'd. */
@@ -40,12 +52,38 @@ export async function generateMetadata({
   params,
 }: CorridorPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const corridor = getCorridorBySlug(slug);
+  const longTail = getLongTailBySlug(slug);
+  const parsed = longTail
+    ? { sourceCurrency: longTail.sourceCurrency, targetCurrency: longTail.targetCurrency }
+    : parseCorridorSlug(slug);
+  const corridorSlug = longTail ? longTail.baseSlug : slug;
+  const corridor = getCorridorBySlug(corridorSlug);
   if (!corridor) {
     return { title: "Corridor not found" };
   }
-  const content = getCorridorContent(slug);
-  const languages = hreflangMap(slug);
+  const languages = hreflangMap(corridor.slug);
+
+  // Phase 4 — long-tail platform corridors get search-tailored metadata that
+  // matches the exact route under the GitHub Pages basePath.
+  if (longTail) {
+    const title = `${longTail.label} ${parsed.sourceCurrency} to ${parsed.targetCurrency} Payout Calculator — Real Bank Deductions & Net Take-Home`;
+    const description = `Calculate exact net ${parsed.targetCurrency} payout from ${longTail.label}. Audits ${longTail.label} fee, intermediary SWIFT cuts, local bank landing charges, and statutory tax withholding.`;
+    return {
+      title,
+      description,
+      alternates: {
+        canonical: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
+      },
+      openGraph: {
+        type: "website",
+        url: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
+        title,
+        description,
+      },
+    };
+  }
+
+  const content = getCorridorContent(corridor.slug);
   return {
     title: `${corridor.from} to ${corridor.to} — Payout Fee Audit (${corridor.country})`,
     description: `${content.overview.slice(0, 150)}`,
@@ -63,13 +101,16 @@ export async function generateMetadata({
 }
 
 function buildJsonLd(slug: string) {
-  const corridor = getCorridorBySlug(slug);
+  const longTail = getLongTailBySlug(slug);
+  const corridor = getCorridorBySlug(longTail ? longTail.baseSlug : slug);
   if (!corridor) return null;
-  const content = getCorridorContent(slug);
-  const guide = getComplianceGuide(slug);
+  const content = getCorridorContent(corridor.slug);
+  const guide = getComplianceGuide(corridor.slug);
   const channels = getChannels();
-  const corridorPair = `${corridor.from}→${corridor.to}`;
-  const corridorUrl = `${SITE_URL}/calculator/${corridor.slug}/`;
+  const corridorPair = longTail
+    ? `${longTail.label} ${corridor.from}→${corridor.to}`
+    : `${corridor.from}→${corridor.to}`;
+  const corridorUrl = `${SITE_URL}/calculator/${slug}/`;
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -90,8 +131,10 @@ function buildJsonLd(slug: string) {
       {
         "@type": "ListItem",
         position: 3,
-        name: `${corridor.from} to ${corridor.to} (${corridor.country})`,
-        item: `${BREADCRUMB_ORIGIN}/calculator/${corridor.slug}/`,
+        name: longTail
+          ? `${longTail.label} ${corridor.from} to ${corridor.to} (${corridor.country})`
+          : `${corridor.from} to ${corridor.to} (${corridor.country})`,
+        item: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
       },
     ],
   };
@@ -202,18 +245,40 @@ function buildJsonLd(slug: string) {
 
 export default async function CorridorPage({ params }: CorridorPageProps) {
   const { slug } = await params;
-  const corridor = getCorridorBySlug(slug);
+  const longTail = getLongTailBySlug(slug);
+  const corridor = getCorridorBySlug(longTail ? longTail.baseSlug : slug);
   if (!corridor) {
     notFound();
   }
-  const content = getCorridorContent(corridor.slug);
+  const parsed = longTail
+    ? {
+        platform: longTail.platformId,
+        sourceCurrency: longTail.sourceCurrency,
+        targetCurrency: longTail.targetCurrency,
+      }
+    : parseCorridorSlug(slug);
+
+  const platforms = getPlatforms();
+  const platformPreset =
+    platforms.find((item) => item.id === parsed.platform) ?? null;
+
+  // Phase 4 — long-tail pages keep the base corridor's country-specific copy
+  // but lead with a platform-tailored headline + overview so every generated
+  // route is a genuinely distinct document (platform win-rate wording varies).
+  const baseContent = getCorridorContent(corridor.slug);
+  const content = longTail
+    ? {
+        ...baseContent,
+        pageHeadline: `${longTail.label} ${corridor.from}→${corridor.to} payout audit: the ${platformPreset?.feePercent ?? 10}% platform cut, itemized`,
+        overview: `This is the ${longTail.label} edition of the ${corridor.from}→${corridor.to} audit. A $1,000 ${longTail.label} payout deducts ${platformPreset?.feePercent ?? 10}% platform commission before any money reaches a withdrawal channel — then the intermediary SWIFT cut, local bank landing fee and statutory withholding slice the rest. PayoutDelta ranks every route by the ${corridor.to} that actually lands in your account at the ${corridor.rate.toLocaleString("en-US", { maximumFractionDigits: 2 })} reference rate.`,
+      }
+    : baseContent;
   const guide = getComplianceGuide(corridor.slug);
   const allFaqs = [...content.faqs, ...guide.faqs];
   const uniqueFaqs = allFaqs.filter(
     (item, index, self) =>
       index === self.findIndex((t) => t.q === self[index].q),
   );
-  const platforms = getPlatforms();
   const channels = getChannels();
   const datasetRevision = getDataset().updatedAt.slice(0, 10);
   const related = getCorridors()
@@ -221,7 +286,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
     .slice(0, 3);
   const history = getCorridorHistory(corridor.slug);
   const sparklineStats = computeSparklineStats(history, channels);
-  const jsonLd = buildJsonLd(corridor.slug) ?? [];
+  const jsonLd = buildJsonLd(slug) ?? [];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -234,11 +299,14 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
       ))}
 
       <p className="text-sm font-medium text-slate-500 dark:text-white/50">
-        Payout corridor · {corridor.from} → {corridor.to} ·{" "}
-        {corridor.country}
+        Payout corridor ·{" "}
+        {longTail ? `${longTail.label} · ` : ""}
+        {corridor.from} → {corridor.to} · {corridor.country}
       </p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-        {corridor.from} to {corridor.to} Payout Fee Auditor
+        {longTail
+          ? `${longTail.label} ${corridor.from} to ${corridor.to} Payout Fee Auditor`
+          : `${corridor.from} to ${corridor.to} Payout Fee Auditor`}
       </h1>
       <p className="mt-2 max-w-2xl text-slate-600 dark:text-white/60">
         Reference rate:{" "}
@@ -246,8 +314,10 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           {corridor.rate.toLocaleString("en-US", { maximumFractionDigits: 2 })}{" "}
           {corridor.to}
         </span>{" "}
-        per USD · fee data revision {datasetRevision}. Every calculation runs in your
-        browser; nothing is tracked.
+        per USD · fee data revision {datasetRevision}.{" "}
+        {longTail && platformPreset
+          ? `${longTail.label} default (${platformPreset.feePercent}% platform cut) is pre-selected; you can switch platforms below.`
+          : "Every calculation runs in your browser; nothing is tracked."}
       </p>
 
       {/* Phase 3 — BLUF answer card (server-rendered, indexer-parseable). */}
@@ -256,6 +326,8 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           corridor={corridor}
           channels={channels}
           platforms={platforms}
+          platformId={parsed.platform ?? undefined}
+          platformLabel={longTail?.label}
         />
       </div>
 
@@ -266,6 +338,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           channels={channels}
           history={history}
           sparklineStats={sparklineStats}
+          platformPreset={parsed.platform ?? undefined}
         />
       </div>
 
@@ -274,6 +347,8 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         corridor={corridor}
         channels={channels}
         platforms={platforms}
+        platformId={parsed.platform ?? undefined}
+        platformLabel={longTail?.label}
       />
 
       {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}

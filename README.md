@@ -83,6 +83,15 @@ Settlement / ✓ Direct Payout` pills, a "save vs. the traditional wire" penalty
 callout, and an FTC-grade affiliate disclaimer — routed through a central
 partner directory ([`data/affiliatePartners.ts`](data/affiliatePartners.ts)).
 
+### 🧩 Programmatic Long-Tail Platform Corridors
+17 statically exported corridor pages — every currency corridor plus
+`upwork-*`, `fiverr-*` and `deel-*` permutations for PKR / INR / PHP. Each
+long-tail route pre-selects its platform (Upwork 10%, Fiverr 20%, Deel 0%),
+rewrites its title/H1/AEO answer-block for that platform, and stays a plain
+static file under `./out`. Corridors are declared in
+[`data/corridors.ts`](data/corridors.ts) and pre-set the calculator on mount
+with `?gross=` deep-link sharing intact.
+
 ---
 
 ## Who it's for
@@ -128,6 +137,7 @@ npm run lint      # ESLint
 | `data/fees.json` | Versioned fees/rates snapshot (source of truth) |
 | `data/regulatoryBanking.ts` | Statutory law & local bank clearing database |
 | `data/affiliatePartners.ts` | Central partner & affiliate directory (referral routing) |
+| `data/corridors.ts` | Programmatic long-tail platform corridor registry |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -142,7 +152,7 @@ npm run lint      # ESLint
 | 1 | Codebase audit, system spec & GitHub showcase | Shipped |
 | 2 | AEO/GEO direct-answer snippets & statutory citations | Shipped |
 | 3 | High-intent affiliate engine, partner referral cards & trust micro-badges | Shipped |
-| 4 | Programmatic long-tail corridor engine (Upwork / Fiverr / Deel) | Planned |
+| 4 | Programmatic long-tail platform corridors (Upwork / Fiverr / Deel) | Shipped |
 | 5 | Financial JSON-LD schema dominance | Planned |
 | 6 | GitHub community engine & full developer API docs | Planned |
 | 7 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |

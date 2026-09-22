@@ -25,6 +25,11 @@
  *   - English corridor pages with a localized twin emit hreflang alternates
  *     pointing at the localized sub-paths
  *
+ * Phase 4 also verifies the programmatic long-tail platform corridors
+ * (Upwork / Fiverr / Deel): each generated page passes the same HTML / JSON-LD /
+ * asset / link battery as the base corridors, and every long-tail slug
+ * resolves against `data/fees.json` through its underlying currency corridor.
+ *
  * Also checks ./out hygiene: index/404/sitemap/robots exist and .nojekyll is
  * present so GitHub Pages serves the bare /payout-delta subpath.
  *
@@ -50,6 +55,17 @@ const EXPECTED_SLUGS = [
   "usd-to-bdt",
   "usd-to-egp",
   "usd-to-zar",
+];
+
+/** Phase 4 — programmatic long-tail platform corridors (Upwork/Fiverr/Deel). */
+const EXPECTED_LONG_TAIL_SLUGS = [
+  "upwork-usd-to-pkr",
+  "fiverr-usd-to-pkr",
+  "deel-usd-to-pkr",
+  "upwork-usd-to-inr",
+  "fiverr-usd-to-inr",
+  "upwork-usd-to-php",
+  "fiverr-usd-to-php",
 ];
 
 const EXPECTED_LOCALIZED = [
@@ -352,7 +368,10 @@ const header = `${"Corridor Slug".padEnd(42)}${"HTML Exists".padEnd(14)}${"JSON-
 console.log(header);
 console.log("-".repeat(header.length));
 
-const report = EXPECTED_SLUGS.map(auditCorridor);
+const report = [
+  ...EXPECTED_SLUGS.map(auditCorridor),
+  ...EXPECTED_LONG_TAIL_SLUGS.map(auditCorridor),
+];
 for (const row of report) {
   const flag = (ok) => (ok ? "PASS" : "FAIL");
   console.log(
@@ -515,6 +534,45 @@ if (!corpusMatches) {
   globalBad += 1;
   fail("corpus drift", "data/fees.json slugs differ from EXPECTED_SLUGS");
 }
+
+/**
+ * Phase 4 — long-tail derivation check. Every long-tail slug must parse as
+ * `<platform>-usd-to-<ccy>` where `platform` is upwork/fiverr/deel, the base
+ * currency corridor exists in the corpus, and its target currency matches.
+ */
+function checkLongTailDerivation() {
+  let bad = 0;
+  const pattern = /^(upwork|fiverr|deel)-usd-to-([a-z]{3})$/;
+  const bySlug = new Map(corpus.corridors.map((c) => [c.slug, c]));
+  for (const slug of EXPECTED_LONG_TAIL_SLUGS) {
+    const match = pattern.exec(slug);
+    if (!match) {
+      bad += 1;
+      fail("long-tail slug pattern invalid", slug);
+      continue;
+    }
+    const baseSlug = `usd-to-${match[2]}`;
+    const corridor = bySlug.get(baseSlug);
+    if (!corridor) {
+      bad += 1;
+      fail("long-tail base corridor missing", `${slug} -> ${baseSlug}`);
+      continue;
+    }
+    if (corridor.to.toLowerCase() !== match[2]) {
+      bad += 1;
+      fail("long-tail currency mismatch", `${slug} expects ${match[2].toUpperCase()}`);
+    }
+  }
+  return bad;
+}
+let longTailFailures = checkLongTailDerivation();
+if (longTailFailures > 0) {
+  globalBad += 1;
+  fail("long-tail derivation", `${longTailFailures} corridor(s) unresolved`);
+}
+console.log(
+  `  ${(longTailFailures === 0 ? "PASS  " : "FAIL  ") + "long-tail corridors derive from corpus".padEnd(32)}${EXPECTED_LONG_TAIL_SLUGS.length} platform corridors`
+);
 
 /**
  * Phase 5 — global JSON-LD integrity scan. Parses every JSON-LD block in every

@@ -167,7 +167,7 @@ because they share the same dataset and quote math.
 | 1 | **Codebase Audit, System Memory & GitHub Showcase** — this spec + README overhaul (AEO/GEO-friendly, GitHub-search discoverable) | **Shipped** (`92f8f7f`) |
 | 2 | **AEO/GEO Direct-Answer Snippets & Statutory Citations** — question-answered copy, statute-linked answers, position 0 targeting | **Shipped** (`c081371`) |
 | 3 | **High-Intent Affiliate Engine, Partner Referral Cards & Trust Micro-Badges** — privacy-safe provider routing, sponsored disclosure CTAs, wire-penalty callouts | **Shipped** (`d51faba`) |
-| 4 | **Programmatic Long-Tail Corridor Engine** — Upwork/Fiverr/Deel pay-cycle corridors generated from `data/fees.json` | Planned |
+| 4 | **Programmatic Long-Tail Platform Corridors (Upwork / Fiverr / Deel)** — `data/corridors.ts` registry, pre-set calculator + platform-tailored AEO copy + search metadata, 17 static corridor routes | **Shipped** |
 | 5 | **Financial JSON-LD Schema Dominance** — rich result takeover for fee/rate queries | Planned |
 | 6 | **GitHub Community Engine & Developer API Documentation** — onboarding, issues, full `edge-api` reference | Planned |
 | 7 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
