@@ -1,0 +1,62 @@
+name: "Statutory update / citation correction"
+description: "Submit changes to central bank circulars or tax withholding laws (SBP, RBI, BIR, or peer regulators)."
+title: "[Statutory] {Regulator} {Circular / section} update"
+labels: ["statutory", "data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        PayoutDelta cites real regulation on the PKR / INR / PHP corridors
+        (SBP Foreign Exchange Manual Ch. 13 & ITO §154A, RBI AP (DIR Series)
+        No. 46 & CGST Rule 96A, BSP Circular 980 & BIR 8% freelance gross tax).
+        Corrections are very welcome — they keep the directive data trustworthy.
+
+  - type: input
+    id: corridor
+    attributes:
+      label: Corridor slug
+      placeholder: "usd-to-pkr"
+    validations:
+      required: true
+
+  - type: input
+    id: authority
+    attributes:
+      label: Governing authority / citation
+      placeholder: "SBP Foreign Exchange Manual Ch. 13 · ITO Section 154A"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: changeType
+    attributes:
+      label: What changed
+      options:
+        - Withholding tax rate / tier
+        - Purpose code mapping (9111 / P0802 / …)
+        - Clearing network or PRC / FIRC turnaround
+        - New exemption (PSEB / GST LUT / BIR OSD)
+        - Citation text correction
+    validations:
+      required: true
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: Details & source
+      description: Quote the circular / section and link the official source (SBP, RBI, BIR gazette or ministry page).
+      placeholder: |
+        Section 154A ITO — the PSEB tier moved from 0.25% to 0.20% effective …
+        Source: https://…
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Contribution checklist
+      options:
+        - label: I have linked the primary / official source.
+          required: true
+        - label: I confirm this is factual regulatory information, not advice.
+          required: true

@@ -11,7 +11,7 @@
  *   GET  /v1/dataset             full revisioned fees dataset
  *   GET  /v1/corridors           corridor index
  *   GET  /v1/corridors/:slug     corridor audit (channel quotes + verdict)
- *   GET  /v1/rates               FIFO-style quote route (?corridor&gross&platform)
+ *   GET  /v1/rates               FIFO-style quote route (?corridor|?pair&gross&platform)
  *
  * Every IP is rate-limited with a sliding-window counter (60 req/min) keyed on
  * `cf-connecting-ip`. The counter lives in memory for this singleton worker;
@@ -23,6 +23,7 @@
  */
 
 import fees from "../../data/fees.json";
+import { getRegulatoryBanking } from "../../data/regulatoryBanking";
 
 interface Platform {
   id: string;
@@ -192,6 +193,12 @@ interface CorridorAudit {
     currencyName: string;
     currencySymbol: string;
   };
+  /** Phase 6 — statutory citation object for the corridor's regime. */
+  statutory: {
+    authority: string;
+    clearingNetwork: string;
+    citations: string[];
+  };
   platform: { id: string; name: string; feePercent: number };
   grossUSD: number;
   quotes: ReturnType<typeof quoteChannel>[];
@@ -223,6 +230,14 @@ function auditCorridor(
         currencyName: corridor.currencyName,
         currencySymbol: corridor.currencySymbol,
       },
+      statutory: (() => {
+        const regulation = getRegulatoryBanking(corridor.slug);
+        return {
+          authority: regulation.authority,
+          clearingNetwork: regulation.clearingNetwork,
+          citations: regulation.citations,
+        };
+      })(),
       platform: { id: platform.id, name: platform.name, feePercent: platform.feePercent },
       grossUSD: clampNumber(grossUSD, 100, 100000, 1000),
       quotes,
@@ -247,6 +262,7 @@ const routeHandlers: Record<string, (request: Request, url: URL) => Response | n
         "GET /v1/corridors",
         "GET /v1/corridors/{slug}?gross=1000&platform=direct",
         "GET /v1/rates?corridor=usd-to-pkr&gross=1000&platform=direct",
+        "GET /v1/rates?pair=USD-PKR&gross=1000&platform=upwork",
       ],
       docs: "https://payoutdelta.com/api-access",
     }),
@@ -266,10 +282,19 @@ const routeHandlers: Record<string, (request: Request, url: URL) => Response | n
     }),
   "/v1/rates": (_request, url) => {
     const corridorSlug = url.searchParams.get("corridor");
-    const corridor = dataset.corridors.find((c) => c.slug === corridorSlug);
+    const pair = url.searchParams.get("pair");
+    let corridor = dataset.corridors.find((c) => c.slug === corridorSlug);
+    if (!corridor && pair) {
+      const [fromCode, toCode] = pair
+        .split("-")
+        .map((code) => code.trim().toUpperCase());
+      corridor = dataset.corridors.find(
+        (c) => c.from === fromCode && c.to === toCode
+      );
+    }
     if (!corridor) {
       return badRequest(
-        'Missing or unknown "corridor" query param. Try corridor=usd-to-pkr.',
+        'Missing or unknown "corridor" or "pair" query param. Try corridor=usd-to-pkr or pair=USD-PKR.',
       );
     }
     const gross = Number(url.searchParams.get("gross") ?? 1000);

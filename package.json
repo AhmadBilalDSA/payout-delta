@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/sync_api_feed.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

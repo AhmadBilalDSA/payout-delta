@@ -1,0 +1,69 @@
+name: "New corridor / currency pair request"
+description: "Request a new currency pair or a local bank SWIFT rail to be audited by PayoutDelta."
+title: "[New corridor] USD → {CCC}"
+labels: ["corridor-request", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping expand the payout audit. The dataset lives in
+        `data/fees.json` (corridor + rail rates) and `data/regulatoryBanking.ts`
+        (the receiving-side statutory and local-bank directory). Corridor pages
+        are generated from `data/corridors.ts`.
+
+  - type: input
+    id: pair
+    attributes:
+      label: Currency pair
+      description: ISO 4217 pair you want audited (e.g. USD → NGN).
+      placeholder: "USD → {CCC}"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: country
+    attributes:
+      label: Destination country / region
+      options:
+        - Pakistan (PKR)
+        - India (INR)
+        - Philippines (PHP)
+        - Nigeria (NGN)
+        - Bangladesh (BDT)
+        - Egypt (EGP)
+        - Brazil (BRL)
+        - South Africa (ZAR)
+        - United Kingdom (GBP)
+        - Eurozone (EUR)
+        - Other / new country
+    validations:
+      required: true
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: Why it matters
+      description: Typical invoice size, freelancer volume, and which payout platforms are popular there.
+      placeholder: "e.g. ~80k freelancers, mean invoice $1,200 …"
+    validations:
+      required: false
+
+  - type: textarea
+    id: rails
+    attributes:
+      label: Local bank / SWIFT rails to add
+      description: Real receiving banks with their BIC, benchmark intermediary cut (USD), local landing fee and PRC / FIRC turnaround you can verify.
+      placeholder: |
+        - Bank name — BIC — intermediary $15 — landing fee ₹75 — 48 h PRC (source link)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Contribution checklist
+      options:
+        - label: I confirm fee figures are public benchmarks, not quoted rates.
+          required: true
+        - label: I am happy for the maintainers to verify before shipping.
+          required: true

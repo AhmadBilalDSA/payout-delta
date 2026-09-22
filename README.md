@@ -104,6 +104,19 @@ now resolve to structured entities instead of prose. Builders live in
 ([`lib/aeoFaqs.ts`](lib/aeoFaqs.ts)) with the on-page accordion, so
 structured data never drifts from the markup.
 
+### 📣 GitHub Community Engine & 1-Click Viral Sharing
+The verdict card grows a **Copy audit breakdown** menu that exports the exact
+numbers on screen as a Reddit markdown table (r/freelance, r/Upwork,
+r/pakistan, r/developersIndia) or an X / LinkedIn one-liner — one click, pasted
+straight into the community. The [developer API reference](app/api-access)
+now ships interactive cURL / TypeScript / Python snippets for the static JSON
+feed and the edge worker, live response-schema views (base rates, provider
+spreads, statutory citation objects) and the full developer SLA. Open-source
+contributions are formalized through structured issue templates
+([`new_corridor.yml`](.github/ISSUE_TEMPLATE/new_corridor.yml),
+[`statutory_update.yml`](.github/ISSUE_TEMPLATE/statutory_update.yml)) and a
+step-by-step [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ---
 
 ## Who it's for
@@ -155,9 +168,13 @@ npm run lint      # ESLint
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
-| `edge-api/` | Cloudflare Worker rate router |
-| `app/api-access/` | Developer playground |
-| `scripts/test_corridors.mjs` | Link + JSON-LD integrity audit |
+| `edge-api/` | Cloudflare Worker rate router (`?corridor` / `?pair` routes) |
+| `app/api-access/` | Developer API reference, quick-start snippets & playground |
+| `public/api/fees.json` | Versioned static JSON feed (mirrors `data/fees.json` via prebuild) |
+| `scripts/sync_api_feed.mjs` | Static feed sync for the API portal |
+| `scripts/test_corridors.mjs` | Link + JSON-LD + static-feed integrity audit |
+| `.github/ISSUE_TEMPLATE/` | Structured corridor & statutory request forms |
+| `CONTRIBUTING.md` | Contribution guide, gates & data conventions |
 
 ### Roadmap
 
@@ -168,17 +185,20 @@ npm run lint      # ESLint
 | 3 | High-intent affiliate engine, partner referral cards & trust micro-badges | Shipped |
 | 4 | Programmatic long-tail platform corridors (Upwork / Fiverr / Deel) | Shipped |
 | 5 | Financial JSON-LD schema dominance | Shipped |
-| 6 | GitHub community engine & full developer API docs | Planned |
+| 6 | GitHub community engine & developer API docs | Shipped |
 | 7 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 
 ---
 
 ## Contributing
 
-Help make the take-home number trustworthy everywhere:
+Help make the take-home number trustworthy everywhere — start with the
+[`CONTRIBUTING.md`](CONTRIBUTING.md) guide (setup, gates, data conventions):
 
-- Open an issue for a **real bank credit advice** correction (SWIFT cut, landing
-  fee, clearance time) on any corridor.
+- Open a structured issue for a **new corridor** or a **statutory update**
+  (SBP / RBI / BIR circulars, withholding tiers, purpose codes).
+- Add a **real bank credit advice** correction (SWIFT cut, landing fee,
+  clearance time) on any corridor via `data/regulatoryBanking.ts`.
 - Add a language, a corridor tier, or a statutory citation.
 - Extend the edge API or the invoice addendum library.
 

@@ -609,6 +609,32 @@ if (!corpusMatches) {
 }
 
 /**
+ * Phase 6 — static JSON feed mirror. The developer portal documents
+ * /api/fees.json (exported verbatim from public/api/fees.json) as the
+ * versioned static feed; it must byte-match data/fees.json so the docs never
+ * drift from the dataset the site is built from. `prebuild` keeps it in sync.
+ */
+const feedPath = join(ROOT, "public", "api", "fees.json");
+let feedMirrored = false;
+if (!existsSync(feedPath)) {
+  console.log(`  ${"FAIL  " + "static feed mirror".padEnd(32)}public/api/fees.json missing`);
+  globalBad += 1;
+  fail("static feed mirror", "public/api/fees.json does not exist");
+} else {
+  const normalizeJson = (text) => JSON.stringify(JSON.parse(text));
+  feedMirrored =
+    normalizeJson(readFileSync(feedPath, "utf8")) ===
+    normalizeJson(readFileSync(join(ROOT, "data", "fees.json"), "utf8"));
+  console.log(
+    `  ${(feedMirrored ? "PASS  " : "FAIL  ") + "static feed mirror".padEnd(32)}public/api/fees.json matches data/fees.json`
+  );
+  if (!feedMirrored) {
+    globalBad += 1;
+    fail("static feed mirror", "public/api/fees.json drifted from data/fees.json");
+  }
+}
+
+/**
  * Phase 4 — long-tail derivation check. Every long-tail slug must parse as
  * `<platform>-usd-to-<ccy>` where `platform` is upwork/fiverr/deel, the base
  * currency corridor exists in the corpus, and its target currency matches.

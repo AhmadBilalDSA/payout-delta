@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "dataset": "payoutdelta-fees",
+  "updatedAt": "2026-09-22T12:40:57Z",
+  "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per USD corridor.",
+  "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
+  "currency": {
+    "base": "USD",
+    "symbol": "$"
+  },
+  "platforms": [
+    {
+      "id": "upwork",
+      "name": "Upwork",
+      "feePercent": 10,
+      "feeType": "client-platform-gross-cut"
+    },
+    {
+      "id": "fiverr",
+      "name": "Fiverr",
+      "feePercent": 20,
+      "feeType": "client-platform-gross-cut"
+    },
+    {
+      "id": "direct",
+      "name": "Direct Client Invoice",
+      "feePercent": 0,
+      "feeType": "client-platform-gross-cut"
+    }
+  ],
+  "channels": [
+    {
+      "id": "swift",
+      "name": "Direct SWIFT Wire",
+      "fixedFeeUSD": 45,
+      "fxSpread": 0.035
+    },
+    {
+      "id": "local-bank",
+      "name": "Local Bank Transfer",
+      "fixedFeeUSD": 0.99,
+      "fxSpread": 0.035
+    },
+    {
+      "id": "wise",
+      "name": "Wise",
+      "fixedFeeUSD": 2.99,
+      "fxSpread": 0.0045
+    },
+    {
+      "id": "payoneer",
+      "name": "Payoneer",
+      "fixedFeeUSD": 2,
+      "fxSpread": 0.02
+    },
+    {
+      "id": "remitly",
+      "name": "Remitly Economy",
+      "fixedFeeUSD": 1.99,
+      "fxSpread": 0.012
+    }
+  ],
+  "corridors": [
+    {
+      "slug": "usd-to-pkr",
+      "from": "USD",
+      "to": "PKR",
+      "rate": 277.425913,
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "currencyName": "Pakistani Rupee",
+      "currencySymbol": "Rs"
+    },
+    {
+      "slug": "usd-to-inr",
+      "from": "USD",
+      "to": "INR",
+      "rate": 95.873393,
+      "country": "India",
+      "countryCode": "IN",
+      "currencyName": "Indian Rupee",
+      "currencySymbol": "₹"
+    },
+    {
+      "slug": "usd-to-php",
+      "from": "USD",
+      "to": "PHP",
+      "rate": 62.823624,
+      "country": "Philippines",
+      "countryCode": "PH",
+      "currencyName": "Philippine Peso",
+      "currencySymbol": "₱"
+    },
+    {
+      "slug": "usd-to-brl",
+      "from": "USD",
+      "to": "BRL",
+      "rate": 5.131146,
+      "country": "Brazil",
+      "countryCode": "BR",
+      "currencyName": "Brazilian Real",
+      "currencySymbol": "R$"
+    },
+    {
+      "slug": "usd-to-gbp",
+      "from": "USD",
+      "to": "GBP",
+      "rate": 0.747749,
+      "country": "United Kingdom",
+      "countryCode": "GB",
+      "currencyName": "Pound Sterling",
+      "currencySymbol": "£"
+    },
+    {
+      "slug": "usd-to-eur",
+      "from": "USD",
+      "to": "EUR",
+      "rate": 0.87176,
+      "country": "Eurozone",
+      "countryCode": "EU",
+      "currencyName": "Euro",
+      "currencySymbol": "€"
+    },
+    {
+      "slug": "usd-to-ngn",
+      "from": "USD",
+      "to": "NGN",
+      "rate": 1330.691027,
+      "country": "Nigeria",
+      "countryCode": "NG",
+      "currencyName": "Nigerian Naira",
+      "currencySymbol": "₦"
+    },
+    {
+      "slug": "usd-to-bdt",
+      "from": "USD",
+      "to": "BDT",
+      "rate": 122.759188,
+      "country": "Bangladesh",
+      "countryCode": "BD",
+      "currencyName": "Bangladeshi Taka",
+      "currencySymbol": "৳"
+    },
+    {
+      "slug": "usd-to-egp",
+      "from": "USD",
+      "to": "EGP",
+      "rate": 51.928286,
+      "country": "Egypt",
+      "countryCode": "EG",
+      "currencyName": "Egyptian Pound",
+      "currencySymbol": "E£"
+    },
+    {
+      "slug": "usd-to-zar",
+      "from": "USD",
+      "to": "ZAR",
+      "rate": 16.247701,
+      "country": "South Africa",
+      "countryCode": "ZA",
+      "currencyName": "South African Rand",
+      "currencySymbol": "R"
+    }
+  ]
+}

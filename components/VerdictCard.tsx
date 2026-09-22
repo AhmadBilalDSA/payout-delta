@@ -85,6 +85,35 @@ export default function VerdictCard({
     }
   }
 
+  const exportLabels = {
+    breakdown: t("copyAuditBreakdown"),
+    reddit: t("redditExporter"),
+    social: t("socialExporter"),
+    copiedReddit: t("copiedReddit"),
+    copiedSocial: t("copiedSocial"),
+  };
+
+  async function copyViral(kind: "reddit" | "social"): Promise<void> {
+    const payload = buildViralPayload(
+      mode,
+      verdict,
+      inverseVerdict,
+      corridor,
+      platform,
+      quotes
+    );
+    if (!payload || typeof navigator === "undefined" || !navigator.clipboard) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(
+        kind === "reddit" ? payload.reddit : payload.social
+      );
+    } catch {
+      return;
+    }
+  }
+
   const showSparkline = history.length >= 2;
 
   if (mode === "net-to-gross") {
@@ -172,6 +201,7 @@ export default function VerdictCard({
               >
                 {copied ? t("copied") : t("copyAudit")}
               </button>
+              <AuditExportMenu labels={exportLabels} onCopy={copyViral} />
               <button
                 type="button"
                 aria-live="polite"
@@ -281,20 +311,21 @@ export default function VerdictCard({
                 void copyAudit();
               }}
               className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-                copied
-                  ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
-                  : "bg-white/[0.08] hover:bg-white/[0.16]"
-              }`}
-            >
-              {copied ? t("copied") : t("copyAudit")}
-            </button>
-            <button
-              type="button"
-              aria-live="polite"
-              onClick={() => {
-                void copyShareLink();
-              }}
-              title={t("shareLink")}
+copied
+                    ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
+                    : "bg-white/[0.08] hover:bg-white/[0.16]"
+                }`}
+              >
+                {copied ? t("copied") : t("copyAudit")}
+              </button>
+              <AuditExportMenu labels={exportLabels} onCopy={copyViral} />
+              <button
+                type="button"
+                aria-live="polite"
+                onClick={() => {
+                  void copyShareLink();
+                }}
+                title={t("shareLink")}
               className={`inline-flex h-10 items-center rounded-full border border-white/[0.12] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out ${
                 copiedShare
                   ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
@@ -466,4 +497,152 @@ function buildTargetAudit(
       verdict.savingsUSD
     )}`,
   ].join("\n");
+}
+
+/**
+ * Phase 6 — 1-click viral exporters. Two drop-in copy targets sharing one
+ * payload builder: a Reddit markdown audit table and an X / LinkedIn
+ * one-liner. All numbers come from the live verdict/quotes so the exported
+ * figures always match the on-screen audit.
+ */
+interface ExportLabels {
+  breakdown: string;
+  reddit: string;
+  social: string;
+  copiedReddit: string;
+  copiedSocial: string;
+}
+
+function AuditExportMenu({
+  labels,
+  onCopy,
+}: {
+  labels: ExportLabels;
+  onCopy: (kind: "reddit" | "social") => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  async function handleCopy(kind: "reddit" | "social"): Promise<void> {
+    setOpen(false);
+    await onCopy(kind);
+    setFeedback(kind === "reddit" ? labels.copiedReddit : labels.copiedSocial);
+    window.setTimeout(() => setFeedback(null), 2000);
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-live="polite"
+        onClick={() => setOpen((value) => !value)}
+        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/[0.12] bg-white/[0.08] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-white/[0.16]"
+      >
+        {feedback ? (
+          <span className="text-emerald-300">{feedback}</span>
+        ) : (
+          <>
+            <span aria-hidden="true" className="text-[10px] leading-none opacity-70">
+              ▼
+            </span>
+            {labels.breakdown}
+          </>
+        )}
+      </button>
+
+      {open && (
+        <>
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="fixed inset-0 z-10 cursor-default"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            role="menu"
+            aria-label={labels.breakdown}
+            className="absolute right-0 z-20 mt-2 w-72 origin-top-right rounded-xl border border-white/[0.1] bg-[#16161B] p-1.5 shadow-2xl shadow-black/50"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                void handleCopy("reddit");
+              }}
+              className="flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/[0.08]"
+            >
+              <span className="text-xs font-semibold text-white">
+                {labels.reddit}
+              </span>
+              <span className="text-[10px] leading-relaxed text-white/50">
+                r/freelance · r/Upwork · r/pakistan · r/developersIndia
+              </span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                void handleCopy("social");
+              }}
+              className="flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/[0.08]"
+            >
+              <span className="text-xs font-semibold text-white">
+                {labels.social}
+              </span>
+              <span className="text-[10px] leading-relaxed text-white/50">
+                X · LinkedIn
+              </span>
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function fmtInt(amount: number): string {
+  return Math.round(amount).toLocaleString("en-US");
+}
+
+function buildViralPayload(
+  mode: CalcMode,
+  verdict: Verdict,
+  inverseVerdict: InverseVerdict,
+  corridor: Corridor,
+  platform: Platform,
+  quotes: ChannelQuote[]
+): { reddit: string; social: string } | null {
+  const best = verdict.best;
+  if (best === null) {
+    return null;
+  }
+  const swiftQuote = quotes.find((quote) => quote.channelId === "swift");
+  const gross = Math.round(best.grossUSD);
+  const platformFee = best.platformFeeUSD.toFixed(2);
+  const swiftDeduction = (swiftQuote?.feeDeductedUSD ?? 0).toFixed(2);
+  const bestNet = fmtInt(best.localAmount);
+  const swiftNet = swiftQuote ? fmtInt(swiftQuote.localAmount) : "—";
+  const deltaSavings = swiftQuote
+    ? fmtInt(best.localAmount - swiftQuote.localAmount)
+    : fmtInt(best.localAmount);
+  const targetCurrency = corridor.to;
+  const countryName = corridor.country;
+  const shareUrl = buildShareLink(mode, platform, verdict, inverseVerdict);
+
+  const reddit = [
+    `**Payout Audit via PayoutDelta (${gross} ${platform.name} → ${targetCurrency})**`,
+    `- Gross Billed: $${gross}`,
+    `- Platform Commission (${platform.feePercent}%): -$${platformFee}`,
+    `- Intermediary SWIFT Wire Cut: -$${swiftDeduction}`,
+    `- Net Take-Home (${best.channelName}): ${bestNet} ${targetCurrency}`,
+    `- Traditional Bank Wire Net: ${swiftNet} ${targetCurrency}`,
+    `- **Leakage Prevented / Saved: ${deltaSavings} ${targetCurrency}**`,
+    `*Audit Link: ${shareUrl}*`,
+  ].join("\n");
+
+  const social = `Just audited a $${gross} ${platform.name} payout to ${countryName}: ${best.channelName} saves ${deltaSavings} ${targetCurrency} over traditional bank wires. Check your numbers: ${shareUrl}`;
+
+  return { reddit, social };
 }
