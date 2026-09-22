@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+/*
+ * The site's `dark:` utilities are authored against an explicit
+ * `data-theme` attribute (see the :root / [data-theme="dark"] token block),
+ * not the OS `prefers-color-scheme`. Re-wire Tailwind v4's `dark` variant so
+ * the header theme toggle flips every surface with one attribute change.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Apple-grade theme cross-fade: surfaces, separators and type animate when
+ * the theme flips, while `prefers-reduced-motion` users get a hard swap.
+ * Component-owned transitions (transition-all / transition-colors classes)
+ * keep their higher specificity and win over this global fallback.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  *,
+  ::before,
+  ::after {
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+}
+
 @theme inline {
   --color-background: var(--canvas);
   --color-foreground: var(--ink);
@@ -53,6 +79,18 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--background);
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 body {
@@ -89,35 +127,60 @@ body {
 @media print {
   html,
   body {
+    height: auto !important;
+    overflow: visible !important;
     background: #ffffff !important;
   }
 
+  /* Hide the interactive app entirely — only print targets stay visible. */
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
 
+  /* Reveal the audit receipt and the live invoice document only. */
   .print-area,
   .print-area *,
   #invoice-document,
   #invoice-document * {
-    visibility: visible;
+    visibility: visible !important;
   }
 
   .print-area {
-    position: absolute;
+    position: absolute !important;
     inset: 0;
-    width: 100%;
+    width: 100% !important;
     margin: 0 auto;
   }
 
+  /* Isolate the invoice against the page origin and neutralize the screen
+     sizing classes (`aspect-[210/297]`, `overflow-hidden`, glass shadow) so
+     tall documents flow onto a second page instead of being clipped. */
   #invoice-document {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: auto;
-    margin: 0 auto;
-    aspect-ratio: auto;
-    border-radius: 0 !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
     box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Keep each line-item row whole — no mid-row page splits. */
+  .invoice-table-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Keep the remittance addendum whole on its own page block. */
+  .invoice-addendum {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }

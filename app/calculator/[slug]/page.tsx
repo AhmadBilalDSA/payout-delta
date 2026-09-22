@@ -227,16 +227,16 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         />
       ))}
 
-      <p className="text-sm font-medium text-slate-500">
+      <p className="text-sm font-medium text-slate-500 dark:text-white/50">
         Payout corridor · {corridor.from} → {corridor.to} ·{" "}
         {corridor.country}
       </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
         {corridor.from} to {corridor.to} Payout Fee Auditor
       </h1>
-      <p className="mt-2 max-w-2xl text-slate-600">
+      <p className="mt-2 max-w-2xl text-slate-600 dark:text-white/60">
         Reference rate:{" "}
-        <span className="font-semibold text-slate-900">
+        <span className="font-semibold text-slate-900 dark:text-white">
           {corridor.rate.toLocaleString("en-US", { maximumFractionDigits: 2 })}{" "}
           {corridor.to}
         </span>{" "}
@@ -273,11 +273,11 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         <section aria-labelledby="corridor-overview">
           <h2
             id="corridor-overview"
-            className="text-xl font-bold text-slate-900"
+            className="text-xl font-bold text-slate-900 dark:text-white"
           >
             {content.pageHeadline}
           </h2>
-          <p className="mt-3 leading-relaxed text-slate-700">
+          <p className="mt-3 leading-relaxed text-slate-700 dark:text-white/70">
             {content.overview}
           </p>
         </section>
@@ -285,7 +285,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         <section aria-labelledby="tax-considerations">
           <h2
             id="tax-considerations"
-            className="text-xl font-bold text-slate-900"
+            className="text-xl font-bold text-slate-900 dark:text-white"
           >
             Tax considerations for {corridor.country}
           </h2>
@@ -299,11 +299,11 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         <section aria-labelledby="clearance-times">
           <h2
             id="clearance-times"
-            className="text-xl font-bold text-slate-900"
+            className="text-xl font-bold text-slate-900 dark:text-white"
           >
             Domestic payout clearance times
           </h2>
-          <p className="mt-3 leading-relaxed text-slate-700">
+          <p className="mt-3 leading-relaxed text-slate-700 dark:text-white/70">
             {content.clearanceTimes}
           </p>
         </section>
@@ -311,17 +311,17 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         <section aria-labelledby="swift-rules">
           <h2
             id="swift-rules"
-            className="text-xl font-bold text-slate-900"
+            className="text-xl font-bold text-slate-900 dark:text-white"
           >
             Inbound SWIFT &amp; central-bank rules
           </h2>
-          <p className="mt-3 leading-relaxed text-slate-700">
+          <p className="mt-3 leading-relaxed text-slate-700 dark:text-white/70">
             {content.swiftRules}
           </p>
         </section>
 
         <section aria-labelledby="corridor-faq">
-          <h2 id="corridor-faq" className="text-xl font-bold text-slate-900">
+          <h2 id="corridor-faq" className="text-xl font-bold text-slate-900 dark:text-white">
             Frequently asked questions
           </h2>
           <div className="mt-3">
@@ -332,7 +332,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         <section aria-labelledby="related-corridors">
           <h2
             id="related-corridors"
-            className="text-xl font-bold text-slate-900"
+            className="text-xl font-bold text-slate-900 dark:text-white"
           >
             Audited corridors
           </h2>
@@ -343,12 +343,12 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           </div>
         </section>
 
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-white/50">
           The above is informational, not financial or tax advice. Verify
           today’s live rates and your local obligations before transacting.{" "}
           <Link
             href="/disclaimer"
-            className="underline underline-offset-2 hover:text-slate-700"
+            className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white"
           >
             Full disclaimer
           </Link>

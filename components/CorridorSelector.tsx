@@ -28,7 +28,7 @@ export default function CorridorSelector() {
     <div
       role="group"
       aria-label="Active currency corridor"
-      className="inline-flex gap-1 rounded-full bg-[#E5E5EA] p-1"
+      className="inline-flex gap-1 rounded-full bg-[#E5E5EA] p-1 dark:bg-white/[0.12]"
     >
       {TOP_CORRIDORS.map((corridor) => {
         const isActive = activeSlug === corridor.slug;
@@ -41,12 +41,12 @@ export default function CorridorSelector() {
             onFocus={() => setActiveSlug(corridor.slug)}
             className={`rounded-full px-4 py-2 text-sm font-medium tabular-nums transition-all duration-200 ease-out ${
               isActive
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-white text-slate-900 shadow-sm dark:bg-[#15151A] dark:text-white"
+                : "text-slate-600 hover:text-slate-900 dark:text-white/50 dark:hover:text-white"
             }`}
           >
             {corridor.from}
-            <span aria-hidden="true" className="mx-0.5 text-slate-400">
+            <span aria-hidden="true" className="mx-0.5 text-slate-400 dark:text-white/40">
               →
             </span>
             {corridor.to}

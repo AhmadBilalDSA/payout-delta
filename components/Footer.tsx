@@ -44,7 +44,9 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h2 className="text-xs font-semibold text-slate-900">{title}</h2>
+      <h2 className="text-xs font-semibold text-slate-900 dark:text-white">
+        {title}
+      </h2>
       <ul className="mt-3 space-y-2">
         {links.map((link) => (
           <li key={link.label}>
@@ -53,7 +55,7 @@ function FooterColumn({
               {...(link.external
                 ? { target: "_blank", rel: "noopener noreferrer" }
                 : {})}
-              className="text-xs text-neutral-500 transition-colors duration-200 ease-out hover:text-slate-900"
+              className="text-xs text-neutral-500 transition-colors duration-200 ease-out hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
             >
               {link.label}
             </Link>
@@ -75,14 +77,14 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-sub-canvas border-t border-black/[0.06]">
+    <footer className="bg-sub-canvas border-t border-black/[0.06] dark:border-white/[0.08]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <FooterColumn title="Product" links={PRODUCT_LINKS} />
           <FooterColumn title="Legal" links={LEGAL_LINKS} />
           <FooterColumn title="Open Data" links={OPEN_DATA_LINKS} />
           <div>
-            <h2 className="text-xs font-semibold text-slate-900">
+            <h2 className="text-xs font-semibold text-slate-900 dark:text-white">
               System Status
             </h2>
             <ul className="mt-3 space-y-2">
@@ -91,7 +93,7 @@ export default function Footer() {
                   href={`${GITHUB_URL}/actions`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-neutral-500 transition-colors duration-200 ease-out hover:text-slate-900"
+                  className="text-xs text-neutral-500 transition-colors duration-200 ease-out hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
                 >
                   Static Export Build Status
                   <span aria-hidden="true" className="ml-0.5 opacity-50">
@@ -99,7 +101,7 @@ export default function Footer() {
                   </span>
                 </Link>
               </li>
-              <li className="text-xs tabular-nums text-neutral-500">
+              <li className="text-xs tabular-nums text-neutral-500 dark:text-neutral-400">
                 <span className="sr-only">Last Audited Date: </span>
                 {updatedAt}
               </li>
@@ -107,11 +109,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 space-y-2 border-t border-black/[0.06] pt-6">
-          <p className="text-xs tabular-nums text-neutral-500">
+        <div className="mt-10 space-y-2 border-t border-black/[0.06] pt-6 dark:border-white/[0.08]">
+          <p className="text-xs tabular-nums text-neutral-500 dark:text-neutral-400">
             © {year} PayoutDelta. All rights reserved.
           </p>
-          <p className="max-w-3xl text-xs leading-relaxed text-neutral-500">
+          <p className="max-w-3xl text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
             PayoutDelta is an independent auditing index and is not directly
             affiliated with Upwork, Fiverr, Wise, or Payoneer.
           </p>

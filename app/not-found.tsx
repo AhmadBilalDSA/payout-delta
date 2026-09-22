@@ -13,11 +13,11 @@ export default function NotFound() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
       <div className="text-center">
-        <p className="text-6xl font-black text-emerald-600">404</p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+        <p className="text-6xl font-black text-emerald-600 dark:text-emerald-400">404</p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           This calculator isn’t here
         </h1>
-        <p className="mx-auto mt-2 max-w-xl text-slate-600">
+        <p className="mx-auto mt-2 max-w-xl text-slate-600 dark:text-white/60">
           The URL you followed doesn’t match a live payout corridor. Pick one
           of the corridors below to run a fee audit instead.
         </p>
@@ -29,7 +29,7 @@ export default function NotFound() {
       >
         <h2
           id="fallback-corridors"
-          className="text-xl font-bold text-slate-900"
+          className="text-xl font-bold text-slate-900 dark:text-white"
         >
           Audited corridors
         </h2>
@@ -40,8 +40,11 @@ export default function NotFound() {
         </div>
       </section>
 
-      <p className="mt-8 text-center text-sm text-slate-500">
-        <Link href="/" className="underline underline-offset-2 hover:text-slate-700">
+      <p className="mt-8 text-center text-sm text-slate-500 dark:text-white/50">
+        <Link
+          href="/"
+          className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white"
+        >
           Return to the PayoutDelta home page
         </Link>
       </p>

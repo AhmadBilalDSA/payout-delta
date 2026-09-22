@@ -88,7 +88,7 @@ export function TransparencyClauseBlock({
   return (
     <section
       aria-label={TRANSPARENCY_CLAUSE_TITLE}
-      className="mt-8 rounded-lg border border-slate-200 p-4"
+      className="invoice-addendum mt-8 rounded-lg border border-slate-200 p-4"
     >
       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
         {TRANSPARENCY_CLAUSE_TITLE}

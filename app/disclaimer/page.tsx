@@ -13,16 +13,16 @@ export default function DisclaimerPage() {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
         Disclaimer
       </h1>
-      <div className="mt-6 space-y-6 text-slate-700">
-        <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed">
+      <div className="mt-6 space-y-6 text-slate-700 dark:text-white/70">
+        <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed dark:border-amber-500/40 dark:bg-amber-500/10">
           {disclaimer}
         </p>
 
         <section>
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             Not financial advice
           </h2>
           <p className="mt-3 leading-relaxed">
@@ -35,7 +35,7 @@ export default function DisclaimerPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             Not tax advice
           </h2>
           <p className="mt-3 leading-relaxed">
@@ -46,7 +46,7 @@ export default function DisclaimerPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             Dataset limitations
           </h2>
           <p className="mt-3 leading-relaxed">
@@ -58,7 +58,7 @@ export default function DisclaimerPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold text-slate-900">Third parties</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Third parties</h2>
           <p className="mt-3 leading-relaxed">
             Provider names (Upwork, Fiverr, Wise, Payoneer, Remitly) are
             trademarks of their owners. PayoutDelta is not affiliated with or

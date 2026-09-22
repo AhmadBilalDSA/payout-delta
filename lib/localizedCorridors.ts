@@ -226,3 +226,17 @@ export function hreflangMap(slug: string): Record<string, string> | undefined {
     [localized.lang]: `/${localized.lang}/calculator/${slug}/`,
   };
 }
+
+/**
+ * Route for a `(lang, slug)` corridor pair. English always resolves to the
+ * canonical corridor page; a localized pair resolves only when authored,
+ * otherwise it gracefully falls back to the English corridor so the
+ * global switchers in the header never navigate into a 404. `basePath` is
+ * appended automatically by `next/link`.
+ */
+export function localizedCorridorHref(lang: string, slug: string): string {
+  if (lang === "en") return `/calculator/${slug}/`;
+  return getLocalizedCorridor(lang, slug)
+    ? `/${lang}/calculator/${slug}/`
+    : `/calculator/${slug}/`;
+}

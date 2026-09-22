@@ -15,13 +15,13 @@ export default function ErrorPage({
 }) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6">
-      <p className="text-sm font-semibold uppercase tracking-wider text-red-700">
+      <p className="text-sm font-semibold uppercase tracking-wider text-red-700 dark:text-red-400">
         Something went wrong
       </p>
-      <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+      <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
         The auditor hit an unexpected snag
       </h1>
-      <p className="mt-4 text-slate-600">
+      <p className="mt-4 text-slate-600 dark:text-white/60">
         Try reloading the page. If the problem persists, a cached build may be
         out of date — hard-refresh or contact us.
       </p>

@@ -111,14 +111,14 @@ export default function InvoicePage() {
         }}
       />
 
-      <section className="border-b border-black/[0.06] py-12 text-center sm:py-16">
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+      <section className="border-b border-black/[0.06] py-12 text-center sm:py-16 dark:border-white/[0.08]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/40">
           Tools · Phase 4
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-white">
           Freelance Invoice Studio
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600">
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-white/60">
           Generate minimalist, transparent international invoices with built-in
           remittance fee clauses. Everything renders in your browser — print to
           a clean A4 PDF, and no data ever leaves your device.
@@ -129,7 +129,7 @@ export default function InvoicePage() {
         <InvoiceEditor channels={channels} />
       </div>
 
-      <p className="mt-10 text-xs leading-relaxed text-slate-500">
+      <p className="mt-10 text-xs leading-relaxed text-slate-500 dark:text-white/50">
         PayoutDelta is informational tooling, not financial, tax or legal
         advice. Invoice drafts and logos stay in your browser’s local storage;
         nothing is transmitted or tracked.

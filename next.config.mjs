@@ -8,6 +8,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  devIndicators: false,
   basePath: process.env.NODE_ENV === 'production' ? repoPrefix : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? repoPrefix : '',
 };

@@ -136,13 +136,13 @@ export default async function LocalizedCorridorPage({
         />
       ))}
 
-      <p className="text-sm font-medium text-slate-500">
+      <p className="text-sm font-medium text-slate-500 dark:text-white/50">
         {localized.eyebrow} · {corridor.from} → {corridor.to}
       </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
         {localized.headline}
       </h1>
-      <p className="mt-2 max-w-2xl text-slate-600">
+      <p className="mt-2 max-w-2xl text-slate-600 dark:text-white/60">
         {localized.intro} — {localized.localeName} edition · fee data revision{" "}
         {datasetRevision}.
       </p>
@@ -169,9 +169,9 @@ export default async function LocalizedCorridorPage({
 
       <div className="mt-10 space-y-8">
         <section aria-labelledby="localized-faq">
-          <h2 id="localized-faq" className="text-xl font-bold text-slate-900">
+          <h2 id="localized-faq" className="text-xl font-bold text-slate-900 dark:text-white">
             Frequently asked questions
-            <span lang="en" className="ml-1 text-sm font-normal text-slate-500">
+            <span lang="en" className="ml-1 text-sm font-normal text-slate-500 dark:text-white/50">
               ({localized.localeName})
             </span>
           </h2>
@@ -180,12 +180,12 @@ export default async function LocalizedCorridorPage({
           </div>
         </section>
 
-        <p className="text-xs leading-relaxed text-slate-500">
+        <p className="text-xs leading-relaxed text-slate-500 dark:text-white/50">
           {localized.note}{" "}
           <Link
             href={`/calculator/${corridor.slug}/`}
             lang="en"
-            className="underline underline-offset-2 hover:text-slate-700"
+            className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white"
           >
             Read the English version
           </Link>

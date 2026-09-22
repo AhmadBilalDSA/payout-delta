@@ -13,9 +13,9 @@ export default function AdSlot() {
   return (
     <div
       aria-label="Advertisement placeholder"
-      className="flex min-h-[90px] w-full items-center justify-center border-b border-black/[0.06] bg-[#F5F5F7]"
+      className="flex min-h-[90px] w-full items-center justify-center border-b border-black/[0.06] bg-[#F5F5F7] dark:border-white/[0.08] dark:bg-[#0A0A0C]"
     >
-      <span className="text-xs font-medium text-slate-500">
+      <span className="text-xs font-medium text-slate-500 dark:text-white/40">
         Advertisement placeholder 970×90
       </span>
     </div>

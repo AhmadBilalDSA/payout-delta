@@ -166,7 +166,7 @@ export default function InvoicePreview({
             </thead>
             <tbody className="divide-y divide-slate-100">
               {draft.lineItems.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.id} className="invoice-table-row">
                   <td className="py-2.5 pr-2 text-slate-700">
                     {item.description || "—"}
                   </td>
