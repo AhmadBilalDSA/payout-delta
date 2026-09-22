@@ -56,3 +56,4 @@ dist/
 
 # phase 6 backup archives (kept local, ignored)
 backups/
+*.zip
