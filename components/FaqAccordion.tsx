@@ -24,7 +24,7 @@ export default function FaqAccordion({
       className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white dark:divide-white/[0.08] dark:border-white/[0.08] dark:bg-[#15151A]"
     >
       {items.map((item, index) => (
-        <Accordion.Item key={item.q} value={`faq-${index}`}>
+        <Accordion.Item key={`${item.q}-${index}`} value={`faq-${index}`}>
           <Accordion.Header>
             <Accordion.Trigger className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm font-medium text-slate-900 hover:bg-slate-50 dark:text-white dark:hover:bg-white/[0.05]">
               {item.q}

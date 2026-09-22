@@ -122,9 +122,11 @@ export default function InvoiceEditor({
   };
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-2">
-      {/* Left — controls */}
-      <div className="flex flex-col gap-5">
+    <div className="invoice-editor-grid grid items-start gap-8 lg:grid-cols-2">
+      {/* Left — controls (print-hiding: `display: none` via the
+          #invoice-editor-controls / .no-print print rules, so the form inputs
+          allocate no page height in the Save-as-PDF dialog). */}
+      <div id="invoice-editor-controls" className="no-print flex flex-col gap-5">
         <Section title="Identity & client">
           <div className="grid gap-3">
             <FieldGroupTitle>Your details</FieldGroupTitle>
@@ -468,7 +470,7 @@ export default function InvoiceEditor({
 
       {/* Right — live preview */}
       <div className="flex flex-col gap-4 lg:sticky lg:top-24">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="no-print flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">
               Live document preview

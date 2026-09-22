@@ -111,7 +111,7 @@ export default function InvoicePage() {
         }}
       />
 
-      <section className="border-b border-black/[0.06] py-12 text-center sm:py-16 dark:border-white/[0.08]">
+      <section className="no-print border-b border-black/[0.06] py-12 text-center sm:py-16 dark:border-white/[0.08]">
         <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/40">
           Tools · Phase 4
         </p>
@@ -129,7 +129,7 @@ export default function InvoicePage() {
         <InvoiceEditor channels={channels} />
       </div>
 
-      <p className="mt-10 text-xs leading-relaxed text-slate-500 dark:text-white/50">
+      <p className="no-print mt-10 text-xs leading-relaxed text-slate-500 dark:text-white/50">
         PayoutDelta is informational tooling, not financial, tax or legal
         advice. Invoice drafts and logos stay in your browser’s local storage;
         nothing is transmitted or tracked.

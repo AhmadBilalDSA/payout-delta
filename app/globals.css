@@ -110,34 +110,114 @@ body {
 /* ---------------------------------------------------------------------------
  * Print styles — Export Invoice Justification PDF (client-side audit receipt)
  *
- * While a print is requested the page's normal content is hidden and only the
- * `.print-area` receipt is visible, so the browser's Save-as-PDF dialog yields
- * a clean 1-page document instead of a screenshot of the app.
+ * Two print targets share one stylesheet:
  *
- * Phase 4 — the Freelance Invoice Studio reuses the same zero-bloat strategy:
- * `#invoice-document` becomes the sole visible node, so a native
- * `window.print()` renders the live invoice as a crisp A4 portrait PDF.
+ *   1. Freelance Invoice Studio (#invoice-document) — app chrome (header /
+ *      footer / nav / ad / editor controls) is removed from layout flow with
+ *      `display: none`, the remaining document flows statically at full width,
+ *      and `@page { margin: 0 }` hands the page margins to the document's own
+ *      16mm padding. The screen-only `aspect-[210/297]` + `overflow-hidden`
+ *      classes are neutralized so tall invoices paginate onto as many pages as
+ *      the line items need instead of clipping at the first page fold.
+ *
+ *   2. Calculator audit receipt (.print-area) — the one-page Save-as-PDF path
+ *      keeps its absolute overlay: the live app stays `visibility: hidden` in
+ *      flow, the receipt re-renders absolute over the page origin, and the
+ *      studio chrome hiding is scoped back out so the receipt's own
+ *      <header>/<footer> are not dropped by the generic hiders above.
  * ---------------------------------------------------------------------------
  */
 @page {
   size: A4 portrait;
-  margin: 12mm;
+  margin: 0;
 }
 
 @media print {
-  html,
-  body {
-    height: auto !important;
-    overflow: visible !important;
-    background: #ffffff !important;
+  /* Hide the rest of the application completely from layout flow. */
+  header,
+  footer,
+  aside,
+  nav,
+  .no-print,
+  #invoice-editor-controls {
+    display: none !important;
   }
 
-  /* Hide the interactive app entirely — only print targets stay visible. */
+  /* Reset document flow. */
+  html,
+  body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+
+  /* Remove outer margins and wrappers from pushing extra pages. */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  /* The printable invoice canvas. */
+  #invoice-document {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 16mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+
+    /* Neutralize the screen sizing classes (`aspect-[210/297]`,
+       `overflow-hidden`, glass shadow) so tall documents paginate instead of
+       being clipped at a fixed A4-height viewport. */
+    aspect-ratio: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Collapse the editor grid so the lone preview column flows at full width
+     once the controls column is hidden. */
+  .invoice-editor-grid {
+    display: block !important;
+    gap: 0 !important;
+  }
+
+  /* Drop the inner document column's `h-full` and screen padding so the
+     16mm document padding is the single page inset. */
+  #invoice-document > div {
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  /* Prevent page-break cutting through rows or summary sections. */
+  tr,
+  .invoice-table-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .invoice-addendum,
+  .invoice-summary-box {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Calculator audit-receipt path (one-page Save-as-PDF): keep the live app
+     out of the print and drop the receipt over the page origin. The
+     display:none hiders above already removed header/footer/nav space; the
+     receipt's own <header>/<footer> are re-shown inside the overlay. */
   body * {
     visibility: hidden !important;
   }
 
-  /* Reveal the audit receipt and the live invoice document only. */
   .print-area,
   .print-area *,
   #invoice-document,
@@ -150,37 +230,25 @@ body {
     inset: 0;
     width: 100% !important;
     margin: 0 auto;
+    padding: 12mm !important;
   }
 
-  /* Isolate the invoice against the page origin and neutralize the screen
-     sizing classes (`aspect-[210/297]`, `overflow-hidden`, glass shadow) so
-     tall documents flow onto a second page instead of being clipped. */
-  #invoice-document {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
-    overflow: visible !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
+  .print-area header,
+  .print-area footer,
+  .print-area nav,
+  .print-area aside {
+    display: block !important;
   }
+}
 
-  /* Keep each line-item row whole — no mid-row page splits. */
-  .invoice-table-row {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  /* Keep the remittance addendum whole on its own page block. */
-  .invoice-addendum {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
+/* Strict print isolation — last in cascade, wins against any print sheet or
+   browser extension that leaks layout back in. Kept separate so the calculator
+   audit-receipt overlay rules above stay untouched. */
+@media print {
+  header, footer, aside, nav, .no-print, #invoice-editor-controls { display: none !important; }
+  html, body { width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important; background: #ffffff !important; color: #000000 !important; overflow: visible !important; }
+  main { margin: 0 !important; padding: 0 !important; display: block !important; }
+  #invoice-document { position: static !important; display: block !important; width: 100% !important; max-width: 100% !important; margin: 0 auto !important; padding: 14mm !important; box-shadow: none !important; border: none !important; background: #ffffff !important; }
+  tr, .invoice-table-row, .invoice-addendum, .invoice-summary-box { break-inside: avoid !important; page-break-inside: avoid !important; }
+  @page { size: A4 portrait; margin: 0; }
 }

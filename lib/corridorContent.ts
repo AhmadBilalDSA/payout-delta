@@ -25,6 +25,20 @@ export interface FaqItem {
   a: string;
 }
 
+/**
+ * Collapses FAQ lists to the first occurrence of each question (compared by
+ * exact question text). Editorial `content.faqs` and `guide.faqs` can both
+ * carry a near-identical generic question, so the page merges them through
+ * this helper — a duplicate `q` would otherwise produce a duplicate React key
+ * crash and duplicate FAQPage JSON-LD entries.
+ */
+export function dedupeFaqs(items: FaqItem[]): FaqItem[] {
+  return items.filter(
+    (item, index, self) =>
+      index === self.findIndex((other) => other.q === item.q),
+  );
+}
+
 export interface CorridorContent {
   /** H2 slug-friendly headline tailored to the receiving market. */
   pageHeadline: string;

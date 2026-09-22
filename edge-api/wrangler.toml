@@ -1,0 +1,25 @@
+# PayoutDelta Edge API — Cloudflare Worker configuration (Phase 6).
+#
+# Deploy from the repo root:
+#   npx wrangler deploy --config edge-api/wrangler.toml
+# Local development:
+#   npx wrangler dev --config edge-api/wrangler.toml --port 8787
+#
+# The worker is the live continuation of the Phase-2 `/api/v1/rates` stub: the
+# static export can only prerender, never answer request-time data, so the
+# editable fee dataset (<repo>/data/fees.json) is bundled into this worker and
+# served with per-IP rate limiting from the edge.
+
+name = "payoutdelta-edge-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Public playground on the workers.dev host by default. When the `api.` host
+# is added to the account, wire the custom route and redeploy:
+#   workers_dev = false
+#   routes = [{ pattern = "api.payoutdelta.com/*", zone_name = "payoutdelta.com" }]
+
+[vars]
+API_NAME = "PayoutDelta Edge API"
+API_DOCS = "https://payoutdelta.com/api-access"
+RATE_LIMIT_PER_MINUTE = "60"

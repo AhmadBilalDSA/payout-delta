@@ -12,6 +12,7 @@ import {
 import Calculator from "@/components/Calculator";
 import BlufSummary from "@/components/BlufSummary";
 import FaqAccordion from "@/components/FaqAccordion";
+import { dedupeFaqs } from "@/lib/corridorContent";
 
 const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
 
@@ -93,7 +94,7 @@ function buildJsonLd(lang: string, slug: string) {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     inLanguage: lang,
-    mainEntity: localized.faqs.map((item) => ({
+    mainEntity: dedupeFaqs(localized.faqs).map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -117,6 +118,11 @@ export default async function LocalizedCorridorPage({
 
   const platforms = getPlatforms();
   const channels = getChannels();
+  const allFaqs = localized.faqs;
+  const uniqueFaqs = allFaqs.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.q === self[index].q),
+  );
   const datasetRevision = getDataset().updatedAt.slice(0, 10);
   const history = getCorridorHistory(corridor.slug);
   const sparklineStats = computeSparklineStats(history, channels);
@@ -176,7 +182,7 @@ export default async function LocalizedCorridorPage({
             </span>
           </h2>
           <div className="mt-3">
-            <FaqAccordion items={localized.faqs} />
+            <FaqAccordion items={uniqueFaqs} />
           </div>
         </section>
 

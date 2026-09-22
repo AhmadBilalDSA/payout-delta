@@ -10,7 +10,7 @@ import {
   getDataset,
   getPlatforms,
 } from "@/lib/db";
-import { getCorridorContent } from "@/lib/corridorContent";
+import { dedupeFaqs, getCorridorContent } from "@/lib/corridorContent";
 import { computeSparklineStats, getCorridorHistory } from "@/lib/history";
 import { getComplianceGuide } from "@/data/complianceGuides";
 import { hreflangMap } from "@/lib/localizedCorridors";
@@ -100,7 +100,7 @@ function buildJsonLd(slug: string) {
     "@type": "FAQPage",
     url: corridorUrl,
     inLanguage: "en",
-    mainEntity: [...content.faqs, ...guide.faqs].map((item) => ({
+    mainEntity: dedupeFaqs([...content.faqs, ...guide.faqs]).map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -207,6 +207,11 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
   }
   const content = getCorridorContent(corridor.slug);
   const guide = getComplianceGuide(corridor.slug);
+  const allFaqs = [...content.faqs, ...guide.faqs];
+  const uniqueFaqs = allFaqs.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.q === self[index].q),
+  );
   const platforms = getPlatforms();
   const channels = getChannels();
   const datasetRevision = getDataset().updatedAt.slice(0, 10);
@@ -325,7 +330,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
             Frequently asked questions
           </h2>
           <div className="mt-3">
-            <FaqAccordion items={[...content.faqs, ...guide.faqs]} />
+            <FaqAccordion items={uniqueFaqs} />
           </div>
         </section>
 
