@@ -242,7 +242,7 @@ export const enStrings = {
   platformSurchargeApplied: "{pct}% surcharge layered on the gross bill",
   localClearingFee: "Local clearing / landing fee",
   syncToInvoice: "Sync to Invoice",
-  syncedTick: "Synced to Invoice",
+  syncedTick: "Synced to Invoice Studio",
   syncHint:
     "Your bank, purpose code and tax tier are saved locally and auto-fill the Invoice Studio.",
   purposeCodeLabel: "Purpose code {code}",
@@ -252,6 +252,7 @@ export const enStrings = {
   receivingBank: "Receiving bank",
   swiftBic: "SWIFT / BIC code",
   intermediaryNote: "Intermediary correspondent routing note",
+  syncLoadedBanner: "Loaded statutory banking parameters from Calculator",
   statutoryAddendumToggle: "Include Statutory Tax & Purpose Code Addendum",
   statutoryAddendumHint:
     "Appends the statutory purpose code, withholding basis and legal reference to the printed invoice.",
@@ -497,6 +498,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       receivingBank: "وصول کنندہ بینک",
       swiftBic: "SWIFT / BIC کوڈ",
       intermediaryNote: "انٹرمیڈیری کارسپانڈنٹ روٹنگ نوٹ",
+      syncLoadedBanner: "کیلکولیٹر سے اسٹیٹیوٹری بینک پیرامیٹرز لوڈ ہو گئے",
       statutoryAddendumToggle: "قانونی ٹیکس اور پرپز کوڈ اڈنڈم شامل کریں",
       statutoryAddendumHint:
         "چھپی ہوئی انوائس پر قانونی پرپز کوڈ، ٹیکس کی بنیاد اور حوالہ شامل کرتا ہے۔",
@@ -730,6 +732,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       receivingBank: "प्राप्तकर्ता बैंक",
       swiftBic: "SWIFT / BIC कोड",
       intermediaryNote: "इंटरमीडियरी संवाददाता रूटिंग नोट",
+      syncLoadedBanner: "कैलकुलेटर से सांविधिक बैंक पैरामीटर लोड हो गए",
       statutoryAddendumToggle: "सांविधिक कर और पर्पस कोड अडेंडम शामिल करें",
       statutoryAddendumHint:
         "मुद्रित इनवॉइस पर सांविधिक पर्पस कोड, कर आधार और कानूनी संदर्भ जोड़ता है।",
@@ -963,8 +966,9 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       bankClearingDetails: "Banking & clearing details",
       beneficiaryAccount: "Beneficiary account / IBAN",
       receivingBank: "Receiving bank",
-      swiftBic: "SWIFT / BIC code",
+swiftBic: "SWIFT / BIC code",
       intermediaryNote: "Intermediary correspondent routing note",
+      syncLoadedBanner: "Na-load ang mga statutory banking parameter mula sa Calculator",
       statutoryAddendumToggle: "Include Statutory Tax & Purpose Code Addendum",
       statutoryAddendumHint:
         "Appends the statutory purpose code, withholding basis and legal reference to the printed invoice.",
@@ -1200,6 +1204,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       receivingBank: "Banco receptor",
       swiftBic: "Código SWIFT / BIC",
       intermediaryNote: "Nota de ruta del corresponsal intermediario",
+      syncLoadedBanner: "Parámetros bancarios legales cargados desde la Calculadora",
       statutoryAddendumToggle: "Incluir Anexo de Impuestos Estatutarios y Código de Propósito",
       statutoryAddendumHint:
         "Agrega el código de propósito, la base de retención y la referencia legal a la factura impresa.",
@@ -1435,6 +1440,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       receivingBank: "Banco receptor",
       swiftBic: "Código SWIFT / BIC",
       intermediaryNote: "Nota de rota do correspondente intermediário",
+      syncLoadedBanner: "Parâmetros bancários legais carregados da Calculadora",
       statutoryAddendumToggle: "Incluir Anexo de Impostos Legais e Código de Propósito",
       statutoryAddendumHint:
         "Adiciona o código de propósito, a base de retenção e a referência legal à fatura impressa.",
@@ -1670,6 +1676,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       receivingBank: "المصرف المستقبِل",
       swiftBic: "رمز SWIFT / BIC",
       intermediaryNote: "ملاحظة توجيه المراسل الوسيط",
+      syncLoadedBanner: "تم تحميل معايير البنك التنظيمية من الحاسبة",
       statutoryAddendumToggle: "تضمين ملحق الضرائب القانونية ورمز الغرض",
       statutoryAddendumHint:
         "يضيف رمز الغرض وأساس الخصم والمرجع القانوني إلى الفاتورة المطبوعة.",

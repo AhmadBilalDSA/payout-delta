@@ -6,7 +6,12 @@ import type { Corridor } from "@/lib/types";
 import { formatLocal, formatUSD } from "@/utils/format";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
-import { writeBankSync } from "@/lib/invoiceTypes";
+import {
+  INVOICE_SYNC_EVENT,
+  INVOICE_SYNC_KEY,
+  writeBankSync,
+  type InvoiceSyncPayload,
+} from "@/lib/invoiceTypes";
 
 /**
  * Phase 9 — Statutory Bank Settlement & Dynamic Transaction Costing Engine.
@@ -25,8 +30,10 @@ import { writeBankSync } from "@/lib/invoiceTypes";
  *
  * The "Sync to Invoice" button persists the exact bank, purpose code and tax
  * tier to localStorage so the Invoice Studio auto-fills its Banking & Clearing
- * section and statutory addendum on the next visit. All client-side; bank
- * names, SWIFT codes and statutory references are English data.
+ * section and statutory addendum on the next visit, and fires a
+ * `payoutdelta:synced` event so an already-open studio applies it instantly.
+ * All client-side; bank names, SWIFT codes and statutory references are
+ * English data.
  */
 export default function TransactionCostingWidget({
   corridor,
@@ -101,7 +108,7 @@ export default function TransactionCostingWidget({
   const taxPct = Math.round(safeTax * 10000) / 100;
 
   const handleSync = () => {
-    if (!bank || !tier) return;
+    if (!bank || !tier || synced) return;
     writeBankSync({
       bankName: bank.name,
       swiftCode: bank.swiftCode,
@@ -116,7 +123,27 @@ export default function TransactionCostingWidget({
       corridorSlug: corridor.slug,
       savedAt: new Date().toISOString(),
     });
+    const syncPayload: InvoiceSyncPayload = {
+      receivingBank: bank.name,
+      swiftBic: bank.swiftCode,
+      statutoryAuthority: `${regulation.authority} · ${tier.authority}`,
+      purposeCode: tier.purposeCode ?? "",
+      taxRate: tier.rate,
+      currency: corridor.to,
+      timestamp: Date.now(),
+    };
+    try {
+      window.localStorage.setItem(INVOICE_SYNC_KEY, JSON.stringify(syncPayload));
+    } catch {
+      // Storage unavailable — the live event below still reaches the studio.
+    }
+    window.dispatchEvent(
+      new CustomEvent<InvoiceSyncPayload>(INVOICE_SYNC_EVENT, {
+        detail: syncPayload,
+      })
+    );
     setSynced(true);
+    window.setTimeout(() => setSynced(false), 2500);
   };
 
   return (
@@ -351,9 +378,16 @@ export default function TransactionCostingWidget({
           type="button"
           onClick={handleSync}
           disabled={synced || !bank || !tier}
-          className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-150 ease-out hover:bg-neutral-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-semibold transition-all duration-150 ease-out active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 ${
+            synced
+              ? "border border-emerald-400/60 bg-emerald-500/15 text-emerald-300"
+              : "bg-neutral-900 text-white shadow-sm hover:bg-neutral-800 disabled:opacity-40 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          }`}
         >
-          {synced ? "✓" : "⭮"} {synced ? t("syncedTick") : t("syncToInvoice")}
+          <span aria-hidden="true" className={synced ? "text-emerald-300" : ""}>
+            {synced ? "✓" : "⭮"}
+          </span>
+          {synced ? t("syncedTick") : t("syncToInvoice")}
         </button>
         <span className="text-[11px] leading-relaxed text-black/[0.4] dark:text-white/[0.4]">
           {t("syncHint")}

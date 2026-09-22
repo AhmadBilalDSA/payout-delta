@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import AdSlot from "@/components/AdSlot";
+import MarketStatusBar from "@/components/MarketStatusBar";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import "./globals.css";
 
@@ -97,7 +97,7 @@ export default function RootLayout({
         />
         <LanguageProvider>
           <Header />
-          <AdSlot />
+          <MarketStatusBar />
           <main className="flex-1">{children}</main>
           <Footer />
         </LanguageProvider>

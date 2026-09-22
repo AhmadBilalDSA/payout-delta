@@ -119,9 +119,9 @@ export default function CorridorSwitcher() {
           aria-expanded={open}
           aria-label={`Currency corridor: ${current.from} to ${current.to}`}
           onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-8 max-w-[8.5rem] items-center gap-1.5 rounded-full bg-black/[0.04] px-3 text-xs font-semibold text-slate-700 ring-1 ring-black/[0.06] transition-colors duration-200 ease-out hover:bg-black/[0.08] active:scale-[0.98] sm:max-w-none dark:bg-white/[0.06] dark:text-white/80 dark:ring-white/[0.1] dark:hover:bg-white/[0.12]"
+          className="inline-flex h-8 max-w-[8.5rem] items-center gap-1.5 rounded-full bg-white/[0.06] px-3 text-xs font-semibold text-white/80 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.98] sm:max-w-none"
         >
-          <span aria-hidden="true" className="text-sm leading-none text-slate-500 dark:text-white/50">
+          <span aria-hidden="true" className="text-sm leading-none text-white/50">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5">
               <circle cx="12" cy="12" r="9" />
               <ellipse cx="12" cy="12" rx="4" ry="9" />
@@ -133,7 +133,7 @@ export default function CorridorSwitcher() {
           </span>
           <span
             aria-hidden="true"
-            className={`text-[9px] leading-none text-slate-400 transition-transform duration-200 ease-out dark:text-white/40 ${
+            className={`text-[9px] leading-none text-white/40 transition-transform duration-200 ease-out ${
               open ? "rotate-180" : ""
             }`}
           >
@@ -152,7 +152,7 @@ export default function CorridorSwitcher() {
               href={localizedCorridorHref(lang, inverseSlug)}
               aria-label={`Swap to ${inverseLabel}`}
               title={`${inverseLabel} — audited, open it`}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black/[0.04] text-xs font-bold text-slate-600 ring-1 ring-black/[0.06] transition-colors duration-200 ease-out hover:bg-black/[0.08] active:scale-[0.95] dark:bg-white/[0.06] dark:text-white/70 dark:ring-white/[0.1] dark:hover:bg-white/[0.12]"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-xs font-bold text-white/70 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.95]"
             >
               ⇄
             </Link>
@@ -165,7 +165,7 @@ export default function CorridorSwitcher() {
                 aria-label={`Swap to ${inverseLabel} — not audited yet`}
                 title={`${inverseLabel} isn't audited yet`}
                 onClick={() => setInverseOpen((value) => !value)}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black/[0.04] text-xs font-bold text-slate-400 ring-1 ring-black/[0.06] transition-colors duration-200 ease-out hover:bg-black/[0.08] active:scale-[0.95] dark:bg-white/[0.06] dark:text-white/40 dark:ring-white/[0.1] dark:hover:bg-white/[0.12]"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-xs font-bold text-white/40 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.95]"
               >
                 ⇄
               </button>

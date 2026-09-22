@@ -126,7 +126,7 @@ export default function VerdictCard({
     return (
       <section
         aria-label="Invoice requirement verdict"
-        className="relative w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0D0D11] p-6 text-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] sm:p-8"
+        className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 text-white backdrop-blur-md sm:p-8"
       >
         <div
           aria-hidden="true"
@@ -251,7 +251,7 @@ export default function VerdictCard({
   return (
     <section
       aria-label="Best payout channel verdict"
-      className="relative w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0D0D11] p-6 text-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] sm:p-8"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 text-white backdrop-blur-md sm:p-8"
     >
       <div
         aria-hidden="true"

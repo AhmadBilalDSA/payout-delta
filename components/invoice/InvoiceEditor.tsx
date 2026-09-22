@@ -3,11 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { WithdrawalChannel } from "@/lib/types";
-import type { InvoiceDraft, InvoiceLineItem } from "@/lib/invoiceTypes";
+import type {
+  CurrencyCode,
+  InvoiceDraft,
+  InvoiceLineItem,
+  InvoiceSyncPayload,
+} from "@/lib/invoiceTypes";
 import {
   ACCENT_PALETTES,
   CURRENCIES,
   INVOICE_LOGO_LIMIT_BYTES,
+  INVOICE_SYNC_EVENT,
   clearInvoiceDraft,
   createEmptyDraft,
   createLineItem,
@@ -17,8 +23,8 @@ import {
   lineTotal,
   loadInvoiceDraft,
   persistInvoiceDraft,
-  readBankSync,
   readDataUrl,
+  readInvoiceSync,
   subtotal,
   totalLineGst,
 } from "@/lib/invoiceTypes";
@@ -47,6 +53,7 @@ export default function InvoiceEditor({
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [syncedBank, setSyncedBank] = useState<string | null>(null);
+  const [syncLoaded, setSyncLoaded] = useState(false);
   const appliedSyncRef = useRef(false);
 
   // Debounced auto-save on every change; the "Saved locally" badge refreshes.
@@ -60,33 +67,69 @@ export default function InvoiceEditor({
     return () => window.clearTimeout(timer);
   }, [draft]);
 
-  // Phase 9 — one-shot bank-sync bridge: pull the bank, purpose code and tax
-  // tier the calculator persisted and pre-fill the Banking & Clearing section
-  // (only if the user hasn't already edited it). Deferred so hydration stays
-  // deterministic and the effect does not race the state initializer.
+  // Phase 9 · UI polish — live calculator → studio bank-sync bridge. On mount
+  // read the persisted payload, then stay subscribed to the `payoutdelta:synced`
+  // event so a fresh "Sync to Invoice" click in the calculator lands even if
+  // the studio is already open. Deferred so hydration stays deterministic, and
+  // pre-existing user edits are never clobbered (each field keeps its value).
   useEffect(() => {
-    const timer = window.setTimeout(() => {
+    const applySync = (payload: InvoiceSyncPayload) => {
       if (appliedSyncRef.current) return;
       appliedSyncRef.current = true;
-      const payload = readBankSync();
-      if (!payload) return;
-      setDraft((current) => {
-        if (current.banking.receivingBank.trim() !== "") return current;
-        return {
-          ...current,
-          banking: {
-            ...current.banking,
-            receivingBank: payload.bankName,
-            swiftCode: payload.swiftCode,
-            purposeCode: payload.purposeCode ?? "",
-            authority: payload.authority,
-            tierLabel: `${payload.tierName} · ${Math.round(payload.tierRate * 10000) / 100}%`,
-          },
-        };
-      });
-      setSyncedBank(payload.bankName);
+      const tierPct = Number.isFinite(payload.taxRate)
+        ? String(Math.round(payload.taxRate * 10000) / 100)
+        : "";
+      setDraft((current) => ({
+        ...current,
+        meta: {
+          ...current.meta,
+          currency: CURRENCIES.some((currency) => currency.code === payload.currency)
+            ? (payload.currency as CurrencyCode)
+            : current.meta.currency,
+        },
+        taxPercent:
+          tierPct !== "" && current.taxPercent === "0"
+            ? tierPct
+            : current.taxPercent,
+        banking: {
+          ...current.banking,
+          receivingBank:
+            current.banking.receivingBank.trim() !== ""
+              ? current.banking.receivingBank
+              : payload.receivingBank,
+          swiftCode:
+            current.banking.swiftCode.trim() !== ""
+              ? current.banking.swiftCode
+              : payload.swiftBic,
+          purposeCode:
+            current.banking.purposeCode.trim() !== ""
+              ? current.banking.purposeCode
+              : payload.purposeCode,
+          authority:
+            current.banking.authority.trim() !== ""
+              ? current.banking.authority
+              : payload.statutoryAuthority,
+        },
+      }));
+      setSyncedBank(payload.receivingBank);
+      setSyncLoaded(true);
+    };
+
+    const onSyncEvent = (event: Event) => {
+      const detail = (event as CustomEvent<InvoiceSyncPayload>).detail;
+      if (detail) applySync(detail);
+    };
+
+    const timer = window.setTimeout(() => {
+      const payload = readInvoiceSync();
+      if (payload) applySync(payload);
     }, 0);
-    return () => window.clearTimeout(timer);
+
+    window.addEventListener(INVOICE_SYNC_EVENT, onSyncEvent);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener(INVOICE_SYNC_EVENT, onSyncEvent);
+    };
   }, []);
 
   const ccy = draft.meta.currency;
@@ -331,6 +374,15 @@ export default function InvoiceEditor({
 
         <Section title={t("bankClearingDetails")}>
           <div className="grid gap-3">
+            {syncLoaded && (
+              <p
+                role="status"
+                aria-live="polite"
+                className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-xs font-medium text-emerald-700 dark:text-emerald-300"
+              >
+                ✓ {t("syncLoadedBanner")}
+              </p>
+            )}
             <Field
               label={t("beneficiaryAccount")}
               value={draft.banking.beneficiaryAccount}

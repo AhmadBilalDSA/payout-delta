@@ -51,7 +51,7 @@ export default function ThemeToggle() {
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       onClick={toggle}
       suppressHydrationWarning
-      className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full bg-black/[0.06] ring-1 ring-inset ring-black/[0.08] transition-colors duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 dark:bg-white/[0.1] dark:ring-white/[0.16]"
+      className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full bg-white/[0.1] ring-1 ring-inset ring-white/[0.16] transition-colors duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
     >
       <span
         aria-hidden="true"

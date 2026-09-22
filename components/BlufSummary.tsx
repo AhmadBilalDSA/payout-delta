@@ -95,22 +95,22 @@ export default function BlufSummary({
     <section
       aria-label="AEO verified answer — bottom line payout takeaway"
       data-aeo="answer-block"
-      className="w-full min-w-0 overflow-hidden rounded-2xl border border-indigo-500/20 bg-white/70 p-5 ring-1 ring-inset ring-indigo-500/10 backdrop-blur-xl dark:bg-[#0d0d12]/80"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 backdrop-blur-md"
     >
       <div className="flex items-center gap-2">
         <span aria-hidden="true" className="text-sm leading-none">
           ⚡
         </span>
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-300">
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-300">
           {t("aeoBadge")}
         </span>
       </div>
 
       <p
         data-bluf="key-takeaway"
-        className="mt-3 text-sm leading-relaxed text-black/80 dark:text-white/80"
+        className="mt-3 text-sm leading-relaxed text-white/80"
       >
-        <strong className="font-bold text-black dark:text-white">
+        <strong className="font-bold text-white">
           {t("keyTakeaway")}
         </strong>{" "}
         {renderTemplate(synthesisTemplate, synthesisVars)}
@@ -120,20 +120,20 @@ export default function BlufSummary({
         data-aeo="citations"
         className="mt-4 flex flex-wrap items-center gap-2"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-white/40">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40">
           {t("aeoCitationsLabel")}:
         </span>
         {regulation.citations.map((citation) => (
           <span
             key={citation}
-            className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+            className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-white/70"
           >
             {citation}
           </span>
         ))}
       </div>
 
-      <p className="mt-3 text-[11px] leading-relaxed text-slate-400 dark:text-white/40">
+      <p className="mt-3 text-[11px] leading-relaxed text-white/40">
         {t("referenceRate")}: {rateLabel} · {t("feeRevision", { date: asOf })} ·
         {t("aeoNote")}
       </p>

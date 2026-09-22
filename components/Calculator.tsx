@@ -320,11 +320,13 @@ export default function Calculator({
 
       {/* Analytical & Verification Rail — AEO answer citation box, the live
           verdict card with the partner CTA, and the AEO audit FAQ. Sticky from
-          the `lg` breakpoint; `order-first lg:order-none` keeps the "answer
-          first" reading order on mobile while the two rails sit side-by-side
-          on desktop. All slots carry `min-w-0` so long citation chips / FAQ
-          copy cannot compress the rail. */}
-      <div className="flex w-full min-w-0 flex-col gap-6 order-first lg:order-none lg:sticky lg:top-20 lg:col-span-5">
+          the `lg` breakpoint below the h-16 header; `order-first lg:order-none`
+          keeps the "answer first" reading order on mobile while the two rails
+          sit side-by-side on desktop. Every child slot is a self-contained card
+          (`rounded-2xl border-slate-800/80 bg-slate-900/60 p-6`) carrying its
+          own `min-w-0`, so long citation chips / accordion expansions can never
+          overlap or collapse the rail. */}
+      <aside className="flex w-full min-w-0 flex-col gap-6 order-first lg:order-none lg:sticky lg:top-24 lg:col-span-5">
         {bluf}
         <VerdictCard
           verdict={route.verdict}
@@ -337,7 +339,7 @@ export default function Calculator({
           sparklineStats={sparklineStats}
         />
         {faq}
-      </div>
+      </aside>
 
       {/* Print-only audit receipt, mounted the instant an export is asked for
           (becomes the sole visible content inside the Save-as-PDF dialog). */}

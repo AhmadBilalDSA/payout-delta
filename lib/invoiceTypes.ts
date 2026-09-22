@@ -14,6 +14,9 @@
 export const INVOICE_STORAGE_KEY = "payoutdelta_draft_invoice";
 /** Phase 9 — calculator → Invoice Studio bank-sync bridge (localStorage). */
 export const BANK_SYNC_KEY = "payoutdelta_banksync";
+/** Phase 9 · UI polish — live calculator → studio sync payload + event. */
+export const INVOICE_SYNC_KEY = "payoutdelta:invoice_sync";
+export const INVOICE_SYNC_EVENT = "payoutdelta:synced";
 export const INVOICE_LOGO_LIMIT_BYTES = 500 * 1024;
 
 export type CurrencyCode = "USD" | "EUR" | "GBP" | "CAD" | "AUD";
@@ -507,6 +510,64 @@ export function readBankSync(): BankSyncPayload | null {
     const raw = window.localStorage.getItem(BANK_SYNC_KEY);
     if (!raw) return null;
     return sanitizeBankSync(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Phase 9 · UI polish — live calculator → studio sync bridge.
+ *
+ * Alongside the deep `BankSyncPayload` the costing widget writes a lean, flat
+ * payload under `payoutdelta:invoice_sync` and fires `payoutdelta:synced` so
+ * the Invoice Studio can apply it instantly (even while already open). The
+ * payload uses exactly the field names the Banking & Clearing section needs.
+ * ------------------------------------------------------------------------- */
+
+export interface InvoiceSyncPayload {
+  receivingBank: string;
+  swiftBic: string;
+  statutoryAuthority: string;
+  purposeCode: string;
+  taxRate: number;
+  currency: string;
+  timestamp: number;
+}
+
+function sanitizeInvoiceSync(parsed: unknown): InvoiceSyncPayload | null {
+  if (!isRecord(parsed)) return null;
+  if (
+    typeof parsed.receivingBank !== "string" ||
+    parsed.receivingBank.trim() === ""
+  ) {
+    return null;
+  }
+  const toNumber = (value: unknown, fallback: number): number => {
+    const n =
+      typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
+    return Number.isFinite(n) ? n : fallback;
+  };
+  return {
+    receivingBank: parsed.receivingBank,
+    swiftBic: typeof parsed.swiftBic === "string" ? parsed.swiftBic : "",
+    statutoryAuthority:
+      typeof parsed.statutoryAuthority === "string"
+        ? parsed.statutoryAuthority
+        : "",
+    purposeCode: typeof parsed.purposeCode === "string" ? parsed.purposeCode : "",
+    taxRate: toNumber(parsed.taxRate, 0),
+    currency: typeof parsed.currency === "string" ? parsed.currency : "USD",
+    timestamp: toNumber(parsed.timestamp, 0),
+  };
+}
+
+/** Read the latest live calculator sync payload, or `null`. Client-only. */
+export function readInvoiceSync(): InvoiceSyncPayload | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(INVOICE_SYNC_KEY);
+    if (!raw) return null;
+    return sanitizeInvoiceSync(JSON.parse(raw));
   } catch {
     return null;
   }

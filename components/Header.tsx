@@ -9,57 +9,63 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
 /**
- * Frosted navigation header — Apple HIG. Sticky, backdrop-blurred, hairline-
- * bordered. Ties the three global controls (language, corridor, theme) to the
- * provider dictionary: copy re-renders instantly when the visitor switches
- * language, no navigation. Every `next/link` href is server paths-based —
+ * Frosted navigation header — dark command stack. Sticky, backdrop-blurred,
+ * hairline-bordered. Groups the three global controls (language, corridor,
+ * theme) with the brand on the left and the trust cluster + API pill on the
+ * right, so regional copy stays in one place. Invoice Studio navigates with
+ * `next/link` — no hard refresh, so the wallet draft and any calculator sync
+ * state survive the trip. Every `next/link` href is server paths-based —
  * `basePath` (`/payout-delta` in production) is re-applied automatically.
  */
 export default function Header() {
   const { t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl dark:border-white/[0.08] dark:bg-black/60">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-lg">
       <nav
         aria-label="Primary"
-        className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:gap-4 sm:px-6"
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6"
       >
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-tight text-slate-900 transition-opacity duration-200 ease-out hover:opacity-80 dark:text-white"
-        >
-          <span aria-hidden="true" className="text-base font-medium leading-none">
-            Δ
-          </span>
-          <span className="truncate">PayoutDelta</span>
-        </Link>
-
-        <div className="flex items-center justify-center gap-2 sm:gap-3">
-          <LanguageSwitcher />
-          <CorridorSwitcher />
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-tight text-white transition-opacity duration-200 ease-out hover:opacity-80"
+          >
+            <span aria-hidden="true" className="text-base font-medium leading-none">
+              Δ
+            </span>
+            <span className="truncate">PayoutDelta</span>
+          </Link>
+          <span
+            aria-hidden="true"
+            className="hidden h-4 w-px bg-slate-700/60 sm:block"
+          />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <LanguageSwitcher />
+            <CorridorSwitcher />
+          </div>
         </div>
 
         <div className="flex items-center justify-end gap-2 sm:gap-3">
           <span
             aria-hidden="true"
-            className="hidden items-center gap-1.5 lg:inline-flex"
+            className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex"
             title={t("clientSideBadge")}
           >
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[10px] font-semibold text-slate-500 dark:text-white/50">
+            <span className="text-xs text-emerald-400/90">
               {t("clientSideBadge")}
             </span>
           </span>
-          <ThemeToggle />
           <Link
             href="/"
-            className="hidden text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900 sm:inline dark:text-white/70 dark:hover:text-white"
+            className="hidden text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:text-white sm:inline"
           >
             {t("calculator")}
           </Link>
           <Link
             href="/invoice/"
-            className="hidden text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900 sm:inline dark:text-white/70 dark:hover:text-white"
+            className="hidden text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:text-white sm:inline"
           >
             {t("invoiceStudio")}
           </Link>
@@ -67,16 +73,17 @@ export default function Header() {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-xs font-medium text-slate-600 transition-colors duration-200 ease-out hover:text-slate-900 lg:inline dark:text-white/70 dark:hover:text-white"
+            className="hidden text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:text-white lg:inline"
           >
             {t("openDataset")}
             <span aria-hidden="true" className="ml-0.5 opacity-50">
               ↗
             </span>
           </Link>
+          <ThemeToggle />
           <Link
             href="/api-access/"
-            className="hidden rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:bg-neutral-800 md:inline sm:px-4 dark:bg-white dark:text-black dark:hover:bg-white/90"
+            className="hidden items-center whitespace-nowrap rounded-full border border-slate-700/60 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:bg-slate-800 hover:text-white md:inline-flex"
           >
             {t("apiAccess")}
           </Link>

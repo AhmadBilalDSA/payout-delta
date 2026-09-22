@@ -64,15 +64,15 @@ export default function AeoFaqSection({
     <section
       aria-labelledby={`aeo-faq-${corridor.slug}`}
       data-aeo="audit-faq"
-      className="w-full min-w-0"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 backdrop-blur-md"
     >
       <h2
         id={`aeo-faq-${corridor.slug}`}
-        className="text-xl font-bold text-slate-900 dark:text-white"
+        className="text-xl font-bold text-white"
       >
         {t("aeoFaqTitle")}
       </h2>
-      <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/60">
+      <p className="mt-1 text-sm leading-relaxed text-white/60">
         {t("aeoFaqLead")}
       </p>
 
@@ -80,7 +80,7 @@ export default function AeoFaqSection({
         type="multiple"
         value={openValues}
         onValueChange={setOpenValues}
-        className="mt-4 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white dark:divide-white/[0.08] dark:border-white/[0.08] dark:bg-[#15151A]"
+        className="mt-4 divide-y divide-white/[0.08] overflow-hidden rounded-xl border border-slate-700/60 bg-[#15151A]"
       >
         {items.map((item, index) => (
           <Accordion.Item
@@ -89,10 +89,10 @@ export default function AeoFaqSection({
             className="overflow-hidden"
           >
             <Accordion.Header>
-              <Accordion.Trigger className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left text-sm font-medium leading-relaxed text-slate-900 transition-colors hover:bg-slate-50 dark:text-white dark:hover:bg-white/[0.05]">
+              <Accordion.Trigger className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left text-sm font-medium leading-relaxed text-white transition-colors hover:bg-white/[0.05]">
                 {item.q}
                 <span
-                  className="shrink-0 text-slate-400 dark:text-white/40"
+                  className="shrink-0 text-white/40"
                   aria-hidden="true"
                 >
                   ▾
@@ -101,7 +101,7 @@ export default function AeoFaqSection({
             </Accordion.Header>
             <Accordion.Content
               forceMount
-              className="px-4 py-4 text-sm leading-relaxed text-slate-600 dark:text-white/60"
+              className="px-4 py-4 text-sm leading-relaxed text-white/60"
             >
               <p data-aeo={`answer-${index}`}>{item.a}</p>
             </Accordion.Content>

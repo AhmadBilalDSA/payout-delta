@@ -29,9 +29,9 @@ export default function LanguageSwitcher() {
         aria-expanded={open}
         aria-label={`Site language: ${current.englishName}`}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex h-8 max-w-[9rem] items-center gap-1.5 rounded-full bg-black/[0.04] px-3 text-xs font-semibold text-slate-700 ring-1 ring-black/[0.06] transition-colors duration-200 ease-out hover:bg-black/[0.08] active:scale-[0.98] sm:max-w-none dark:bg-white/[0.06] dark:text-white/80 dark:ring-white/[0.1] dark:hover:bg-white/[0.12]"
+        className="inline-flex h-8 max-w-[9rem] items-center gap-1.5 rounded-full bg-white/[0.06] px-3 text-xs font-semibold text-white/80 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.98] sm:max-w-none"
       >
-        <span aria-hidden="true" className="text-sm leading-none text-slate-500 dark:text-white/50">
+        <span aria-hidden="true" className="text-sm leading-none text-white/50">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5">
             <circle cx="12" cy="12" r="9" />
             <path d="M3 12h18M12 3c2.7 2.5 3.9 5.8 3.9 9s-1.2 6.5-3.9 9c-2.7-2.5-3.9-5.8-3.9-9S9.3 5.5 12 3z" strokeLinecap="round" />
@@ -40,7 +40,7 @@ export default function LanguageSwitcher() {
         <span className="truncate">{current.shortLabel}</span>
         <span
           aria-hidden="true"
-          className={`text-[9px] leading-none text-slate-400 transition-transform duration-200 ease-out dark:text-white/40 ${
+          className={`text-[9px] leading-none text-white/40 transition-transform duration-200 ease-out ${
             open ? "rotate-180" : ""
           }`}
         >
