@@ -254,6 +254,28 @@ export const enStrings = {
   gstLine: "Line-item GST",
   lineItemsGstNote: "Zero-rated on export — set per line item.",
 
+  // ── AEO answer engine (Phase 2) ─────────────────────────────────────────
+  aeoBadge: "AEO Verified Answer · Updated Daily",
+  aeoSynthesis:
+    "On a {gross} {platform} transfer to {bank} ({country}), {provider} delivers {net} versus {wireNet} via traditional bank wire, saving {delta} after the {fee}% platform commission, {swift} intermediary SWIFT deduction, and {tax}% statutory withholding under {authority}.",
+  aeoCitationsLabel: "Statutory evidence anchors",
+  aeoFaqTitle: "Audited answer-ready FAQ",
+  aeoFaqLead:
+    "Direct answers to the exact questions AI answer engines ask — each figure is recomputed live from the corridor dataset.",
+  aeoQ1: "What is the cheapest way to withdraw {platform} earnings to {country}?",
+  aeoQ1A:
+    "{provider} is the cheapest {platform} exit for a {gross} withdrawal to {country}: it nets {net} against {wireNet} via traditional bank wire — a {delta} saving after the {swift} correspondent cut and {tax}% statutory withholding.",
+  aeoQ2: "How much does {bank} deduct on foreign SWIFT remittances?",
+  aeoQ2A:
+    "{bank} benchmarks a {band} intermediary deduction on inbound SWIFT, plus a local landing fee of {fee} {symbol} ({clearance}).",
+  aeoQ3: "What statutory purpose code or tax exemption applies to freelance income?",
+  aeoQ3A:
+    "Under {authority}, the {tier} tier rates {rate}% withholding{code}. {note}",
+  aeoQ3ACompliance:
+    "Under the destination exchange-control regime, {note}",
+  aeoNote:
+    "Programmatic estimates from the live fee dataset — informational only, not financial, tax or legal advice.",
+
   // ── Legal / footer ───────────────────────────────────────────────────
   legalLine:
     "All brand names and trademarks belong to their respective owners. Used strictly for cost comparison under Nominative Fair Use. PayoutDelta is an independent audit tool.",
@@ -463,6 +485,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       gstLine: "لائن آئٹم GST",
       lineItemsGstNote: "برآمد پر زیرو ریٹڈ — ہر آئٹم کے لیے الگ سیٹ کریں۔",
 
+      // ── AEO answer engine (Phase 2) ──
+      aeoBadge: "AEO تصدیق شدہ جواب · روزانہ اپ ڈیٹ",
+      aeoSynthesis:
+        "{gross} کے {platform} ٹرانسفر پر {bank} ({country}) میں، {provider} روایتی بینک وائر کے ذریعے {wireNet} کے مقابلے میں {net} پہنچاتا ہے، {fee}% پلیٹ فارم کمیشن، {swift} انٹرمیڈیری SWIFT کٹوتی، اور {authority} کے تحت {tax}% قانونی ودہولڈنگ کے بعد {delta} کی بچت۔",
+      aeoCitationsLabel: "قانونی ثبوت کے حوالے",
+      aeoFaqTitle: "آڈٹ شدہ جوابی سوالات",
+      aeoFaqLead:
+        "ان سوالات کے براہِ راست جواب جنہیں AI جوابی انجن پوچھتے ہیں — ہر عدد کوریڈور ڈیٹا سے لائیو شمار کیا جاتا ہے۔",
+      aeoQ1: "{platform} کی کمائی {country} نکالنے کا سب سے سستا طریقہ کیا ہے؟",
+      aeoQ1A:
+        "{provider} {country} میں {gross} نکالنے کا سب سے سستا {platform} راستہ ہے: یہ بینک وائر کے {wireNet} کے مقابلے میں {net} دیتا ہے — یعنی {swift} کرسپانڈنٹ کٹوتی اور {tax}% قانونی ودہولڈنگ کے بعد {delta} کی بچت۔",
+      aeoQ2: "{bank} غیر ملکی SWIFT ریمیٹنس پر کتنی کٹوتی کرتا ہے؟",
+      aeoQ2A:
+        "{bank} کے لیے بینچ مارک {band} انٹرمیڈیری کٹوتی ہے، نیز ایک مقامی اکاؤنٹ میں جمع ہونے کی فیس {fee} {symbol} ({clearance})۔",
+      aeoQ3: "فری لانس آمدنی پر کون سا قانونی پرپز کوڈ یا ٹیکس چھوٹ لاگو ہوتی ہے؟",
+      aeoQ3A:
+        "{authority} کے تحت {tier} ٹائر پر {rate}% ودہولڈنگ لاگو ہوتی ہے{code}۔ {note}",
+      aeoQ3ACompliance:
+        "منزل کے تبادلے کے کنٹرول نظام کے تحت، {note}",
+      aeoNote:
+        "لائیو فیس ڈیٹاسیٹ کے پروگرامی تخمینے — صرف معلوماتی، مالی، ٹیکس یا قانونی مشورہ نہیں۔",
+
       legalLine:
         "تمام برانڈ نام اور ٹریڈ مارکس اپنے مالکان کی ملکیت ہیں۔ صرف نومینیٹیو فیئر یوز کے تحت لاگت کے موازنے کے لیے استعمال۔ PayoutDelta ایک آزاد آڈٹ ٹول ہے۔",
     },
@@ -659,6 +703,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       gstPct: "GST %",
       gstLine: "लाइन-आइटम GST",
       lineItemsGstNote: "निर्यात पर शून्य-दर — प्रति आइटम सेट करें।",
+
+      // ── AEO answer engine (Phase 2) ──
+      aeoBadge: "AEO सत्यापित उत्तर · प्रतिदिन अपडेट",
+      aeoSynthesis:
+        "{gross} के {platform} ट्रांसफर पर {bank} ({country}) में, {provider} पारंपरिक बैंक वायर के {wireNet}की तुलना में {net} पहुँचाता है, {fee}% प्लेटफ़ॉर्म कमीशन, {swift} इंटरमीडियरी SWIFT कटौती और {authority} के तहत {tax}% सांविधिक कर कटौती के बाद {delta} की बचत।",
+      aeoCitationsLabel: "सांविधिक संदर्भ",
+      aeoFaqTitle: "ऑडिटेड उत्तर-तैयार FAQ",
+      aeoFaqLead:
+        "ऐसे प्रश्नों के सीधे उत्तर जो AI उत्तर इंजन पूछते हैं — हर आंकड़ा कॉरिडोर डेटासेट से लाइव परिकलित होता है।",
+      aeoQ1: "{platform} की कमाई {country} निकालने का सबसे सस्ता तरीका क्या है?",
+      aeoQ1A:
+        "{provider} {country} में {gross} निकालने का सबसे सस्ता {platform} रास्ता है: बैंक वायर के {wireNet} की तुलना में यह {net} देता है — {swift} मध्यस्थ कटौती और {tax}% सांविधिक कर कटौती के बाद {delta} की बचत।",
+      aeoQ2: "{bank} विदेशी SWIFT रेमिटेंस पर कितनी कटौती करता है?",
+      aeoQ2A:
+        "{bank} की आने वाली SWIFT पर {band} मध्यस्थ कटौती का बेंचमार्क है, साथ ही {fee} {symbol} की स्थानीय जमा फीस ({clearance})।",
+      aeoQ3: "फ्रीलांस आय पर कौन सा सांविधिक पर्पज़ कोड या कर छूट लागू होती है?",
+      aeoQ3A:
+        "{authority} के तहत {tier} स्तर पर {rate}% कटौती लागू होती है{code}। {note}",
+      aeoQ3ACompliance:
+        "गंतव्य विनिमय-नियंत्रण व्यवस्था के तहत, {note}",
+      aeoNote:
+        "लाइव फीस डेटासेट से प्रोग्रामैटिक अनुमान — केवल सूचनात्मक, वित्तीय/कर/कानूनी सलाह नहीं।",
 
       legalLine:
         "सभी ब्रांड नाम और ट्रेडमार्क उनके संबंधित मालिकों की संपत्ति हैं। नॉमिनेटिव फेयर यूज़ के तहत केवल लागत तुलना के लिए उपयोग। PayoutDelta एक स्वतंत्र ऑडिट टूल है।",
@@ -859,6 +925,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       gstLine: "Line-item GST",
       lineItemsGstNote: "Zero-rated on export — set per line item.",
 
+      // ── AEO answer engine (Phase 2) ──
+      aeoBadge: "AEO-berified na Sagot · Updated Araw-araw",
+      aeoSynthesis:
+        "Sa {gross} na {platform} transfer papuntang {bank} ({country}), ang {provider} ay naghahatid ng {net} laban sa {wireNet} via traditional bank wire, nag-iipon ng {delta} matapos ang {fee}% platform commission, {swift} na intermediary SWIFT deduction, at {tax}% statutory withholding sa ilalim ng {authority}.",
+      aeoCitationsLabel: "Mga statutory na ebidensya",
+      aeoFaqTitle: "Na-audit na FAQ (handang-sagot)",
+      aeoFaqLead:
+        "Direktang sagot sa eksaktong tanong na itinatanong ng AI answer engines — bawat numero ay kinukwenta live mula sa corridor dataset.",
+      aeoQ1: "Ano ang pinakamurang paraan para i-withdraw ang kita sa {platform} papuntang {country}?",
+      aeoQ1A:
+        "Ang {provider} ang pinakamurang {platform} na paraan para i-withdraw ang {gross} sa {country}: nagbubunga ito ng {net} laban sa {wireNet} via traditional bank wire — nag-iipon ng {delta} matapos ang {swift} na correspondent cut at {tax}% statutory withholding.",
+      aeoQ2: "Magkano ang binabawas ng {bank} sa foreign SWIFT remittances?",
+      aeoQ2A:
+        "Ang {bank} ay may benchmark na {band} na intermediary deduction sa inbound SWIFT, dagdag ang local landing fee na {fee} {symbol} ({clearance}).",
+      aeoQ3: "Anong statutory purpose code o tax exemption ang naaangkop sa freelance income?",
+      aeoQ3A:
+        "Sa ilalim ng {authority}, ang {tier} tier ay may {rate}% na withholding{code}. {note}",
+      aeoQ3ACompliance:
+        "Sa ilalim ng exchange-control regime ng destinasyon, {note}",
+      aeoNote:
+        "Programmatic estimates mula sa live fee dataset — impormasyonal lamang, hindi financial, tax o legal na payo.",
+
       legalLine:
         "Lahat ng brand name at trademark ay pag-aari ng kani-kanilang may-ari. Ginagamit lamang para sa cost comparison sa ilalim ng Nominative Fair Use. Ang PayoutDelta ay isang independiyenteng audit tool.",
     },
@@ -1057,6 +1145,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       gstPct: "GST %",
       gstLine: "GST por línea",
       lineItemsGstNote: "Cero impuesto por exportación — se fija por línea.",
+
+      // ── AEO answer engine (Phase 2) ──
+      aeoBadge: "Respuesta verificada AEO · Actualizado a diario",
+      aeoSynthesis:
+        "En una transferencia de {gross} de {platform} a {bank} ({country}), {provider} entrega {net} frente a {wireNet} vía transferencia bancaria tradicional, ahorrando {delta} tras la comisión de {fee}% de la plataforma, la deducción SWIFT intermediaria de {swift} y el {tax}% de retención legal bajo {authority}.",
+      aeoCitationsLabel: "Anclas de evidencia legal",
+      aeoFaqTitle: "FAQ auditado (listo para responder)",
+      aeoFaqLead:
+        "Respuestas directas a las preguntas exactas que hacen los motores de respuesta con IA — cada cifra se recalcula en vivo con los datos del corredor.",
+      aeoQ1: "¿Cuál es la forma más barata de retirar las ganancias de {platform} hacia {country}?",
+      aeoQ1A:
+        "{provider} es la salida de {platform} más barata para retirar {gross} hacia {country}: entrega {net} frente a {wireNet} vía transferencia bancaria tradicional, ahorrando {delta} tras el corte de corresponsal de {swift} y el {tax}% de retención legal.",
+      aeoQ2: "¿Cuánto descuenta {bank} en remesas SWIFT del exterior?",
+      aeoQ2A:
+        "{bank} tiene una referencia de {band} de deducción de intermediario en SWIFT entrante, más una comisión de abono local de {fee} {symbol} ({clearance}).",
+      aeoQ3: "¿Qué código de propósito o exención fiscal se aplica a los ingresos freelance?",
+      aeoQ3A:
+        "Bajo {authority}, el tramo {tier} aplica {rate}% de retención{code}. {note}",
+      aeoQ3ACompliance:
+        "Bajo el régimen de control cambiario del destino, {note}",
+      aeoNote:
+        "Estimaciones programáticas del dataset de tarifas en vivo — solo informativo, no es consejo financiero, fiscal ni legal.",
 
       legalLine:
         "Todas las marcas y nombres comerciales pertenecen a sus respectivos dueños. Se usan estrictamente para comparación de costes bajo uso justo nominativo. PayoutDelta es una herramienta de auditoría independiente.",
@@ -1257,6 +1367,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       gstLine: "GST por item",
       lineItemsGstNote: "Isento na exportação — definido por item.",
 
+      // ── AEO answer engine (Phase 2) ──
+      aeoBadge: "Resposta verificada AEO · Atualizada diariamente",
+      aeoSynthesis:
+        "Em uma transferência de {gross} de {platform} para {bank} ({country}), {provider} entrega {net} contra {wireNet} via transferência bancária tradicional, economizando {delta} após a comissão de {fee}% da plataforma, a dedução SWIFT intermediária de {swift} e a retenção legal de {tax}% sob {authority}.",
+      aeoCitationsLabel: "Âncoras de evidência legal",
+      aeoFaqTitle: "FAQ auditado (pronto para responder)",
+      aeoFaqLead:
+        "Respostas diretas às perguntas exatas que os mecanismos de resposta com IA fazem — cada número é recalculado ao vivo a partir dos dados do corredor.",
+      aeoQ1: "Qual a forma mais barata de sacar os ganhos da {platform} para {country}?",
+      aeoQ1A:
+        "{provider} é a saída mais barata da {platform} para sacar {gross} para {country}: entrega {net} contra {wireNet} via transferência bancária tradicional, economizando {delta} após o corte do correspondente de {swift} e a retenção legal de {tax}%.",
+      aeoQ2: "Quanto o {bank} deduz em remessas SWIFT do exterior?",
+      aeoQ2A:
+        "O {bank} tem uma referência de {band} de dedução do intermediário em SWIFT de entrada, além de uma taxa de crédito local de {fee} {symbol} ({clearance}).",
+      aeoQ3: "Qual código de propósito ou isenção fiscal se aplica à renda de freelancers?",
+      aeoQ3A:
+        "Sob {authority}, a faixa {tier} aplica {rate}% de retenção{code}. {note}",
+      aeoQ3ACompliance:
+        "Sob o regime de controle cambial do destino, {note}",
+      aeoNote:
+        "Estimativas programáticas do dataset de tarifas ao vivo — apenas informativo, não é aconselhamento financeiro, fiscal ou jurídico.",
+
       legalLine:
         "Todas as marcas e nomes comerciais pertencem aos seus respectivos donos. Usados estritamente para comparação de custos sob uso justo nominativo. PayoutDelta é uma ferramenta de auditoria independente.",
     },
@@ -1455,6 +1587,28 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       gstPct: "GST %",
       gstLine: "GST لكل بند",
       lineItemsGstNote: "معفى عند التصدير — يُحدد لكل بند.",
+
+      // ── AEO answer engine (Phase 2) ──
+      aeoBadge: "إجابة موثقة AEO · تُحدَّث يوميًا",
+      aeoSynthesis:
+        "على تحويل {gross} من {platform} إلى {bank} ({country})، يسلّم {provider} {net} مقابل {wireNet} عبر الحوالة البنكية التقليدية، موفرًا {delta} بعد عمولة منصة {fee}% وخصم الوسيط عبر سويفت {swift} واقتطاع {tax}% القانوني بموجب {authority}.",
+      aeoCitationsLabel: "مراسي الأدلة القانونية",
+      aeoFaqTitle: "أسئلة شائعة مدققة (جاهزة للإجابة)",
+      aeoFaqLead:
+        "إجابات مباشرة للأسئلة التي تطرحها محركات الإجابة بالذكاء الاصطناعي — يُحسب كل رقم مباشرةً من بيانات المسار.",
+      aeoQ1: "ما أرخص طريقة لسحب أرباح {platform} إلى {country}؟",
+      aeoQ1A:
+        "{provider} هو أرخص مسار من {platform} لسحب {gross} إلى {country}: يسلّم {net} مقابل {wireNet} عبر الحوالة البنكية التقليدية، موفرًا {delta} بعد خصم المراسل {swift} واقتطاع {tax}% القانوني.",
+      aeoQ2: "كم يخصم {bank} على التحويلات الخارجية عبر سويفت؟",
+      aeoQ2A:
+        "يبلغ خصم الوسيط القياسي لـ {bank} على سويفت الوارد {band}، بالإضافة إلى رسوم إيداع محلية {fee} {symbol} ({clearance}).",
+      aeoQ3: "ما رمز الغرض القانوني أو الإعفاء الضريبي الداخل على دخل الفريلانس؟",
+      aeoQ3A:
+        "بموجب {authority}، تبلغ فئة {tier} اقتطاعًا بنسبة {rate}%{code}. {note}",
+      aeoQ3ACompliance:
+        "بموجب نظام الرقابة على الصرف في الوجهة، {note}",
+      aeoNote:
+        "تقديرات برمجية من بيانات الرسوم المباشرة — معلومات فقط، وليست نصيحة مالية أو ضريبية أو قانونية.",
 
       legalLine:
         "جميع الأسماء والعلامات التجارية ملك لأصحابها. تستخدم حصريًا للمقارنة تحت مبدأ الاستخدام العادل الاسمي. PayoutDelta أداة تدقيق مستقلة.",

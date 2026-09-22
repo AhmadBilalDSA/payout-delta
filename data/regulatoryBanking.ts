@@ -62,6 +62,11 @@ export interface CorridorRegulation {
   authority: string;
   /** National clearing network identifier. */
   clearingNetwork: string;
+  /**
+   * Phase 2 — extractable statutory evidence anchors for the AEO citation
+   * chips: named regulator + section + purpose-code shorthand per corridor.
+   */
+  citations: string[];
   /** Banks offered in the recipient dropdown. */
   banks: RegulatoryBank[];
   /** Statutory tax / exemption tiers. */
@@ -360,6 +365,10 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     slug: "usd-to-pkr",
     authority: "SBP Foreign Exchange Manual Chapter 13 & Income Tax Ordinance Section 154A",
     clearingNetwork: "Raast / BEFTN",
+    citations: [
+      "SBP Foreign Exchange Manual Ch. 13 · Section 154A ITO (PC 9111)",
+      "PRC Purpose Code 9111 · PSEB 0.25% final tax",
+    ],
     banks: pkrBanks,
     tiers: pkrTiers,
     generic: false,
@@ -368,6 +377,10 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     slug: "usd-to-inr",
     authority: "RBI AP (DIR Series) No. 46 & Section 194S of the Income Tax Act",
     clearingNetwork: "IMPS / NEFT / RTGS",
+    citations: [
+      "RBI Master Direction No. 16 · CGST Rule 96A (LUT zero-rated)",
+      "Purpose Code P0802 · Software & Technology Services",
+    ],
     banks: inrBanks,
     tiers: inrTiers,
     generic: false,
@@ -376,6 +389,10 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     slug: "usd-to-php",
     authority: "Bangko Sentral ng Pilipinas (BSP) Circular 980 & BIR 8% Freelance Gross Income Tax",
     clearingNetwork: "PESONet / InstaPay",
+    citations: [
+      "BSP Circular 980 · BIR 8% Gross Income Tax",
+      "PESONet / InstaPay clearing · 8% flat on gross",
+    ],
     banks: phpBanks,
     tiers: phpTiers,
     generic: false,
@@ -398,6 +415,10 @@ export function getRegulatoryBanking(slug: string): CorridorRegulation {
     slug,
     authority: "International remittance governed by the destination country's exchange-control & income-tax regime",
     clearingNetwork: network,
+    citations: [
+      `National Inward Clearing Settlement · ${network}`,
+      "Benchmark intermediary SWIFT deduction $15–$25",
+    ],
     banks: genericBank(fallback.label, fallback.currency, fallback.clearance),
     tiers: fallbackTiers(network),
     generic: true,

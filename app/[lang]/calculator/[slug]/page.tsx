@@ -12,6 +12,7 @@ import {
 import Calculator from "@/components/Calculator";
 import BlufSummary from "@/components/BlufSummary";
 import FaqAccordion from "@/components/FaqAccordion";
+import AeoFaqSection from "@/components/AeoFaqSection";
 import { dedupeFaqs } from "@/lib/corridorContent";
 
 const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
@@ -172,6 +173,13 @@ export default async function LocalizedCorridorPage({
           sparklineStats={sparklineStats}
         />
       </div>
+
+      {/* Phase 2 — localized pages carry the same programmatic audit FAQ. */}
+      <AeoFaqSection
+        corridor={corridor}
+        channels={channels}
+        platforms={platforms}
+      />
 
       <div className="mt-10 space-y-8">
         <section aria-labelledby="localized-faq">

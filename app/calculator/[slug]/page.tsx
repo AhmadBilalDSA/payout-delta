@@ -18,6 +18,7 @@ import Calculator from "@/components/Calculator";
 import FaqAccordion from "@/components/FaqAccordion";
 import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
+import AeoFaqSection from "@/components/AeoFaqSection";
 import ComplianceGuide from "@/components/ComplianceGuide";
 
 const SITE_URL = "https://payoutdelta.com";
@@ -267,6 +268,13 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           sparklineStats={sparklineStats}
         />
       </div>
+
+      {/* Phase 2 — targeted AEO audit FAQ driven by the live corridor dataset. */}
+      <AeoFaqSection
+        corridor={corridor}
+        channels={channels}
+        platforms={platforms}
+      />
 
       {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}
       <div className="mt-8">
