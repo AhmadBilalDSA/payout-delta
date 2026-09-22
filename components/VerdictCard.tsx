@@ -15,6 +15,7 @@ import { formatLocal, formatUSD } from "@/utils/format";
 import RateSparkline from "@/components/RateSparkline";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { platformUiKey } from "@/lib/i18n/helpers";
+import { getPartnerConfig } from "@/data/affiliatePartners";
 
 /**
  * Obsidian hero verdict card — an Apple Wallet / dark macOS-widget look.
@@ -47,7 +48,7 @@ export default function VerdictCard({
   history: HistoryPoint[];
   sparklineStats: SparklineStats;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
 
@@ -203,6 +204,20 @@ export default function VerdictCard({
   const best = verdict.best;
   const worst = verdict.worst;
 
+  // Phase 3 — high-intent affiliate engine: partner config + wire penalty.
+  const partner = getPartnerConfig(best.channelId);
+  const wireQuote = quotes.find((quote) => quote.channelId === "swift");
+  const wireSavings =
+    wireQuote === undefined
+      ? 0
+      : Math.max(0, best.localAmount - wireQuote.localAmount);
+  const ctaLabel =
+    partner.kind === "affiliate"
+      ? lang === "en"
+        ? partner.claimCopy
+        : `${t("claimRateVia")} ${best.channelName} →`
+      : partner.claimCopy;
+
   return (
     <section
       aria-label="Best payout channel verdict"
@@ -292,6 +307,87 @@ export default function VerdictCard({
               {copiedShare ? t("copied") : t("shareLink")}
             </button>
           </div>
+
+          {/* Phase 3 — high-intent partner referral card + regulatory
+              disclosures. Affiliate rails get a sponsored outbound CTA with
+              trust markers and the wire-penalty callout; unpartnered rails
+              surface a neutral bank advisory instead. */}
+          <div className="mt-6 rounded-2xl border border-white/[0.08] bg-white/[0.05] p-4">
+            {partner.kind === "affiliate" ? (
+              <>
+                <a
+                  href={partner.url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  title={partner.disclosure}
+                  className="group inline-flex w-full items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-violet-900/40 transition-all duration-200 ease-out hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[320px]"
+                >
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
+                      {partner.partnerBadge}
+                    </span>
+                    <span>{ctaLabel}</span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-lg leading-none transition-transform duration-200 group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
+                </a>
+
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-emerald-300/90">
+                  <span className="inline-flex items-center gap-1">
+                    <span aria-hidden="true" className="text-emerald-400">
+                      ✓
+                    </span>
+                    {t("zeroHiddenMarkup")}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span aria-hidden="true" className="text-emerald-400">
+                      ✓
+                    </span>
+                    {t("regulatedSettlement")}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span aria-hidden="true" className="text-emerald-400">
+                      ✓
+                    </span>
+                    {t("directPayout")}
+                  </span>
+                </div>
+
+                {wireSavings > 0 && (
+                  <p className="mt-3 inline-flex flex-wrap items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs font-semibold tabular-nums text-amber-300">
+                    {t("avoidWirePenalty")} — Save{" "}
+                    {formatLocal(wireSavings, corridor)}
+                  </p>
+                )}
+
+                <p className="mt-3 text-[10px] leading-relaxed text-white/40">
+                  {partner.disclosure}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-white">
+                  {partner.partnerBadge}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-white/50">
+                  {partner.disclosure}
+                </p>
+                <p className="mt-2 text-[10px] leading-relaxed text-white/40">
+                  {partner.claimCopy}.
+                </p>
+              </>
+            )}
+          </div>
+
+          {partner.kind === "affiliate" && (
+            <p className="mt-3 text-[11px] leading-relaxed text-white/40">
+              {t("affiliateDisclaimer")}
+            </p>
+          )}
         </div>
       </div>
     </section>

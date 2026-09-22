@@ -276,6 +276,15 @@ export const enStrings = {
   aeoNote:
     "Programmatic estimates from the live fee dataset — informational only, not financial, tax or legal advice.",
 
+  // ── Affiliate engine & trust micro-badges (Phase 3) ─────────────────────
+  claimRateVia: "Claim This Rate via",
+  zeroHiddenMarkup: "Zero Hidden Markup",
+  regulatedSettlement: "Regulated Inward Settlement",
+  directPayout: "Direct Payout",
+  avoidWirePenalty: "Avoid the traditional wire penalty",
+  affiliateDisclaimer:
+    "Independent audit. We may earn a referral commission at zero cost to you.",
+
   // ── Legal / footer ───────────────────────────────────────────────────
   legalLine:
     "All brand names and trademarks belong to their respective owners. Used strictly for cost comparison under Nominative Fair Use. PayoutDelta is an independent audit tool.",
@@ -507,6 +516,15 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       aeoNote:
         "لائیو فیس ڈیٹاسیٹ کے پروگرامی تخمینے — صرف معلوماتی، مالی، ٹیکس یا قانونی مشورہ نہیں۔",
 
+      // ── Affiliate engine & trust micro-badges (Phase 3) ──
+      claimRateVia: "یہ ریٹ حاصل کریں بذریعہ",
+      zeroHiddenMarkup: "صفر خفیہ مارک اپ",
+      regulatedSettlement: "ریگولیٹڈ انوارڈ سیٹلمنٹ",
+      directPayout: "براہِ راست ادائیگی",
+      avoidWirePenalty: "روایتی وائر پنالٹی سے بچیں",
+      affiliateDisclaimer:
+        "آزاد آڈٹ۔ ہم آپ پر بغیر کسی اضافی قیمت کے رعایتی کمیشن حاصل کر سکتے ہیں۔",
+
       legalLine:
         "تمام برانڈ نام اور ٹریڈ مارکس اپنے مالکان کی ملکیت ہیں۔ صرف نومینیٹیو فیئر یوز کے تحت لاگت کے موازنے کے لیے استعمال۔ PayoutDelta ایک آزاد آڈٹ ٹول ہے۔",
     },
@@ -725,6 +743,15 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "गंतव्य विनिमय-नियंत्रण व्यवस्था के तहत, {note}",
       aeoNote:
         "लाइव फीस डेटासेट से प्रोग्रामैटिक अनुमान — केवल सूचनात्मक, वित्तीय/कर/कानूनी सलाह नहीं।",
+
+      // ── Affiliate engine & trust micro-badges (Phase 3) ──
+      claimRateVia: "इस दर का दावा कीजिए via",
+      zeroHiddenMarkup: "शून्य छिपा मार्कअप",
+      regulatedSettlement: "नियमित अंतर्भुक्त निपटान",
+      directPayout: "प्रत्यक्ष भुगतान",
+      avoidWirePenalty: "पारंपरिक वायर पेनल्टी से बचें",
+      affiliateDisclaimer:
+        "स्वतंत्र ऑडिट। आपको बिना किसी अतिरिक्त लागत के हम रेफरल कमीशन अर्जित कर सकते हैं।",
 
       legalLine:
         "सभी ब्रांड नाम और ट्रेडमार्क उनके संबंधित मालिकों की संपत्ति हैं। नॉमिनेटिव फेयर यूज़ के तहत केवल लागत तुलना के लिए उपयोग। PayoutDelta एक स्वतंत्र ऑडिट टूल है।",
@@ -947,6 +974,15 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       aeoNote:
         "Programmatic estimates mula sa live fee dataset — impormasyonal lamang, hindi financial, tax o legal na payo.",
 
+      // ── Affiliate engine & trust micro-badges (Phase 3) ──
+      claimRateVia: "I-claim ang rate na ito via",
+      zeroHiddenMarkup: "Zero Hidden Markup",
+      regulatedSettlement: "Regulated Inward Settlement",
+      directPayout: "Direct Payout",
+      avoidWirePenalty: "Iwasan ang traditional wire penalty",
+      affiliateDisclaimer:
+        "Independent audit. Maaari kaming kumita ng referral commission nang walang dagdag na gastos sa iyo.",
+
       legalLine:
         "Lahat ng brand name at trademark ay pag-aari ng kani-kanilang may-ari. Ginagamit lamang para sa cost comparison sa ilalim ng Nominative Fair Use. Ang PayoutDelta ay isang independiyenteng audit tool.",
     },
@@ -1167,6 +1203,15 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "Bajo el régimen de control cambiario del destino, {note}",
       aeoNote:
         "Estimaciones programáticas del dataset de tarifas en vivo — solo informativo, no es consejo financiero, fiscal ni legal.",
+
+      // ── Affiliate engine & trust micro-badges (Phase 3) ──
+      claimRateVia: "Reclama esta tarifa vía",
+      zeroHiddenMarkup: "Cero margen oculto",
+      regulatedSettlement: "Liquidación interna regulada",
+      directPayout: "Pago directo",
+      avoidWirePenalty: "Evita la penalización de transferencia tradicional",
+      affiliateDisclaimer:
+        "Auditoría independiente. Podemos ganar una comisión de referencia sin coste adicional para ti.",
 
       legalLine:
         "Todas las marcas y nombres comerciales pertenecen a sus respectivos dueños. Se usan estrictamente para comparación de costes bajo uso justo nominativo. PayoutDelta es una herramienta de auditoría independiente.",
@@ -1389,6 +1434,15 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       aeoNote:
         "Estimativas programáticas do dataset de tarifas ao vivo — apenas informativo, não é aconselhamento financeiro, fiscal ou jurídico.",
 
+      // ── Affiliate engine & trust micro-badges (Phase 3) ──
+      claimRateVia: "Reivindique esta taxa via",
+      zeroHiddenMarkup: "Zero markup oculto",
+      regulatedSettlement: "Liquidação interna regulada",
+      directPayout: "Pagamento direto",
+      avoidWirePenalty: "Evite a penalidade da transferência tradicional",
+      affiliateDisclaimer:
+        "Auditoria independente. Podemos ganhar comissão de indicação sem custo adicional para você.",
+
       legalLine:
         "Todas as marcas e nomes comerciais pertencem aos seus respectivos donos. Usados estritamente para comparação de custos sob uso justo nominativo. PayoutDelta é uma ferramenta de auditoria independente.",
     },
@@ -1609,6 +1663,15 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "بموجب نظام الرقابة على الصرف في الوجهة، {note}",
       aeoNote:
         "تقديرات برمجية من بيانات الرسوم المباشرة — معلومات فقط، وليست نصيحة مالية أو ضريبية أو قانونية.",
+
+      // ── Affiliate engine & trust micro-badges (Phase 3) ──
+      claimRateVia: "طالب هذا السعر عبر",
+      zeroHiddenMarkup: "صفر زيادة سعرية خفية",
+      regulatedSettlement: "تسوية داخلية منظّمة",
+      directPayout: "دفع مباشر",
+      avoidWirePenalty: "تجنّب غرامة الحوالة التقليدية",
+      affiliateDisclaimer:
+        "تدقيق مستقل. قد نربح عمولة إحالة دون أي تكلفة إضافية عليك.",
 
       legalLine:
         "جميع الأسماء والعلامات التجارية ملك لأصحابها. تستخدم حصريًا للمقارنة تحت مبدأ الاستخدام العادل الاسمي. PayoutDelta أداة تدقيق مستقلة.",
