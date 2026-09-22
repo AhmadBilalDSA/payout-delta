@@ -29,6 +29,24 @@ Phase 2 contract
 4. Emit a diff report + `PR`/`change` into the artifact bucket so the static
    site and the rate-alert job both rebuild from one source of truth.
 
+Anti-detection & stealth (provider pages resist headless browsers)
+------------------------------------------------------------------
+- Drive pages with `playwright-stealth` (chromium only): its `stealth_async`
+  patch neutralizes `navigator.webdriver`, automation markers and the typical
+  fingerprint tells so providers serve their regular (not bot-gated) page
+  variants to the crawler.
+- Pass explicit launch args: `--disable-blink-features=AutomationControlled`,
+  `--no-sandbox`, plus a realistic pooled `viewport`/`locale`/timezone rotated
+  per domain; keep a per-domain request throttle so the crawler stays far
+  below provider rate limits and never trips WAF blocks.
+
+Non-destructive overwrite guards
+--------------------------------
+- The ETL NEVER truncates in place. Scrape into a staging snapshot on disk,
+  run `validate()` against it, and only then atomically `os.replace()` over
+  `data/fees.json`. A mid-crawl crash therefore leaves the last good revision
+  in place and the static site can always rebuild from it.
+
 Run (Phase 2 wiring)
 --------------------
     pip install playwright  && playwright install chromium

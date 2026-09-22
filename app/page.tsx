@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
 import CorridorCard from "@/components/CorridorCard";
+import Hero from "@/components/Hero";
 
 export default function Home() {
   const corridors = getCorridors();
@@ -8,27 +9,8 @@ export default function Home() {
   const channels = getChannels();
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      <section className="text-center">
-        <p className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-          Free · No signup · Static (nothing sent to a server)
-        </p>
-        <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-          See exactly what a freelance payout actually costs you
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-          PayoutDelta decomposes every withdrawal into the three leaks that
-          eat your earnings — platform commission, channel fixed fees and FX
-          spread — across 10 currency corridors on Upwork, Fiverr and direct
-          invoices.
-        </p>
-        <a
-          href="#corridors"
-          className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
-        >
-          Pick your corridor
-        </a>
-      </section>
+    <div className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
+      <Hero />
 
       <section
         id="corridors"

@@ -27,18 +27,33 @@ import VerdictCard from "@/components/VerdictCard";
  * ---------------------------------------------------------------------------
  * PHASE 2 — COMMENTED SAAS HOOKS (do NOT implement in Phase 1)
  * ---------------------------------------------------------------------------
- * <button type="button">Export Invoice Justification PDF</button>
- * <button type="button">Set Rate Drop Alert</button>
+ * <button type="button">Download Invoice PDF</button>
+ * <button type="button">Get Rate Drop Alerts</button>
+ * <button type="button">Embed This Calculator</button>
+ * <button type="button">Weekend Inflation Warning</button>
  *
- * 1) EXPORT INVOICE PDF — once self-hosted, inject a button beside the
+ * 1) DOWNLOAD INVOICE PDF — once self-hosted, inject a button beside the
  *    verdict that POSTs {amount, platform, corridor, bestChannel} to the Phase
  *    2 API; server renders a PDF via pdf-lib/(puppeteer) and returns bytes.
  *    Static export forbids request-time render today, hence the stub UI only.
  *
- * 2) RATE DROP ALERTS — hydrate an optional email form when the managed
+ * 2) GET RATE DROP ALERTS — hydrate an optional email form when the managed
  *    backend is available: subscribe → writes row in fact_rate_alerts, and
  *    the cron job (reusing scripts/playwright_scraper.py) emails the user
  *    when `liveRate < (rate * (1 - threshold))`. Phase 1: commented block.
+ *
+ * 3) EMBED THIS CALCULATOR — agencies/invoicing tools should be able to
+ *    drop this auditor into their own pages. The static host already serves
+ *    this route, so Phase 2's embed is a copy-paste <iframe> widget fragment
+ *    (e.g. <iframe src="/calculator/[slug]/embed">) with a branded border-box
+ *    skin; the mPaaS tier then layers attribution/referral tracking on top.
+ *    Phase 1: commented stub.
+ *
+ * 4) WEEKEND INFLATION WARNING — FX desks commonly mark up their spread when
+ *    USD liquidity thins on weekends (markets effectively closed Fri 22:00 UTC
+ *    → Sun 22:00 UTC). Phase 2 will read `Date.prototype.getDay()` plus a
+ *    provider-schedule table and annotate the verdict when a weekend payout is
+ *    imminent ("Weekend spread ~ +X% vs weekday lanes"). Phase 1: stub.
  * ---------------------------------------------------------------------------
  */
 

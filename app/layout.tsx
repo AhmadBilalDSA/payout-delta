@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import AdSlot from "@/components/AdSlot";
 import "./globals.css";
 
@@ -82,10 +82,10 @@ export default function RootLayout({
             __html: JSON.stringify(orgJsonLd).replace(/</g, "\\u003c"),
           }}
         />
+        <Header />
         <AdSlot />
-        <SiteHeader />
         <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <Footer />
       </body>
     </html>
   );
