@@ -188,6 +188,35 @@ LatAm? …"). All numbers are computed at build time from `data/fees.json` with
 the exact same quote engine as the calculator, so the index and your verdicts
 always agree.
 
+### 📜 FX Contract Protection Addendum Generator (Phase H)
+A one-click legal-tech addendum for the Invoice Studio
+([`components/invoice/ContractAddendumModal.tsx`](components/invoice/ContractAddendumModal.tsx)):
+beside "Generate Bank Settlement Letter", a **📜 Generate Contract Addendum**
+button opens a client-only generator pre-filled from the draft (contractor
+name, client name, reference invoice #, settlement currency) that emits three
+fixed statutory-English clauses — **(A)** strict **OUR wire-fee allocation**,
+**(B)** a **3.0% currency devaluation buffer**, and **(C)** statutory purpose &
+**tax-exemption affirmation** — as a formal white executive-typography preview
+plus plain text for pasting into contracts/email. Actions: **📋 Copy Legal
+Addendum Text** (2.5s "✓ Copied to clipboard" toast) and **🖨️ Print / Download
+PDF Addendum** — the `.contract-addendum` print clip pins the sheet to exactly
+one clean 210×297mm page with zero trailing blank pages. Forms persist on-device
+under `payoutdelta:addendum_form`.
+
+### 🔔 Local-First Rate Alert Watchlist (Phase H)
+Mounted in the calculator's Local Bank & Tax Settlement tab below the costing
+waterfall, [`components/RateWatchlistWidget.tsx`](components/RateWatchlistWidget.tsx)
+shows the live mid-market rate (`corridor.rate`) and lets you pin an
+**above/below target** ("alert me when the rate hits X"). Alerts persist
+per-corridor under `payoutdelta:rate_alerts` and are re-checked on every page
+load — when the target is met you get an emerald **"🎯 Target Rate Triggered:
+{current} (Above/Below target {X})"** badge, with an optional **🔔 Enable
+Desktop Rate Alerts** button firing a native browser notification. Everything
+hydrates through `useSyncExternalStore` (localStorage `storage` events +
+external permission store), so thresholds sync across tabs with no
+setState-in-effect cascades. 100% on-device · no polling · no network · no
+telemetry.
+
 ### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
 The repo ships a free-tier **OpenSEO worker**
 ([`scripts/openseo_worker.js`](scripts/openseo_worker.js)) that tracks the top
@@ -306,7 +335,8 @@ npm run lint      # ESLint
 - **Zero telemetry, zero tracking, zero data retention** — every input stays
   on-device. The only "storage" is your browser's own `localStorage`
   (draft invoice, language preference, bank-sync, PRC letter shells, annual
-  tax ledger) plus the WhatsApp advisory card's per-session `sessionStorage`
+  tax ledger, contract-addendum shells and per-corridor rate-alert watchlist)
+  plus the WhatsApp advisory card's per-session `sessionStorage`
   dismiss marker — the lead deep-link itself is composed in-memory from the
   on-screen numbers and never transmitted out of the page.
 - **Versioned fee dataset** — `data/fees.json` is the single source of truth;
@@ -336,6 +366,8 @@ npm run lint      # ESLint
 | `app/leaderboard/` + `components/LeaderboardShareCard.tsx` | Phase G — global cross-border banking leakage index (50-corridor ranked table + shareable benchmark card) |
 | `scripts/openseo_worker.js` | Phase F — Cloudflare OpenSEO rank monitor (top 20 queries → SERP sweep → JSON) |
 | `public/seo_rankings.json` | Phase F — committed OpenSEO rankings mirror (transparency stats + footer badge target) |
+| `components/invoice/ContractAddendumModal.tsx` | Phase H — FX Contract Protection Addendum generator (Clauses A/B/C, copy + single-page PDF print) |
+| `components/RateWatchlistWidget.tsx` | Phase H — local-first rate-alert watchlist (above/below target, desktop notifications) |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -366,6 +398,7 @@ npm run lint      # ESLint
 | Phase D | SWIFT intermediary leakage & BIC route inspector — correspondent routing, SHA cut band, rail efficiency score, double-dip risk, 1-click wire instructions + searchable `/swift-auditor` terminal | Shipped |
 | Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (`ab8f7bf`) |
 | Phase F | High-variance WhatsApp consulting funnel — thresholds (spread ≥ $150 or ≥ 5% of gross), context-specific `wa.me` deep-link, per-session dismiss, env-configured line + Cloudflare OpenSEO rank monitor (top 20 programmatic queries, SERP sweep, static rankings mirror) with footer transparency badge | Shipped (this commit) |
+| Phase H | FX Contract Protection Addendum Generator — "📜 Generate Contract Addendum" in the Invoice Studio, fixed statutory-English Clauses A/B/C (OUR wire-fee allocation, 3.0% devaluation buffer, tax-exemption affirmation), white executive preview + plain-text copy, single-page `.contract-addendum` PDF print · Local-First Rate Alert Watchlist — above/below target pins per corridor in `payoutdelta:rate_alerts`, emerald "🎯 Target Rate Triggered" badge + optional native desktop notification, `useSyncExternalStore` hydration (no setState-in-effect) | Shipped (this commit) |
 
 ---
 

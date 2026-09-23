@@ -183,6 +183,37 @@ document text is statutory-legal English and hardcoded (i18n dictionaries
   the printed invoice as a **Settlement Schedule** block when
   `includeSettlementSchedule` is on (gross → net USD → converted → take-home
   rows + status pill). Line items gained ↑/↓ reordering in the studio.
+- **Phase H — FX Contract Protection Addendum Generator**
+  (`components/invoice/ContractAddendumModal.tsx`) — a legal-tech companion to
+  the PRC letter: a "📜 Generate Contract Addendum" button sitting beside
+  "Generate Bank Settlement Letter" in the studio's Banking & Clearing panel
+  opens a client-only generator pre-filled from the draft (contractor name,
+  client name, reference invoice #, settlement currency). Three fixed statutory
+  English clauses — (A) strict OUR wire-fee allocation, (B) 3.0% currency
+  devaluation buffer, (C) statutory purpose & tax-exemption affirmation — render
+  as a live formal executive-typography preview on white (`#FFFFFF`, in
+  contrast to the obsidian surfaces) plus a plain-text copy for pasting into
+  contracts/email. Actions: "📋 Copy Legal Addendum Text" (clipboard + 2.5s
+  "✓ Copied to clipboard" toast), "🖨️ Print / Download PDF Addendum" via
+  `window.print()` (the `.contract-addendum` `@media print` rule hard-clips the
+  print-only copy to a fixed 210×297mm box with `overflow: hidden`, mirroring
+  `.prc-letter`, so one clean A4 sheet and zero trailing blank pages), and
+  Escape/backdrop dismiss. Field shells persist under `payoutdelta:addendum_form`.
+- **Phase H — Local-First Rate Alert Watchlist**
+  (`components/RateWatchlistWidget.tsx`) — a "alert me when the rate hits X"
+  widget mounted in the calculator's Tab 2 (Local Bank & Tax Settlement)
+  directly below the costing waterfall. For the active corridor it shows the
+  current mid-market rate (`corridor.rate`), lets the contractor pin a target
+  above/below threshold, and persists alerts on-device under
+  `payoutdelta:rate_alerts`. On every page load it re-checks the threshold and,
+  when met, renders an emerald "🎯 Target Rate Triggered: {current} (Above/Below
+  target {X})" badge; an explicit "🔔 Enable Desktop Rate Alerts" button asks the
+  browser for native `Notification` permission and a fire-and-forget desktop
+  notification accompanies the badge. Both the alert map and the notification
+  permission hydrate through `useSyncExternalStore` (localStorage `storage`
+  events + an external permission store), so thresholds stay in sync across
+  tabs with zero `setState`-in-effect cascades. 100% client-side: no polling
+  loop, no network, no telemetry — the static-export budget stays intact.
 
 ### 2.5 Statutory & banking database (`data/regulatoryBanking.ts`)
 
@@ -366,6 +397,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 | 9 | **UI Refresh — Color Palette Modernization, Full-Width Verdict CTA & Zero-Runtime SVG Trendline Engine** — light slate canvas + obsidian dark deck tokens in `globals.css` (`:root` / `[data-theme="dark"]`, `@custom-variant dark`), unified translucent card backdrops across VerdictCard / Calculator rails / FeeBreakdownList / TransactionCostingWidget / TaxImpactCard / ComplianceGuide / FaqAccordion / InvoiceEditor / CorridorCard / SliderControls, rebalanced `Header` (emerald live-badge, ghost nav, API Access pill·CorridorSwitcher), `VerdictCard` redesigned around a full-width gradient partner CTA (provider badge pill + external-link arrow) with the `AuditExportMenu` superseded by a wrap-friendly RTL-safe `ShareUtilityTray` (Reddit / X · LinkedIn / Copy Link), trust markers, wire-penalty callout & affiliate disclosure preserved, and a new deterministic `CurrencyTrendSparkline` (slug-seeded FNV-1a → mulberry32, 30-day mean-reverting smooth-Bézier SVG with low/high/volatility readout) mounted on every English + localized corridor page | **Shipped** (`3ef8c73`) |
 | 10 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 | 11 | **Configurable Monetization Engine, High-Ticket WhatsApp Funnel & Global Leakage Index** — monetizationConfig repo (consulting line + thresholds + canonical affiliate links + wa.me builder), `WhatsAppConsultingCard` high-ticket advisory funnel (≥$120 leakage or ≥$2,500 gross), dynamic "Save $X via {partner} →" verdict CTA + trust subtext, Remitly partner rail, `app/leaderboard/` 50-corridor leakage index (metric banner + ranked table + one-click shareable benchmark), header nav link + sitemap + `auditLeaderboard` checks | **Shipped** (this commit) |
+| 12 | **FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist** — legal-tech: "📜 Generate Contract Addendum" in the studio (Clauses A/B/C fixed statutory English, white executive preview + plain-text copy, single-page `.contract-addendum` PDF print); "alert me when the rate hits X" watchlist in the calculator settlement tab (mid-market base rate, above/below threshold pill, `payoutdelta:rate_alerts` localStorage, emerald triggered badge, optional native desktop notification via `useSyncExternalStore` hydration, zero setState-in-effect) | **Shipped** (this commit) |
 
 ---
 
@@ -586,3 +618,4 @@ ranked rows, basePath assets/links) complete the route.
 - `ab8f7bf` — **Phase E**: Multi-Milestone Invoicing & Year-End Tax Season Remittance Ledger (`lib/ledgerEngine.ts` record engine + annual summary + RFC 4180 CSV, `components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/` KPI/filter/CSV/print dashboard, Invoice Studio Settlement & Realization panel + "Save Invoice to Tax Ledger" + line-item reordering, InvoicePreview Settlement Schedule print block, `globals.css` `.tax-ledger-print-area` print rules, header nav + `taxLedger` key ×7 catalogs, sitemap entry, `auditTaxLedger`, docs).
 - `3ef8c73` — **Phase F**: High-Variance WhatsApp Consulting Funnel & Cloudflare OpenSEO Rank Monitor (`data/config.ts` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` line, `components/leads/WhatsAppLeadCta.tsx` threshold-gated VIP advisory card with `wa.me` deep-link + session dismiss, `Calculator.tsx` `whatsappLead` mode-aware memo + audit-rail mount, `scripts/openseo_worker.js` top-20 SERP rank worker, `public/seo_rankings.json` mirror, footer "Ranked #1 Real-Time Settlement Engine" badge, Phase F `auditOpenSeo` corridor checks, docs).
 - *this commit* — **Phase G**: Configurable Monetization Repository, High-Ticket WhatsApp Funnel & Global Leakage Index (`data/monetizationConfig.ts` consulting line `consultingWhatsAppNumber` default `923041943795` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` override, `consultingThresholdUsd` 120 / `consultingGrossThresholdUsd` 2500, canonical `affiliateLinks` Wise/Payoneer/Remitly, `generateWhatsAppLeadUrl` builder; `components/leads/WhatsAppConsultingCard.tsx` session-dismissable high-ticket advisory card mounted under the verdict card; `VerdictCard` "Save $X via {partner} →" dynamic CTA + "Official partner rate · Regulated local clearing · Zero hidden spreads" subtext; `data/affiliatePartners.ts` consolidated onto `affiliateLinks` + Remitly partner rail; `app/leaderboard/` 50-corridor "Global Cross-Border Banking Leakage Index (2026)" + `LeaderboardShareCard` shareable benchmark, header nav link, sitemap entry, Phase G `auditLeaderboard` corridor checks; `WhatsAppLeadCta.tsx` superseded and removed, docs).
+- *this commit* — **Phase H**: FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist (`components/invoice/ContractAddendumModal.tsx` + `components/RateWatchlistWidget.tsx`: "📜 Generate Contract Addendum" studio button beside "Generate Bank Settlement Letter", Clauses A/B/C fixed statutory English, live white-card executive preview, "📋 Copy Legal Addendum Text" + 2.5s toast, "🖨️ Print / Download PDF" via single-page `.contract-addendum` `@media print` hard-clip in `globals.css`, prefill from draft identity/meta, `payoutdelta:addendum_form` persistence; calculator Tab 2 `RateWatchlistWidget` under the costing waterfall — mid-market `corridor.rate`, above/below target pills, `payoutdelta:rate_alerts` localStorage keyed by corridor slug, emerald "🎯 Target Rate Triggered" badge, "🔔 Enable Desktop Rate Alerts" native notification, rendered via `useSyncExternalStore` with `storage`-event + external-permission stores (no setState-in-effect), docs).

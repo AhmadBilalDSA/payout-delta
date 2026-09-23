@@ -376,6 +376,38 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+ * FX Contract Protection Addendum — single-page legal sheet
+ * (.contract-addendum). Mirrors the .prc-letter hard clip above: the print-only
+ * copy mounted by ContractAddendumModal is pinned to a fixed 210×297mm box
+ * with `overflow: hidden`, so `window.print()` yields exactly one crisp white
+ * A4 sheet and zero trailing blank pages (the dialog's .no-print chrome and
+ * the underlying app stay hidden by the isolation rules above).
+ * ------------------------------------------------------------------------- */
+@media print {
+  .contract-addendum {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 14mm 16mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * Hotfix — blank-page guard for every printable sheet (.print-sheet surfaces:
  * the invoice document, calculator audit receipt and PRC letter). Two failure
  * modes are closed here (last in cascade, matches/extends the isolation block

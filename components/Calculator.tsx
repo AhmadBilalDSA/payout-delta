@@ -29,6 +29,7 @@ import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
 import TaxImpactCard from "@/components/TaxImpactCard";
 import TransactionCostingWidget from "@/components/TransactionCostingWidget";
+import RateWatchlistWidget from "@/components/RateWatchlistWidget";
 import AuditReceipt from "@/components/AuditReceipt";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
 import SwiftRouteInspector from "@/components/compliance/SwiftRouteInspector";
@@ -544,6 +545,12 @@ export default function Calculator({
                 tierRate={taxSnapshot.tierRate}
               />
             )}
+
+            {/* Legal-tech — local-first rate threshold watchlist, mounted
+                directly below the costing widget. Thresholds & pinned rates
+                persist per corridor in localStorage; the emerald trigger badge
+                + optional desktop notification are 100% on-device. */}
+            <RateWatchlistWidget corridor={corridor} />
           </>
         )}
 

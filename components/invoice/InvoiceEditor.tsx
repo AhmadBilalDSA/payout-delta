@@ -35,6 +35,7 @@ import { formatUSD } from "@/utils/format";
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
+import ContractAddendumModal from "@/components/invoice/ContractAddendumModal";
 import { SwiftRouteInspectorModal } from "@/components/compliance/SwiftRouteInspector";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -66,6 +67,8 @@ export default function InvoiceEditor({
   const appliedSyncRef = useRef(false);
   // Phase C — 1-click bank PRC/FIRC letter generator overlay for the studio.
   const [prcOpen, setPrcOpen] = useState(false);
+  // Phase H — FX Contract Protection Addendum generator overlay.
+  const [addendumOpen, setAddendumOpen] = useState(false);
   // Phase D — SWIFT route inspector overlay for the Banking & Clearing panel.
   const [routeOpen, setRouteOpen] = useState(false);
   // Phase E — "Saved to Tax Ledger" transient confirmation toast.
@@ -93,6 +96,24 @@ export default function InvoiceEditor({
       grossUsd: gross,
     };
   }, [draft]);
+
+  // Phase H — prefill the FX Contract Protection Addendum from the draft's
+  // identity, invoice number and settlement currency.
+  const addendumPrefill = useMemo(
+    () => ({
+      contractorName: draft.identity.freelancerName,
+      clientName: draft.identity.clientCompany || draft.identity.clientName,
+      invoiceNumber: draft.meta.number,
+      currency: draft.meta.currency,
+    }),
+    [
+      draft.identity.freelancerName,
+      draft.identity.clientCompany,
+      draft.identity.clientName,
+      draft.meta.number,
+      draft.meta.currency,
+    ]
+  );
 
   // Debounced auto-save on every change; the "Saved locally" badge refreshes.
   // `loadInvoiceDraft()` is safe to call during prerender (returns a pristine
@@ -617,6 +638,13 @@ export default function InvoiceEditor({
               >
                 Inspect SWIFT Route
               </button>
+              <button
+                type="button"
+                onClick={() => setAddendumOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
+              >
+                📜 Generate Contract Addendum
+              </button>
             </div>
           </div>
         </Section>
@@ -1066,6 +1094,16 @@ export default function InvoiceEditor({
           currency={draft.meta.currency}
           recipientName={draft.identity.freelancerName}
           account={draft.banking.beneficiaryAccount}
+        />
+      )}
+
+      {/* Phase H — FX Contract Protection Addendum generator overlay
+          (client-only), prefilled from the draft's contractor / client / invoice. */}
+      {addendumOpen && (
+        <ContractAddendumModal
+          open={addendumOpen}
+          onClose={() => setAddendumOpen(false)}
+          prefill={addendumPrefill}
         />
       )}
 
