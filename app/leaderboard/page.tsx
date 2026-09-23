@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Corridor, WithdrawalChannel } from "@/lib/types";
 
 import LeaderboardShareCard from "@/components/LeaderboardShareCard";
 import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
+import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { quoteAllChannels } from "@/utils/calculateRoute";
 
 const SITE_URL = "https://payoutdelta.com";
@@ -64,24 +66,80 @@ interface LeaderboardRow {
   slug: string;
   country: string;
   currency: string;
-  /** USD leakage at $1,000 gross vs the cheapest digital rail. */
+  /** Total traditional bank-wire leakage in USD at the $1,000 benchmark. */
   penaltyUsd: number;
   /** Name of the cheapest digital rail on the corridor. */
   bestRail: string;
-  /** penaltyUsd as a percentage of the $1,000 base. */
+  /** Net USD savings vs the modern rail, as a percentage of the $1,000 base. */
   savingsPct: number;
 }
 
 const BENCHMARK_GROSS_USD = 1000;
+const DEFAULT_DIRECT_WIRE_FEE_USD = 18;
+const DEFAULT_DIRECT_WIRE_SPREAD = 0.035;
+const DEFAULT_INTERMEDIARY_CUT_USD = 18;
+
+interface BestRail {
+  channelId: string;
+  channelName: string;
+  fixedFeeUSD: number;
+  fxSpread: number;
+}
+
+/**
+ * Corridor-authoritative direct-wire fee model. Corridors authored in
+ * `data/fees.json` carry per-market "Direct Wire" provider records; every
+ * other corridor falls back to the standard $18 wire + 3.5% FX markup.
+ */
+function getDirectWireOverride(corridor: Corridor): {
+  fixedFeeUSD: number;
+  fxSpread: number;
+} {
+  const directWire = corridor.providers?.find(
+    (provider) => provider.id === "swift"
+  );
+  return {
+    fixedFeeUSD: directWire?.fixedFeeUSD ?? DEFAULT_DIRECT_WIRE_FEE_USD,
+    fxSpread: directWire?.fxSpread ?? DEFAULT_DIRECT_WIRE_SPREAD,
+  };
+}
+
+/**
+ * Resolves the cheapest digital rail's actual fee model for a corridor —
+ * preferring the corridor-authoritative provider record, then the global
+ * channel card, so the benchmark claim always matches what the calculator
+ * would quote on that market.
+ */
+function findWinningProvider(
+  winnerChannelId: string,
+  corridor: Corridor,
+  channels: WithdrawalChannel[]
+): BestRail {
+  const corridorProvider = corridor.providers?.find(
+    (provider) => provider.id === winnerChannelId
+  );
+  const globalChannel = channels.find(
+    (channel) => channel.id === winnerChannelId
+  );
+  return {
+    channelId: winnerChannelId,
+    channelName: globalChannel?.name ?? winnerChannelId,
+    fixedFeeUSD:
+      corridorProvider?.fixedFeeUSD ?? globalChannel?.fixedFeeUSD ?? 0,
+    fxSpread: corridorProvider?.fxSpread ?? globalChannel?.fxSpread ?? 0,
+  };
+}
 
 /**
  * Builds the ranked leakage index at build time.
  *
- * Every corridor is quoted at a $1,000 gross direct invoice (0% platform
- * cut — the pure banking-layer comparison). "Typical Bank Wire Penalty" is
- * the USD-equivalent of the local-currency shortfall between the traditional
- * SWIFT wire and the best digital rail, recomputed through the winner's
- * effective rate so the index and the calculator verdicts agree exactly.
+ * Every corridor is benchmarked at a $1,000 gross payment with a 0% platform
+ * cut — the pure banking-layer comparison. The traditional bank-wire penalty
+ * stacks the corridor's direct-wire fee, the default receiving bank's
+ * intermediary SWIFT cut (from the statutory bank database), and the hidden
+ * FX markup; net savings compare that total against the cheapest rail's fee
+ * and spread on the same corridor. Corridors rank descending by wire
+ * leakage, so each market shows its own authentic numbers.
  */
 function buildLeaderboard(): LeaderboardRow[] {
   const channels = getChannels();
@@ -96,23 +154,33 @@ function buildLeaderboard(): LeaderboardRow[] {
         corridor,
         channels
       );
-      const best = quotes[0];
-      const swiftQuote = quotes.find((quote) => quote.channelId === "swift");
-      if (!best || !swiftQuote) {
+      const winner = quotes[0];
+      if (!winner) {
         return null;
       }
-      const penaltyUsd =
-        best.effectiveRate > 0 &&
-        best.localAmount > swiftQuote.localAmount
-          ? (best.localAmount - swiftQuote.localAmount) / best.effectiveRate
-          : 0;
+
+      const directWire = getDirectWireOverride(corridor);
+      const regulation = getRegulatoryBanking(corridor.slug);
+      const wireIntermediary =
+        regulation.defaultIntermediaryCut ?? DEFAULT_INTERMEDIARY_CUT_USD;
+      const wireTotalPenaltyUsd =
+        directWire.fixedFeeUSD +
+        wireIntermediary +
+        BENCHMARK_GROSS_USD * directWire.fxSpread;
+
+      const best = findWinningProvider(winner.channelId, corridor, channels);
+      const bestTotalCostUsd =
+        best.fixedFeeUSD + BENCHMARK_GROSS_USD * best.fxSpread;
+      const netSavingsUsd = Math.max(0, wireTotalPenaltyUsd - bestTotalCostUsd);
+      const savingsPct = (netSavingsUsd / BENCHMARK_GROSS_USD) * 100;
+
       return {
         slug: corridor.slug,
         country: corridor.country,
         currency: corridor.to,
-        penaltyUsd,
+        penaltyUsd: wireTotalPenaltyUsd,
         bestRail: best.channelName,
-        savingsPct: (penaltyUsd / BENCHMARK_GROSS_USD) * 100,
+        savingsPct,
       };
     })
     .filter((row): row is LeaderboardRow => row !== null);
@@ -264,13 +332,14 @@ export default function LeaderboardPage() {
             How the index is computed
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-white/60">
-            Each corridor is quoted at a $1,000 gross direct invoice with a 0%
-            platform cut — isolating the pure banking layer. The “bank wire
-            penalty” is the USD-equivalent shortfall between a traditional SWIFT
-            wire (flat $45 fee + 3.5% FX markup) and the cheapest digital rail
-            on that corridor, recomputed through the winner&apos;s effective
-            rate, so the index numbers match the live calculator verdicts
-            exactly.
+            Each corridor is benchmarked at a $1,000 gross payment with a 0%
+            platform cut — isolating the pure banking layer. The bank-wire
+            penalty stacks the corridor&apos;s own direct-wire fee, the default
+            receiving bank&apos;s intermediary SWIFT cut (from the statutory bank
+            database), and the hidden FX markup. Net savings compare that total
+            against the cheapest digital rail&apos;s fee and spread on the same
+            corridor, so Singapore, Sweden, Brazil, Pakistan and Mexico each
+            land on their own authentic benchmark.
           </p>
           <p className="mt-3 text-xs leading-relaxed text-white/40">
             Figures are indicative public benchmarks compiled from merchant and

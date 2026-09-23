@@ -76,6 +76,14 @@ export interface CorridorRegulation {
   tiers: StatutoryTier[];
   /** True for the generic fallback entries. */
   generic: boolean;
+  /**
+   * Default receiving-bank intermediary SWIFT cut in USD for the leakage
+   * benchmarks (Phase G — drives the Global Cross-Border Banking Leakage
+   * Index). Authored corridors mirror the primary listed bank's
+   * `intermediaryUSD`; fallback wires use the generic bank cut so every
+   * corridor resolves an authentic, distinct figure.
+   */
+  defaultIntermediaryCut?: number;
 }
 
 /* ---------------------------------------------------------------------------
@@ -3503,7 +3511,11 @@ const AUTHORED: Record<string, CorridorRegulation> = {
 export function getRegulatoryBanking(slug: string): CorridorRegulation {
   const authored = AUTHORED[slug];
   if (authored) {
-    return authored;
+    return {
+      ...authored,
+      defaultIntermediaryCut:
+        authored.banks[0]?.intermediaryUSD ?? FALLBACK_SWIFT_BAND.min,
+    };
   }
   const network = FALLBACK_NETWORKS[slug] ?? "Local ACH";
   const fallback = GENERIC_BY_SLUG[slug] ?? {
@@ -3511,6 +3523,11 @@ export function getRegulatoryBanking(slug: string): CorridorRegulation {
     currency: slug.split("-").pop()?.toUpperCase() ?? "LOCAL",
     clearance: "1–2 business days",
   };
+  const genericBanks = genericBank(
+    fallback.label,
+    fallback.currency,
+    fallback.clearance
+  );
   return {
     slug,
     authority: "International remittance governed by the destination country's exchange-control & income-tax regime",
@@ -3519,8 +3536,10 @@ export function getRegulatoryBanking(slug: string): CorridorRegulation {
       `National Inward Clearing Settlement · ${network}`,
       "Benchmark intermediary SWIFT deduction $15–$25",
     ],
-    banks: genericBank(fallback.label, fallback.currency, fallback.clearance),
+    banks: genericBanks,
     tiers: fallbackTiers(network),
     generic: true,
+    defaultIntermediaryCut:
+      genericBanks[0]?.intermediaryUSD ?? FALLBACK_SWIFT_BAND.min,
   };
 }
