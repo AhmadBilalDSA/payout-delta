@@ -217,6 +217,23 @@ external permission store), so thresholds sync across tabs with no
 setState-in-effect cascades. 100% on-device · no polling · no network · no
 telemetry.
 
+### 🛡️ Enterprise Fault Isolation & Defensive Mathematical Guards (Phase S1)
+A systems-reliability layer over every interactive surface.
+[`lib/safeMath.ts`](lib/safeMath.ts) centralizes fault-tolerant arithmetic —
+**`safeDivide`** clamps a zero / sub-epsilon denominator to `Number.EPSILON`
+and returns a `fallback` for null / NaN / Infinity operands, alongside
+**`safeMultiply`**, **`clampNumber`** and **`sanitizeFinancialInput`** (strips
+commas & currency symbols). [`lib/calculatorEngine.ts`](lib/calculatorEngine.ts)
+runs every division through the guards and bails to a safe zero stack the
+instant `targetNetLocal ≤ 0` or `baseRate ≤ 0`; [`utils/inverseMath.ts`](utils/inverseMath.ts)
+does the same for platform-cut and cost-percentage math. And
+[`components/ErrorBoundary.tsx`](components/ErrorBoundary.tsx) — a native React
+class boundary — wraps the calculator on every corridor page (English +
+localized), the Invoice Studio and the leaderboard index table, so a render
+crash anywhere confines to an obsidian **"Component Fault Guard"** fallback
+card with a one-click **↻ Reset Module to Defaults** re-mount instead of
+blanking the route. Zero external packages, still fully static.
+
 ### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
 The repo ships a free-tier **OpenSEO worker**
 ([`scripts/openseo_worker.js`](scripts/openseo_worker.js)) that tracks the top
@@ -368,6 +385,8 @@ npm run lint      # ESLint
 | `public/seo_rankings.json` | Phase F — committed OpenSEO rankings mirror (transparency stats + footer badge target) |
 | `components/invoice/ContractAddendumModal.tsx` | Phase H — FX Contract Protection Addendum generator (Clauses A/B/C, copy + single-page PDF print) |
 | `components/RateWatchlistWidget.tsx` | Phase H — local-first rate-alert watchlist (above/below target, desktop notifications) |
+| `lib/safeMath.ts` | Phase S1 — fault-tolerant math primitives (`safeDivide` / `safeMultiply` / `clampNumber` / `sanitizeFinancialInput`) |
+| `components/ErrorBoundary.tsx` | Phase S1 — institutional React class fault guard (obsidian fallback card + reset) |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -399,6 +418,7 @@ npm run lint      # ESLint
 | Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (`ab8f7bf`) |
 | Phase F | High-variance WhatsApp consulting funnel — thresholds (spread ≥ $150 or ≥ 5% of gross), context-specific `wa.me` deep-link, per-session dismiss, env-configured line + Cloudflare OpenSEO rank monitor (top 20 programmatic queries, SERP sweep, static rankings mirror) with footer transparency badge | Shipped (this commit) |
 | Phase H | FX Contract Protection Addendum Generator — "📜 Generate Contract Addendum" in the Invoice Studio, fixed statutory-English Clauses A/B/C (OUR wire-fee allocation, 3.0% devaluation buffer, tax-exemption affirmation), white executive preview + plain-text copy, single-page `.contract-addendum` PDF print · Local-First Rate Alert Watchlist — above/below target pins per corridor in `payoutdelta:rate_alerts`, emerald "🎯 Target Rate Triggered" badge + optional native desktop notification, `useSyncExternalStore` hydration (no setState-in-effect) | Shipped (this commit) |
+| Phase S1 | Enterprise fault isolation & defensive mathematical guards — `lib/safeMath.ts` guarded arithmetic (`safeDivide` epsilon-clamp + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in the calculator gross-up + inverse solver wrapped, early zero-stack bail on degenerate target/rate, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) around the calculator (English + localized pages), Invoice Studio and leaderboard index | Shipped (this commit) |
 
 ---
 

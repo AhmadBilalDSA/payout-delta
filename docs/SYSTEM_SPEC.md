@@ -214,6 +214,25 @@ document text is statutory-legal English and hardcoded (i18n dictionaries
   events + an external permission store), so thresholds stay in sync across
   tabs with zero `setState`-in-effect cascades. 100% client-side: no polling
   loop, no network, no telemetry — the static-export budget stays intact.
+- **Phase S1 — Enterprise Fault Isolation & Defensive Mathematical Guards**
+  (`components/ErrorBoundary.tsx` + `lib/safeMath.ts`) — a systems-reliability
+  layer on top of the interactive surfaces. `lib/safeMath.ts` centralizes
+  fault-tolerant arithmetic (`safeDivide`, which clamps a zero / sub-epsilon
+  denominator to `Number.EPSILON` and returns a `fallback` for null / NaN /
+  non-finite operands; `safeMultiply`; `clampNumber`; `sanitizeFinancialInput`
+  which strips commas / symbols from user input). `lib/calculatorEngine.ts`
+  routes every division through `safeDivide` and bails to a safe zero stack the
+  instant `targetNetLocal <= 0` or `baseRate <= 0`; `utils/inverseMath.ts` runs
+  its platform-cut and cost-percentage divisions through the same guards and
+  clamps the target through `clampNumber`. Every interactive module on the
+  primary routes is wrapped in `components/ErrorBoundary.tsx` — a native React
+  class boundary (`getDerivedStateFromError` + `componentDidCatch`) that
+  renders the obsidian "Component Fault Guard" fallback card (slate-900/90
+  surface, red-500 accent, emerald ↻ Reset Module to Defaults re-mount) and
+  confines a render crash to one module instead of blanking the whole route:
+  `<Calculator>` (English + localized corridor pages, "Payout Calculator
+  Guard"), `<InvoiceEditor>` ("Invoice Studio Guard") and the leaderboard
+  index table ("Leaderboard Guard"). Zero external packages.
 
 ### 2.5 Statutory & banking database (`data/regulatoryBanking.ts`)
 
@@ -398,6 +417,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 | 10 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 | 11 | **Configurable Monetization Engine, High-Ticket WhatsApp Funnel & Global Leakage Index** — monetizationConfig repo (consulting line + thresholds + canonical affiliate links + wa.me builder), `WhatsAppConsultingCard` high-ticket advisory funnel (≥$120 leakage or ≥$2,500 gross), dynamic "Save $X via {partner} →" verdict CTA + trust subtext, Remitly partner rail, `app/leaderboard/` 50-corridor leakage index (metric banner + ranked table + one-click shareable benchmark), header nav link + sitemap + `auditLeaderboard` checks | **Shipped** (this commit) |
 | 12 | **FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist** — legal-tech: "📜 Generate Contract Addendum" in the studio (Clauses A/B/C fixed statutory English, white executive preview + plain-text copy, single-page `.contract-addendum` PDF print); "alert me when the rate hits X" watchlist in the calculator settlement tab (mid-market base rate, above/below threshold pill, `payoutdelta:rate_alerts` localStorage, emerald triggered badge, optional native desktop notification via `useSyncExternalStore` hydration, zero setState-in-effect) | **Shipped** (this commit) |
+| S1 | **Enterprise Fault Isolation & Defensive Mathematical Guards** — centralized `lib/safeMath.ts` primitives (`safeDivide` epsilon-clamps zero/sub-epsilon denominators + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in `lib/calculatorEngine.ts` + `utils/inverseMath.ts` wrapped through the guards with an early zero-stack bail on `targetNetLocal <= 0` / `baseRate <= 0`, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) wired around `<Calculator>` (English + localized corridor pages), `<InvoiceEditor>` and the leaderboard index table | **Shipped** (this commit) |
 
 ---
 
@@ -619,3 +639,4 @@ ranked rows, basePath assets/links) complete the route.
 - `3ef8c73` — **Phase F**: High-Variance WhatsApp Consulting Funnel & Cloudflare OpenSEO Rank Monitor (`data/config.ts` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` line, `components/leads/WhatsAppLeadCta.tsx` threshold-gated VIP advisory card with `wa.me` deep-link + session dismiss, `Calculator.tsx` `whatsappLead` mode-aware memo + audit-rail mount, `scripts/openseo_worker.js` top-20 SERP rank worker, `public/seo_rankings.json` mirror, footer "Ranked #1 Real-Time Settlement Engine" badge, Phase F `auditOpenSeo` corridor checks, docs).
 - *this commit* — **Phase G**: Configurable Monetization Repository, High-Ticket WhatsApp Funnel & Global Leakage Index (`data/monetizationConfig.ts` consulting line `consultingWhatsAppNumber` default `923041943795` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` override, `consultingThresholdUsd` 120 / `consultingGrossThresholdUsd` 2500, canonical `affiliateLinks` Wise/Payoneer/Remitly, `generateWhatsAppLeadUrl` builder; `components/leads/WhatsAppConsultingCard.tsx` session-dismissable high-ticket advisory card mounted under the verdict card; `VerdictCard` "Save $X via {partner} →" dynamic CTA + "Official partner rate · Regulated local clearing · Zero hidden spreads" subtext; `data/affiliatePartners.ts` consolidated onto `affiliateLinks` + Remitly partner rail; `app/leaderboard/` 50-corridor "Global Cross-Border Banking Leakage Index (2026)" + `LeaderboardShareCard` shareable benchmark, header nav link, sitemap entry, Phase G `auditLeaderboard` corridor checks; `WhatsAppLeadCta.tsx` superseded and removed, docs).
 - *this commit* — **Phase H**: FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist (`components/invoice/ContractAddendumModal.tsx` + `components/RateWatchlistWidget.tsx`: "📜 Generate Contract Addendum" studio button beside "Generate Bank Settlement Letter", Clauses A/B/C fixed statutory English, live white-card executive preview, "📋 Copy Legal Addendum Text" + 2.5s toast, "🖨️ Print / Download PDF" via single-page `.contract-addendum` `@media print` hard-clip in `globals.css`, prefill from draft identity/meta, `payoutdelta:addendum_form` persistence; calculator Tab 2 `RateWatchlistWidget` under the costing waterfall — mid-market `corridor.rate`, above/below target pills, `payoutdelta:rate_alerts` localStorage keyed by corridor slug, emerald "🎯 Target Rate Triggered" badge, "🔔 Enable Desktop Rate Alerts" native notification, rendered via `useSyncExternalStore` with `storage`-event + external-permission stores (no setState-in-effect), docs).
+- *this commit* — **Phase S1**: Enterprise Fault Isolation & Defensive Mathematical Guards (`lib/safeMath.ts` centralized primitives — `safeDivide` epsilon-clamps zero / sub-epsilon denominators and finite-guards null/NaN/Infinity operands with a caller `fallback`, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`; `lib/calculatorEngine.ts` routes every division through `safeDivide` + bails to the safe zero stack when `targetNetLocal <= 0` or `baseRate <= 0`, `utils/inverseMath.ts` guards platform-cut / cost-percentage divisions and clamps the target via `clampNumber`; `components/ErrorBoundary.tsx` native React class boundary (`getDerivedStateFromError` + `componentDidCatch`) rendering the obsidian "Component Fault Guard" fallback card with an emerald ↻ Reset Module to Defaults action, wired around `<Calculator>` on English + localized corridor pages ("Payout Calculator Guard"), `<InvoiceEditor>` ("Invoice Studio Guard") and the leaderboard index table ("Leaderboard Guard"), docs).
