@@ -23,6 +23,7 @@ import {
 } from "@/lib/seoSchemas";
 import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
 import Calculator from "@/components/Calculator";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import BlufSummary from "@/components/BlufSummary";
 import FaqAccordion from "@/components/FaqAccordion";
 import AeoFaqSection from "@/components/AeoFaqSection";
@@ -188,29 +189,33 @@ export default async function LocalizedCorridorPage({
 
       {/* Phase 7 — the same anti-collapse 12-column rail shell as the English
           corridor page: interactive inputs / waterfall on the left, the AEO
-          answer box + verdict + audit FAQ pinned on the right. */}
+          answer box + verdict + audit FAQ pinned on the right. Phase S1 — the
+          interactive calculator is wrapped in the institutional error
+          boundary so a render fault is contained to its own fallback card. */}
       <div className="mt-6">
-        <Calculator
-          corridor={corridor}
-          platforms={platforms}
-          channels={channels}
-          history={history}
-          sparklineStats={sparklineStats}
-          bluf={
-            <BlufSummary
-              corridor={corridor}
-              channels={channels}
-              platforms={platforms}
-            />
-          }
-          faq={
-            <AeoFaqSection
-              corridor={corridor}
-              channels={channels}
-              platforms={platforms}
-            />
-          }
-        />
+        <ErrorBoundary fallbackTitle="Payout Calculator Guard">
+          <Calculator
+            corridor={corridor}
+            platforms={platforms}
+            channels={channels}
+            history={history}
+            sparklineStats={sparklineStats}
+            bluf={
+              <BlufSummary
+                corridor={corridor}
+                channels={channels}
+                platforms={platforms}
+              />
+            }
+            faq={
+              <AeoFaqSection
+                corridor={corridor}
+                channels={channels}
+                platforms={platforms}
+              />
+            }
+          />
+        </ErrorBoundary>
       </div>
 
       <div className="mt-10 space-y-8">

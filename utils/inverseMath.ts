@@ -1,3 +1,4 @@
+import { clampNumber, safeDivide, safeMultiply } from '@/lib/safeMath';
 import type {
   Corridor,
   InvertedQuote,
@@ -127,7 +128,7 @@ export function invertChannelQuote(
 
   // Re-derive the full breakdown from the (clamped) billable gross so every
   // figure the UI shows is internally consistent with what gets invoiced.
-  const platformFeeUSD = safeNumber((grossRequired * feePercent) / 100);
+  const platformFeeUSD = safeDivide(grossRequired * feePercent, 100);
   const netAfterPlatform = safeNumber(grossRequired - platformFeeUSD);
   const bankAndWireCutUSD = safeNumber(solved.bankAndWireCutUsd);
   const usdConvertedFinal = Math.max(0, netAfterPlatform - bankAndWireCutUSD);
@@ -135,8 +136,10 @@ export function invertChannelQuote(
   const totalCostUSD = safeNumber(
     platformFeeUSD + bankAndWireCutUSD + spreadLeakageUsd
   );
-  const totalCostPercent =
-    grossRequired > 0 ? (totalCostUSD / grossRequired) * 100 : 0;
+  const totalCostPercent = safeMultiply(
+    safeDivide(totalCostUSD, grossRequired),
+    100
+  );
 
   const outOfBounds =
     grossRequiredRaw < MIN_GROSS_USD || grossRequiredRaw > MAX_GROSS_USD;
@@ -217,7 +220,11 @@ export function computeInverseRoute(
   quotes: InvertedQuote[];
   verdict: InverseVerdict;
 } {
-  const targetNetLocal = Math.max(0, Math.round(safeNumber(targetNetLocalInput)));
+  const targetNetLocal = clampNumber(
+    Math.round(safeNumber(targetNetLocalInput)),
+    0,
+    MAX_GROSS_USD
+  );
   const quotes = invertAllChannels(
     targetNetLocal,
     platform,
@@ -244,9 +251,9 @@ export function localSliderBounds(corridor: Corridor): {
 } {
   const rate = safeNumber(corridor.rate);
   return {
-    min: Math.max(1, Math.round(MIN_GROSS_USD * rate)),
-    max: Math.round(20000 * rate),
-    step: Math.max(1, Math.round(50 * rate)),
+    min: Math.max(1, Math.round(safeMultiply(MIN_GROSS_USD, rate))),
+    max: Math.round(safeMultiply(20000, rate)),
+    step: Math.max(1, Math.round(safeMultiply(50, rate))),
   };
 }
 

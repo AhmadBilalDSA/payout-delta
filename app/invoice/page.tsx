@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import InvoiceEditor from "@/components/invoice/InvoiceEditor";
 import InvoiceHero from "@/components/invoice/InvoiceHero";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { getChannels, getCorridors } from "@/lib/db";
 
 const SITE_URL = "https://payoutdelta.com";
@@ -116,7 +117,11 @@ export default function InvoicePage() {
       <InvoiceHero />
 
       <div className="mt-8">
-        <InvoiceEditor channels={channels} corridors={corridors} />
+        {/* Phase S1 — the interactive editor is wrapped in the institutional
+            error boundary so a fault is contained to its own fallback card. */}
+        <ErrorBoundary fallbackTitle="Invoice Studio Guard">
+          <InvoiceEditor channels={channels} corridors={corridors} />
+        </ErrorBoundary>
       </div>
 
       <p className="no-print mt-10 text-xs leading-relaxed text-slate-500 dark:text-white/50">

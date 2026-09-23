@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Corridor, WithdrawalChannel } from "@/lib/types";
 
 import LeaderboardShareCard from "@/components/LeaderboardShareCard";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { quoteAllChannels } from "@/utils/calculateRoute";
@@ -269,66 +270,71 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
-      <div className="mt-8 w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-md backdrop-blur-md">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-white/[0.08] text-[10px] font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
-                <th className="px-4 py-3">Rank</th>
-                <th className="px-4 py-3">Country &amp; Currency</th>
-                <th className="px-4 py-3">
-                  Typical Bank Wire Penalty ($ on $1k)
-                </th>
-                <th className="px-4 py-3">Best Digital Rail</th>
-                <th className="px-4 py-3">Savings %</th>
-                <th className="px-4 py-3">Direct Audit Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr
-                  key={row.slug}
-                  className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03]"
-                >
-                  <td className="px-4 py-3 font-mono tabular-nums tracking-tight text-white/70">
-                    #{row.rank}
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-semibold text-white">{row.country}</p>
-                    <p className="font-mono text-xs tabular-nums text-white/45">
-                      {row.currency}
-                    </p>
-                  </td>
-                  <td
-                    className={`px-4 py-3 font-mono font-bold tabular-nums tracking-tight ${
-                      row.rank <= 10
-                        ? "text-amber-300"
-                        : "text-emerald-300"
-                    }`}
-                  >
-                    {formatPenalty(row.penaltyUsd)}
-                  </td>
-                  <td className="px-4 py-3 text-white/80">{row.bestRail}</td>
-                  <td className="px-4 py-3 font-mono tabular-nums tracking-tight text-white/60">
-                    {row.savingsPct.toFixed(1)}%
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/calculator/${row.slug}/`}
-                      className="inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-emerald-400 transition-colors duration-150 ease-out hover:text-emerald-300"
-                    >
-                      Audit {row.slug.replace("usd-to-", "").toUpperCase()}
-                      <span aria-hidden="true" className="opacity-60">
-                        →
-                      </span>
-                    </Link>
-                  </td>
+      {/* Phase S1 — the ranked index table is wrapped in the institutional
+          error boundary; a fault falls back to the guarded card instead of
+          blanking the whole index. */}
+      <ErrorBoundary fallbackTitle="Leaderboard Guard">
+        <div className="mt-8 w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-md backdrop-blur-md">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/[0.08] text-[10px] font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
+                  <th className="px-4 py-3">Rank</th>
+                  <th className="px-4 py-3">Country &amp; Currency</th>
+                  <th className="px-4 py-3">
+                    Typical Bank Wire Penalty ($ on $1k)
+                  </th>
+                  <th className="px-4 py-3">Best Digital Rail</th>
+                  <th className="px-4 py-3">Savings %</th>
+                  <th className="px-4 py-3">Direct Audit Link</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr
+                    key={row.slug}
+                    className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03]"
+                  >
+                    <td className="px-4 py-3 font-mono tabular-nums tracking-tight text-white/70">
+                      #{row.rank}
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-semibold text-white">{row.country}</p>
+                      <p className="font-mono text-xs tabular-nums text-white/45">
+                        {row.currency}
+                      </p>
+                    </td>
+                    <td
+                      className={`px-4 py-3 font-mono font-bold tabular-nums tracking-tight ${
+                        row.rank <= 10
+                          ? "text-amber-300"
+                          : "text-emerald-300"
+                      }`}
+                    >
+                      {formatPenalty(row.penaltyUsd)}
+                    </td>
+                    <td className="px-4 py-3 text-white/80">{row.bestRail}</td>
+                    <td className="px-4 py-3 font-mono tabular-nums tracking-tight text-white/60">
+                      {row.savingsPct.toFixed(1)}%
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/calculator/${row.slug}/`}
+                        className="inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-emerald-400 transition-colors duration-150 ease-out hover:text-emerald-300"
+                      >
+                        Audit {row.slug.replace("usd-to-", "").toUpperCase()}
+                        <span aria-hidden="true" className="opacity-60">
+                          →
+                        </span>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </ErrorBoundary>
 
       <div className="mt-8 grid w-full grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <div className="w-full min-w-0 rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-md backdrop-blur-md">

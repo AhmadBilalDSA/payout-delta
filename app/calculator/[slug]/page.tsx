@@ -33,6 +33,7 @@ import {
 } from "@/lib/seoSchemas";
 import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
 import Calculator from "@/components/Calculator";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import FaqAccordion from "@/components/FaqAccordion";
 import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
@@ -282,34 +283,38 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
       {/* UI anti-collapse grid — Calculator renders the 12-column rail shell
           (interactive inputs / waterfall left, analytical AEO + verdict + FAQ
           right) and mounts the server-rendered BLUF + AEO FAQ slots beside the
-          live verdict card. */}
+          live verdict card. Phase S1 — the interactive calculator is wrapped
+          in an institutional error boundary so a render fault in one module
+          is contained to its own fallback card, never the whole route. */}
       <div className="mt-6">
-        <Calculator
-          corridor={corridor}
-          platforms={platforms}
-          channels={channels}
-          history={history}
-          sparklineStats={sparklineStats}
-          platformPreset={parsed.platform ?? undefined}
-          bluf={
-            <BlufSummary
-              corridor={corridor}
-              channels={channels}
-              platforms={platforms}
-              platformId={parsed.platform ?? undefined}
-              platformLabel={longTail?.label}
-            />
-          }
-          faq={
-            <AeoFaqSection
-              corridor={corridor}
-              channels={channels}
-              platforms={platforms}
-              platformId={parsed.platform ?? undefined}
-              platformLabel={longTail?.label}
-            />
-          }
-        />
+        <ErrorBoundary fallbackTitle="Payout Calculator Guard">
+          <Calculator
+            corridor={corridor}
+            platforms={platforms}
+            channels={channels}
+            history={history}
+            sparklineStats={sparklineStats}
+            platformPreset={parsed.platform ?? undefined}
+            bluf={
+              <BlufSummary
+                corridor={corridor}
+                channels={channels}
+                platforms={platforms}
+                platformId={parsed.platform ?? undefined}
+                platformLabel={longTail?.label}
+              />
+            }
+            faq={
+              <AeoFaqSection
+                corridor={corridor}
+                channels={channels}
+                platforms={platforms}
+                platformId={parsed.platform ?? undefined}
+                platformLabel={longTail?.label}
+              />
+            }
+          />
+        </ErrorBoundary>
       </div>
 
       {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}

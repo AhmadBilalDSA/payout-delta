@@ -20,7 +20,13 @@
  * Pure, finite-safe and clamped: a zero, negative, NaN or absurd input can
  * never produce Infinity or spin a loop. The calculator consumes this in a
  * single O(1) `useMemo` pass, keeping INP well under 50ms.
+ *
+ * All divisions run through the Phase S1 `lib/safeMath.ts` guards, and the
+ * gross-up bails to a safe zero stack the instant a non-positive target or
+ * reference rate arrives — an inversion can never divide by zero.
  */
+
+import { safeDivide, safeMultiply } from "@/lib/safeMath";
 
 function safeNumber(value: number): number {
   return Number.isFinite(value) ? value : 0;
@@ -100,26 +106,32 @@ export function calculateGrossFromTargetNet(
   const landingFeeLocal = Math.max(0, safeNumber(input.landingFeeLocal));
   const taxRate = safeNumber(input.taxWithholdingRate);
 
-  // Guard rails — anything at or past a singular denominator is un-solvable.
-  if (targetNetLocal <= 0 || feePercent < 0 || feePercent >= 100) {
-    return INFEASIBLE;
-  }
-  if (baseRate <= 0 || spread >= 1 || taxRate < 0 || taxRate >= 1) {
+  // Phase S1 guard rail #0 — a non-positive target or reference rate can never
+  // be inverted: resolve to the safe zero stack before any division runs.
+  if (targetNetLocal <= 0 || baseRate <= 0) {
     return INFEASIBLE;
   }
 
-  const platformRate = feePercent / 100;
-  const realizedRate = baseRate * (1 - spread);
+  // Guard rails — anything at or past a singular denominator is un-solvable.
+  if (feePercent < 0 || feePercent >= 100) {
+    return INFEASIBLE;
+  }
+  if (spread >= 1 || taxRate < 0 || taxRate >= 1) {
+    return INFEASIBLE;
+  }
+
+  const platformRate = safeDivide(feePercent, 100);
+  const realizedRate = safeMultiply(baseRate, 1 - spread);
   if (realizedRate <= 0) {
     return INFEASIBLE;
   }
 
-  const preTaxLocal = targetNetLocal / (1 - taxRate);
-  const netUsdNeeded = preTaxLocal / realizedRate;
-  const landingFeeUsd = landingFeeLocal / baseRate;
+  const preTaxLocal = safeDivide(targetNetLocal, 1 - taxRate);
+  const netUsdNeeded = safeDivide(preTaxLocal, realizedRate);
+  const landingFeeUsd = safeDivide(landingFeeLocal, baseRate);
   const bankAndWireCutUsd = fixedFeeUSD + wireUSD + landingFeeUsd;
   const usdBeforeWires = netUsdNeeded + bankAndWireCutUsd;
-  const requiredGrossBill = usdBeforeWires / (1 - platformRate);
+  const requiredGrossBill = safeDivide(usdBeforeWires, 1 - platformRate);
 
   return {
     feasible: true,
@@ -128,11 +140,17 @@ export function calculateGrossFromTargetNet(
     usdBeforeWires,
     platformRate,
     requiredGrossBill,
-    platformCutUsd: requiredGrossBill * platformRate,
+    platformCutUsd: safeMultiply(requiredGrossBill, platformRate),
     bankAndWireCutUsd,
-    spreadLeakageUsd: netUsdNeeded * spread,
-    spreadLeakageLocal: netUsdNeeded * baseRate * spread,
-    taxWithholdingLocal: preTaxLocal * taxRate,
-    realizedTakeHomeLocal: netUsdNeeded * realizedRate * (1 - taxRate),
+    spreadLeakageUsd: safeMultiply(netUsdNeeded, spread),
+    spreadLeakageLocal: safeMultiply(
+      safeMultiply(netUsdNeeded, baseRate),
+      spread
+    ),
+    taxWithholdingLocal: safeMultiply(preTaxLocal, taxRate),
+    realizedTakeHomeLocal: safeMultiply(
+      safeMultiply(netUsdNeeded, realizedRate),
+      1 - taxRate
+    ),
   };
 }
