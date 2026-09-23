@@ -124,17 +124,31 @@ now resolve to structured entities instead of prose. Builders live in
 structured data never drifts from the markup.
 
 ### 📣 GitHub Community Engine & 1-Click Viral Sharing
-The verdict card grows a **Copy audit breakdown** menu that exports the exact
-numbers on screen as a Reddit markdown table (r/freelance, r/Upwork,
-r/pakistan, r/developersIndia) or an X / LinkedIn one-liner — one click, pasted
-straight into the community. The [developer API reference](app/api-access)
-now ships interactive cURL / TypeScript / Python snippets for the static JSON
-feed and the edge worker, live response-schema views (base rates, provider
-spreads, statutory citation objects) and the full developer SLA. Open-source
-contributions are formalized through structured issue templates
-([`new_corridor.yml`](.github/ISSUE_TEMPLATE/new_corridor.yml),
+The verdict card grows a full-width **sponsored referral CTA** on affiliate
+rails (provider badge pill, gradient button, external-link arrow, FTC-grade
+disclosure) and a **`ShareUtilityTray`** directly beneath it — three
+wrap-friendly one-click actions that export the exact numbers on screen as a
+Reddit markdown table (r/freelance, r/Upwork, r/pakistan, r/developersIndia),
+an X / LinkedIn one-liner, or a shareable audit link. The [developer API
+reference](app/api-access) ships interactive cURL / TypeScript / Python
+snippets for the static JSON feed and the edge worker, live response-schema
+views (base rates, provider spreads, statutory citation objects) and the full
+developer SLA. Open-source contributions are formalized through structured
+issue templates ([`new_corridor.yml`](.github/ISSUE_TEMPLATE/new_corridor.yml),
 [`statutory_update.yml`](.github/ISSUE_TEMPLATE/statutory_update.yml)) and a
 step-by-step [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+### 📈 Zero-Runtime SVG Trendline Engine & UI Refresh
+Every corridor page (English + all 5 localized editions) renders a
+deterministic **30-day interbank realization trendline** — a pure inline SVG,
+slug-seeded (FNV-1a → mulberry32) mean-reverting walk around the reference
+rate with smooth Bézier smoothing, an emerald/cyan drift stroke, low / high /
+annualized-volatility readouts and a live central-bank reference pill. No
+canvas, no chart dependency, no hydration mismatch possible. The same pass
+modernized the design tokens (`globals.css`) to a light slate canvas +
+obsidian dark deck, unified every translucent card backdrop across the
+calculator rails, and rebalanced the header (emerald live-badge, ghost nav,
+API Access pill).
 
 ---
 
@@ -207,7 +221,8 @@ npm run lint      # ESLint
 | 6 | GitHub community engine & developer API docs | Shipped |
 | 7 | UI anti-collapse grid overhaul, currency pair switcher & 5 high-volume corridors (VND / KES / IDR / COP / TRY) | Shipped |
 | 8 | 50-country expansion — Batches 1 & 2: 20 high-demand corridors across LatAm, Europe, MEA & APAC (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR + UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD) | Shipped (`38b4e97`) |
-| 9 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
+| 9 | UI refresh — color palette modernization, full-width verdict CTA + `ShareUtilityTray`, and zero-runtime SVG trendline engine on every corridor page | Shipped |
+| 10 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 
 ---
 

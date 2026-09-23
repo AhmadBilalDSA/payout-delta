@@ -21,7 +21,7 @@ export default function FaqAccordion({
       type="multiple"
       value={value}
       onValueChange={onValueChange}
-      className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white dark:divide-white/[0.08] dark:border-white/[0.08] dark:bg-[#15151A]"
+      className="divide-y divide-slate-200 rounded-xl border border-slate-200/90 bg-white/80 shadow-sm backdrop-blur-md dark:divide-slate-800/80 dark:border-slate-800/80 dark:bg-slate-900/60"
     >
       {items.map((item, index) => (
         <Accordion.Item key={`${item.q}-${index}`} value={`faq-${index}`}>

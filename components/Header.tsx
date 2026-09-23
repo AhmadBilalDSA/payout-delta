@@ -21,7 +21,7 @@ export default function Header() {
   const { t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 h-16 w-full border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-lg">
       <nav
         aria-label="Primary"
         className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6"
@@ -29,7 +29,7 @@ export default function Header() {
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-tight text-white transition-opacity duration-200 ease-out hover:opacity-80"
+            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold tracking-tight text-white transition-opacity duration-200 ease-out hover:opacity-80"
           >
             <span aria-hidden="true" className="text-base font-medium leading-none">
               Δ
@@ -40,32 +40,32 @@ export default function Header() {
             aria-hidden="true"
             className="hidden h-4 w-px bg-slate-700/60 sm:block"
           />
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <LanguageSwitcher />
+          <div className="flex items-center gap-2">
             <CorridorSwitcher />
+            <LanguageSwitcher />
           </div>
         </div>
 
         <div className="flex items-center justify-end gap-2 sm:gap-3">
           <span
             aria-hidden="true"
-            className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex"
+            className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-500/10 px-2.5 py-1 md:inline-flex"
             title={t("clientSideBadge")}
           >
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span className="text-xs text-emerald-400/90">
+            <span className="text-xs font-medium text-emerald-400/90">
               {t("clientSideBadge")}
             </span>
           </span>
           <Link
             href="/"
-            className="hidden text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:text-white sm:inline"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
           >
             {t("calculator")}
           </Link>
           <Link
             href="/invoice/"
-            className="hidden text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:text-white sm:inline"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
           >
             {t("invoiceStudio")}
           </Link>
@@ -73,7 +73,7 @@ export default function Header() {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:text-white lg:inline"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 lg:inline"
           >
             {t("openDataset")}
             <span aria-hidden="true" className="ml-0.5 opacity-50">
@@ -83,7 +83,7 @@ export default function Header() {
           <ThemeToggle />
           <Link
             href="/api-access/"
-            className="hidden items-center whitespace-nowrap rounded-full border border-slate-700/60 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors duration-200 ease-out hover:bg-slate-800 hover:text-white md:inline-flex"
+            className="hidden items-center whitespace-nowrap rounded-full border border-slate-700 bg-slate-800/40 px-3 py-1.5 text-xs text-slate-200 transition-colors duration-200 ease-out hover:bg-slate-800 md:inline-flex"
           >
             {t("apiAccess")}
           </Link>

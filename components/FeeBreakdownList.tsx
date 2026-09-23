@@ -45,10 +45,10 @@ export default function FeeBreakdownList({
         return (
           <div
             key={quote.channelId}
-            className={`overflow-hidden rounded-2xl border bg-white transition-all duration-200 ease-out dark:bg-[#15151A] ${
+            className={`overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 shadow-sm backdrop-blur-md transition-all duration-200 ease-out dark:border-slate-800/80 dark:bg-slate-900/60 ${
               isOpen
-                ? "border-black/[0.15] shadow-sm dark:border-white/[0.15]"
-                : "border-black/[0.06] hover:border-black/[0.15] dark:border-white/[0.08] dark:hover:border-white/[0.15]"
+                ? "shadow-md dark:shadow-none"
+                : "hover:shadow-md dark:hover:shadow-none"
             }`}
           >
             <button

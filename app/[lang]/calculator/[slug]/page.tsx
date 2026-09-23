@@ -26,6 +26,7 @@ import Calculator from "@/components/Calculator";
 import BlufSummary from "@/components/BlufSummary";
 import FaqAccordion from "@/components/FaqAccordion";
 import AeoFaqSection from "@/components/AeoFaqSection";
+import CurrencyTrendSparkline from "@/components/CurrencyTrendSparkline";
 
 interface LocalizedCorridorPageProps {
   params: Promise<{ lang: string; slug: string }>;
@@ -177,6 +178,13 @@ export default async function LocalizedCorridorPage({
         {localized.intro} — {localized.localeName} edition · fee data revision{" "}
         {datasetRevision}.
       </p>
+
+      <CurrencyTrendSparkline
+        slug={slug}
+        rate={corridor.rate}
+        code={corridor.to}
+        className="mt-6"
+      />
 
       {/* Phase 7 — the same anti-collapse 12-column rail shell as the English
           corridor page: interactive inputs / waterfall on the left, the AEO

@@ -150,7 +150,7 @@ export default function TransactionCostingWidget({
     <section
       id="transaction-costing"
       aria-labelledby="transaction-costing-title"
-      className="w-full min-w-0 overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm transition-colors duration-200 hover:border-black/[0.12] dark:border-white/[0.08] dark:bg-zinc-900/80 dark:shadow-none dark:backdrop-blur-md dark:hover:border-zinc-700"
+      className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 p-5 shadow-sm backdrop-blur-md transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60"
     >
       <h2
         id="transaction-costing-title"

@@ -38,6 +38,7 @@ import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
 import AeoFaqSection from "@/components/AeoFaqSection";
 import ComplianceGuide from "@/components/ComplianceGuide";
+import CurrencyTrendSparkline from "@/components/CurrencyTrendSparkline";
 
 interface CorridorPageProps {
   params: Promise<{ slug: string }>;
@@ -270,6 +271,13 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           ? `${longTail.label} default (${platformPreset.feePercent}% platform cut) is pre-selected; you can switch platforms below.`
           : "Every calculation runs in your browser; nothing is tracked."}
       </p>
+
+      <CurrencyTrendSparkline
+        slug={slug}
+        rate={corridor.rate}
+        code={corridor.to}
+        className="mt-6"
+      />
 
       {/* UI anti-collapse grid — Calculator renders the 12-column rail shell
           (interactive inputs / waterfall left, analytical AEO + verdict + FAQ

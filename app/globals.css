@@ -40,19 +40,26 @@
 
 :root {
   /*
-   * PayoutDelta design tokens — Apple-grade, light-first.
-   * Dark variants are wired on [data-theme="dark"] for the future theme-toggle
-   * milestone; the site ships light-only today so every component stays legible.
+   * PayoutDelta design tokens — crisp slate surfaces, light-first.
+   *
+   * The canvas is a clean slate-50 wash (`#f8fafc`) instead of pure white and
+   * the ink is slate-900 (`#0f172a`), so cards, hairlines and typography hold
+   * real contrast instead of washing out into muddy beige/charcoal. Dark mode
+   * drops onto a deep navy `#090d16` canvas with near-white slate-100 ink.
+   * Surfaces read these tokens via `bg-background` / `text-foreground`, and
+   * card containers apply Translucent surface recipes inline (e.g.
+   * `bg-white/80 dark:bg-slate-900/60`) so unlayered CSS can never outrank
+   * Tailwind utilities.
    */
-  --canvas: #ffffff; /* primary surface */
-  --sub-canvas: #f5f5f7; /* recessed surface */
-  --ink: #1d1d1f; /* Apple near-black text */
-  --carbon-60: rgba(0, 0, 0, 0.56); /* secondary text */
-  --hairline: rgba(0, 0, 0, 0.06); /* 1px separators */
-  --hairline-strong: rgba(0, 0, 0, 0.08); /* hover borders */
+  --canvas: #f8fafc; /* slate-50 — primary surface */
+  --sub-canvas: #f1f5f9; /* slate-100 — recessed surface */
+  --ink: #0f172a; /* slate-900 — crisp primary text */
+  --carbon-60: rgba(15, 23, 42, 0.56); /* slate-900/56 — secondary text */
+  --hairline: rgba(15, 23, 42, 0.08); /* 1px separators */
+  --hairline-strong: rgba(15, 23, 42, 0.12); /* hover borders */
   --apple-glass-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04),
-    0 12px 32px -4px rgba(0, 0, 0, 0.08);
+    0 0 0 1px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.04),
+    0 12px 32px -4px rgba(15, 23, 42, 0.08);
   --accent: #10b981; /* emerald-500 (marks, dots) */
   --accent-strong: #059669; /* emerald-600 (primary actions) */
 
@@ -63,14 +70,14 @@
 }
 
 [data-theme="dark"] {
-  --canvas: #000000;
-  --sub-canvas: #0a0a0c;
-  --ink: #f5f5f7;
-  --carbon-60: rgba(255, 255, 255, 0.56);
-  --hairline: rgba(255, 255, 255, 0.08);
-  --hairline-strong: rgba(255, 255, 255, 0.12);
+  --canvas: #090d16; /* deep navy canvas — no more washed-out charcoal */
+  --sub-canvas: #0b1220; /* recessed surface */
+  --ink: #f1f5f9; /* slate-100 — near-white ink */
+  --carbon-60: rgba(241, 245, 249, 0.56);
+  --hairline: rgba(148, 163, 184, 0.16); /* slate-400 hairlines */
+  --hairline-strong: rgba(148, 163, 184, 0.24);
   --apple-glass-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(148, 163, 184, 0.08), 0 2px 8px rgba(0, 0, 0, 0.4),
     0 12px 32px -4px rgba(0, 0, 0, 0.6);
   --accent: #10b981;
   --accent-strong: #059669;
@@ -80,6 +87,7 @@
 html {
   scroll-behavior: smooth;
   background-color: var(--background);
+  color: var(--foreground);
 }
 
 @keyframes dropdown-in {

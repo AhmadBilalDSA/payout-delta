@@ -265,7 +265,7 @@ because they share the same dataset and quote math.
 
 ---
 
-## 5. Nine-Phase Dominance Roadmap
+## 5. Ten-Phase Dominance Roadmap
 
 | # | Phase | Status |
 | --- | --- | --- |
@@ -277,7 +277,8 @@ because they share the same dataset and quote math.
 | 6 | **GitHub Community Engine & Developer API Documentation** — 1-click viral Reddit/X/LinkedIn audit export on the verdict card, full API reference (cURL / TypeScript / Python quick-start, response-schema & SLA panels, static feed + edge worker), structured `.github/ISSUE_TEMPLATE` forms, `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed | **Shipped** (`9ef48f6`) |
 | 7 | **UI Anti-Collapse Grid Overhaul, Currency Pair Switcher & 5 High-Volume Corridors (VND / KES / IDR / COP / TRY)** — two-rail anti-collapse corridor grid (interactive waterfall left, sticky AEO + verdict + FAQ right, `min-w-0` guards, enforced 1.8 RTL line-height), header currency capsule grouped by region + one-tap `⇄` invert with "not audited" status pill, five new fully-audited corridors with real banks/SWIFT/statutory tiers (15 base + 17 long-tail → 32 English corridor routes), corpus & long-tail audit expanded | **Shipped** (`8fc8730`) |
 | 8 | **50-Country Expansion — Batches 1 & 2: 20 High-Demand International Corridors (Batch 1: MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR; Batch 2: UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD)** — LatAm, Europe, MEA & APAC authored statutory/bank records (20 new base corridors + 40 long-tail → 35 base & 92 English corridor pages; regional currency capsule regrouped, Asia Pacific relabel), corpus & long-tail audit extended | **Shipped** (`38b4e97` + Batch 2 `6b3892a`) |
-| 9 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
+| 9 | **UI Refresh — Color Palette Modernization, Full-Width Verdict CTA & Zero-Runtime SVG Trendline Engine** — light slate canvas + obsidian dark deck tokens in `globals.css` (`:root` / `[data-theme="dark"]`, `@custom-variant dark`), unified translucent card backdrops across VerdictCard / Calculator rails / FeeBreakdownList / TransactionCostingWidget / TaxImpactCard / ComplianceGuide / FaqAccordion / InvoiceEditor / CorridorCard / SliderControls, rebalanced `Header` (emerald live-badge, ghost nav, API Access pill·CorridorSwitcher), `VerdictCard` redesigned around a full-width gradient partner CTA (provider badge pill + external-link arrow) with the `AuditExportMenu` superseded by a wrap-friendly RTL-safe `ShareUtilityTray` (Reddit / X · LinkedIn / Copy Link), trust markers, wire-penalty callout & affiliate disclosure preserved, and a new deterministic `CurrencyTrendSparkline` (slug-seeded FNV-1a → mulberry32, 30-day mean-reverting smooth-Bézier SVG with low/high/volatility readout) mounted on every English + localized corridor page | **Shipped** (this commit) |
+| 10 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
 
 ---
 
@@ -308,6 +309,7 @@ compatibility is a merge blocker.
 - `38b4e97` — Phase 8 refinement: per-corridor provider fee models (Wise / Payoneer / Direct Wire fixed + FX spread) registered on all 10 Batch 1 corridors in `data/fees.json`; `regulatoryBanking.ts` upgraded to exact bank benches (3 receiving banks per corridor), statutory tiers, local rails & citations; `lib/types.ts` exposes `ProviderFee`; spec §2.5 and README refreshed.
 - `6b3892a` — Phase 8 (Batch 2 of 50): 10 fully-audited high-demand corridors UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD (provider fee models in `data/fees.json`, authored statutory/bank records in `regulatoryBanking.ts` → 28 fully-audited corridors, 20 new long-tail slugs in `corridors.ts` → 35 base & 92 English corridor routes, regional currency capsule regrouped / Asia Pacific relabel, corpus/long-tail audit + docs totals updated).
 - `d74a248` — i18n: dictionary, auto-locale detection, trust badges, corridor selector.
+- `(ui-refresh)` — Phase 9: UI refresh — color palette modernization & unified translucent card backdrops (`globals.css` slate canvas + obsidian dark deck), full-width verdict CTA redesign + `ShareUtilityTray` in `VerdictCard` (replaces `AuditExportMenu`, RTL-safe share actions preserved), rebalanced `Header`, and the zero-runtime `CurrencyTrendSparkline` deterministic 30-day SVG trendline on every corridor & localized page.
 - `a66422c` — sitemap `/api-access/` entry.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.
 - `acf8c60` — statutory settlement engine, dynamic waterfall, invoice sync, UI stabilization.

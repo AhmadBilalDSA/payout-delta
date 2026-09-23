@@ -26,7 +26,7 @@ export default function ComplianceGuide({
 
   return (
     <section aria-labelledby={`compliance-title-${guide.slug}`}>
-      <details className="group overflow-hidden rounded-2xl border border-black/[0.06] bg-white open:shadow-sm dark:border-white/[0.08] dark:bg-[#15151A]">
+      <details className="group overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 shadow-sm backdrop-blur-md open:shadow-md dark:border-slate-800/80 dark:bg-slate-900/60 dark:open:shadow-none">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 select-none [&::-webkit-details-marker]:hidden">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-600">

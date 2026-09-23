@@ -86,11 +86,12 @@ export default function VerdictCard({
   }
 
   const exportLabels = {
-    breakdown: t("copyAuditBreakdown"),
     reddit: t("redditExporter"),
     social: t("socialExporter"),
     copiedReddit: t("copiedReddit"),
     copiedSocial: t("copiedSocial"),
+    shareLink: t("shareLink"),
+    copied: t("copied"),
   };
 
   async function copyViral(kind: "reddit" | "social"): Promise<void> {
@@ -186,42 +187,29 @@ export default function VerdictCard({
               </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                aria-live="polite"
-                onClick={() => {
-                  void copyAudit();
-                }}
-                className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-                  copied
-                    ? "border-violet-400/40 bg-violet-400/20 text-violet-300"
-                    : "bg-white/[0.08] hover:bg-white/[0.16]"
-                }`}
-              >
-                {copied ? t("copied") : t("copyAudit")}
-              </button>
-              <AuditExportMenu labels={exportLabels} onCopy={copyViral} />
-              <button
-                type="button"
-                aria-live="polite"
-                onClick={() => {
-                  void copyShareLink();
-                }}
-                title={t("shareLink")}
-                className={`inline-flex h-10 items-center rounded-full border border-white/[0.12] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-                  copiedShare
-                    ? "border-violet-400/40 bg-violet-400/20 text-violet-300"
-                    : "bg-white/[0.08] hover:bg-white/[0.16]"
-                }`}
-              >
-                <span aria-hidden="true" className="mr-1.5 text-base leading-none">
-                  {copiedShare ? "✓" : "⧉"}
-                </span>
-                {copiedShare ? t("copied") : t("shareLink")}
-              </button>
-            </div>
+            <button
+              type="button"
+              aria-live="polite"
+              onClick={() => {
+                void copyAudit();
+              }}
+              className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
+                copied
+                  ? "border-violet-400/40 bg-violet-400/20 text-violet-300"
+                  : "bg-white/[0.08] hover:bg-white/[0.16]"
+              }`}
+            >
+              {copied ? t("copied") : t("copyAudit")}
+            </button>
           </div>
+
+          <ShareUtilityTray
+            labels={exportLabels}
+            onCopy={copyViral}
+            onCopyShare={copyShareLink}
+            copiedShare={copiedShare}
+            wrapperClass="mt-6"
+          />
         </div>
       </section>
     );
@@ -245,7 +233,7 @@ export default function VerdictCard({
     partner.kind === "affiliate"
       ? lang === "en"
         ? partner.claimCopy
-        : `${t("claimRateVia")} ${best.channelName} →`
+        : `${t("claimRateVia")} ${best.channelName}`
       : partner.claimCopy;
 
   return (
@@ -303,123 +291,115 @@ export default function VerdictCard({
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              aria-live="polite"
-              onClick={() => {
-                void copyAudit();
-              }}
-              className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-copied
-                    ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
-                    : "bg-white/[0.08] hover:bg-white/[0.16]"
-                }`}
-              >
-                {copied ? t("copied") : t("copyAudit")}
-              </button>
-              <AuditExportMenu labels={exportLabels} onCopy={copyViral} />
-              <button
-                type="button"
-                aria-live="polite"
-                onClick={() => {
-                  void copyShareLink();
-                }}
-                title={t("shareLink")}
-              className={`inline-flex h-10 items-center rounded-full border border-white/[0.12] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out ${
-                copiedShare
-                  ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
-                  : "bg-white/[0.08] hover:bg-white/[0.16]"
-              }`}
-            >
-              <span aria-hidden="true" className="mr-1.5 text-base leading-none">
-                {copiedShare ? "✓" : "⧉"}
-              </span>
-              {copiedShare ? t("copied") : t("shareLink")}
-            </button>
-          </div>
-
-          {/* Phase 3 — high-intent partner referral card + regulatory
-              disclosures. Affiliate rails get a sponsored outbound CTA with
-              trust markers and the wire-penalty callout; unpartnered rails
-              surface a neutral bank advisory instead. */}
-          <div className="mt-6 rounded-2xl border border-white/[0.08] bg-white/[0.05] p-4">
-            {partner.kind === "affiliate" ? (
-              <>
-                <a
-                  href={partner.url}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  title={partner.disclosure}
-                  className="group inline-flex w-full items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-violet-900/40 transition-all duration-200 ease-out hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[320px]"
-                >
-                  <span className="flex flex-col items-start gap-0.5">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
-                      {partner.partnerBadge}
-                    </span>
-                    <span>{ctaLabel}</span>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 text-lg leading-none transition-transform duration-200 group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </a>
-
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-emerald-300/90">
-                  <span className="inline-flex items-center gap-1">
-                    <span aria-hidden="true" className="text-emerald-400">
-                      ✓
-                    </span>
-                    {t("zeroHiddenMarkup")}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span aria-hidden="true" className="text-emerald-400">
-                      ✓
-                    </span>
-                    {t("regulatedSettlement")}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span aria-hidden="true" className="text-emerald-400">
-                      ✓
-                    </span>
-                    {t("directPayout")}
-                  </span>
-                </div>
-
-                {wireSavings > 0 && (
-                  <p className="mt-3 inline-flex flex-wrap items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs font-semibold tabular-nums text-amber-300">
-                    {t("avoidWirePenalty")} — Save{" "}
-                    {formatLocal(wireSavings, corridor)}
-                  </p>
-                )}
-
-                <p className="mt-3 text-[10px] leading-relaxed text-white/40">
-                  {partner.disclosure}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-sm font-semibold text-white">
-                  {partner.partnerBadge}
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-white/50">
-                  {partner.disclosure}
-                </p>
-                <p className="mt-2 text-[10px] leading-relaxed text-white/40">
-                  {partner.claimCopy}.
-                </p>
-              </>
-            )}
-          </div>
-
-          {partner.kind === "affiliate" && (
-            <p className="mt-3 text-[11px] leading-relaxed text-white/40">
-              {t("affiliateDisclaimer")}
-            </p>
-          )}
+          <button
+            type="button"
+            aria-live="polite"
+            onClick={() => {
+              void copyAudit();
+            }}
+            className={`inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-out ${
+              copied
+                ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-300"
+                : "bg-white/[0.08] hover:bg-white/[0.16]"
+            }`}
+          >
+            {copied ? t("copied") : t("copyAudit")}
+          </button>
         </div>
+
+        {/* Phase 3 — high-intent partner referral CTA + regulatory disclosures.
+            Affiliate rails get a sponsored full-width outbound CTA with a
+            provider badge, an external-link arrow, trust markers and the
+            wire-penalty callout; unpartnered rails surface a neutral bank
+            advisory instead. The sharing utility tray sits directly below the
+            primary CTA so export actions never collide with the button. */}
+        {partner.kind === "affiliate" ? (
+          <>
+            <a
+              href={partner.url}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              title={partner.disclosure}
+              className="mt-4 flex w-full items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 shadow-md shadow-violet-500/20 transition-all text-sm"
+            >
+              <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                {partner.partnerBadge}
+              </span>
+              <span className="text-center">{ctaLabel}</span>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4 shrink-0"
+              >
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </a>
+
+            <ShareUtilityTray
+              labels={exportLabels}
+              onCopy={copyViral}
+              onCopyShare={copyShareLink}
+              copiedShare={copiedShare}
+              wrapperClass="mt-3"
+            />
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-emerald-300/90">
+              <span className="inline-flex items-center gap-1">
+                <span aria-hidden="true" className="text-emerald-400">
+                  ✓
+                </span>
+                {t("zeroHiddenMarkup")}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span aria-hidden="true" className="text-emerald-400">
+                  ✓
+                </span>
+                {t("regulatedSettlement")}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span aria-hidden="true" className="text-emerald-400">
+                  ✓
+                </span>
+                {t("directPayout")}
+              </span>
+            </div>
+
+            {wireSavings > 0 && (
+              <p className="mt-3 inline-flex flex-wrap items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs font-semibold tabular-nums text-amber-300">
+                {t("avoidWirePenalty")} — Save{" "}
+                {formatLocal(wireSavings, corridor)}
+              </p>
+            )}
+
+            <p className="mt-3 text-[10px] leading-relaxed text-white/40">
+              {partner.disclosure}
+            </p>
+          </>
+        ) : (
+          <div className="mt-6 rounded-2xl border border-white/[0.08] bg-white/[0.05] p-4">
+            <p className="text-sm font-semibold text-white">
+              {partner.partnerBadge}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-white/50">
+              {partner.disclosure}
+            </p>
+            <p className="mt-2 text-[10px] leading-relaxed text-white/40">
+              {partner.claimCopy}.
+            </p>
+          </div>
+        )}
+
+        {partner.kind === "affiliate" && (
+          <p className="mt-3 text-[11px] leading-relaxed text-white/40">
+            {t("affiliateDisclaimer")}
+          </p>
+        )}
       </div>
     </section>
   );
@@ -500,104 +480,122 @@ function buildTargetAudit(
 }
 
 /**
- * Phase 6 — 1-click viral exporters. Two drop-in copy targets sharing one
- * payload builder: a Reddit markdown audit table and an X / LinkedIn
- * one-liner. All numbers come from the live verdict/quotes so the exported
- * figures always match the on-screen audit.
+ * Phase 6 — 1-click viral exporters + UI-refresh sharing utility tray. Three
+ * wrap-friendly border buttons (Reddit markdown table, X / LinkedIn one-liner,
+ * Copy Link) form a secondary action tray that sits directly below the primary
+ * CTA. All numbers come from the live verdict/quotes so the exported figures
+ * always match the on-screen audit.
  */
-interface ExportLabels {
-  breakdown: string;
+interface ShareTrayLabels {
   reddit: string;
   social: string;
   copiedReddit: string;
   copiedSocial: string;
+  shareLink: string;
+  copied: string;
 }
 
-function AuditExportMenu({
+function ShareUtilityTray({
   labels,
   onCopy,
+  onCopyShare,
+  copiedShare,
+  wrapperClass = "mt-3",
 }: {
-  labels: ExportLabels;
+  labels: ShareTrayLabels;
   onCopy: (kind: "reddit" | "social") => Promise<void>;
+  onCopyShare: () => Promise<void>;
+  copiedShare: boolean;
+  wrapperClass?: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<"reddit" | "social" | null>(null);
 
   async function handleCopy(kind: "reddit" | "social"): Promise<void> {
-    setOpen(false);
     await onCopy(kind);
-    setFeedback(kind === "reddit" ? labels.copiedReddit : labels.copiedSocial);
+    setFeedback(kind);
     window.setTimeout(() => setFeedback(null), 2000);
   }
 
+  const trayButton =
+    "inline-flex items-center gap-1.5 rounded-lg border border-slate-700/60 px-3 py-1.5 text-xs text-slate-300 transition-colors duration-200 ease-out hover:bg-slate-800/50 hover:text-slate-100";
+
   return (
-    <div className="relative">
+    <div
+      className={`${wrapperClass} flex w-full flex-wrap items-center gap-2`}
+      role="group"
+      aria-label="Share this audit"
+    >
       <button
         type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
         aria-live="polite"
-        onClick={() => setOpen((value) => !value)}
-        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/[0.12] bg-white/[0.08] px-4 text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-white/[0.16]"
+        onClick={() => {
+          void handleCopy("reddit");
+        }}
+        className={trayButton}
       >
-        {feedback ? (
-          <span className="text-emerald-300">{feedback}</span>
-        ) : (
-          <>
-            <span aria-hidden="true" className="text-[10px] leading-none opacity-70">
-              ▼
-            </span>
-            {labels.breakdown}
-          </>
-        )}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-3.5 w-3.5 text-slate-400"
+        >
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+        </svg>
+        {feedback === "reddit" ? labels.copiedReddit : labels.reddit}
       </button>
-
-      {open && (
-        <>
-          <button
-            type="button"
-            aria-label="Close menu"
-            className="fixed inset-0 z-10 cursor-default"
-            onClick={() => setOpen(false)}
-          />
-          <div
-            role="menu"
-            aria-label={labels.breakdown}
-            className="absolute right-0 z-20 mt-2 w-72 origin-top-right rounded-xl border border-white/[0.1] bg-[#16161B] p-1.5 shadow-2xl shadow-black/50"
-          >
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                void handleCopy("reddit");
-              }}
-              className="flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/[0.08]"
-            >
-              <span className="text-xs font-semibold text-white">
-                {labels.reddit}
-              </span>
-              <span className="text-[10px] leading-relaxed text-white/50">
-                r/freelance · r/Upwork · r/pakistan · r/developersIndia
-              </span>
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                void handleCopy("social");
-              }}
-              className="flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/[0.08]"
-            >
-              <span className="text-xs font-semibold text-white">
-                {labels.social}
-              </span>
-              <span className="text-[10px] leading-relaxed text-white/50">
-                X · LinkedIn
-              </span>
-            </button>
-          </div>
-        </>
-      )}
+      <button
+        type="button"
+        aria-live="polite"
+        onClick={() => {
+          void handleCopy("social");
+        }}
+        className={trayButton}
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-3.5 w-3.5 text-slate-400"
+        >
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <path d="M8.59 13.51l6.83 3.98" />
+          <path d="M15.41 6.51l-6.82 3.98" />
+        </svg>
+        {feedback === "social" ? labels.copiedSocial : labels.social}
+      </button>
+      <button
+        type="button"
+        aria-live="polite"
+        onClick={() => {
+          void onCopyShare();
+        }}
+        className={trayButton}
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-3.5 w-3.5 text-slate-400"
+        >
+          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+        </svg>
+        {copiedShare ? labels.copied : labels.shareLink}
+      </button>
     </div>
   );
 }
