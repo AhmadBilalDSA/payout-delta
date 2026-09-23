@@ -83,6 +83,14 @@ const EXPECTED_SLUGS = [
   "usd-to-rsd",
   "usd-to-sgd",
   "usd-to-hkd",
+  "usd-to-sek",
+  "usd-to-nok",
+  "usd-to-dkk",
+  "usd-to-bam",
+  "usd-to-gel",
+  "usd-to-uyu",
+  "usd-to-crc",
+  "usd-to-hrk",
 ];
 
 /** Phase 4 — programmatic long-tail platform corridors (Upwork/Fiverr/Deel). */
@@ -144,6 +152,22 @@ const EXPECTED_LONG_TAIL_SLUGS = [
   "fiverr-usd-to-sgd",
   "upwork-usd-to-hkd",
   "fiverr-usd-to-hkd",
+  "upwork-usd-to-sek",
+  "fiverr-usd-to-sek",
+  "upwork-usd-to-nok",
+  "fiverr-usd-to-nok",
+  "upwork-usd-to-dkk",
+  "fiverr-usd-to-dkk",
+  "upwork-usd-to-bam",
+  "fiverr-usd-to-bam",
+  "upwork-usd-to-gel",
+  "fiverr-usd-to-gel",
+  "upwork-usd-to-uyu",
+  "fiverr-usd-to-uyu",
+  "upwork-usd-to-crc",
+  "fiverr-usd-to-crc",
+  "upwork-usd-to-hrk",
+  "fiverr-usd-to-hrk",
 ];
 
 const EXPECTED_LOCALIZED = [
@@ -732,7 +756,10 @@ function checkLongTailDerivation() {
       fail("long-tail base corridor missing", `${slug} -> ${baseSlug}`);
       continue;
     }
-    if (corridor.to.toLowerCase() !== match[2]) {
+    // Euro-legacy alias: a corridor may keep its pre-euro ISO code in the
+    // slug while pricing in EUR (e.g. Croatia `usd-to-hrk` receives EUR).
+    const euroAlias = corridor.to === "EUR" && corridor.slug === `usd-to-${match[2]}`;
+    if (corridor.to.toLowerCase() !== match[2] && !euroAlias) {
       bad += 1;
       fail("long-tail currency mismatch", `${slug} expects ${match[2].toUpperCase()}`);
     }

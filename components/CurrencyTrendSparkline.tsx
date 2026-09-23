@@ -1,14 +1,20 @@
+"use client";
+
+import { useState } from "react";
+
 /**
- * Phase 8 — 30-day interbank realization trendline, zero chart libraries.
+ * Phase 8/9 — 30-day interbank realization trendline with a live cursor,
+ * zero chart libraries.
  *
- * A deterministic, server-rendered SVG (400×60 viewBox) that traces a smooth
- * mean-reverting 30-day trajectory around the corridor's reference rate. The
- * seed comes from the corridor slug (FNV-1a → mulberry32), so every corridor
- * gets a stable, corridor-specific curve that survives full static export —
- * no canvas, no runtime PRNG, no hydration mismatch possible. The stroke
- * resolves to emerald when the simulated 30-day drift is positive and cyan
- * when it is negative, and the footer surfaces low / high / annualized
- * volatility with a live-reference pill.
+ * A deterministic inline SVG (400×90 viewBox) tracing a smooth mean-reverting
+ * 30-day walk around the corridor's reference rate. The seed comes from the
+ * corridor slug (FNV-1a → mulberry32), so the curve is stable per corridor and
+ * identical across static export and hydration — no canvas, no runtime PRNG,
+ * no third-party charting. The default (non-hover) header shows the current
+ * interbank base rate plus the 30-day net delta; on mouse move a crosshair +
+ * focal dot follow the cursor and the readout swaps to that day's simulated
+ * rate, its "Day -N" offset and its deviation from the base rate. SSR renders
+ * the null-hover state, so the prerendered HTML never races the client.
  */
 export default function CurrencyTrendSparkline({
   slug,
@@ -23,9 +29,11 @@ export default function CurrencyTrendSparkline({
 }) {
   const DAYS = 30;
   const WIDTH = 400;
-  const HEIGHT = 60;
-  const PAD_X = 8;
-  const PAD_Y = 10;
+  const HEIGHT = 90;
+  const PAD_X = 10;
+  const PAD_Y = 12;
+
+  const [hovered, setHovered] = useState<number | null>(null);
 
   function fnv1a(input: string): number {
     let hash = 0x811c9dc5;
@@ -80,10 +88,11 @@ export default function CurrencyTrendSparkline({
   const hi = Math.max(...values);
   const span = hi - lo || 1;
 
+  /** Day offsets run oldest → newest: `[{ day: -29, rate }, … { day: 0 }]`. */
   const points = values.map((value, index) => {
     const x = PAD_X + (index / (DAYS - 1)) * (WIDTH - PAD_X * 2);
     const y = PAD_Y + (1 - (value - lo) / span) * (HEIGHT - PAD_Y * 2);
-    return { x, y };
+    return { day: -(DAYS - 1 - index), x, y };
   });
 
   function smoothPath(pts: { x: number; y: number }[]): string {
@@ -117,30 +126,76 @@ export default function CurrencyTrendSparkline({
 
   const driftLabel = `${positive ? "+" : ""}${(drift * 100).toFixed(1)}%`;
   const formatRate = (value: number): string =>
-    value.toLocaleString("en-US", { maximumFractionDigits: 4 });
+    value.toLocaleString("en-US", {
+      maximumFractionDigits: value >= 100 ? 2 : 4,
+    });
+
+  function handleMouseMove(event: React.MouseEvent<SVGSVGElement>): void {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const frac = (event.clientX - rect.left) / rect.width;
+    const index = Math.min(
+      DAYS - 1,
+      Math.max(0, Math.round(frac * (DAYS - 1))),
+    );
+    setHovered(index);
+  }
+
+  const active =
+    hovered === null || Number.isNaN(hovered) ? null : points[hovered];
+  const activeRate =
+    hovered === null || Number.isNaN(hovered) ? null : values[hovered];
+  const activeDrift =
+    activeRate === null ? 0 : ((activeRate - rate) / rate) * 100;
 
   return (
     <div
-      className={`rounded-2xl border border-slate-200/90 bg-white/80 p-5 shadow-sm backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-900/60 ${className ?? ""}`}
+      className={`rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md ${className ?? ""}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             30-Day Interbank Realization Trend
           </p>
-          <p className="mt-1 text-lg font-bold tabular-nums tracking-tight text-slate-900 dark:text-white">
-            {formatRate(rate)} {code}
-          </p>
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <p className="text-lg font-bold tabular-nums tracking-tight text-slate-900 dark:text-white">
+              {activeRate === null
+                ? formatRate(rate)
+                : formatRate(activeRate)}{" "}
+              {code}
+            </p>
+            {active !== null ? (
+              <span className="text-xs tabular-nums text-slate-500 dark:text-slate-400">
+                {active.day === 0 ? "Today" : `Day ${active.day}`} ·{" "}
+                <span
+                  className={
+                    activeDrift >= 0
+                      ? "font-semibold text-emerald-600 dark:text-emerald-400"
+                      : "font-semibold text-rose-600 dark:text-rose-400"
+                  }
+                >
+                  {activeDrift >= 0 ? "+" : ""}
+                  {activeDrift.toFixed(2)}%
+                </span>{" "}
+                vs base
+              </span>
+            ) : (
+              <span className="text-xs tabular-nums text-slate-500 dark:text-slate-400">
+                {driftLabel} net 30d
+              </span>
+            )}
+          </div>
         </div>
         <span
           role="status"
           className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[11px] font-bold tabular-nums ring-1 ${
-            positive
+            activeDrift >= 0
               ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20 dark:text-emerald-400 dark:ring-emerald-400/20"
-              : "bg-cyan-500/10 text-cyan-600 ring-cyan-500/20 dark:text-cyan-400 dark:ring-cyan-400/20"
+              : "bg-rose-500/10 text-rose-600 ring-rose-500/20 dark:text-rose-400 dark:ring-rose-400/20"
           }`}
         >
-          {driftLabel} 30d
+          {activeRate === null
+            ? `${driftLabel} 30d`
+            : `${activeDrift >= 0 ? "+" : ""}${activeDrift.toFixed(2)}%`}
         </span>
       </div>
 
@@ -148,9 +203,11 @@ export default function CurrencyTrendSparkline({
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         width="100%"
         role="img"
-        aria-label={`${DAYS}-day simulated trend around the ${rate} ${code ?? ""} reference rate, ${driftLabel} drift`}
-        className="mt-4"
+        aria-label={`${DAYS}-day simulated trend around the ${rate} ${code ?? ""} reference rate, ${driftLabel} drift — move the cursor to inspect each day`}
+        className="mt-4 cursor-crosshair touch-none"
         shapeRendering="geometricPrecision"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setHovered(null)}
       >
         <desc>
           Deterministic {DAYS}-day mean-reverting trajectory anchored to the{" "}
@@ -174,6 +231,26 @@ export default function CurrencyTrendSparkline({
           strokeDasharray="3 5"
         />
 
+        {active !== null && (
+          <>
+            <line
+              x1={active.x}
+              x2={active.x}
+              y1={0}
+              y2={HEIGHT}
+              stroke="currentColor"
+              strokeDasharray="3 3"
+              className="text-slate-400/60 dark:text-slate-600"
+            />
+            <circle
+              cx={active.x}
+              cy={active.y}
+              r="4"
+              className="fill-emerald-400 stroke-white dark:stroke-slate-900 stroke-2"
+            />
+          </>
+        )}
+
         <path d={area} fill={`url(#${gradientId})`} />
         <path
           d={line}
@@ -183,12 +260,7 @@ export default function CurrencyTrendSparkline({
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle
-          cx={lastPoint.x}
-          cy={lastPoint.y}
-          r="3.25"
-          fill={stroke}
-        />
+        <circle cx={lastPoint.x} cy={lastPoint.y} r="3.25" fill={stroke} />
         <circle
           cx={lastPoint.x}
           cy={lastPoint.y}
@@ -204,8 +276,14 @@ export default function CurrencyTrendSparkline({
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs tabular-nums text-slate-500 dark:text-slate-400">
         <p>
-          Low <span className="font-semibold text-slate-700 dark:text-slate-200">{formatRate(lo)}</span>{" "}
-          · High <span className="font-semibold text-slate-700 dark:text-slate-200">{formatRate(hi)}</span>{" "}
+          Low{" "}
+          <span className="font-semibold text-slate-700 dark:text-slate-200">
+            {formatRate(lo)}
+          </span>{" "}
+          · High{" "}
+          <span className="font-semibold text-slate-700 dark:text-slate-200">
+            {formatRate(hi)}
+          </span>{" "}
           · Volatility{" "}
           <span className="font-semibold text-slate-700 dark:text-slate-200">
             {vol.toFixed(1)}%

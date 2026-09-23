@@ -127,7 +127,7 @@ export default function VerdictCard({
     return (
       <section
         aria-label="Invoice requirement verdict"
-        className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 text-white backdrop-blur-md sm:p-8"
+className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 text-white shadow-md backdrop-blur-md sm:p-8"
       >
         <div
           aria-hidden="true"
@@ -239,7 +239,7 @@ export default function VerdictCard({
   return (
     <section
       aria-label="Best payout channel verdict"
-      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 text-white backdrop-blur-md sm:p-8"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 text-white shadow-md backdrop-blur-md sm:p-8"
     >
       <div
         aria-hidden="true"
@@ -320,7 +320,7 @@ export default function VerdictCard({
               target="_blank"
               rel="noopener noreferrer sponsored"
               title={partner.disclosure}
-              className="mt-4 flex w-full items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 shadow-md shadow-violet-500/20 transition-all text-sm"
+              className="mt-4 flex w-full items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-md shadow-violet-500/20 transition-all text-sm"
             >
               <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                 {partner.partnerBadge}

@@ -37,9 +37,10 @@ your account.**
 ## Features
 
 ### 🧮 Cross-Border Payout Auditor
-35 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR, VND,
+43 primary corridors (PKR, INR, PHP, BRL, GBP, EUR, NGN, BDT, EGP, ZAR, VND,
 KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR, UAH,
-IQD, MAD, CLP, PEN, HUF, BGN, RSD, SGD, HKD) with live comparison between
+IQD, MAD, CLP, PEN, HUF, BGN, RSD, SGD, HKD, SEK, NOK, DKK, BAM, GEL, UYU,
+CRC, HRK) with live comparison between
 **Wise, Payoneer, Direct Wire, Remitly and local bank rails** — a best-verdict
 ranking of the **local currency you actually receive**, not the one quoted
 mid-market. Batches 1 & 2 of the 50-country expansion added twenty
@@ -48,7 +49,10 @@ Europe (Poland, Romania, Czechia, Hungary, Bulgaria, Serbia, Ukraine), MEA
 (Ghana, UAE, Saudi Arabia, Iraq, Morocco) and APAC (Thailand, Malaysia,
 Singapore, Hong Kong) — each with authored statutory & bank records and
 **per-corridor provider fee models** (Wise / Payoneer / Direct Wire fixed
-fees + FX spreads registered in `data/fees.json`).
+fees + FX spreads registered in `data/fees.json`). Batch 3 added the Nordic
+belt and high-intent niche markets (Sweden, Norway, Denmark, Bosnia,
+Georgia, Uruguay, Costa Rica, Croatia-on-EUR) with the same authored
+regulatory depth for a 43-corridor corpus.
 
 ### 🧭 Currency Pair Switcher & Anti-Collapse Grid
 The header carries a tactile `USD → PKR` capsule grouped by receiving region
@@ -102,8 +106,8 @@ callout, and an FTC-grade affiliate disclaimer — routed through a central
 partner directory ([`data/affiliatePartners.ts`](data/affiliatePartners.ts)).
 
 ### 🧩 Programmatic Long-Tail Platform Corridors
-92 statically exported corridor pages — every currency corridor plus
-`upwork-*`, `fiverr-*` and `deel-*` permutations across all 35 base slugs
+116 statically exported corridor pages — every currency corridor plus
+`upwork-*`, `fiverr-*` and `deel-*` permutations across all 43 base slugs
 (Upwork/Fiverr cover every corridor, Deel runs PKR). Each long-tail route
 pre-selects its platform (Upwork 10%, Fiverr 20%, Deel 0%), rewrites its
 title/H1/AEO answer-block for that platform, and stays a plain static file
@@ -112,7 +116,7 @@ under `./out`. Corridors are declared in
 with `?gross=` deep-link sharing intact.
 
 ### 🧬 Financial JSON-LD Schema Dominance
-Every corridor route (92 English + 5 localized) emits **one** top-level
+Every corridor route (116 English + 5 localized) emits **one** top-level
 schema.org `@graph` per page: a `CurrencyConversionService` with live
 `ExchangeRateSpecification`, a `FinancialProduct` per compared rail with its
 fixed fee & FX-spread structure, a seven-layer `HowTo` realization waterfall,

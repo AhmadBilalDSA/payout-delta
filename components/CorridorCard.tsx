@@ -6,7 +6,7 @@ export default function CorridorCard({ corridor }: { corridor: Corridor }) {
   return (
     <Link
       href={`/calculator/${corridor.slug}`}
-      className="group rounded-xl border border-slate-200/90 bg-white/80 p-4 shadow-sm backdrop-blur-md transition-colors hover:border-emerald-500 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/60 dark:hover:border-emerald-400/60"
+      className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm shadow-slate-900/5 transition-colors hover:border-emerald-500 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md dark:hover:border-emerald-400/60"
     >
       <div className="flex items-baseline justify-between gap-2">
         <p className="font-semibold text-slate-900 dark:text-white">

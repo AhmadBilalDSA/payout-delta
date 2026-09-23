@@ -34,7 +34,7 @@ zero tracking, zero data retention, zero sign-up.
 
 ## 2. Codebase Audit — Permanent Inventory
 
-### 2.1 Corridors (35 standard, `data/fees.json`)
+### 2.1 Corridors (43 standard, `data/fees.json`)
 
 | Slug | From → To | Country / Currency |
 | --- | --- | --- |
@@ -73,6 +73,14 @@ zero tracking, zero data retention, zero sign-up.
 | `usd-to-rsd` | USD → RSD | Serbia |
 | `usd-to-sgd` | USD → SGD | Singapore |
 | `usd-to-hkd` | USD → HKD | Hong Kong |
+| `usd-to-sek` | USD → SEK | Sweden |
+| `usd-to-nok` | USD → NOK | Norway |
+| `usd-to-dkk` | USD → DKK | Denmark |
+| `usd-to-bam` | USD → BAM | Bosnia & Herzegovina |
+| `usd-to-gel` | USD → GEL | Georgia |
+| `usd-to-uyu` | USD → UYU | Uruguay |
+| `usd-to-crc` | USD → CRC | Costa Rica |
+| `usd-to-hrk` | USD → EUR | Croatia |
 
 Authoring of banks & statutory tiers (`data/regulatoryBanking.ts`): **PKR, INR,
 PHP, VND, KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED,
@@ -309,7 +317,8 @@ compatibility is a merge blocker.
 - `38b4e97` — Phase 8 refinement: per-corridor provider fee models (Wise / Payoneer / Direct Wire fixed + FX spread) registered on all 10 Batch 1 corridors in `data/fees.json`; `regulatoryBanking.ts` upgraded to exact bank benches (3 receiving banks per corridor), statutory tiers, local rails & citations; `lib/types.ts` exposes `ProviderFee`; spec §2.5 and README refreshed.
 - `6b3892a` — Phase 8 (Batch 2 of 50): 10 fully-audited high-demand corridors UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD (provider fee models in `data/fees.json`, authored statutory/bank records in `regulatoryBanking.ts` → 28 fully-audited corridors, 20 new long-tail slugs in `corridors.ts` → 35 base & 92 English corridor routes, regional currency capsule regrouped / Asia Pacific relabel, corpus/long-tail audit + docs totals updated).
 - `d74a248` — i18n: dictionary, auto-locale detection, trust badges, corridor selector.
-- `(ui-refresh)` — Phase 9: UI refresh — color palette modernization & unified translucent card backdrops (`globals.css` slate canvas + obsidian dark deck), full-width verdict CTA redesign + `ShareUtilityTray` in `VerdictCard` (replaces `AuditExportMenu`, RTL-safe share actions preserved), rebalanced `Header`, and the zero-runtime `CurrencyTrendSparkline` deterministic 30-day SVG trendline on every corridor & localized page.
+- `58d063b` — Phase 9: UI refresh — color palette modernization & unified translucent card backdrops (`globals.css` slate canvas + obsidian dark deck), full-width verdict CTA redesign + `ShareUtilityTray` in `VerdictCard` (replaces `AuditExportMenu`, RTL-safe share actions preserved), rebalanced `Header`, and the zero-runtime `CurrencyTrendSparkline` deterministic 30-day SVG trendline on every corridor & localized page.
+- `(ui-trendline-batch3)` — Phase 10: institutional UI overhaul + Batch 3 corridor expansion — obsidian navy `#0B0F19` dark deck & institutional slate card recipe (`bg-white / dark:bg-slate-900/70` + `shadow-slate-900/5`), interactive `CurrencyTrendSparkline` cursor (crosshair + focal dot + hover readout, Day -N + deviation %), de-bloated home hub `CorridorDirectory` (search + region pills + compact tiles with 30d micro-trend), and Batch 3 of 50 (SEK / NOK / DKK / BAM / GEL / UYU / CRC / HRK → 43 base & 116 English corridor pages, authored statutory/bank records → 36 fully-audited corridors, 16 new long-tail slugs, regional capsule regrouped, corpus/long-tail audit + docs totals updated).
 - `a66422c` — sitemap `/api-access/` entry.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.
 - `acf8c60` — statutory settlement engine, dynamic waterfall, invoice sync, UI stabilization.

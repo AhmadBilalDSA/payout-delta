@@ -40,16 +40,18 @@
 
 :root {
   /*
-   * PayoutDelta design tokens — crisp slate surfaces, light-first.
-   *
-   * The canvas is a clean slate-50 wash (`#f8fafc`) instead of pure white and
-   * the ink is slate-900 (`#0f172a`), so cards, hairlines and typography hold
-   * real contrast instead of washing out into muddy beige/charcoal. Dark mode
-   * drops onto a deep navy `#090d16` canvas with near-white slate-100 ink.
-   * Surfaces read these tokens via `bg-background` / `text-foreground`, and
-   * card containers apply Translucent surface recipes inline (e.g.
-   * `bg-white/80 dark:bg-slate-900/60`) so unlayered CSS can never outrank
-   * Tailwind utilities.
+   * PayoutDelta design tokens — institutional fintech slate (Stripe/Linear
+   * discipline), light-first. Every muddy tan / sepia / khaki token is purged:
+   * the light canvas is a clean slate-50 `#F8FAFC` with slate-900 `#0F172A`
+   * ink; the dark deck is a deep obsidian navy `#0B0F19` with near-white
+   * `#F8FAFC` ink. Card containers apply the vertical-card recipe inline
+   * (`bg-white border-slate-200/90 shadow-slate-900/5` light ·
+   * `dark:bg-slate-900/70 dark:border-slate-800/80 dark:shadow-md
+   * dark:backdrop-blur-md`) so unlayered CSS can never outrank Tailwind
+   * utilities. Muted copy resolves to `text-slate-500/600` (light) and
+   * `text-slate-400` (dark); savings accents use
+   * `text-emerald-600 dark:text-emerald-400 bg-emerald-500/10`, conversion
+   * CTAs use `from-violet-600 to-indigo-600`.
    */
   --canvas: #f8fafc; /* slate-50 — primary surface */
   --sub-canvas: #f1f5f9; /* slate-100 — recessed surface */
@@ -70,10 +72,10 @@
 }
 
 [data-theme="dark"] {
-  --canvas: #090d16; /* deep navy canvas — no more washed-out charcoal */
-  --sub-canvas: #0b1220; /* recessed surface */
-  --ink: #f1f5f9; /* slate-100 — near-white ink */
-  --carbon-60: rgba(241, 245, 249, 0.56);
+  --canvas: #0b0f19; /* deep obsidian navy — no washed-out charcoal */
+  --sub-canvas: #0d1220; /* recessed surface */
+  --ink: #f8fafc; /* slate-50 — near-white ink */
+  --carbon-60: rgba(248, 250, 252, 0.56);
   --hairline: rgba(148, 163, 184, 0.16); /* slate-400 hairlines */
   --hairline-strong: rgba(148, 163, 184, 0.24);
   --apple-glass-shadow:
@@ -84,10 +86,18 @@
   color-scheme: dark;
 }
 
+/* Institutional background guarantees — root & body. The `!important` pins
+   survive any leaky third-party stylesheet while the attribute-scoped override
+   keeps the header theme toggle authoritative in dark mode. */
 html {
   scroll-behavior: smooth;
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="dark"] {
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
 }
 
 @keyframes dropdown-in {

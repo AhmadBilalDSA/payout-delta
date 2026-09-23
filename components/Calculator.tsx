@@ -237,7 +237,7 @@ export default function Calculator({
               {inverseRoute.quotes.map((quote, index) => (
                 <div
                   key={quote.channelId}
-                  className="flex flex-col gap-3 rounded-2xl border border-slate-200/90 bg-white/80 p-4 shadow-sm backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-900/60 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span

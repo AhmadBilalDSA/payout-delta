@@ -7,9 +7,10 @@
  * intermediary cuts and local clearing rails), and the statutory withholding /
  * exemption tiers used to compute the "real bank take-home".
  *
- * The twenty-eight fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
+ * The thirty-six fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
  * TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR, UAH, IQD, MAD, CLP,
- * PEN, HUF, BGN, RSD, SGD, HKD) reference the underlying legislation by
+ * PEN, HUF, BGN, RSD, SGD, HKD, SEK, NOK, DKK, BAM, GEL, UYU, CRC, HRK)
+ * reference the underlying legislation by
  * section; every remaining corridor falls back to accurate standard
  * intermediary bands ($15–$25) plus its national clearing network identifier
  * so the engine never renders empty on any audited route.
@@ -1954,6 +1955,435 @@ const hkdBanks: RegulatoryBank[] = [
 ];
 
 /* ---------------------------------------------------------------------------
+ * Sweden — USD → SEK
+ * Inkomstskattelagen (1999:1229) da. statlig inkomstskatt — Skatteverket.
+ * ------------------------------------------------------------------------- */
+
+const sekTiers: StatutoryTier[] = [
+  {
+    id: "sweden-statlig",
+    name: "Statlig inkomstskatt",
+    authority: "Inkomstskattelagen 65 kap.",
+    rate: 0.2,
+    purposeCode: "INK1",
+    note: "20% state income tax on the portion above Skatteverket's statlig skatt threshold; kommunalskatt 29–35% applies below it.",
+  },
+  {
+    id: "sweden-kommunal",
+    name: "Kommunal inkomstskatt",
+    authority: "Inkomstskattelagen 62 kap.",
+    rate: 0.31,
+    purposeCode: "INK1",
+    note: "Municipal income tax (29–35%) withheld via Skatteverket A-tax for self-employed freelancers.",
+  },
+];
+
+const sekBanks: RegulatoryBank[] = [
+  {
+    id: "seb",
+    name: "Skandinaviska Enskilda Banken",
+    displayName: "SEB (Sweden)",
+    swiftCode: "SWEDSESS",
+    intermediaryUSD: 9,
+    intermediaryMinUSD: 6,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Bankgiro 1 day · RIX RTGS same-day",
+    localCurrency: "SEK",
+  },
+  {
+    id: "handelsbanken",
+    name: "Handelsbanken",
+    displayName: "Handelsbanken (Sweden)",
+    swiftCode: "HANDSSSS",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 6,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Bankgiro 1 day · RIX RTGS same-day",
+    localCurrency: "SEK",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Norway — USD → NOK
+ * Lov om skatt på formue og inntekt (Skatteloven) — Skatteetaten.
+ * ------------------------------------------------------------------------- */
+
+const nokTiers: StatutoryTier[] = [
+  {
+    id: "norway-personal",
+    name: "Alminnelig inntekt",
+    authority: "Skatteloven § 2-1",
+    rate: 0.22,
+    purposeCode: "Skatt M-2",
+    note: "22% ordinary income tax (alminnelig inntekt) on net freelance income; trinnskatt adds 0–16.2% at higher thresholds.",
+  },
+  {
+    id: "norway-vat",
+    name: "MVA register-free",
+    authority: "Merverdiavgiftsloven § 6-7",
+    rate: 0,
+    purposeCode: "Export services",
+    exemption: true,
+    note: "Exempt-status freelancers stay out of the VAT register when exporting services below the threshold.",
+  },
+];
+
+const nokBanks: RegulatoryBank[] = [
+  {
+    id: "dnb",
+    name: "DNB Bank",
+    displayName: "DNB (Norway)",
+    swiftCode: "DNBANOKK",
+    intermediaryUSD: 9,
+    intermediaryMinUSD: 6,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Straksbetaling instant · NICS 1 day",
+    localCurrency: "NOK",
+  },
+  {
+    id: "nordea-no",
+    name: "Nordea Bank (Norway)",
+    displayName: "Nordea (Norway)",
+    swiftCode: "NDEANOKK",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 6,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Straksbetaling instant · NICS 1 day",
+    localCurrency: "NOK",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Denmark — USD → DKK
+ * Ligningsloven & personskatteloven — Skattestyrelsen (SKAT).
+ * ------------------------------------------------------------------------- */
+
+const dkkTiers: StatutoryTier[] = [
+  {
+    id: "denmark-ato",
+    name: "Acontoskat B-skat",
+    authority: "Kildeskatteloven (KSL)",
+    rate: 0.34,
+    purposeCode: "Ligning",
+    note: "34% average personal income tax incl. top-skatt (amtskommunal gebyr) withheld as SKAT B-skat for self-employed.",
+  },
+  {
+    id: "denmark-vat-rchg",
+    name: "VAT reverse charge",
+    authority: "Momsloven § 45",
+    rate: 0,
+    purposeCode: "B2B export",
+    exemption: true,
+    note: "0% VAT on exported services; intra-EU B2B falls under Momsloven reverse charge.",
+  },
+];
+
+const dkkBanks: RegulatoryBank[] = [
+  {
+    id: "danske",
+    name: "Danske Bank",
+    displayName: "Danske Bank (Denmark)",
+    swiftCode: "DABADKKK",
+    intermediaryUSD: 9,
+    intermediaryMinUSD: 6,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Straksclearing instant · Kronings 1 day",
+    localCurrency: "DKK",
+  },
+  {
+    id: "jyske",
+    name: "Jyske Bank",
+    displayName: "Jyske Bank (Denmark)",
+    swiftCode: "JYBADKKK",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 6,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "Straksclearing instant · Kronings 1 day",
+    localCurrency: "DKK",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Bosnia and Herzegovina — USD → BAM
+ * Zakon o porezu na dohodak (FBiH) / RS — Porezna uprava.
+ * ------------------------------------------------------------------------- */
+
+const bamTiers: StatutoryTier[] = [
+  {
+    id: "bosnia-fbih-pit",
+    name: "Porez na dohodak 10%",
+    authority: "Zakon o porezu na dohodak FBiH",
+    rate: 0.1,
+    purposeCode: "Neto dohodak",
+    note: "10% flat personal income tax on self-employment income in the Federation of BiH.",
+  },
+  {
+    id: "bosnia-rs",
+    name: "Porez na dohodak RS",
+    authority: "Zakon o porezu na dohodak RS",
+    rate: 0.1,
+    purposeCode: "Paušalno",
+    note: "10% flat personal income tax in Republika Srpska; lump-sum (paušal) regime simplifies payment.",
+  },
+];
+
+const bamBanks: RegulatoryBank[] = [
+  {
+    id: "raiffeisen-bh",
+    name: "Raiffeisen Bank d.d.",
+    displayName: "Raiffeisen (BiH)",
+    swiftCode: "RZBAB2B",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 16,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "CBBiH RTGS 1 day · MixPayday ACH",
+    localCurrency: "BAM",
+  },
+  {
+    id: "intesa-bh",
+    name: "Intesa Sanpaolo Banka BiH",
+    displayName: "Intesa Sanpaolo (BiH)",
+    swiftCode: "ISPBBA22",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 16,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "CBBiH RTGS 1 day · MixPayday ACH",
+    localCurrency: "BAM",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Georgia — USD → GEL
+ * Tax Code of Georgia Art. 96 — Revenue Service (RS.GOV.GE).
+ * ------------------------------------------------------------------------- */
+
+const gelTiers: StatutoryTier[] = [
+  {
+    id: "georgia-pit",
+    name: "Personal Income Tax 20%",
+    authority: "Tax Code Art. 96",
+    rate: 0.2,
+    purposeCode: "Non-business income",
+    note: "20% personal income tax on self-employment income for a registered entrepreneur (IP).",
+  },
+  {
+    id: "georgia-small",
+    name: "Small Business Status",
+    authority: "Tax Code Art. 82",
+    rate: 0.01,
+    purposeCode: "IP status 01",
+    exemption: true,
+    note: "1% of turnover for micro IPs under the small-business status instead of 20% profit taxation.",
+  },
+];
+
+const gelBanks: RegulatoryBank[] = [
+  {
+    id: "tbc",
+    name: "TBC Bank",
+    displayName: "TBC Bank (Georgia)",
+    swiftCode: "TBCBGE22",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 16,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "NPC instant · RTGS 1 day",
+    localCurrency: "GEL",
+  },
+  {
+    id: "bog",
+    name: "Bank of Georgia",
+    displayName: "Bank of Georgia",
+    swiftCode: "BAGAGE22",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 16,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "NPC instant · RTGS 1 day",
+    localCurrency: "GEL",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Uruguay — USD → UYU
+ * Ley 18.083 IRPF / IAE — Dirección General Impositiva (DGI).
+ * ------------------------------------------------------------------------- */
+
+const uyuTiers: StatutoryTier[] = [
+  {
+    id: "uruguay-irpf",
+    name: "IRPF Profesional",
+    authority: "Ley 18.083 Tit. 1",
+    rate: 0.1,
+    purposeCode: "IRPF cuota profesional",
+    note: "IRPF computed under the professional/minimum-liquid regime — the 10% floor bracket is the lever on freelance revenue.",
+  },
+  {
+    id: "uruguay-vat",
+    name: "IVA exoneración",
+    authority: "Ley 18.083 Tit. 6",
+    rate: 0,
+    purposeCode: "Servicios exportados",
+    exemption: true,
+    note: "0% VAT on exported digital services under the export exoneration regime (Ley Nº 19.294 Art. 60).",
+  },
+];
+
+const uyuBanks: RegulatoryBank[] = [
+  {
+    id: "brou",
+    name: "Banco República",
+    displayName: "Banco República (Uruguay)",
+    swiftCode: "BROUUYMM",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "SPI instant · ENET RTGS",
+    localCurrency: "UYU",
+  },
+  {
+    id: "itau-uy",
+    name: "Banco Itaú Uruguay",
+    displayName: "Itaú (Uruguay)",
+    swiftCode: "ITAUUYMM",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "SPI instant · ENET RTGS",
+    localCurrency: "UYU",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Costa Rica — USD → CRC
+ * Ley del Impuesto sobre la Renta 7092 — Ministerio de Hacienda.
+ * ------------------------------------------------------------------------- */
+
+const crcTiers: StatutoryTier[] = [
+  {
+    id: "costa-renta",
+    name: "Impuesto sobre la Renta",
+    authority: "Ley 7092 Art. 3",
+    rate: 0.15,
+    purposeCode: "Renta 15-25%",
+    note: "15–25% renta brackets on professional income; freelancers bill under the 'renta de actividades lucrativas' regime.",
+  },
+  {
+    id: "costa-digital",
+    name: "0% Renta Digital Export",
+    authority: "Ley 7092 Art. 5 bis",
+    rate: 0,
+    purposeCode: "Servicios digitales",
+    exemption: true,
+    note: "0% renta on exported digital services when registered under the export regime (Art. 5 bis).",
+  },
+];
+
+const crcBanks: RegulatoryBank[] = [
+  {
+    id: "bncr",
+    name: "Banco Nacional",
+    displayName: "Banco Nacional (Costa Rica)",
+    swiftCode: "BNCRCRSJ",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SINPE instant · drives national usage",
+    localCurrency: "CRC",
+  },
+  {
+    id: "bac",
+    name: "BAC San José",
+    displayName: "BAC Credomatic (Costa Rica)",
+    swiftCode: "BACCCRSJ",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SINPE instant · drives national usage",
+    localCurrency: "CRC",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Croatia — USD → HRK (EUR since 2023)
+ * Zakon o porezu na dohodak (NN 115/16) — Porezna uprava.
+ * ------------------------------------------------------------------------- */
+
+const hrkTiers: StatutoryTier[] = [
+  {
+    id: "croatia-pit",
+    name: "Porez na dohodak",
+    authority: "NN 115/16 Art. 15",
+    rate: 0.2,
+    purposeCode: "Dohodak od obrta",
+    note: "20% personal income tax on self-employed (obrt) income charged in Croatia's euro economy.",
+  },
+  {
+    id: "croatia-pausal",
+    name: "Paušalni obrt",
+    authority: "NN 115/16 Art. 87",
+    rate: 0.084,
+    purposeCode: "Paušalni obrt",
+    note: "Lump-sum craft regime — tax computed on benchmark paušal revenue rather than actual net profit.",
+  },
+];
+
+const hrkBanks: RegulatoryBank[] = [
+  {
+    id: "zaba",
+    name: "Zagrebačka banka",
+    displayName: "Zagrebačka banka (Croatia)",
+    swiftCode: "ZABAHR2X",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 8,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SEPA/TARGET2 instant · euro clearing",
+    localCurrency: "EUR",
+  },
+  {
+    id: "erste-hr",
+    name: "Erste&Steiermärkische Bank",
+    displayName: "Erste Bank (Croatia)",
+    swiftCode: "ESBCHR22",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 8,
+    intermediaryMaxUSD: 14,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "SEPA/TARGET2 instant · euro clearing",
+    localCurrency: "EUR",
+  },
+];
+
+/* ---------------------------------------------------------------------------
  * Global fallback engine — EUR / GBP / BRL / NGN / BDT / EGP / ZAR.
  * Standard intermediary deduction $15–$25, national clearing network, and a
  * statutory export-tax compliance notice.
@@ -2386,6 +2816,118 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     ],
     banks: hkdBanks,
     tiers: hkdTiers,
+    generic: false,
+  },
+  "usd-to-sek": {
+    slug: "usd-to-sek",
+    authority:
+      "Skatteverket · Inkomstskattelagen (1999:1229) 62–65 kap.",
+    clearingNetwork: "Bankgiro / RIX RTGS",
+    citations: [
+      "IL 65 kap Statlig skatt 20%",
+      "IL 62 kap Kommunalskatt",
+      "Skatteverket A-tax ärende",
+    ],
+    banks: sekBanks,
+    tiers: sekTiers,
+    generic: false,
+  },
+  "usd-to-nok": {
+    slug: "usd-to-nok",
+    authority:
+      "Skatteetaten · Lov om skatt på formue og inntekt (Skatteloven)",
+    clearingNetwork: "Straksbetaling / NICS",
+    citations: [
+      "Skatteloven § 2-1 22%",
+      "Trinnskatt progressive",
+      "Skatteetaten Lønnsoppgave",
+    ],
+    banks: nokBanks,
+    tiers: nokTiers,
+    generic: false,
+  },
+  "usd-to-dkk": {
+    slug: "usd-to-dkk",
+    authority:
+      "Skattestyrelsen (SKAT) · Kildeskatteloven & personskatteloven",
+    clearingNetwork: "Straksclearing / Kronings",
+    citations: [
+      "KSL Acontoskat B-skat",
+      "Momsloven § 45 Reverse Charge",
+      "SKAT efaktura nemKonto",
+    ],
+    banks: dkkBanks,
+    tiers: dkkTiers,
+    generic: false,
+  },
+  "usd-to-bam": {
+    slug: "usd-to-bam",
+    authority:
+      "Centralna banka BiH · Zakon o porezu na dohodak FBiH/RS",
+    clearingNetwork: "CBBiH RTGS / MixPayday",
+    citations: [
+      "FBiH Porez na dohodak 10%",
+      "RS Paušalno 10%",
+      "CBBiH inst.bank kredit",
+    ],
+    banks: bamBanks,
+    tiers: bamTiers,
+    generic: false,
+  },
+  "usd-to-gel": {
+    slug: "usd-to-gel",
+    authority:
+      "Revenue Service Georgia · Tax Code of Georgia Art. 82 & 96",
+    clearingNetwork: "NPC instant / RTGS",
+    citations: [
+      "TCG Art. 96 PIT 20%",
+      "TCG Art. 82 Small Business 1%",
+      "RS.GOV.GE e-income ledger",
+    ],
+    banks: gelBanks,
+    tiers: gelTiers,
+    generic: false,
+  },
+  "usd-to-uyu": {
+    slug: "usd-to-uyu",
+    authority:
+      "Dirección General Impositiva (DGI) · Ley 18.083 (IRPF / IVA)",
+    clearingNetwork: "SPI instant / ENET RTGS",
+    citations: [
+      "Ley 18.083 Tit. 1 IRPF 10%",
+      "Ley 19.294 Art. 60 Export",
+      "DGI factura electrónica",
+    ],
+    banks: uyuBanks,
+    tiers: uyuTiers,
+    generic: false,
+  },
+  "usd-to-crc": {
+    slug: "usd-to-crc",
+    authority:
+      "Ministerio de Hacienda · Ley del Impuesto sobre la Renta 7092",
+    clearingNetwork: "SINPE instant",
+    citations: [
+      "Renta Art. 3 br. 15-25%",
+      "Ley 7092 Art. 5 bis Export 0%",
+      "SINPE Móvil instant",
+    ],
+    banks: crcBanks,
+    tiers: crcTiers,
+    generic: false,
+  },
+  "usd-to-hrk": {
+    slug: "usd-to-hrk",
+    authority:
+      "Porezna uprava · Zakon o porezu na dohodak (NN 115/16)",
+    clearingNetwork: "SEPA / TARGET2 instant (EUR)",
+    citations: [
+      "ZPD NN 115/16 Art. 15",
+      "Paušalni obrt Art. 87",
+      "T2 Instant euro clearing",
+    ],
+    banks: hrkBanks,
+    tiers: hrkTiers,
     generic: false,
   },
 };

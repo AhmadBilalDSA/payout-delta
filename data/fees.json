@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-23T16:05:00Z",
+  "updatedAt": "2026-09-23T18:30:00Z",
   "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per USD corridor.",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
@@ -510,6 +510,86 @@
         { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.017 },
         { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.019 }
       ]
+    },
+    {
+      "slug": "usd-to-sek",
+      "from": "USD",
+      "to": "SEK",
+      "rate": 10.4,
+      "country": "Sweden",
+      "countryCode": "SE",
+      "currencyName": "Swedish Krona",
+      "currencySymbol": "SEK"
+    },
+    {
+      "slug": "usd-to-nok",
+      "from": "USD",
+      "to": "NOK",
+      "rate": 10.75,
+      "country": "Norway",
+      "countryCode": "NO",
+      "currencyName": "Norwegian Krone",
+      "currencySymbol": "NOK"
+    },
+    {
+      "slug": "usd-to-dkk",
+      "from": "USD",
+      "to": "DKK",
+      "rate": 6.85,
+      "country": "Denmark",
+      "countryCode": "DK",
+      "currencyName": "Danish Krone",
+      "currencySymbol": "DKK"
+    },
+    {
+      "slug": "usd-to-bam",
+      "from": "USD",
+      "to": "BAM",
+      "rate": 1.8,
+      "country": "Bosnia and Herzegovina",
+      "countryCode": "BA",
+      "currencyName": "Bosnian Convertible Mark",
+      "currencySymbol": "KM"
+    },
+    {
+      "slug": "usd-to-gel",
+      "from": "USD",
+      "to": "GEL",
+      "rate": 2.72,
+      "country": "Georgia",
+      "countryCode": "GE",
+      "currencyName": "Georgian Lari",
+      "currencySymbol": "₾"
+    },
+    {
+      "slug": "usd-to-uyu",
+      "from": "USD",
+      "to": "UYU",
+      "rate": 40.2,
+      "country": "Uruguay",
+      "countryCode": "UY",
+      "currencyName": "Uruguayan Peso",
+      "currencySymbol": "$U"
+    },
+    {
+      "slug": "usd-to-crc",
+      "from": "USD",
+      "to": "CRC",
+      "rate": 515,
+      "country": "Costa Rica",
+      "countryCode": "CR",
+      "currencyName": "Costa Rican Colón",
+      "currencySymbol": "₡"
+    },
+    {
+      "slug": "usd-to-hrk",
+      "from": "USD",
+      "to": "EUR",
+      "rate": 0.92,
+      "country": "Croatia",
+      "countryCode": "HR",
+      "currencyName": "Euro",
+      "currencySymbol": "€"
     }
   ]
 }

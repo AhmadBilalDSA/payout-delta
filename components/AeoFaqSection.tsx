@@ -64,7 +64,7 @@ export default function AeoFaqSection({
     <section
       aria-labelledby={`aeo-faq-${corridor.slug}`}
       data-aeo="audit-faq"
-      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 backdrop-blur-md"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-md backdrop-blur-md"
     >
       <h2
         id={`aeo-faq-${corridor.slug}`}

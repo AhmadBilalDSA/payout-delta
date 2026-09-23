@@ -831,7 +831,7 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200/90 bg-white/80 p-5 shadow-sm backdrop-blur-md transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60">
+    <section className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md">
       <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-white/50">
         {title}
       </h2>
