@@ -7,8 +7,9 @@ import {
   consultingThresholdUsd,
   generateWhatsAppLeadUrl,
 } from "@/data/monetizationConfig";
+import { WHATSAPP_DISMISS_KEY } from "@/lib/privacyGuard";
 
-const DISMISS_KEY = "payoutdelta:whatsapp_consulting_dismissed";
+const DISMISS_KEY = WHATSAPP_DISMISS_KEY;
 const DISMISS_EVENT = "payoutdelta:whatsapp-consulting-dismissed";
 
 const DISMISSED = "1";

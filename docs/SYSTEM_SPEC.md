@@ -418,6 +418,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 | 11 | **Configurable Monetization Engine, High-Ticket WhatsApp Funnel & Global Leakage Index** — monetizationConfig repo (consulting line + thresholds + canonical affiliate links + wa.me builder), `WhatsAppConsultingCard` high-ticket advisory funnel (≥$120 leakage or ≥$2,500 gross), dynamic "Save $X via {partner} →" verdict CTA + trust subtext, Remitly partner rail, `app/leaderboard/` 50-corridor leakage index (metric banner + ranked table + one-click shareable benchmark), header nav link + sitemap + `auditLeaderboard` checks | **Shipped** (this commit) |
 | 12 | **FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist** — legal-tech: "📜 Generate Contract Addendum" in the studio (Clauses A/B/C fixed statutory English, white executive preview + plain-text copy, single-page `.contract-addendum` PDF print); "alert me when the rate hits X" watchlist in the calculator settlement tab (mid-market base rate, above/below threshold pill, `payoutdelta:rate_alerts` localStorage, emerald triggered badge, optional native desktop notification via `useSyncExternalStore` hydration, zero setState-in-effect) | **Shipped** (this commit) |
 | S1 | **Enterprise Fault Isolation & Defensive Mathematical Guards** — centralized `lib/safeMath.ts` primitives (`safeDivide` epsilon-clamps zero/sub-epsilon denominators + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in `lib/calculatorEngine.ts` + `utils/inverseMath.ts` wrapped through the guards with an early zero-stack bail on `targetNetLocal <= 0` / `baseRate <= 0`, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) wired around `<Calculator>` (English + localized corridor pages), `<InvoiceEditor>` and the leaderboard index table | **Shipped** (this commit) |
+| S3 | **Static CSP Headers, Client-Side XSS Sanitization & Isolated Storage Purge** — `public/_headers` Cloudflare Pages security headers (strict CSP `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` blocking camera/microphone/geolocation); zero-dependency `utils/sanitize.ts` sanitizer (`stripHtml` decodes entities + strips active markup/URIs, `sanitizeText` clamps with newline preservation) wired into every Invoice Studio input boundary (shared `Field` onChange, `correspondentNote` textarea, sync-to-invoice payloads, draft read/save paths); `lib/privacyGuard.ts` centralizes all storage under the `payoutdelta:*` namespace (`invoice_draft`, `bank_sync`, `invoice_sync`, `tax_ledger`, `rate_alerts`, `prc_letter_`, `addendum_form`, `theme`, `language`), quota-safe no-throw `readLocalStorage` / `writeLocalStorage` / `removeLocalStorage` wrappers + one-time-session legacy-key migration (`payoutdelta_draft_invoice`, `payoutdelta_banksync`, `payoutdelta_prc_letter_*`, `payoutdelta-theme`, `payoutdelta_lang` → namespaced), and `purgeAllLocalData()` counting every `payoutdelta*` entry; footer "🔒 Clear Local Cache" island (`ClearLocalCacheButton.tsx`) with aria-live count toast; no-FOUC inline bootstrap reads canonical keys with legacy fallback | **Shipped** (this commit) |
 | S2 | **Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants** — three build-time SRE gate batteries in `scripts/test_corridors.mjs` Phase S2: (1) every authored receiving-bank `swiftCode` + correspondent-node `bic` literal (read straight off the TS source, CI-safe on Node 20) validated against ISO 9362 8/11-char syntax — no lowercase, no spaces, no malformed lengths; (2) financial range invariants across the full static surface (`baseRate > 0` finite, `0 ≤ platformFee ≤ 50%`, `0 ≤ fxSpread ≤ 15%`, `0 ≤ intermediaryUSD ≤ $100`); (3) a `buildLeaderboard()` replication asserting 50/50 corridors ranked with positive savings %, non-zero `≥ $25` wire penalties and no 10-consecutive identical cluster. Includes the corrected Bosnia & Herzegovina BIC (`RZBAB2B` → `RZBABA2S`), and a client-side no-throw `lib/schemaValidator.ts` `validateCorridorRuntime` that hydrates malformed corridor props before `Calculator.tsx` / `InvoiceEditor.tsx` render | **Shipped** (this commit) |
 
 ---
@@ -648,6 +649,52 @@ missing or malformed corridor field to safe statutory fallbacks, and both
 every incoming corridor prop through it before rendering — so a stale static
 payload can never take down an island.
 
+**Phase S3 (Static CSP Headers, Client-Side XSS Sanitization & Isolated
+Storage Purge)** adds a defense-in-depth hardening layer on top of that
+reliability work:
+
+`public/_headers` (S3.1) ships Cloudflare Pages security headers on every
+static response: a strict `Content-Security-Policy` (`default-src 'self';
+script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self'
+'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:`),
+`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+`Referrer-Policy: strict-origin-when-cross-origin`, and a `Permissions-Policy`
+that blocks camera, microphone and geolocation.
+
+`utils/sanitize.ts` (S3.2) is a zero-dependency sanitizer: `stripHtml`
+decodes entities (`&amp;lt;` double-encoding included) and strips scriptable
+elements, all generic tags, inline `on*` handlers and `javascript:` /
+`vbscript:` / `data:` URIs; `sanitizeText(input, maxLen)` clamps length while
+preserving newlines (required by the `whitespace-pre-line` invoice note). It
+is wired into the Invoice Studio boundary in four places: the shared `Field`
+component (every text/number/date keystroke), the `correspondentNote`
+textarea, the sync-to-invoice payload merge in `applySync`, and the draft
+read/save paths in `lib/invoiceTypes.ts` (`sanitizeDraft`, `loadInvoiceDraft`,
+`sanitizeBankSync`, `sanitizeInvoiceSync`, `draftFromUrlParams`).
+
+`lib/privacyGuard.ts` (S3.3) is the single owner of every storage key. All
+ten are namespaced `payoutdelta:*` — `invoice_draft`, `bank_sync`,
+`invoice_sync`, `tax_ledger`, `rate_alerts`, `prc_letter_` (prefix),
+`addendum_form`, `whatsapp_consulting_dismissed`, `theme`, `language`. The
+quota-safe no-throw `readLocalStorage` / `writeLocalStorage` /
+`removeLocalStorage` wrappers run a one-time-per-session
+`migrateLegacyStorage()` that remaps the shipped legacy spellings
+(`payoutdelta_draft_invoice`, `payoutdelta_banksync`, `payoutdelta_prc_letter_*`
+→ `payoutdelta:prc_letter_*`, `payoutdelta-theme` → `payoutdelta:theme`,
+`payoutdelta_lang` → `payoutdelta:language`) onto the canonical keys without
+ever overwriting a newer value, then deletes the legacy entry. All Phase
+D/E/F/H/7 consumers (`ledgerEngine`, `prcLetterEngine`, `RateWatchlistWidget`,
+`ContractAddendumModal`, `ThemeToggle`, `LanguageProvider`,
+`WhatsAppConsultingCard`) now route through these wrappers; the no-FOUC
+inline bootstrap in `app/layout.tsx` reads the canonical keys with a legacy
+fallback chain.
+
+The visitor-facing control is the footer "🔒 Clear Local Cache" island
+(`components/ClearLocalCacheButton.tsx`, S3.4): `purgeAllLocalData()` removes
+every localStorage key prefixed `payoutdelta` (both spellings) + the
+sessionStorage dismiss marker and reports the entry count in an `aria-live`
+toast — placing the on-device financial footprint under the visitor's control.
+
 ---
 
 ## 7. Existing Commits That Anchor This Spec
@@ -678,3 +725,4 @@ payload can never take down an island.
 - *this commit* — **Phase H**: FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist (`components/invoice/ContractAddendumModal.tsx` + `components/RateWatchlistWidget.tsx`: "📜 Generate Contract Addendum" studio button beside "Generate Bank Settlement Letter", Clauses A/B/C fixed statutory English, live white-card executive preview, "📋 Copy Legal Addendum Text" + 2.5s toast, "🖨️ Print / Download PDF" via single-page `.contract-addendum` `@media print` hard-clip in `globals.css`, prefill from draft identity/meta, `payoutdelta:addendum_form` persistence; calculator Tab 2 `RateWatchlistWidget` under the costing waterfall — mid-market `corridor.rate`, above/below target pills, `payoutdelta:rate_alerts` localStorage keyed by corridor slug, emerald "🎯 Target Rate Triggered" badge, "🔔 Enable Desktop Rate Alerts" native notification, rendered via `useSyncExternalStore` with `storage`-event + external-permission stores (no setState-in-effect), docs).
 - *this commit* — **Phase S1**: Enterprise Fault Isolation & Defensive Mathematical Guards (`lib/safeMath.ts` centralized primitives — `safeDivide` epsilon-clamps zero / sub-epsilon denominators and finite-guards null/NaN/Infinity operands with a caller `fallback`, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`; `lib/calculatorEngine.ts` routes every division through `safeDivide` + bails to the safe zero stack when `targetNetLocal <= 0` or `baseRate <= 0`, `utils/inverseMath.ts` guards platform-cut / cost-percentage divisions and clamps the target via `clampNumber`; `components/ErrorBoundary.tsx` native React class boundary (`getDerivedStateFromError` + `componentDidCatch`) rendering the obsidian "Component Fault Guard" fallback card with an emerald ↻ Reset Module to Defaults action, wired around `<Calculator>` on English + localized corridor pages ("Payout Calculator Guard"), `<InvoiceEditor>` ("Invoice Studio Guard") and the leaderboard index table ("Leaderboard Guard"), docs).
 - *this commit* — **Phase S2**: Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants (`scripts/test_corridors.mjs` Phase S2 batteries — `auditBicSource` ISO 9362 BIC syntax gate over the literal TS receiving-bank + correspondent corpus (caught + fixed Bosnia & Herzegovina `RZBAB2B` → `RZBABA2S`), financial range invariants across rates / platform cuts / fx spreads / `intermediaryUSD` literals + derived `defaultIntermediaryCut`, and a `buildLeaderboard()` replication asserting 50/50 corridors with positive savings %, non-zero `≥ $25` wire penalties and no 10-row identical cluster; `lib/schemaValidator.ts` non-throwing `validateCorridorRuntime` hydrating malformed corridor props before `components/Calculator.tsx` + `components/invoice/InvoiceEditor.tsx` render, docs).
+- *this commit* — **Phase S3**: Static CSP Headers, Client-Side XSS Sanitization & Isolated Storage Purge (`public/_headers` Cloudflare Pages security headers — strict CSP `default-src 'self'`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` camera/microphone/geolocation deny; `utils/sanitize.ts` zero-dependency `stripHtml` / `sanitizeText` sanitizer wired into every Invoice Studio input boundary (`Field` onChange choke point, `correspondentNote` textarea, `applySync` payload merge, draft read/save paths); `lib/privacyGuard.ts` `payoutdelta:*` namespace registry (10 canonical keys) + quota-safe no-throw storage wrappers + one-time-session `migrateLegacyStorage()` remapping legacy spellings (`payoutdelta_draft_invoice`, `payoutdelta_banksync`, `payoutdelta_prc_letter_*`, `payoutdelta-theme`, `payoutdelta_lang`) + `purgeAllLocalData()`; `lib/ledgerEngine.ts` → `payoutdelta:tax_ledger`, `lib/prcLetterEngine.ts` → `payoutdelta:prc_letter_` prefix, `RateWatchlistWidget`/`ContractAddendumModal`/`ThemeToggle`/`LanguageProvider`/`WhatsAppConsultingCard` centralized on wrappers, `PrcLetterModal` display key + `app/layout.tsx` no-FOUC bootstrap canonical-with-legacy-fallback reads; `components/ClearLocalCacheButton.tsx` footer "🔒 Clear Local Cache" island with aria-live count toast; README + spec docs).

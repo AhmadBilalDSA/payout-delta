@@ -255,6 +255,27 @@ non-throwing `validateCorridorRuntime` that silently hydrates malformed
 corridor props before `Calculator` / `InvoiceEditor` render. Zero external
 packages, still fully static.
 
+### 🔐 Static CSP Headers, Client-Side XSS Sanitization & Isolated Storage Purge (Phase S3)
+A defense-in-depth hardening layer on top of the phase-S1/S2 reliability work.
+[`public/_headers`](public/_headers) ships **Cloudflare Pages security headers** on
+every response — a strict Content-Security-Policy (`default-src 'self'`,
+`script-src 'self' 'unsafe-inline' 'unsafe-eval'`, `style-src 'self'
+'unsafe-inline'`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff
+`, strict `Referrer-Policy`, and a `Permissions-Policy` that blocks camera,
+microphone and geolocation. [`utils/sanitize.ts`](utils/sanitize.ts) adds a
+**zero-dependency HTML/script sanitizer** (`stripHtml` + `sanitizeText`) wired
+into every Invoice Studio keystroke — the shared `Field` boundary, the
+correspondent-note textarea, sync-to-invoice payloads and the draft/read/save
+paths — so no pasted markup ever reaches the printable sheet. And
+[`lib/privacyGuard.ts`](lib/privacyGuard.ts) **centralizes every localStorage key
+under the `payoutdelta:*` namespace** (`invoice_draft`, `bank_sync`,
+`invoice_sync`, `tax_ledger`, `rate_alerts`, `prc_letter_`, `addendum_form`,
+`theme`, `language`), gates all reads/writes with quota-safe, no-throw wrappers
+that one-time-migrate legacy keys, and powers a footer **"🔒 Clear Local Cache"**
+button ([`components/ClearLocalCacheButton.tsx`](components/ClearLocalCacheButton.tsx))
+that purges the entire on-device financial footprint. Zero external packages,
+still fully static.
+
 ### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
 The repo ships a free-tier **OpenSEO worker**
 ([`scripts/openseo_worker.js`](scripts/openseo_worker.js)) that tracks the top
@@ -417,6 +438,10 @@ npm run lint      # ESLint
 | `scripts/sync_api_feed.mjs` | Static feed sync for the API portal |
 | `scripts/test_corridors.mjs` | Link + JSON-LD + static-feed integrity audit + Phase S2 schema gates (ISO 9362 BICs · financial ranges · leaderboard consistency) |
 | `lib/schemaValidator.ts` | Phase S2 — non-throwing runtime corridor guard (`validateCorridorRuntime` hydrates malformed props) |
+| `utils/sanitize.ts` | Phase S3 — zero-dependency HTML/script sanitizer (`stripHtml` / `sanitizeText`, newline-preserving) |
+| `lib/privacyGuard.ts` | Phase S3 — `payoutdelta:*` localStorage namespace registry + quota-safe wrappers + one-time legacy migration |
+| `components/ClearLocalCacheButton.tsx` | Phase S3 — footer "🔒 Clear Local Cache" purge island (counts + clears every `payoutdelta*` entry) |
+| `public/_headers` | Phase S3 — Cloudflare Pages CSP + security headers (XFO, nosniff, Referrer-Policy, Permissions-Policy) |
 | `.github/ISSUE_TEMPLATE/` | Structured corridor & statutory request forms |
 | `CONTRIBUTING.md` | Contribution guide, gates & data conventions |
 
@@ -440,6 +465,7 @@ npm run lint      # ESLint
 | Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (`ab8f7bf`) |
 | Phase F | High-variance WhatsApp consulting funnel — thresholds (spread ≥ $150 or ≥ 5% of gross), context-specific `wa.me` deep-link, per-session dismiss, env-configured line + Cloudflare OpenSEO rank monitor (top 20 programmatic queries, SERP sweep, static rankings mirror) with footer transparency badge | Shipped (this commit) |
 | Phase H | FX Contract Protection Addendum Generator — "📜 Generate Contract Addendum" in the Invoice Studio, fixed statutory-English Clauses A/B/C (OUR wire-fee allocation, 3.0% devaluation buffer, tax-exemption affirmation), white executive preview + plain-text copy, single-page `.contract-addendum` PDF print · Local-First Rate Alert Watchlist — above/below target pins per corridor in `payoutdelta:rate_alerts`, emerald "🎯 Target Rate Triggered" badge + optional native desktop notification, `useSyncExternalStore` hydration (no setState-in-effect) | Shipped (this commit) |
+| Phase S3 | Static CSP headers, client-side XSS sanitization & isolated storage purge — `public/_headers` Cloudflare Pages security headers (CSP `default-src 'self'`, X-Frame-Options DENY, nosniff, strict Referrer-Policy, Permissions-Policy blocking camera/mic/geolocation) · zero-dependency `utils/sanitize.ts` sanitizer wired into every Invoice Studio input boundary (`Field`, correspondent-note textarea, sync payloads, draft read/save paths) · `lib/privacyGuard.ts` `payoutdelta:*` namespace registry with quota-safe wrappers + one-time legacy-key migration + footer "🔒 Clear Local Cache" purge island | Shipped (this commit) |
 | Phase S2 | Static schema SRE gates, ISO 9362 SWIFT validation & financial range invariants — `test_corridors.mjs` Phase S2 batteries (BIC syntax gate over the literal TS bank + correspondent corpus incl. the corrected `RZBAB2B` → `RZBABA2S`, range invariants over rates / platform cuts / fx spreads / intermediary cuts, and a `buildLeaderboard()` replication asserting 50/50 rows, positive savings, non-zero `≥ $25` penalties, ranked variance) + non-throwing `lib/schemaValidator.ts` `validateCorridorRuntime` wired through `Calculator` / `InvoiceEditor` | Shipped (this commit) |
 | Phase S1 | Enterprise fault isolation & defensive mathematical guards — `lib/safeMath.ts` guarded arithmetic (`safeDivide` epsilon-clamp + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in the calculator gross-up + inverse solver wrapped, early zero-stack bail on degenerate target/rate, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) around the calculator (English + localized pages), Invoice Studio and leaderboard index | Shipped (this commit) |
 

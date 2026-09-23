@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const ADDENDUM_FORM_KEY = "payoutdelta:addendum_form";
+import {
+  ADDENDUM_FORM_KEY,
+  readLocalStorage,
+  writeLocalStorage,
+} from "@/lib/privacyGuard";
 
 const CLAUSE_A_TITLE = "Strict OUR Wire Fee Allocation";
 const CLAUSE_A_BODY =
@@ -86,9 +90,9 @@ function todayIso(): string {
 
 function readStoredForm(): Partial<AddendumForm> | null {
   if (typeof window === "undefined") return null;
+  const raw = readLocalStorage(ADDENDUM_FORM_KEY);
+  if (!raw) return null;
   try {
-    const raw = window.localStorage.getItem(ADDENDUM_FORM_KEY);
-    if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<AddendumForm>;
     return typeof parsed === "object" && parsed !== null ? parsed : null;
   } catch {
@@ -120,19 +124,15 @@ function ContractAddendumDialog({
 
   // Persist the particulars on every change (quota-safe, on-device).
   useEffect(() => {
-    try {
-      window.localStorage.setItem(
-        ADDENDUM_FORM_KEY,
-        JSON.stringify({
-          contractorName: form.contractorName,
-          clientName: form.clientName,
-          invoiceNumber: form.invoiceNumber,
-          currency: form.currency,
-        })
-      );
-    } catch {
-      // Private browsing / quota — the addendum stays in memory.
-    }
+    writeLocalStorage(
+      ADDENDUM_FORM_KEY,
+      JSON.stringify({
+        contractorName: form.contractorName,
+        clientName: form.clientName,
+        invoiceNumber: form.invoiceNumber,
+        currency: form.currency,
+      })
+    );
   }, [form.contractorName, form.clientName, form.invoiceNumber, form.currency]);
 
   useEffect(() => {

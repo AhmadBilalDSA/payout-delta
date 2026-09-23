@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 
+import { THEME_KEY, writeLocalStorage } from "@/lib/privacyGuard";
+
 /**
  * Phase 7 — iOS-style sun/moon theme pill (client island).
  *
  * Writes `data-theme="dark"` on the `<html>` root — the selector every
  * `dark:` utility and the `:root`/`[data-theme="dark"]` token block in
- * globals.css key on — and mirrors the choice into localStorage so the
- * no-FOUC bootstrap script in `app/layout.tsx` re-applies it before paint on
- * the next visit.
+ * globals.css key on — and mirrors the choice into localStorage (Phase S3
+ * `payoutdelta:theme` namespace key) so the no-FOUC bootstrap script in
+ * `app/layout.tsx` re-applies it before paint on the next visit.
  *
  * All visual states are expressed as *static* `dark:` classes (compiled to
  * `:where([data-theme="dark"], …)` selectors), never conditional strings, so
@@ -17,8 +19,6 @@ import { useState } from "react";
  * attribute change is already reflected by the stylesheet — no flash, no
  * hydration mismatch.
  */
-
-const STORAGE_KEY = "payoutdelta-theme";
 
 function initialTheme(): "light" | "dark" {
   if (typeof document === "undefined") return "light";
@@ -35,12 +35,7 @@ export default function ThemeToggle() {
     const next: "light" | "dark" = dark ? "light" : "dark";
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // Storage can be blocked (private mode / disabled cookies) — the
-      // attribute toggle above already applied the theme for this session.
-    }
+    writeLocalStorage(THEME_KEY, next);
   };
 
   return (

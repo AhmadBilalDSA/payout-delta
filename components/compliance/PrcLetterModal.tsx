@@ -8,6 +8,7 @@ import {
   buildPrcLetterText,
   loadPrcForm,
   prcSchemeForSlug,
+  prcStorageKey,
   resolvePrcScheme,
   savePrcForm,
   type PrcLetterDocument,
@@ -24,7 +25,7 @@ import { getRegulatoryBanking } from "@/data/regulatoryBanking";
  * (beneficiary name, account / IBAN, remitter, remittance reference / UETR)
  * plus the statutory purpose-code declaration, and the letterhead preview
  * re-renders live from `lib/prcLetterEngine.ts`. State persists per corridor
- * under `payoutdelta_prc_letter_<slug>`.
+ * under `payoutdelta:prc_letter_<slug>` (Phase S3 namespace).
  *
  * Actions:
  *   • "Download Official PDF / Print" — native `window.print()`; a print-only
@@ -477,8 +478,8 @@ function PrcLetterDialog({
 
               <p className="text-[11px] leading-relaxed text-black/[0.4] dark:text-white/[0.4]">
                 Letter drafts persist only in this browser (
-                {`payoutdelta_prc_letter${slug ? "_" + slug : ""}`}). Generated
-                on-device — nothing is sent anywhere.
+                {prcStorageKey(slug)}). Generated on-device — nothing
+                is sent anywhere.
               </p>
             </div>
 

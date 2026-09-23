@@ -7,15 +7,26 @@
  * so this module stays importable during the static-export prerender.
  *
  * Zero-server promise: drafts persist only to the client's own localStorage
- * under `payoutdelta_draft_invoice`, and logo uploads are converted to data
- * URLs in-browser. No invoice data ever leaves the device.
+ * under the Phase S3 `payoutdelta:invoice_draft` namespace key, and logo
+ * uploads are converted to data URLs in-browser. No invoice data ever leaves
+ * the device. All storage keys are owned by `lib/privacyGuard.ts` (as are the
+ * guarded read/write/remove accessors that self-heal legacy keys), and every
+ * user-entered string is run through `utils/sanitize.ts` so the printed sheet
+ * can never carry markup.
  */
 
-export const INVOICE_STORAGE_KEY = "payoutdelta_draft_invoice";
-/** Phase 9 — calculator → Invoice Studio bank-sync bridge (localStorage). */
-export const BANK_SYNC_KEY = "payoutdelta_banksync";
-/** Phase 9 · UI polish — live calculator → studio sync payload + event. */
-export const INVOICE_SYNC_KEY = "payoutdelta:invoice_sync";
+import {
+  BANK_SYNC_KEY,
+  INVOICE_DRAFT_KEY,
+  INVOICE_SYNC_KEY,
+  readLocalStorage,
+  removeLocalStorage,
+  writeLocalStorage,
+} from "@/lib/privacyGuard";
+import { sanitizeText, stripHtml } from "@/utils/sanitize";
+
+export { BANK_SYNC_KEY, INVOICE_SYNC_KEY };
+export const INVOICE_STORAGE_KEY = INVOICE_DRAFT_KEY;
 export const INVOICE_SYNC_EVENT = "payoutdelta:synced";
 export const INVOICE_LOGO_LIMIT_BYTES = 500 * 1024;
 
@@ -371,20 +382,12 @@ function sanitizeSettlement(parsed: unknown): InvoiceSettlement {
 
 export function persistInvoiceDraft(draft: InvoiceDraft): void {
   if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(INVOICE_STORAGE_KEY, JSON.stringify(draft));
-  } catch {
-    // Quota exceeded / private browsing — draft silently stays in memory.
-  }
+  writeLocalStorage(INVOICE_STORAGE_KEY, JSON.stringify(draft));
 }
 
 export function clearInvoiceDraft(): void {
   if (typeof window === "undefined") return;
-  try {
-    window.localStorage.removeItem(INVOICE_STORAGE_KEY);
-  } catch {
-    // ignore
-  }
+  removeLocalStorage(INVOICE_STORAGE_KEY);
 }
 
 /** Read a pasted/selected logo into a base64 data URL. */
@@ -402,6 +405,10 @@ export function readDataUrl(file: File): Promise<string> {
 /**
  * Merge a parsed JSON blob with a pristine draft so older/malformed drafts
  * from a prior session never crash the studio.
+ *
+ * Phase S3 — every user-entered string read back from the wallet is re-run
+ * through `sanitizeText` so a stale or tampered local draft can never carry
+ * markup onto the printable sheet.
  */
 function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
   if (!isRecord(parsed)) return fallback;
@@ -414,7 +421,7 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
     rawItems.filter(isRecord).length > 0
       ? rawItems.filter(isRecord).map((item) => ({
           id: asString(item.id, createLineItem().id),
-          description: asString(item.description, ""),
+          description: sanitizeText(asString(item.description, "")),
           quantity: asString(item.quantity, "1"),
           unitRate: asString(item.unitRate, ""),
           gstPercent: asGstPercent(item.gstPercent),
@@ -424,23 +431,23 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
 
   return {
     identity: {
-      freelancerName: asString(identity.freelancerName, ""),
-      freelancerEmail: asString(identity.freelancerEmail, ""),
-      freelancerAddress: asString(identity.freelancerAddress, ""),
-      freelancerTaxId: asString(identity.freelancerTaxId, ""),
-      clientName: asString(identity.clientName, ""),
-      clientCompany: asString(identity.clientCompany, ""),
-      clientEmail: asString(identity.clientEmail, ""),
+      freelancerName: sanitizeText(asString(identity.freelancerName, "")),
+      freelancerEmail: sanitizeText(asString(identity.freelancerEmail, "")),
+      freelancerAddress: sanitizeText(asString(identity.freelancerAddress, "")),
+      freelancerTaxId: sanitizeText(asString(identity.freelancerTaxId, "")),
+      clientName: sanitizeText(asString(identity.clientName, "")),
+      clientCompany: sanitizeText(asString(identity.clientCompany, "")),
+      clientEmail: sanitizeText(asString(identity.clientEmail, "")),
     },
     meta: {
-      number: asString(meta.number, fallback.meta.number),
+      number: sanitizeText(asString(meta.number, fallback.meta.number), 64),
       issueDate: asString(meta.issueDate, fallback.meta.issueDate),
       dueDate: asString(meta.dueDate, fallback.meta.dueDate),
       currency: asCurrencyCode(meta.currency),
     },
     lineItems,
     taxPercent: asTaxPercent(parsed.taxPercent),
-    note: asString(parsed.note, ""),
+    note: sanitizeText(asString(parsed.note, ""), 600),
     accent: asAccentKey(parsed.accent),
     logoDataUrl: asDataUrl(parsed.logoDataUrl),
     includeTransparencyClause:
@@ -452,13 +459,13 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
         ? parsed.includeBankTaxNote
         : fallback.includeBankTaxNote,
     banking: {
-      beneficiaryAccount: asString(banking.beneficiaryAccount, fallback.banking.beneficiaryAccount),
-      receivingBank: asString(banking.receivingBank, fallback.banking.receivingBank),
-      swiftCode: asString(banking.swiftCode, fallback.banking.swiftCode),
-      correspondentNote: asString(banking.correspondentNote, fallback.banking.correspondentNote),
-      purposeCode: asString(banking.purposeCode, fallback.banking.purposeCode),
-      authority: asString(banking.authority, fallback.banking.authority),
-      tierLabel: asString(banking.tierLabel, fallback.banking.tierLabel),
+      beneficiaryAccount: sanitizeText(asString(banking.beneficiaryAccount, fallback.banking.beneficiaryAccount), 64),
+      receivingBank: sanitizeText(asString(banking.receivingBank, fallback.banking.receivingBank)),
+      swiftCode: sanitizeText(asString(banking.swiftCode, fallback.banking.swiftCode), 32),
+      correspondentNote: sanitizeText(asString(banking.correspondentNote, fallback.banking.correspondentNote), 600),
+      purposeCode: sanitizeText(asString(banking.purposeCode, fallback.banking.purposeCode), 32),
+      authority: sanitizeText(asString(banking.authority, fallback.banking.authority)),
+      tierLabel: sanitizeText(asString(banking.tierLabel, fallback.banking.tierLabel)),
     },
     includeStatutoryAddendum:
       typeof parsed.includeStatutoryAddendum === "boolean"
@@ -488,10 +495,12 @@ export function draftFromUrlParams(): InvoiceDraft | null {
       ? (ccy as CurrencyCode)
       : "USD";
     const channel = params.get("channel");
-    const description =
+    const description = sanitizeText(
       channel && channel.trim() !== ""
         ? `Milestone payment (${channel.trim()}) — net of platform fees`
-        : "Project milestone — net of platform fees";
+        : "Project milestone — net of platform fees",
+      160
+    );
 
     const draft = createEmptyDraft();
     draft.meta.currency = currency;
@@ -509,13 +518,13 @@ export function draftFromUrlParams(): InvoiceDraft | null {
 export function loadInvoiceDraft(): InvoiceDraft {
   const fallback = createEmptyDraft();
   if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(INVOICE_STORAGE_KEY);
-    if (raw) {
+  const raw = readLocalStorage(INVOICE_STORAGE_KEY);
+  if (raw) {
+    try {
       return sanitizeDraft(JSON.parse(raw), fallback);
+    } catch {
+      // fall through to URL prefill / empty draft
     }
-  } catch {
-    // fall through to URL prefill / empty draft
   }
   return draftFromUrlParams() ?? fallback;
 }
@@ -551,40 +560,40 @@ function sanitizeBankSync(parsed: unknown): BankSyncPayload | null {
     const n = typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
     return Number.isFinite(n) ? n : fallback;
   };
-  const toNullableString = (value: unknown): string | null =>
-    typeof value === "string" && value.trim() !== "" ? value : null;
+  const toCleanString = (value: unknown, fallback = ""): string =>
+    typeof value === "string" ? stripHtml(value) : fallback;
+  const toNullableString = (value: unknown): string | null => {
+    const cleaned = toCleanString(value);
+    return cleaned.trim() !== "" ? cleaned : null;
+  };
   return {
-    bankName: parsed.bankName,
-    swiftCode: typeof parsed.swiftCode === "string" ? parsed.swiftCode : "",
-    bankSpeed: typeof parsed.bankSpeed === "string" ? parsed.bankSpeed : "",
+    bankName: stripHtml(parsed.bankName),
+    swiftCode: toCleanString(parsed.swiftCode),
+    bankSpeed: toCleanString(parsed.bankSpeed),
     intermediaryUSD: toNumber(parsed.intermediaryUSD, 0),
     clearingFee: toNumber(parsed.clearingFee, 0),
-    currency: typeof parsed.currency === "string" ? parsed.currency : "USD",
-    tierName: typeof parsed.tierName === "string" ? parsed.tierName : "",
+    currency: toCleanString(parsed.currency, "USD"),
+    tierName: toCleanString(parsed.tierName),
     tierRate: toNumber(parsed.tierRate, 0),
     purposeCode: toNullableString(parsed.purposeCode),
-    authority: typeof parsed.authority === "string" ? parsed.authority : "",
-    corridorSlug: typeof parsed.corridorSlug === "string" ? parsed.corridorSlug : "",
-    savedAt: typeof parsed.savedAt === "string" ? parsed.savedAt : "",
+    authority: toCleanString(parsed.authority),
+    corridorSlug: toCleanString(parsed.corridorSlug),
+    savedAt: toCleanString(parsed.savedAt),
   };
 }
 
 /** Persist a calculator "Sync to Invoice" payload. Client-only. */
 export function writeBankSync(payload: BankSyncPayload): void {
   if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(BANK_SYNC_KEY, JSON.stringify(payload));
-  } catch {
-    // Storage unavailable — sync silently degrades to a manual fill-in.
-  }
+  writeLocalStorage(BANK_SYNC_KEY, JSON.stringify(payload));
 }
 
 /** Read the latest calculator bank-sync payload, or `null`. Client-only. */
 export function readBankSync(): BankSyncPayload | null {
   if (typeof window === "undefined") return null;
+  const raw = readLocalStorage(BANK_SYNC_KEY);
+  if (!raw) return null;
   try {
-    const raw = window.localStorage.getItem(BANK_SYNC_KEY);
-    if (!raw) return null;
     return sanitizeBankSync(JSON.parse(raw));
   } catch {
     return null;
@@ -626,16 +635,15 @@ function sanitizeInvoiceSync(parsed: unknown): InvoiceSyncPayload | null {
       typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
     return Number.isFinite(n) ? n : fallback;
   };
+  const toCleanString = (value: unknown, fallback = ""): string =>
+    typeof value === "string" ? stripHtml(value) : fallback;
   return {
-    receivingBank: parsed.receivingBank,
-    swiftBic: typeof parsed.swiftBic === "string" ? parsed.swiftBic : "",
-    statutoryAuthority:
-      typeof parsed.statutoryAuthority === "string"
-        ? parsed.statutoryAuthority
-        : "",
-    purposeCode: typeof parsed.purposeCode === "string" ? parsed.purposeCode : "",
+    receivingBank: stripHtml(parsed.receivingBank),
+    swiftBic: toCleanString(parsed.swiftBic),
+    statutoryAuthority: toCleanString(parsed.statutoryAuthority),
+    purposeCode: toCleanString(parsed.purposeCode),
     taxRate: toNumber(parsed.taxRate, 0),
-    currency: typeof parsed.currency === "string" ? parsed.currency : "USD",
+    currency: toCleanString(parsed.currency, "USD"),
     timestamp: toNumber(parsed.timestamp, 0),
     lineItemAmount:
       typeof parsed.lineItemAmount === "number" &&
@@ -645,7 +653,7 @@ function sanitizeInvoiceSync(parsed: unknown): InvoiceSyncPayload | null {
     lineItemDescription:
       typeof parsed.lineItemDescription === "string" &&
       parsed.lineItemDescription.trim() !== ""
-        ? parsed.lineItemDescription
+        ? stripHtml(parsed.lineItemDescription)
         : undefined,
   };
 }
@@ -653,9 +661,9 @@ function sanitizeInvoiceSync(parsed: unknown): InvoiceSyncPayload | null {
 /** Read the latest live calculator sync payload, or `null`. Client-only. */
 export function readInvoiceSync(): InvoiceSyncPayload | null {
   if (typeof window === "undefined") return null;
+  const raw = readLocalStorage(INVOICE_SYNC_KEY);
+  if (!raw) return null;
   try {
-    const raw = window.localStorage.getItem(INVOICE_SYNC_KEY);
-    if (!raw) return null;
     return sanitizeInvoiceSync(JSON.parse(raw));
   } catch {
     return null;

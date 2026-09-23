@@ -72,7 +72,7 @@ function ThemeBootstrap() {
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: `(()=>{try{var t=localStorage.getItem("payoutdelta-theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.setAttribute("data-theme","dark")}catch(e){}try{var L=[["en","en-US"],["ur","ur-PK"],["hi","hi-IN"],["fil","fil-PH"],["es","es-ES"],["pt","pt-BR"],["ar","ar-SA"]],R=["ur","ar"],s="";try{s=(localStorage.getItem("payoutdelta_lang")||"").toLowerCase()}catch(e){}var f=null;for(var i=0;i<L.length;i++){if(L[i][0]===s){f=L[i];break}}if(!f){var b=(navigator.language||"en").toLowerCase().slice(0,2);for(var j=0;j<L.length;j++){if(L[j][0]===b){f=L[j];break}}}if(f){document.documentElement.lang=f[1];document.documentElement.dir=R.indexOf(f[0])>=0?"rtl":"ltr"}}catch(e){}})();`,
+        __html: `(()=>{try{var t=localStorage.getItem("payoutdelta:theme")||localStorage.getItem("payoutdelta-theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.setAttribute("data-theme","dark")}catch(e){}try{var L=[["en","en-US"],["ur","ur-PK"],["hi","hi-IN"],["fil","fil-PH"],["es","es-ES"],["pt","pt-BR"],["ar","ar-SA"]],R=["ur","ar"],s="";try{s=(localStorage.getItem("payoutdelta:language")||localStorage.getItem("payoutdelta_lang")||"").toLowerCase()}catch(e){}var f=null;for(var i=0;i<L.length;i++){if(L[i][0]===s){f=L[i];break}}if(!f){var b=(navigator.language||"en").toLowerCase().slice(0,2);for(var j=0;j<L.length;j++){if(L[j][0]===b){f=L[j];break}}}if(f){document.documentElement.lang=f[1];document.documentElement.dir=R.indexOf(f[0])>=0?"rtl":"ltr"}}catch(e){}})();`,
       }}
     />
   );

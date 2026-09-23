@@ -378,10 +378,17 @@ function formatHumanReadableDate(isoDate: string): string {
  * localStorage persistence (client-only, guarded for SSR).
  * ------------------------------------------------------------------------- */
 
-export const PRC_STORAGE_PREFIX = "payoutdelta_prc_letter_";
+import {
+  PRC_LETTER_PREFIX,
+  readLocalStorage,
+  writeLocalStorage,
+} from "@/lib/privacyGuard";
+
+/** Per-corridor form-shell prefix (owned by `lib/privacyGuard.ts`). */
+export const PRC_STORAGE_PREFIX = PRC_LETTER_PREFIX;
 
 export function prcStorageKey(corridorSlug?: string): string {
-  return `${PRC_STORAGE_PREFIX}${corridorSlug || "global"}`;
+  return `${PRC_LETTER_PREFIX}${corridorSlug || "global"}`;
 }
 
 export interface PrcLetterPrefill {
@@ -410,9 +417,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /** Read the persisted form shell for a corridor, or `null`. */
 export function loadPrcForm(corridorSlug?: string): Partial<PrcLetterPrefill> | null {
   if (typeof window === "undefined") return null;
+  const raw = readLocalStorage(prcStorageKey(corridorSlug));
+  if (!raw) return null;
   try {
-    const raw = window.localStorage.getItem(prcStorageKey(corridorSlug));
-    if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (!isRecord(parsed)) return null;
     const toNum = (v: unknown, fallback: number) => {
@@ -449,9 +456,5 @@ export function savePrcForm(
   form: Partial<PrcLetterPrefill>
 ): void {
   if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(prcStorageKey(corridorSlug), JSON.stringify(form));
-  } catch {
-    // Quota / private browsing — the letter still drafts in memory.
-  }
+  writeLocalStorage(prcStorageKey(corridorSlug), JSON.stringify(form));
 }

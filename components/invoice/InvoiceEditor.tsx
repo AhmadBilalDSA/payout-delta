@@ -40,6 +40,7 @@ import ContractAddendumModal from "@/components/invoice/ContractAddendumModal";
 import { SwiftRouteInspectorModal } from "@/components/compliance/SwiftRouteInspector";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { sanitizeText } from "@/utils/sanitize";
 
 /**
  * Freelance Invoice Studio — editor + persistence (client island).
@@ -174,19 +175,19 @@ export default function InvoiceEditor({
           receivingBank:
             current.banking.receivingBank.trim() !== ""
               ? current.banking.receivingBank
-              : payload.receivingBank,
+              : sanitizeText(payload.receivingBank),
           swiftCode:
             current.banking.swiftCode.trim() !== ""
               ? current.banking.swiftCode
-              : payload.swiftBic,
+              : sanitizeText(payload.swiftBic, 32),
           purposeCode:
             current.banking.purposeCode.trim() !== ""
               ? current.banking.purposeCode
-              : payload.purposeCode,
+              : sanitizeText(payload.purposeCode, 32),
           authority:
             current.banking.authority.trim() !== ""
               ? current.banking.authority
-              : payload.statutoryAuthority,
+              : sanitizeText(payload.statutoryAuthority),
         },
         lineItems:
           hasLineItem &&
@@ -195,7 +196,10 @@ export default function InvoiceEditor({
                 index === 0
                   ? {
                       ...item,
-                      description: String(payload.lineItemDescription),
+                      description: sanitizeText(
+                        String(payload.lineItemDescription),
+                        300
+                      ),
                       quantity:
                         parseAmount(item.quantity) > 0 ? item.quantity : "1",
                       unitRate: String(Math.round(payload.lineItemAmount ?? 0)),
@@ -204,7 +208,7 @@ export default function InvoiceEditor({
               )
             : current.lineItems,
       }));
-      setSyncedBank(payload.receivingBank);
+      setSyncedBank(sanitizeText(payload.receivingBank));
       setSyncLoaded(true);
     };
 
@@ -591,7 +595,9 @@ export default function InvoiceEditor({
               <textarea
                 value={draft.banking.correspondentNote}
                 onChange={(event) =>
-                  patchBanking({ correspondentNote: event.target.value })
+                  patchBanking({
+                    correspondentNote: sanitizeText(event.target.value, 600),
+                  })
                 }
                 rows={2}
                 placeholder="Route via the bank's London / New York correspondent — OUR instruction."
@@ -1281,6 +1287,11 @@ function Field({
   className?: string;
 }) {
   const inputClass = `w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] dark:border-white/10 dark:bg-neutral-900 dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/25 dark:focus:ring-white/[0.06] ${className}`;
+  // Phase S3 — every keystroke is routed through `sanitizeText` BEFORE it can
+  // enter draft state, so no pasted markup ever reaches the printable sheet or
+  // the local wallet. This covers names, client details, invoice #, line-item
+  // titles, GST/quantity/rate fields and the invoice note through one boundary.
+  const toSafeValue = (next: string) => onChange(sanitizeText(next));
   if (type === "date") {
     return (
       <label className="block">
@@ -1290,7 +1301,7 @@ function Field({
         <input
           type="date"
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => toSafeValue(event.target.value)}
           className={inputClass}
         />
       </label>
@@ -1305,7 +1316,7 @@ function Field({
         type={type}
         inputMode={inputMode}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event) => toSafeValue(event.target.value)}
         placeholder={placeholder}
         className={inputClass}
       />

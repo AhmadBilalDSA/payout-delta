@@ -11,8 +11,9 @@
  * whole season as a spreadsheet-ready CSV.
  *
  * Zero-server promise (identical to the invoice studio): records persist only
- * to the visitor's own `localStorage` under `payoutdelta:remittance_ledger`
- * and never leave the device. Every browser-only API (localStorage, Blob,
+ * to the visitor's own `localStorage` under `payoutdelta:tax_ledger`
+ * (namespace key owned by `lib/privacyGuard.ts`) and never leave the device.
+ * Every browser-only API (localStorage, Blob,
  * URL.createObjectURL, document) lives behind a `typeof window === "undefined"`
  * guard or a caller-gated function, so this module stays importable during
  * the static-export prerender.
@@ -27,9 +28,18 @@ import type {
   WireProtocol,
 } from "@/lib/invoiceTypes";
 import { grandTotal, parseAmount } from "@/lib/invoiceTypes";
+import {
+  TAX_LEDGER_KEY,
+  readLocalStorage,
+  removeLocalStorage,
+  writeLocalStorage,
+} from "@/lib/privacyGuard";
 
-/** localStorage key for the accumulated remittance ledger. */
-export const LEDGER_STORAGE_KEY = "payoutdelta:remittance_ledger";
+/**
+ * localStorage key for the accumulated remittance ledger (owned by
+ * `lib/privacyGuard.ts` under the `payoutdelta:*` namespace).
+ */
+export const LEDGER_STORAGE_KEY = TAX_LEDGER_KEY;
 
 /** Realization status derived from the record's realized take-home. */
 export type LedgerStatus = "Pending" | "Realized";
@@ -256,9 +266,9 @@ export function sanitizeLedgerRecord(parsed: unknown): RemittanceRecord | null {
 /** Read every saved ledger record, newest first. Client-only. */
 export function getLedgerRecords(): RemittanceRecord[] {
   if (typeof window === "undefined") return [];
+  const raw = readLocalStorage(LEDGER_STORAGE_KEY);
+  if (!raw) return [];
   try {
-    const raw = window.localStorage.getItem(LEDGER_STORAGE_KEY);
-    if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     return parsed
@@ -273,36 +283,25 @@ export function getLedgerRecords(): RemittanceRecord[] {
 /** Append a record to the ledger. Returns the persisted record. Client-only. */
 export function addLedgerRecord(record: RemittanceRecord): RemittanceRecord {
   if (typeof window === "undefined") return record;
-  try {
-    const current = getLedgerRecords();
-    const next = [record, ...current];
-    window.localStorage.setItem(LEDGER_STORAGE_KEY, JSON.stringify(next));
-    return record;
-  } catch {
+  const current = getLedgerRecords();
+  const next = [record, ...current];
+  if (!writeLocalStorage(LEDGER_STORAGE_KEY, JSON.stringify(next))) {
     // Quota exceeded / private browsing — record stays in memory only.
-    return record;
   }
+  return record;
 }
 
 /** Remove one record by id. Client-only. */
 export function deleteLedgerRecord(id: string): void {
   if (typeof window === "undefined") return;
-  try {
-    const next = getLedgerRecords().filter((record) => record.id !== id);
-    window.localStorage.setItem(LEDGER_STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    // ignore
-  }
+  const next = getLedgerRecords().filter((record) => record.id !== id);
+  writeLocalStorage(LEDGER_STORAGE_KEY, JSON.stringify(next));
 }
 
 /** Wipe the whole ledger (tax-season reset). Client-only. */
 export function clearLedger(): void {
   if (typeof window === "undefined") return;
-  try {
-    window.localStorage.removeItem(LEDGER_STORAGE_KEY);
-  } catch {
-    // ignore
-  }
+  removeLocalStorage(LEDGER_STORAGE_KEY);
 }
 
 /* ---------------------------------------------------------------------------

@@ -16,6 +16,11 @@ import {
   SUPPORTED_LANGS,
 } from "@/lib/i18n/dictionaries";
 import type { SupportedLang, UiKey, Vars } from "@/lib/i18n/dictionaries";
+import {
+  LANGUAGE_KEY,
+  readLocalStorage,
+  writeLocalStorage,
+} from "@/lib/privacyGuard";
 
 /**
  * PayoutDelta — global language provider (Phase 7 refresh).
@@ -35,7 +40,7 @@ import type { SupportedLang, UiKey, Vars } from "@/lib/i18n/dictionaries";
  * two layers agree, so users never see a flash of the wrong script.
  */
 
-const LANGUAGE_STORAGE_KEY = "payoutdelta_lang";
+const LANGUAGE_STORAGE_KEY = LANGUAGE_KEY;
 const FALLBACK_LANG: SupportedLang = "en";
 
 interface LanguageContextValue {
@@ -51,16 +56,12 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 /** Reads the stored preference, falls back to the browser base language. */
 function detectInitialLang(): SupportedLang {
-  try {
-    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (stored !== null) {
-      const candidate = stored as SupportedLang;
-      if (SUPPORTED_LANGS.includes(candidate)) {
-        return candidate;
-      }
+  const stored = readLocalStorage(LANGUAGE_STORAGE_KEY);
+  if (stored !== null) {
+    const candidate = stored as SupportedLang;
+    if (SUPPORTED_LANGS.includes(candidate)) {
+      return candidate;
     }
-  } catch {
-    // Storage blocked (private mode) — fall through to navigator detection.
   }
   const base = navigator.language?.toLowerCase().slice(0, 2) ?? "";
   const matched = SUPPORTED_LANGS.find((code) => code === base);
@@ -103,11 +104,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const meta = LANG_META[next];
     document.documentElement.lang = langToLocale(next);
     document.documentElement.dir = meta.isRTL ? "rtl" : "ltr";
-    try {
-      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, next);
-    } catch {
-      // Storage blocked — the attribute switch still applies for the session.
-    }
+    writeLocalStorage(LANGUAGE_STORAGE_KEY, next);
   }, []);
 
   const t = useCallback(

@@ -13,6 +13,7 @@ import {
   writeBankSync,
   type InvoiceSyncPayload,
 } from "@/lib/invoiceTypes";
+import { writeLocalStorage } from "@/lib/privacyGuard";
 
 /**
  * Phase 9 — Statutory Bank Settlement & Dynamic Transaction Costing Engine.
@@ -218,11 +219,7 @@ export default function TransactionCostingWidget({
       lineItemAmount,
       lineItemDescription,
     };
-    try {
-      window.localStorage.setItem(INVOICE_SYNC_KEY, JSON.stringify(syncPayload));
-    } catch {
-      // Storage unavailable — the live event below still reaches the studio.
-    }
+    writeLocalStorage(INVOICE_SYNC_KEY, JSON.stringify(syncPayload));
     window.dispatchEvent(
       new CustomEvent<InvoiceSyncPayload>(INVOICE_SYNC_EVENT, {
         detail: syncPayload,

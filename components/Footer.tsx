@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getDataset } from "@/lib/db";
 import { SEO_RANKINGS_BADGE_LABEL, SEO_RANKINGS_DATA_PATH } from "@/data/config";
+import ClearLocalCacheButton from "@/components/ClearLocalCacheButton";
 
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
@@ -123,6 +124,9 @@ export default function Footer() {
                     ↗
                   </span>
                 </Link>
+              </li>
+              <li className="mt-3">
+                <ClearLocalCacheButton />
               </li>
             </ul>
           </div>

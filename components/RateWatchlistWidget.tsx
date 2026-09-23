@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import type { Corridor } from "@/lib/types";
-
-const RATE_ALERT_KEY = "payoutdelta:rate_alerts";
+import {
+  RATE_ALERTS_KEY,
+  readLocalStorage,
+  writeLocalStorage,
+} from "@/lib/privacyGuard";
 
 type AlertDirection = "above" | "below";
 
@@ -29,9 +32,9 @@ let alertSnapshotCache: { key: string; value: RateAlert | null } = {
 
 function readAlerts(): AlertMap {
   if (typeof window === "undefined") return {};
+  const raw = readLocalStorage(RATE_ALERTS_KEY);
+  if (!raw) return {};
   try {
-    const raw = window.localStorage.getItem(RATE_ALERT_KEY);
-    if (!raw) return {};
     const parsed = JSON.parse(raw) as AlertMap;
     return typeof parsed === "object" && parsed !== null ? parsed : {};
   } catch {
@@ -40,11 +43,7 @@ function readAlerts(): AlertMap {
 }
 
 function writeAlerts(alerts: AlertMap): void {
-  try {
-    window.localStorage.setItem(RATE_ALERT_KEY, JSON.stringify(alerts));
-  } catch {
-    // Private browsing / quota — the alert stays in memory for the session.
-  }
+  writeLocalStorage(RATE_ALERTS_KEY, JSON.stringify(alerts));
   notifyAlertListeners();
 }
 
