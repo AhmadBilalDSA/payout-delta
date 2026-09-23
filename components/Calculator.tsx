@@ -101,6 +101,10 @@ export default function Calculator({
   const [prcOpen, setPrcOpen] = useState(false);
   const [prcSnapshot, setPrcSnapshot] = useState<PrcLetterPrefill | null>(null);
 
+  // Hotfix — segmented deck: "Payout Fee Comparison" (live audit rail) vs
+  // "Local Bank & Tax Settlement" (statutory waterfall + tax + compliance).
+  const [activeTab, setActiveTab] = useState<"audit" | "settlement">("audit");
+
   const platform =
     platforms.find((item) => item.id === platformId) ?? platforms[0];
 
@@ -279,13 +283,54 @@ export default function Calculator({
   }, [printQuote]);
 
   return (
-    <div className="grid w-full grid-cols-1 items-start gap-8 lg:grid-cols-12">
-      {/* Primary Interactive Rail — calculator input card, ranked breakdown and
+    <div className="w-full min-w-0">
+      {/* Segmented tab deck — "Payout Fee Comparison" (live audit) vs "Local
+          Bank & Tax Settlement" (statutory waterfall). The control spans full
+          width above both rails; the active surface is a white pill so the
+          obsidian canvas reads at a glance, and `aria-selected` keeps the
+          deck accessible for screen readers. */}
+      <div
+        role="tablist"
+        aria-label="Calculator view"
+        className="flex w-full min-w-0 items-center gap-1 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/90 p-1.5 shadow-md backdrop-blur-md"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "audit"}
+          onClick={() => setActiveTab("audit")}
+          className={`flex-1 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-semibold transition-all sm:px-4 ${
+            activeTab === "audit"
+              ? "bg-white text-slate-950 shadow-sm"
+              : "text-slate-400 hover:bg-white/[0.06] hover:text-slate-200"
+          }`}
+        >
+          ⚡ Payout Fee Comparison
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "settlement"}
+          onClick={() => setActiveTab("settlement")}
+          className={`flex-1 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-semibold transition-all sm:px-4 ${
+            activeTab === "settlement"
+              ? "bg-white text-slate-950 shadow-sm"
+              : "text-slate-400 hover:bg-white/[0.06] hover:text-slate-200"
+          }`}
+        >
+          🏦 Local Bank &amp; Tax Settlement
+        </button>
+      </div>
+
+      <div className="mt-6 grid w-full grid-cols-1 items-start gap-8 lg:grid-cols-12">
+        {/* Primary Interactive Rail — calculator input card, ranked breakdown and
           the 7-step waterfall engine + bank/tax addendum selectors. Every
           flex child carries `min-w-0` so wide numbers can never compress the
           column (anti-collapse guard against flex sizing overflow). */}
       <div className="flex w-full min-w-0 flex-col gap-6 lg:col-span-7">
-        <SliderControls
+        {activeTab === "audit" ? (
+          <>
+            <SliderControls
           mode={mode}
           onModeChange={setMode}
           amount={amount}
@@ -369,53 +414,59 @@ export default function Calculator({
             </div>
           </section>
         )}
-
-        {/* Interactive tax & net take-home impact — beneath the verdict and the
-            ranked breakdown. Binds live to the parent amount/target state. */}
-        {taxSnapshot !== null && (
-          <TaxImpactCard
-            corridor={corridor}
-            mode={mode}
-            invoiceValue={isTarget ? targetNet : amount}
-            onInvoiceChange={(value) => {
-              if (isTarget) {
-                setTargetNet(clampLocalTarget(value, targetBounds));
-              } else {
-                setAmount(clampGrossUSD(value));
-              }
-            }}
-            grossUSD={taxSnapshot.grossUSD}
-            grossLocal={taxSnapshot.grossLocal}
-            netLocalPreTax={taxSnapshot.netLocalPreTax}
-            channelCutUSD={taxSnapshot.channelCutUSD}
-            channelName={taxSnapshot.channelName}
-            effectiveRate={taxSnapshot.effectiveRate}
-            tierRate={taxSnapshot.tierRate}
-          />
-        )}
-
-        {/* Phase 8/9 — local bank settlement & custom costing under the ranked
-            breakdown and tax card, shared by every corridor page variant. In
-            target mode the widget is anchored on the solver's gross-up so the
-            waterfall lands exactly on the target at its default bank/tier. */}
-        {costingAnchor !== null && (
+          </>
+        ) : (
           <>
-            <TransactionCostingWidget
-              corridor={corridor}
-              mode={mode}
-              {...costingAnchor}
-              onGenerateLetter={setPrcSnapshot}
-            />
+            {/* Phase 8/9 — local bank settlement & custom costing under the
+                ranked breakdown, shared by every corridor page variant. In
+                target mode the widget is anchored on the solver's gross-up so
+                the waterfall lands exactly on the target at its default
+                bank/tier. */}
+            {costingAnchor !== null && (
+              <>
+                <TransactionCostingWidget
+                  corridor={corridor}
+                  mode={mode}
+                  {...costingAnchor}
+                  onGenerateLetter={setPrcSnapshot}
+                />
 
-            {/* Phase C — 1-click Bank PRC / FIRC statutory export exemption
-                letter. Opens the generator with the live waterfall snapshot. */}
-            <button
-              type="button"
-              onClick={openPrcLetter}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
-            >
-              📄 Generate Bank PRC / Exemption Letter
-            </button>
+                {/* Phase C — 1-click Bank PRC / FIRC statutory export exemption
+                    letter. Opens the generator with the live waterfall snapshot. */}
+                <button
+                  type="button"
+                  onClick={openPrcLetter}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
+                >
+                  📄 Generate Bank PRC / Exemption Letter
+                </button>
+              </>
+            )}
+
+            {/* Interactive tax & net take-home impact — binds live to the
+                settlement stack beside the waterfall; the amounts follow the
+                parent amount/target state. */}
+            {taxSnapshot !== null && (
+              <TaxImpactCard
+                corridor={corridor}
+                mode={mode}
+                invoiceValue={isTarget ? targetNet : amount}
+                onInvoiceChange={(value) => {
+                  if (isTarget) {
+                    setTargetNet(clampLocalTarget(value, targetBounds));
+                  } else {
+                    setAmount(clampGrossUSD(value));
+                  }
+                }}
+                grossUSD={taxSnapshot.grossUSD}
+                grossLocal={taxSnapshot.grossLocal}
+                netLocalPreTax={taxSnapshot.netLocalPreTax}
+                channelCutUSD={taxSnapshot.channelCutUSD}
+                channelName={taxSnapshot.channelName}
+                effectiveRate={taxSnapshot.effectiveRate}
+                tierRate={taxSnapshot.tierRate}
+              />
+            )}
           </>
         )}
 
@@ -433,19 +484,29 @@ export default function Calculator({
           (`rounded-2xl border-slate-800/80 bg-slate-900/60 p-6`) carrying its
           own `min-w-0`, so long citation chips / accordion expansions can never
           overlap or collapse the rail. */}
-      <aside className="flex w-full min-w-0 flex-col gap-6 order-first lg:order-none lg:sticky lg:top-24 lg:col-span-5">
-        {bluf}
-        <VerdictCard
-          verdict={route.verdict}
-          corridor={corridor}
-          quotes={route.quotes}
-          platform={platform}
-          mode={mode}
-          inverseVerdict={inverseRoute.verdict}
-          history={history}
-          sparklineStats={sparklineStats}
-        />
-        {faq}
+      <aside
+        className={`flex w-full min-w-0 flex-col gap-6 lg:col-span-5 lg:sticky lg:top-24 ${
+          activeTab === "audit" ? "order-first lg:order-none" : ""
+        }`}
+      >
+        {activeTab === "audit" ? (
+          <>
+            {bluf}
+            <VerdictCard
+              verdict={route.verdict}
+              corridor={corridor}
+              quotes={route.quotes}
+              platform={platform}
+              mode={mode}
+              inverseVerdict={inverseRoute.verdict}
+              history={history}
+              sparklineStats={sparklineStats}
+            />
+            {faq}
+          </>
+        ) : (
+          <StatutoryComplianceCard corridor={corridor} />
+        )}
       </aside>
 
       {/* Print-only audit receipt, mounted the instant an export is asked for
@@ -469,6 +530,7 @@ export default function Calculator({
           prefill={prcSnapshot ?? defaultPrcSnapshot}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -487,4 +549,81 @@ function clampLocalTarget(
       ? bounds.min + Math.round((clamped - bounds.min) / bounds.step) * bounds.step
       : clamped;
   return Math.min(bounds.max, Math.max(bounds.min, stepped));
+}
+
+/**
+ * Hotfix — "Statutory Compliance" details card for the settlement tab. Pulls
+ * the governing authority, clearing network, default local bank and the first
+ * statutory filing tier straight from the build-time regulatory table, so the
+ * sticky rail beside the waterfall shows the jurisdiction fields without
+ * duplicating the page-level ComplianceGuide drawer below the fold.
+ */
+function StatutoryComplianceCard({ corridor }: { corridor: Corridor }) {
+  const regulation = getRegulatoryBanking(corridor.slug);
+  const bank = regulation.banks[0];
+  const tier = regulation.tiers[0];
+
+  return (
+    <section
+      aria-labelledby="statutory-compliance"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-md backdrop-blur-md"
+    >
+      <p className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.06] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+        <span
+          aria-hidden="true"
+          className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"
+        />
+        Statutory Compliance
+      </p>
+      <h2
+        id="statutory-compliance"
+        className="mt-4 text-lg font-bold tracking-tight text-slate-100"
+      >
+        {corridor.country} Payout Regulations
+      </h2>
+      <p className="mt-1 text-xs leading-relaxed text-slate-400">
+        Local withholding, realization and documentation posture for the{" "}
+        {corridor.from} → {corridor.to} corridor.
+      </p>
+      <div className="mt-4 flex flex-col gap-2.5">
+        <StatLine label="Governing authority" value={regulation.authority} />
+        <StatLine
+          label="Clearing network"
+          value={regulation.clearingNetwork}
+        />
+        {tier !== undefined && (
+          <StatLine
+            label="Default statutory status"
+            value={`${tier.name} · ${(tier.rate * 100).toFixed(2)}%`}
+          />
+        )}
+        {tier?.purposeCode !== undefined && (
+          <StatLine label="Export purpose code" value={tier.purposeCode} />
+        )}
+        {bank !== undefined && (
+          <StatLine label="Default local bank" value={bank.displayName} />
+        )}
+      </div>
+      <p className="mt-4 text-[10px] leading-relaxed text-slate-500">
+        {regulation.citations.join(" · ")}
+      </p>
+    </section>
+  );
+}
+
+/** Single statutory row chip for the compliance card. */
+function StatLine({ label, value }: { label: string; value?: string }) {
+  if (value === undefined || value === "") {
+    return null;
+  }
+  return (
+    <div className="flex flex-col gap-0.5 rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2">
+      <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
+        {label}
+      </span>
+      <span className="text-xs font-medium leading-snug text-slate-200">
+        {value}
+      </span>
+    </div>
+  );
 }

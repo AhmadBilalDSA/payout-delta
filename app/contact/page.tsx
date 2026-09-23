@@ -27,7 +27,7 @@ export default function ContactPage() {
         or the corridor FAQ on each calculator page.
       </p>
 
-      <ul className="mt-8 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white dark:divide-white/[0.08] dark:border-white/[0.08] dark:bg-[#15151A]">
+      <ul className="mt-8 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white dark:divide-white/[0.08] dark:border-white/[0.08] dark:bg-slate-900">
         <li className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-semibold text-slate-900 dark:text-white">General enquiries</p>

@@ -40,43 +40,48 @@
 
 :root {
   /*
-   * PayoutDelta design tokens — institutional fintech slate (Stripe/Linear
-   * discipline), light-first. Every muddy tan / sepia / khaki token is purged:
-   * the light canvas is a clean slate-50 `#F8FAFC` with slate-900 `#0F172A`
-   * ink; the dark deck is a deep obsidian navy `#0B0F19` with near-white
-   * `#F8FAFC` ink. Card containers apply the vertical-card recipe inline
-   * (`bg-white border-slate-200/90 shadow-slate-900/5` light ·
-   * `dark:bg-slate-900/70 dark:border-slate-800/80 dark:shadow-md
-   * dark:backdrop-blur-md`) so unlayered CSS can never outrank Tailwind
-   * utilities. Muted copy resolves to `text-slate-500/600` (light) and
-   * `text-slate-400` (dark); savings accents use
-   * `text-emerald-600 dark:text-emerald-400 bg-emerald-500/10`, conversion
-   * CTAs use `from-violet-600 to-indigo-600`.
+   * PayoutDelta design tokens — enforced obsidian fintech deck. The paint
+   * surface is ALWAYS the deep navy screen (no light mode, no muddy sepia /
+   * tan / pale-charcoal escape): canvas `#080D1A`, near-white `#F8FAFC` ink,
+   * cards on slate-900 `#0F172A` behind slate-800 `#1E293B` hairlines. Every
+   * tan / sepia / khaki token (`#d6cbbe`, `#d8cbc4`) and the muddy charcoal
+   * `#15151A` are purged from the app. Card containers apply the vertical-card
+   * recipe inline (`dark:bg-slate-900/70 dark:border-slate-800/80
+   * dark:shadow-md dark:backdrop-blur-md`) so unlayered CSS can never outrank
+   * Tailwind utilities. Muted copy resolves to `--muted-text` (#94A3B8);
+   * savings accents use `text-emerald-600 dark:text-emerald-400
+   * bg-emerald-500/10`, conversion CTAs use emerald-400 fill with slate-950
+   * ink.
    */
-  --canvas: #f8fafc; /* slate-50 — primary surface */
-  --sub-canvas: #f1f5f9; /* slate-100 — recessed surface */
-  --ink: #0f172a; /* slate-900 — crisp primary text */
-  --carbon-60: rgba(15, 23, 42, 0.56); /* slate-900/56 — secondary text */
-  --hairline: rgba(15, 23, 42, 0.08); /* 1px separators */
-  --hairline-strong: rgba(15, 23, 42, 0.12); /* hover borders */
+  --background: #080d1a; /* enforced obsidian canvas */
+  --foreground: #f8fafc; /* near-white ink */
+  --card-bg: #0f172a; /* slate-900 — card surfaces */
+  --card-border: #1e293b; /* slate-800 — card hairlines */
+  --muted-text: #94a3b8; /* slate-400 — secondary copy */
+
+  /* Internal aliases — the @theme inline block + legacy utilities keep
+     reading --canvas / --ink / --carbon-60 / --hairline. */
+  --canvas: #080d1a;
+  --sub-canvas: #0b1220;
+  --ink: #f8fafc;
+  --carbon-60: rgba(248, 250, 252, 0.56);
+  --hairline: rgba(148, 163, 184, 0.16);
+  --hairline-strong: rgba(148, 163, 184, 0.24);
   --apple-glass-shadow:
-    0 0 0 1px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.04),
-    0 12px 32px -4px rgba(15, 23, 42, 0.08);
+    0 0 0 1px rgba(148, 163, 184, 0.08), 0 2px 8px rgba(0, 0, 0, 0.4),
+    0 12px 32px -4px rgba(0, 0, 0, 0.6);
   --accent: #10b981; /* emerald-500 (marks, dots) */
   --accent-strong: #059669; /* emerald-600 (primary actions) */
 
-  /* Legacy aliases so bg-background / text-foreground utilities keep working. */
-  --background: var(--canvas);
-  --foreground: var(--ink);
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 [data-theme="dark"] {
-  --canvas: #0b0f19; /* deep obsidian navy — no washed-out charcoal */
-  --sub-canvas: #0d1220; /* recessed surface */
-  --ink: #f8fafc; /* slate-50 — near-white ink */
+  --canvas: #080d1a;
+  --sub-canvas: #0b1220;
+  --ink: #f8fafc;
   --carbon-60: rgba(248, 250, 252, 0.56);
-  --hairline: rgba(148, 163, 184, 0.16); /* slate-400 hairlines */
+  --hairline: rgba(148, 163, 184, 0.16);
   --hairline-strong: rgba(148, 163, 184, 0.24);
   --apple-glass-shadow:
     0 0 0 1px rgba(148, 163, 184, 0.08), 0 2px 8px rgba(0, 0, 0, 0.4),
@@ -87,16 +92,18 @@
 }
 
 /* Institutional background guarantees — root & body. The `!important` pins
-   survive any leaky third-party stylesheet while the attribute-scoped override
-   keeps the header theme toggle authoritative in dark mode. */
+   survive any leaky third-party stylesheet, and the palette is locked to the
+   obsidian canvas unconditionally (no light-first fallback). `min-height: 100vh`
+   fills the viewport so hairlines on short pages still reach the fold. */
 html {
   scroll-behavior: smooth;
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: #080d1a !important;
+  color: #f8fafc !important;
+  min-height: 100vh;
 }
 
 html[data-theme="dark"] {
-  background-color: #0b0f19 !important;
+  background-color: #080d1a !important;
   color: #f8fafc !important;
 }
 
@@ -114,6 +121,7 @@ html[data-theme="dark"] {
 body {
   background: var(--background);
   color: var(--foreground);
+  min-height: 100vh;
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
@@ -343,5 +351,50 @@ body {
     color: #000000 !important;
     font-size: 10.5pt !important;
     line-height: 1.45 !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Hotfix — blank-page guard for every printable sheet (.print-sheet surfaces:
+ * the invoice document, calculator audit receipt and PRC letter). Two failure
+ * modes are closed here (last in cascade, matches/extends the isolation block
+ * above): (1) the obsidian `min-height: 100vh` body now overrides to `auto`
+ * with `min-height: 0` so the print engine never emits an empty leading or
+ * trailing page, and (2) `.print-sheet` children opt out of shattering so
+ * summary blocks / table rows never push an orphan page. `box-shadow` is
+ * flattened because some renderers treat the glass glow as a compositing layer
+ * that forces an extra blank sheet. The white surface is re-pinned so the
+ * dark canvas cannot bleed into the exported PDF.
+ * ------------------------------------------------------------------------- */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .print-sheet {
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-sheet section,
+  .print-sheet thead,
+  .print-sheet tr,
+  .print-sheet .invoice-table-row,
+  .print-sheet .invoice-summary-box {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }

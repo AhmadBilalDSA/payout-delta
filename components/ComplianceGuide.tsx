@@ -82,7 +82,7 @@ export default function ComplianceGuide({
           <p className="mt-2 text-sm leading-relaxed text-black/70 dark:text-white/70">
             {guide.taxIntro}
           </p>
-          <div className="mt-3 overflow-x-auto rounded-xl border border-black/20 bg-white dark:border-white/20 dark:bg-[#15151A]">
+          <div className="mt-3 overflow-x-auto rounded-xl border border-black/20 bg-white dark:border-white/20 dark:bg-slate-900">
             <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
               <thead>
                 <tr className="bg-black text-white dark:bg-white dark:text-black">

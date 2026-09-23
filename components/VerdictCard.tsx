@@ -47,7 +47,7 @@ export default function VerdictCard({
   history: HistoryPoint[];
   sparklineStats: SparklineStats;
 }) {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
 
@@ -218,14 +218,9 @@ if (mode === "net-to-gross") {
                 target="_blank"
                 rel="noopener noreferrer sponsored"
                 title={partner.disclosure}
-                className="mt-4 flex w-full items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-md shadow-violet-500/20 transition-all text-sm"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/20 transition-all text-sm mt-4"
               >
-                <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-                  {partner.partnerBadge}
-                </span>
-                <span className="text-center">
-                  {t("lockInRateVia", { channel: best.channelName })}
-                </span>
+                <span>Lock In Best Rate via {best.channelName}</span>
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -236,8 +231,7 @@ if (mode === "net-to-gross") {
                   strokeLinejoin="round"
                   className="h-4 w-4 shrink-0"
                 >
-                  <path d="M7 17L17 7" />
-                  <path d="M8 7h9v9" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </a>
 
@@ -288,12 +282,6 @@ if (mode === "net-to-gross") {
     wireQuote === undefined
       ? 0
       : Math.max(0, best.localAmount - wireQuote.localAmount);
-  const ctaLabel =
-    partner.kind === "affiliate"
-      ? lang === "en"
-        ? partner.claimCopy
-        : `${t("claimRateVia")} ${best.channelName}`
-      : partner.claimCopy;
 
   return (
     <section
@@ -379,12 +367,9 @@ if (mode === "net-to-gross") {
               target="_blank"
               rel="noopener noreferrer sponsored"
               title={partner.disclosure}
-              className="mt-4 flex w-full items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-md shadow-violet-500/20 transition-all text-sm"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/20 transition-all text-sm mt-4"
             >
-              <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-                {partner.partnerBadge}
-              </span>
-              <span className="text-center">{ctaLabel}</span>
+              <span>Lock In Best Rate via {best.channelName}</span>
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -395,8 +380,7 @@ if (mode === "net-to-gross") {
                 strokeLinejoin="round"
                 className="h-4 w-4 shrink-0"
               >
-                <path d="M7 17L17 7" />
-                <path d="M8 7h9v9" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
 

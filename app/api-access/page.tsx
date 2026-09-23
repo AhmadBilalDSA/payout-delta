@@ -246,7 +246,7 @@ export default function ApiAccessPage() {
 
         <div className="mt-4 grid gap-6 lg:grid-cols-2">
           {/* Example 1 — static JSON feed */}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-[#15151A]">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-slate-900">
             <div className="border-b border-slate-200 p-4 dark:border-white/[0.08]">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-bold text-slate-900 dark:text-white">
@@ -287,7 +287,7 @@ export default function ApiAccessPage() {
           </div>
 
           {/* Example 2 — live edge worker */}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-[#15151A]">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-slate-900">
             <div className="border-b border-slate-200 p-4 dark:border-white/[0.08]">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-bold text-slate-900 dark:text-white">
@@ -336,7 +336,7 @@ export default function ApiAccessPage() {
         </h2>
         <div className="mt-4 grid gap-6 lg:grid-cols-2">
           {/* Request builder */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-white/[0.08] dark:bg-[#15151A]">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-white/[0.08] dark:bg-slate-900">
             <div className="flex flex-wrap gap-2">
               {ENDPOINTS.map((item) => (
                 <button
@@ -369,7 +369,7 @@ export default function ApiAccessPage() {
                   <select
                     value={slug}
                     onChange={(event) => setSlug(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/[0.12] dark:bg-[#15151A] dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/[0.12] dark:bg-slate-900 dark:text-white"
                   >
                     {fees.corridors.map((corridor) => (
                       <option key={corridor.slug} value={corridor.slug}>
@@ -392,7 +392,7 @@ export default function ApiAccessPage() {
                     step={50}
                     value={gross}
                     onChange={(event) => setGross(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/[0.12] dark:bg-[#15151A] dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/[0.12] dark:bg-slate-900 dark:text-white"
                   />
                 </label>
               )}
@@ -405,7 +405,7 @@ export default function ApiAccessPage() {
                   <select
                     value={platform}
                     onChange={(event) => setPlatform(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/[0.12] dark:bg-[#15151A] dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/[0.12] dark:bg-slate-900 dark:text-white"
                   >
                     {fees.platforms.map((item) => (
                       <option key={item.id} value={item.id}>
@@ -453,7 +453,7 @@ export default function ApiAccessPage() {
               {ENDPOINTS.map((item) => (
                 <div
                   key={item.key}
-                  className="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/[0.08] dark:bg-[#15151A]"
+                  className="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/[0.08] dark:bg-slate-900"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
@@ -477,7 +477,7 @@ export default function ApiAccessPage() {
               ))}
             </div>
 
-            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-white/[0.08] dark:bg-[#15151A]">
+            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-white/[0.08] dark:bg-slate-900">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">Contract</h3>
               <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm text-slate-600 dark:text-white/60">
                 <li>Response shape: <code className="font-mono text-xs">quotes</code> sorted by best local amount first, with a <code className="font-mono text-xs">verdict</code> summarising the cheapest vs costliest channel.</li>
@@ -496,7 +496,7 @@ export default function ApiAccessPage() {
           Developer SLA & policy
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/[0.08] dark:bg-[#15151A]">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/[0.08] dark:bg-slate-900">
             <p className="font-mono text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               60<small className="text-xs font-semibold">/min</small>
             </p>
@@ -509,7 +509,7 @@ export default function ApiAccessPage() {
               <code className="font-mono">retryAfterSeconds</code> field.
             </p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/[0.08] dark:bg-[#15151A]">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/[0.08] dark:bg-slate-900">
             <p className="font-mono text-2xl font-bold text-slate-900 dark:text-white">
               CORS *
             </p>
@@ -521,7 +521,7 @@ export default function ApiAccessPage() {
               any dashboard, spreadsheet sync or CI job without a key or proxy.
             </p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/[0.08] dark:bg-[#15151A]">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/[0.08] dark:bg-slate-900">
             <p className="font-mono text-2xl font-bold text-slate-900 dark:text-white">
               0
             </p>
@@ -534,7 +534,7 @@ export default function ApiAccessPage() {
             </p>
           </div>
         </div>
-        <p className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-xs leading-relaxed text-slate-500 dark:border-white/[0.08] dark:bg-[#15151A] dark:text-white/50">
+        <p className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-xs leading-relaxed text-slate-500 dark:border-white/[0.08] dark:bg-slate-900 dark:text-white/50">
           The static feed at <code className="font-mono">{FEED_URL}</code> is regenerated
           from <code className="font-mono">data/fees.json</code> on every build
           (<code className="font-mono">npm run prebuild</code>) — versioned, cache-friendly

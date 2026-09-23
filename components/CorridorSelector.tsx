@@ -41,7 +41,7 @@ export default function CorridorSelector() {
             onFocus={() => setActiveSlug(corridor.slug)}
             className={`rounded-full px-4 py-2 text-sm font-medium tabular-nums transition-all duration-200 ease-out ${
               isActive
-                ? "bg-white text-slate-900 shadow-sm dark:bg-[#15151A] dark:text-white"
+                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
                 : "text-slate-600 hover:text-slate-900 dark:text-white/50 dark:hover:text-white"
             }`}
           >
