@@ -7,7 +7,9 @@
     "prebuild": "node scripts/sync_api_feed.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npm run lint && node scripts/test_corridors.mjs && npm run test:simulation",
+    "test:simulation": "node scripts/simulate_edge_cases.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",

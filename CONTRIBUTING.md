@@ -22,9 +22,13 @@ Run the full gate set — every one must pass:
 
 ```bash
 npm run lint                          # 0 errors
-npm run build                         # 36 static routes → ./out
+npm run build                         # 159+ static routes → ./out
 node scripts/test_corridors.mjs       # ALL CHECKS PASSED (exit 0)
+node scripts/simulate_edge_cases.mjs  # ALL INVARIANTS HELD (exit 0)
 ```
+
+Or run the unified suite in one command: `npm run test` (lint → corridor
+audit → headless S4 simulation).
 
 The audit verifies routes, assets, links, JSON-LD (`@graph` per corridor) and
 that `public/api/fees.json` still mirrors `data/fees.json`. Never commit an

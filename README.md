@@ -276,6 +276,26 @@ button ([`components/ClearLocalCacheButton.tsx`](components/ClearLocalCacheButto
 that purges the entire on-device financial footprint. Zero external packages,
 still fully static.
 
+Integer overflow isn't the only closure here — so is the *validation* loop.
+The suite that proves the quotes you see are the quotes you get ships as
+[`scripts/simulate_edge_cases.mjs`](scripts/simulate_edge_cases.mjs) (Phase S4):
+a **zero-dependency headless stress simulator** that imports the real shipping
+engine (lib/safeMath + calculatorEngine + calculateRoute) by stripping the TS
+surface and executing it as plain JS via data URL — no Puppeteer, no Cypress,
+Node-20/CI-safe. It sweeps 5 corridors × 3 platforms × 5 rails across $1 /
+$1,000 / $5,000 / $50,000 in both directions (300 forward quotes + 600 inverse
+`calculateGrossFromTargetNet` solves + 375 sub-floor fee-consumption identities
++ an 11-input degenerate guard battery) and enforces the invariant set with
+exit-1 on any violation: take-home always `> 0` unless fixed fees consume the
+whole micro transfer; **no NaN / ±Infinity / null / undefined** anywhere in a
+quote (including the `JSON.stringify(NaN) → "null"` corruption path); the full
+effective fee stack bounded to `[0.1%, 15%]` on Direct (Standard+) / Upwork
+(High+, Fiverr's 20% cut and fixed-fee-dominated amounts excluded); and
+`Infinity` fixed fees sanitizing identically to fee-0 solves. 2,401 independent
+parity identities cross-check the engine numerically. Runs standalone as
+`npm run test:simulation` and as the final stage of the unified
+`npm run test` suite.
+
 ### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
 The repo ships a free-tier **OpenSEO worker**
 ([`scripts/openseo_worker.js`](scripts/openseo_worker.js)) that tracks the top
@@ -381,6 +401,7 @@ npm install
 npm run dev       # local dev server → http://localhost:3000
 npm run build     # full static export → ./out
 npm run lint      # ESLint
+npm run test      # unified SRE suite — lint → static/JSON-LD audit → headless S4 simulation
 ```
 
 ---
@@ -442,6 +463,7 @@ npm run lint      # ESLint
 | `lib/privacyGuard.ts` | Phase S3 — `payoutdelta:*` localStorage namespace registry + quota-safe wrappers + one-time legacy migration |
 | `components/ClearLocalCacheButton.tsx` | Phase S3 — footer "🔒 Clear Local Cache" purge island (counts + clears every `payoutdelta*` entry) |
 | `public/_headers` | Phase S3 — Cloudflare Pages CSP + security headers (XFO, nosniff, Referrer-Policy, Permissions-Policy) |
+| `scripts/simulate_edge_cases.mjs` | Phase S4 — zero-dependency headless invariant simulator (imports the shipped TS engine via in-memory transform; forward + inverse + micro fee-consumption + degenerate sweeps; R1 take-home / R2 finiteness / R3 fee-bound / R4 sanitization invariants) |
 | `.github/ISSUE_TEMPLATE/` | Structured corridor & statutory request forms |
 | `CONTRIBUTING.md` | Contribution guide, gates & data conventions |
 
@@ -468,6 +490,7 @@ npm run lint      # ESLint
 | Phase S3 | Static CSP headers, client-side XSS sanitization & isolated storage purge — `public/_headers` Cloudflare Pages security headers (CSP `default-src 'self'`, X-Frame-Options DENY, nosniff, strict Referrer-Policy, Permissions-Policy blocking camera/mic/geolocation) · zero-dependency `utils/sanitize.ts` sanitizer wired into every Invoice Studio input boundary (`Field`, correspondent-note textarea, sync payloads, draft read/save paths) · `lib/privacyGuard.ts` `payoutdelta:*` namespace registry with quota-safe wrappers + one-time legacy-key migration + footer "🔒 Clear Local Cache" purge island | Shipped (this commit) |
 | Phase S2 | Static schema SRE gates, ISO 9362 SWIFT validation & financial range invariants — `test_corridors.mjs` Phase S2 batteries (BIC syntax gate over the literal TS bank + correspondent corpus incl. the corrected `RZBAB2B` → `RZBABA2S`, range invariants over rates / platform cuts / fx spreads / intermediary cuts, and a `buildLeaderboard()` replication asserting 50/50 rows, positive savings, non-zero `≥ $25` penalties, ranked variance) + non-throwing `lib/schemaValidator.ts` `validateCorridorRuntime` wired through `Calculator` / `InvoiceEditor` | Shipped (this commit) |
 | Phase S1 | Enterprise fault isolation & defensive mathematical guards — `lib/safeMath.ts` guarded arithmetic (`safeDivide` epsilon-clamp + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in the calculator gross-up + inverse solver wrapped, early zero-stack bail on degenerate target/rate, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) around the calculator (English + localized pages), Invoice Studio and leaderboard index | Shipped (this commit) |
+| Phase S4 | Headless simulation & regression guards — `scripts/simulate_edge_cases.mjs` zero-dependency pure-Node engine importer (strips the TS surface, fuses `lib/safeMath` + `calculatorEngine` + `calculateRoute` into plain JS via data URL); 300 forward quotes + 600 inverse `calculateGrossFromTargetNet` solves across USD→PKR/INR/BRL/PHP/EUR × Upwork/Fiverr/Direct × 5 rails × $1/$1,000/$5,000/$50,000 + 375 sub-floor fee-consumption identities + 11-input degenerate battery; invariants: take-home always `> 0` (fixed-fee carve-out only), no NaN/±Infinity/null/undefined (incl. `JSON.stringify(NaN)→"null"`), effective fee stack inside `[0.1%, 15%]` on Direct (Standard+) / Upwork (High+), `Infinity` fee sanitization parity; 2,401 independent parity identities; `npm run test:simulation` + unified `npm run test` | Shipped (this commit) |
 
 ---
 

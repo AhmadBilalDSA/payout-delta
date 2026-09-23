@@ -420,6 +420,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 | S1 | **Enterprise Fault Isolation & Defensive Mathematical Guards** — centralized `lib/safeMath.ts` primitives (`safeDivide` epsilon-clamps zero/sub-epsilon denominators + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in `lib/calculatorEngine.ts` + `utils/inverseMath.ts` wrapped through the guards with an early zero-stack bail on `targetNetLocal <= 0` / `baseRate <= 0`, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) wired around `<Calculator>` (English + localized corridor pages), `<InvoiceEditor>` and the leaderboard index table | **Shipped** (this commit) |
 | S3 | **Static CSP Headers, Client-Side XSS Sanitization & Isolated Storage Purge** — `public/_headers` Cloudflare Pages security headers (strict CSP `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` blocking camera/microphone/geolocation); zero-dependency `utils/sanitize.ts` sanitizer (`stripHtml` decodes entities + strips active markup/URIs, `sanitizeText` clamps with newline preservation) wired into every Invoice Studio input boundary (shared `Field` onChange, `correspondentNote` textarea, sync-to-invoice payloads, draft read/save paths); `lib/privacyGuard.ts` centralizes all storage under the `payoutdelta:*` namespace (`invoice_draft`, `bank_sync`, `invoice_sync`, `tax_ledger`, `rate_alerts`, `prc_letter_`, `addendum_form`, `theme`, `language`), quota-safe no-throw `readLocalStorage` / `writeLocalStorage` / `removeLocalStorage` wrappers + one-time-session legacy-key migration (`payoutdelta_draft_invoice`, `payoutdelta_banksync`, `payoutdelta_prc_letter_*`, `payoutdelta-theme`, `payoutdelta_lang` → namespaced), and `purgeAllLocalData()` counting every `payoutdelta*` entry; footer "🔒 Clear Local Cache" island (`ClearLocalCacheButton.tsx`) with aria-live count toast; no-FOUC inline bootstrap reads canonical keys with legacy fallback | **Shipped** (this commit) |
 | S2 | **Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants** — three build-time SRE gate batteries in `scripts/test_corridors.mjs` Phase S2: (1) every authored receiving-bank `swiftCode` + correspondent-node `bic` literal (read straight off the TS source, CI-safe on Node 20) validated against ISO 9362 8/11-char syntax — no lowercase, no spaces, no malformed lengths; (2) financial range invariants across the full static surface (`baseRate > 0` finite, `0 ≤ platformFee ≤ 50%`, `0 ≤ fxSpread ≤ 15%`, `0 ≤ intermediaryUSD ≤ $100`); (3) a `buildLeaderboard()` replication asserting 50/50 corridors ranked with positive savings %, non-zero `≥ $25` wire penalties and no 10-consecutive identical cluster. Includes the corrected Bosnia & Herzegovina BIC (`RZBAB2B` → `RZBABA2S`), and a client-side no-throw `lib/schemaValidator.ts` `validateCorridorRuntime` that hydrates malformed corridor props before `Calculator.tsx` / `InvoiceEditor.tsx` render | **Shipped** (this commit) |
+| S4 | **Headless Simulation & Regression Guards** — zero-dependency pure-Node stress simulator `scripts/simulate_edge_cases.mjs` that imports the shipped math engine directly from `lib/safeMath.ts` + `lib/calculatorEngine.ts` (`calculateGrossFromTargetNet`) + `utils/calculateRoute.ts` (`quoteChannel`/`computeRoute`) by stripping the TS surface in-memory and executing the fused plain-JS module via data URL (CI-safe on Node 20, no Puppeteer/Cypress); stresses USD→PKR · INR · BRL · PHP · EUR across Upwork/Fiverr/Direct × 5 rails × $1 / $1,000 / $5,000 / $50,000 boundaries in both directions (forward + inverse) plus a raw sub-clamp micro fee-consumption sweep and a degenerate guard battery. Enforced invariants (any violation → exit 1): realized take-home always `> 0` unless fully consumed by fixed fees; no generated value may be NaN/±Infinity/null/undefined (incl. the `JSON.stringify(NaN) → "null"` corruption path); effective total fee deduction inside `[0.1%, 15%]` on Direct (Standard+) and Upwork (High+), with Fiverr's 20% cut + fixed-fee-dominated micro amounts as documented exclusions. Wired as `npm run test:simulation` and the terminal stage of the unified `npm run test` suite | **Shipped** (this commit) |
 
 ---
 
@@ -428,6 +429,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
 npm run build                 # 159+ static routes → ./out
+npm run test                  # unified SRE suite — lint → static corridor/JSON-LD audit → Phase S4 headless simulation, exit 0
 node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, ledger/tax-ledger audits, Phase S2 schema gates (ISO 9362 BICs · financial ranges · leaderboard consistency), exit 0
 ```
 
@@ -695,6 +697,53 @@ every localStorage key prefixed `payoutdelta` (both spellings) + the
 sessionStorage dismiss marker and reports the entry count in an `aria-live`
 toast — placing the on-device financial footprint under the visitor's control.
 
+**Phase S4 (Headless Simulation & Regression Guards)** closes the loop on the
+Phase B closed-form solver and the Phase S1/S2 guards with a zero-dependency
+pure-Node stress simulator that runs against the exact shipping math engine —
+no browser, no Puppeteer/Cypress, no bundled URL.
+
+`scripts/simulate_edge_cases.mjs` (S4.1) builds the engine in-memory: the
+Node 20 CI baseline cannot import TypeScript with `@/` aliases, so the driver
+reads the three engine sources (`lib/safeMath.ts`,
+`lib/calculatorEngine.ts`, `utils/calculateRoute.ts`), strips the TS surface
+(comments, `import`/`import type` lines, `interface` blocks, parameter/return
+/`as`-cast annotations) and fuses them into one plain-JS module executed via a
+`data:text/javascript` data URL — the same `calculateGrossFromTargetNet`,
+`quoteChannel`, `computeRoute`, `clampGrossUSD` and `safe*` primitives the
+site ships, with the corpus read from the single source of truth
+`data/fees.json`.
+
+S4.2 stresses five high-volume corridors (USD→PKR, USD→INR, USD→BRL, USD→PHP,
+USD→EUR) across three platforms (Upwork, Fiverr, Direct), five rails, and four
+boundaries ($1 micro, $1,000 standard, $5,000 high, $50,000 corporate) in both
+directions: a forward quote sweep (300 quotes), a raw inverse gross-up solve
+using `calculateGrossFromTargetNet` (600 solves across a legacy 0/0/0 stack and
+a realistic wire-$18 + landing-fee + tier-capped stack), plus a micro sweep of
+375 raw identities below the $100 engine floor (where fixed fees may legitimately
+consume the whole transfer) and a degenerate battery of zero/negative/NaN/
+Infinity inputs that must trip the Phase S1 zero-stack guards without throwing.
+
+S4.3 enforces the invariant set (any violation stops the suite with exit 1):
+- **R1 — take-home**: realized net local currency is always `> 0`, with a
+  single documented carve-out for micro amounts below the slider floor whose
+  entire transfer is consumed by fixed fees.
+- **R2 — finiteness**: no produced value may be NaN, ±Infinity, `null` or
+  `undefined` — including the JSON serialization corruption path where
+  `JSON.stringify(NaN)` silently becomes the string `"null"`.
+- **R3 — fee bounds**: the effective total deduction (full fee stack, fixed +
+  platform + spread leakage) stays inside `[0.1%, 15%]` on Direct (Standard+)
+  and Upwork (High+); Fiverr's inherent 20% platform cut and fixed-fee-dominated
+  micro amounts are documented exclusions.
+- **R4 — sanitization parity**: engine-side guards must sanitize a non-finite
+  `fixedFeeUSD` (e.g. `Infinity`) down to a zero fee and solve identically to
+  the fee-0 input, never propagating the non-finite value into a quote.
+
+S4.4 wires the simulator as `npm run test:simulation`, the terminal stage of the
+unified `npm run test` suite (lint → static corridor/JSON-LD audit → S4
+simulation) and a standalone CI target. 2,401 independent parity checks also
+recompute every inverse solve through an identity relation, cross-checking the
+engine numerically rather than against itself.
+
 ---
 
 ## 7. Existing Commits That Anchor This Spec
@@ -726,3 +775,4 @@ toast — placing the on-device financial footprint under the visitor's control.
 - *this commit* — **Phase S1**: Enterprise Fault Isolation & Defensive Mathematical Guards (`lib/safeMath.ts` centralized primitives — `safeDivide` epsilon-clamps zero / sub-epsilon denominators and finite-guards null/NaN/Infinity operands with a caller `fallback`, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`; `lib/calculatorEngine.ts` routes every division through `safeDivide` + bails to the safe zero stack when `targetNetLocal <= 0` or `baseRate <= 0`, `utils/inverseMath.ts` guards platform-cut / cost-percentage divisions and clamps the target via `clampNumber`; `components/ErrorBoundary.tsx` native React class boundary (`getDerivedStateFromError` + `componentDidCatch`) rendering the obsidian "Component Fault Guard" fallback card with an emerald ↻ Reset Module to Defaults action, wired around `<Calculator>` on English + localized corridor pages ("Payout Calculator Guard"), `<InvoiceEditor>` ("Invoice Studio Guard") and the leaderboard index table ("Leaderboard Guard"), docs).
 - *this commit* — **Phase S2**: Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants (`scripts/test_corridors.mjs` Phase S2 batteries — `auditBicSource` ISO 9362 BIC syntax gate over the literal TS receiving-bank + correspondent corpus (caught + fixed Bosnia & Herzegovina `RZBAB2B` → `RZBABA2S`), financial range invariants across rates / platform cuts / fx spreads / `intermediaryUSD` literals + derived `defaultIntermediaryCut`, and a `buildLeaderboard()` replication asserting 50/50 corridors with positive savings %, non-zero `≥ $25` wire penalties and no 10-row identical cluster; `lib/schemaValidator.ts` non-throwing `validateCorridorRuntime` hydrating malformed corridor props before `components/Calculator.tsx` + `components/invoice/InvoiceEditor.tsx` render, docs).
 - *this commit* — **Phase S3**: Static CSP Headers, Client-Side XSS Sanitization & Isolated Storage Purge (`public/_headers` Cloudflare Pages security headers — strict CSP `default-src 'self'`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` camera/microphone/geolocation deny; `utils/sanitize.ts` zero-dependency `stripHtml` / `sanitizeText` sanitizer wired into every Invoice Studio input boundary (`Field` onChange choke point, `correspondentNote` textarea, `applySync` payload merge, draft read/save paths); `lib/privacyGuard.ts` `payoutdelta:*` namespace registry (10 canonical keys) + quota-safe no-throw storage wrappers + one-time-session `migrateLegacyStorage()` remapping legacy spellings (`payoutdelta_draft_invoice`, `payoutdelta_banksync`, `payoutdelta_prc_letter_*`, `payoutdelta-theme`, `payoutdelta_lang`) + `purgeAllLocalData()`; `lib/ledgerEngine.ts` → `payoutdelta:tax_ledger`, `lib/prcLetterEngine.ts` → `payoutdelta:prc_letter_` prefix, `RateWatchlistWidget`/`ContractAddendumModal`/`ThemeToggle`/`LanguageProvider`/`WhatsAppConsultingCard` centralized on wrappers, `PrcLetterModal` display key + `app/layout.tsx` no-FOUC bootstrap canonical-with-legacy-fallback reads; `components/ClearLocalCacheButton.tsx` footer "🔒 Clear Local Cache" island with aria-live count toast; README + spec docs).
+- *this commit* — **Phase S4**: Headless Simulation & Regression Guards (`scripts/simulate_edge_cases.mjs` zero-dependency pure-Node engine importer that strips the TS surface in-memory and fuses `lib/safeMath.ts` + `lib/calculatorEngine.ts` + `utils/calculateRoute.ts` into one plain-JS module executed via data URL — CI-safe on Node 20, no Puppeteer/Cypress; forward stress on USD→PKR/INR/BRL/PHP/EUR × Upwork/Fiverr/Direct × 5 rails × $1/$1,000/$5,000/$50,000 (300 quotes) + 600 inverse `calculateGrossFromTargetNet` closed-form solves (legacy + realistic wire/landing/tier stacks) + 375 raw micro fee-consumption identities below the $100 floor + 11-input degenerate guard battery; invariants R1 take-home > 0 (fixed-fee carve-out), R2 no NaN/±Infinity/null/undefined incl. `JSON.stringify(NaN)→"null"`, R3 effective fee stack inside [0.1%, 15%] on Direct (Standard+) / Upwork (High+, Fiverr 20% cut + micro excluded), R4 `Infinity` fixed-fee sanitization parity; 2,401 independent identity parity checks; wired as `npm run test:simulation` = terminal stage of unified `npm run test`; README + spec docs).
