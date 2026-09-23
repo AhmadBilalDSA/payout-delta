@@ -64,11 +64,11 @@ export default function AeoFaqSection({
     <section
       aria-labelledby={`aeo-faq-${corridor.slug}`}
       data-aeo="audit-faq"
-      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-md backdrop-blur-md"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-md backdrop-blur-md sm:p-6"
     >
       <h2
         id={`aeo-faq-${corridor.slug}`}
-        className="text-xl font-bold text-white"
+        className="text-xl font-bold tracking-tight text-white"
       >
         {t("aeoFaqTitle")}
       </h2>
@@ -76,17 +76,20 @@ export default function AeoFaqSection({
         {t("aeoFaqLead")}
       </p>
 
+      {/* Two-column accordion grid on md+ — each question is its own bordered
+          card so the wide full-bleed section never looks like one long strip;
+          the lead question is right-flushed by the staggered 2+1 column flow. */}
       <Accordion.Root
         type="multiple"
         value={openValues}
         onValueChange={setOpenValues}
-        className="mt-4 divide-y divide-white/[0.08] overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
+        className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2"
       >
         {items.map((item, index) => (
           <Accordion.Item
             key={`${item.q}-${index}`}
             value={`aeo-${index}`}
-            className="overflow-hidden"
+            className="self-start overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
           >
             <Accordion.Header>
               <Accordion.Trigger className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left text-sm font-semibold leading-relaxed text-slate-100 transition-colors hover:bg-white/[0.05]">

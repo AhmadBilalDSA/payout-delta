@@ -339,6 +339,16 @@ function asGstPercent(value: unknown): string {
   return String(Math.min(100, Math.max(0, n)));
 }
 
+/** Normalize the invoice-level tax/VAT % string to a clamped numeric string.
+ * Guarantees the studio default is a clean `"0"` — a malformed persisted
+ * value like `"0s"` collapses to `0` instead of leaking into print/PDF. */
+function asTaxPercent(value: unknown): string {
+  if (typeof value !== "string") return "0";
+  const n = Number.parseFloat(value.replace(/,/g, "").trim());
+  if (!Number.isFinite(n)) return "0";
+  return String(Math.min(100, Math.max(0, n)));
+}
+
 /** Normalize a settlement % / fee string to a clamped non-negative string. */
 function asFeeString(value: unknown, maxPercent = false): string {
   if (typeof value !== "string") return "0";
@@ -429,8 +439,8 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
       currency: asCurrencyCode(meta.currency),
     },
     lineItems,
-    taxPercent: asString(parsed.taxPercent, fallback.taxPercent),
-    note: asString(parsed.note, fallback.note),
+    taxPercent: asTaxPercent(parsed.taxPercent),
+    note: asString(parsed.note, ""),
     accent: asAccentKey(parsed.accent),
     logoDataUrl: asDataUrl(parsed.logoDataUrl),
     includeTransparencyClause:

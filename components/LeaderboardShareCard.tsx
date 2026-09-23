@@ -55,9 +55,16 @@ export default function LeaderboardShareCard() {
 
       <div className="mt-4 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4">
         <p className="text-xs leading-relaxed text-white/70">
-          “Did you know traditional banks take an average of 4.2% on
-          international wires to Asia and LatAm? My bank took $42 on $1,000.
-          Audit your exact wire leakage on PayoutDelta.”
+          “Did you know traditional banks take an average of{" "}
+          <span className="font-mono tabular-nums tracking-tight">
+            4.2%
+          </span>{" "}
+          on international wires to Asia and LatAm? My bank took{" "}
+          <span className="font-mono tabular-nums tracking-tight">$42</span>{" "}
+          on <span className="font-mono tabular-nums tracking-tight">
+            $1,000
+          </span>
+          . Audit your exact wire leakage on PayoutDelta.”
         </p>
       </div>
 

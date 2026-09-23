@@ -77,7 +77,7 @@ export default function FeeBreakdownList({
                         {quote.channelName}
                       </p>
                     </div>
-                    <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
+                    <p className="font-mono text-xs tabular-nums tracking-tight text-black/[0.45] dark:text-white/[0.45]">
                       {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
                       {t("spreadLabel", { pct: spreadPercent.toFixed(2) })}
                     </p>
@@ -86,10 +86,10 @@ export default function FeeBreakdownList({
 
                 <div className="flex shrink-0 items-center gap-4">
                   <div className="text-right">
-                    <p className="font-bold tabular-nums text-black dark:text-white">
+                    <p className="font-mono font-bold tabular-nums tracking-tight text-black dark:text-white">
                       {formatLocal(quote.localAmount, corridor)}
                     </p>
-                    <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
+                    <p className="font-mono text-xs tabular-nums tracking-tight text-black/[0.45] dark:text-white/[0.45]">
                       <span className={index === 0 ? "text-emerald-600" : ""}>
                         {quote.totalCostPercent.toFixed(1)}%
                       </span>{" "}
@@ -128,7 +128,7 @@ export default function FeeBreakdownList({
                     <dt className="text-black/55 dark:text-white/55">
                       1. {t("platformCut")}
                     </dt>
-                    <dd className="tabular-nums font-medium text-black dark:text-white">
+                    <dd className="font-mono tabular-nums font-medium tracking-tight text-black dark:text-white">
                       − {formatUSD(quote.platformFeeUSD)}
                     </dd>
                   </div>
@@ -136,7 +136,7 @@ export default function FeeBreakdownList({
                     <dt className="text-black/55 dark:text-white/55">
                       2. {t("fixedClearingFee")}
                     </dt>
-                    <dd className="tabular-nums font-medium text-black dark:text-white">
+                    <dd className="font-mono tabular-nums font-medium tracking-tight text-black dark:text-white">
                       − {formatUSD(quote.feeDeductedUSD)}
                     </dd>
                   </div>
@@ -144,7 +144,7 @@ export default function FeeBreakdownList({
                     <dt className="text-black/55 dark:text-white/55">
                       3. {t("hiddenFxSpread")}
                     </dt>
-                    <dd className="tabular-nums font-medium text-black dark:text-white">
+                    <dd className="font-mono tabular-nums font-medium tracking-tight text-black dark:text-white">
                       {spreadPercent.toFixed(2)}% · −{" "}
                       {formatLocal(fxLossLocal, corridor)}{" "}
                       <span className="text-black/[0.45] dark:text-white/[0.45]">
@@ -156,7 +156,7 @@ export default function FeeBreakdownList({
                     <dt className="font-semibold text-black/80 dark:text-white/80">
                       4. {t("netReceived")}
                     </dt>
-                    <dd className="font-bold tabular-nums text-emerald-600">
+                    <dd className="font-mono font-bold tabular-nums tracking-tight text-emerald-600">
                       + {formatLocal(quote.localAmount, corridor)}
                     </dd>
                   </div>

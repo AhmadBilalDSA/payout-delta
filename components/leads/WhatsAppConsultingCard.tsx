@@ -143,7 +143,7 @@ export default function WhatsAppConsultingCard({
   return (
     <section
       aria-label="High-value transfer leakage consulting advisory"
-      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 text-white shadow-md backdrop-blur-md sm:p-7"
+      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 text-white shadow-md backdrop-blur-md sm:p-6"
     >
       <div
         aria-hidden="true"
@@ -161,11 +161,11 @@ export default function WhatsAppConsultingCard({
 
         <h3 className="mt-4 text-lg font-bold tracking-tight text-white sm:text-xl">
           You are losing ~
-          <span className="tabular-nums text-emerald-300">
+          <span className="font-mono tabular-nums tracking-tight text-emerald-300">
             ${formatRough(leakageUsd)}
           </span>{" "}
           (
-          <span className="tabular-nums text-white">
+          <span className="font-mono tabular-nums tracking-tight text-white">
             {formatRough(leakageLocal)} {corridor.to}
           </span>
           ) on this transfer
@@ -173,7 +173,7 @@ export default function WhatsAppConsultingCard({
 
         <p className="mt-2 text-sm leading-relaxed text-white/60">
           At regular monthly volume, hidden correspondent spreads cost you ~
-          <span className="font-semibold tabular-nums text-white">
+          <span className="font-mono font-semibold tabular-nums tracking-tight text-white">
             ${formatRough(annualLeakageUsd)}/year
           </span>
           . Optimize your corporate entity, banking routing, and statutory tax

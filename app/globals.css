@@ -132,6 +132,15 @@ body {
     color 0.2s ease;
 }
 
+/* Typographic cadence — tabular numerals. Every monetary amount, rate, fee %
+   and SWIFT deduction renders with `font-mono tabular-nums tracking-tight` so
+   columns never shift and adjacent figures stay optically aligned. The
+   explicit rule keeps `tabular-nums` working even where Tailwind's utility
+   pass is outranked by component-owned font-feature settings. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Right-to-left locales (Urdu / Arabic) need the Nastaliq-capable typefaces
    plus extra breathing room for the deeper glyph stack. Kept in one cascade
    layer so SaaS tooling and dark-mode overrides still apply cleanly.
@@ -170,6 +179,18 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent, #10b981);
   outline-offset: 2px;
+}
+
+/* Freelance Invoice Studio — crisp white paper. The screen surface is pinned
+   to pure white with slate-900 ink (never tan / parchment / sepia) so the
+   live A4 canvas reads like the printed PDF: 8px radius, a hard soft-drop
+   shadow off the obsidian canvas, and no glass tint can bleed through. The
+   print overrides below neutralize borderRadius/box-shadow for pagination. */
+#invoice-document {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 /* ---------------------------------------------------------------------------

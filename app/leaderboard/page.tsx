@@ -76,7 +76,7 @@ interface LeaderboardRow {
 
 const BENCHMARK_GROSS_USD = 1000;
 const DEFAULT_DIRECT_WIRE_FEE_USD = 18;
-const DEFAULT_DIRECT_WIRE_SPREAD = 0.035;
+const DEFAULT_DIRECT_WIRE_SPREAD = 0.032;
 const DEFAULT_INTERMEDIARY_CUT_USD = 18;
 
 interface BestRail {
@@ -89,7 +89,7 @@ interface BestRail {
 /**
  * Corridor-authoritative direct-wire fee model. Corridors authored in
  * `data/fees.json` carry per-market "Direct Wire" provider records; every
- * other corridor falls back to the standard $18 wire + 3.5% FX markup.
+ * other corridor falls back to the standard $18 wire + 3.2% FX markup.
  */
 function getDirectWireOverride(corridor: Corridor): {
   fixedFeeUSD: number;
@@ -171,8 +171,12 @@ function buildLeaderboard(): LeaderboardRow[] {
       const best = findWinningProvider(winner.channelId, corridor, channels);
       const bestTotalCostUsd =
         best.fixedFeeUSD + BENCHMARK_GROSS_USD * best.fxSpread;
+      // Savings are floored at zero — a corridor can never "save" negative —
+      // and the derived percentage is clamped through the same guarded number
+      // so the table cell can never show a backwards `-x.x%`.
       const netSavingsUsd = Math.max(0, wireTotalPenaltyUsd - bestTotalCostUsd);
-      const savingsPct = (netSavingsUsd / BENCHMARK_GROSS_USD) * 100;
+      const savingsPct =
+        Math.max(0, (netSavingsUsd / BENCHMARK_GROSS_USD) * 100);
 
       return {
         slug: corridor.slug,
@@ -230,7 +234,7 @@ export default function LeaderboardPage() {
 
       <div className="mt-6 flex w-full min-w-0 flex-col gap-4 sm:flex-row">
         <div className="flex flex-1 min-w-0 flex-col rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 shadow-md backdrop-blur-md">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/40">
+          <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
             Average retail bank spread
           </p>
           <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-amber-300">
@@ -241,7 +245,7 @@ export default function LeaderboardPage() {
           </p>
         </div>
         <div className="flex flex-1 min-w-0 flex-col rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 shadow-md backdrop-blur-md">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/40">
+          <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
             Modern digital rails
           </p>
           <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-emerald-300">
@@ -252,7 +256,7 @@ export default function LeaderboardPage() {
           </p>
         </div>
         <div className="flex flex-1 min-w-0 flex-col rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 shadow-md backdrop-blur-md">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/40">
+          <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
             Worst corridor penalty
           </p>
           <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-white">
@@ -269,7 +273,7 @@ export default function LeaderboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
-              <tr className="border-b border-white/[0.08] text-[10px] font-semibold uppercase tracking-widest text-white/40">
+              <tr className="border-b border-white/[0.08] text-[10px] font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
                 <th className="px-4 py-3">Rank</th>
                 <th className="px-4 py-3">Country &amp; Currency</th>
                 <th className="px-4 py-3">

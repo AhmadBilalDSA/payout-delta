@@ -263,7 +263,7 @@ export default function InvoicePreview({
             </div>
           </div>
 
-          {draft.note && (
+          {draft.note && draft.note.trim() !== "" && (
             <p className="mt-6 whitespace-pre-line text-[11px] leading-relaxed text-slate-500">
               {draft.note}
             </p>

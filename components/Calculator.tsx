@@ -78,8 +78,9 @@ export default function Calculator({
       verdict). Rendered by the page (server component), passed as a slot so the
       client island can place it beside the live verdict without losing state. */
   bluf?: ReactNode;
-  /** Server-rendered AEO audit FAQ accordion — analytical rail slot (below the
-      verdict). Same child-as-slot pattern as `bluf`. */
+  /** Server-rendered AEO audit FAQ accordion — full-width slot rendered below
+      the two-column grid so the tall accordion never unbalances the rail.
+      Same child-as-slot pattern as `bluf`. */
   faq?: ReactNode;
 }) {
   const { t } = useLanguage();
@@ -389,12 +390,12 @@ export default function Calculator({
         </button>
       </div>
 
-      <div className="mt-6 grid w-full grid-cols-1 items-start gap-8 lg:grid-cols-12">
+      <div className="mt-6 grid w-full grid-cols-1 items-start gap-5 lg:grid-cols-12">
         {/* Primary Interactive Rail — calculator input card, ranked breakdown and
           the 7-step waterfall engine + bank/tax addendum selectors. Every
           flex child carries `min-w-0` so wide numbers can never compress the
           column (anti-collapse guard against flex sizing overflow). */}
-      <div className="flex w-full min-w-0 flex-col gap-6 lg:col-span-7">
+      <div className="flex w-full min-w-0 flex-col gap-5 lg:col-span-7">
         {activeTab === "audit" ? (
           <>
             <SliderControls
@@ -414,7 +415,7 @@ export default function Calculator({
           <section aria-labelledby="required-invoice-breakdown">
             <h2
               id="required-invoice-breakdown"
-              className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
+              className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400"
             >
               {t("requiredInvoiceTitle")}
             </h2>
@@ -435,7 +436,7 @@ export default function Calculator({
                       <p className="truncate font-semibold text-black dark:text-white">
                         {quote.channelName}
                       </p>
-                      <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
+                      <p className="font-mono text-xs tabular-nums tracking-tight text-black/[0.45] dark:text-white/[0.45]">
                         {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
                         {t("spreadLabel", {
                           pct: (quote.fxSpread * 100).toFixed(2),
@@ -447,10 +448,10 @@ export default function Calculator({
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
                       {t("invoiceToClient")}
                     </p>
-                    <p className="text-sm font-bold tabular-nums text-black dark:text-white">
+                    <p className="font-mono text-sm font-bold tabular-nums tracking-tight text-black dark:text-white">
                       {formatUSD(quote.grossRequired)}
                     </p>
-                    <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
+                    <p className="font-mono text-xs tabular-nums tracking-tight text-black/[0.45] dark:text-white/[0.45]">
                       {t("feesToHitTarget", {
                         fees: formatUSD(quote.totalCostUSD),
                         amount: Math.round(quote.targetNetLocal).toLocaleString(
@@ -468,7 +469,7 @@ export default function Calculator({
           <section aria-labelledby="fee-breakdown">
             <h2
               id="fee-breakdown"
-              className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
+              className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400"
             >
               {t("feeBreakdownTitle")}
             </h2>
@@ -553,15 +554,17 @@ export default function Calculator({
       </div>
 
       {/* Analytical & Verification Rail — AEO answer citation box, the live
-          verdict card with the partner CTA, and the AEO audit FAQ. Sticky from
-          the `lg` breakpoint below the h-16 header; `order-first lg:order-none`
-          keeps the "answer first" reading order on mobile while the two rails
-          sit side-by-side on desktop. Every child slot is a self-contained card
-          (`rounded-2xl border-slate-800/80 bg-slate-900/60 p-6`) carrying its
-          own `min-w-0`, so long citation chips / accordion expansions can never
-          overlap or collapse the rail. */}
+          verdict card with the partner CTA, and the WhatsApp consulting card
+          when leakage clears the monetization threshold. Sticky from the `lg`
+          breakpoint below the h-16 header; `order-first lg:order-none` keeps
+          the "answer first" reading order on mobile while the two rails sit
+          side-by-side on desktop. Every child slot is a self-contained card
+          (`rounded-2xl border-slate-800/80 bg-slate-900/60 p-5 sm:p-6`)
+          carrying its own `min-w-0`, so long citation chips can never overlap
+          or collapse the rail. Card-to-card rhythm is `gap-4` (tighter than
+          the audit deck so the short rail balances the input column). */}
       <aside
-        className={`flex w-full min-w-0 flex-col gap-6 lg:col-span-5 lg:sticky lg:top-24 ${
+        className={`flex w-full min-w-0 flex-col gap-4 lg:col-span-5 lg:sticky lg:top-24 ${
           activeTab === "audit" ? "order-first lg:order-none" : ""
         }`}
       >
@@ -587,7 +590,6 @@ export default function Calculator({
                 leakageLocal={whatsappLead.spreadDeltaLocal}
               />
             )}
-            {faq}
           </>
         ) : (
           <StatutoryComplianceCard corridor={corridor} />
@@ -616,6 +618,17 @@ export default function Calculator({
         />
       )}
       </div>
+
+      {/* AEO audit FAQ spans the full page width below the two-column rail —
+          the tall accordion can no longer stretch the sticky right rail into
+          a dead void beside the short input column. Hairline divider + mt-10
+          keeps it anchored to the deck rhythm above; it mounts only on the
+          audit tab since its Q&As answer the fee-comparison questions. */}
+      {activeTab === "audit" && faq !== undefined && (
+        <div className="mt-10 w-full border-t border-slate-800/80 pt-8">
+          {faq}
+        </div>
+      )}
     </div>
   );
 }
