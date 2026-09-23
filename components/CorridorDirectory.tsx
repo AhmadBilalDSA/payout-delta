@@ -17,11 +17,15 @@ import type { Corridor } from "@/lib/types";
 const REGIONS: { label: string; currencies: string[] }[] = [
   {
     label: "South Asia",
-    currencies: ["PKR", "INR", "BDT"],
+    currencies: ["PKR", "INR", "BDT", "NPR", "LKR"],
   },
   {
     label: "Southeast Asia",
     currencies: ["PHP", "VND", "IDR", "THB", "MYR", "SGD", "HKD"],
+  },
+  {
+    label: "Central Asia & APAC",
+    currencies: ["KZT"],
   },
   {
     label: "Europe & UK",
@@ -49,7 +53,22 @@ const REGIONS: { label: string; currencies: string[] }[] = [
   },
   {
     label: "Middle East & Africa",
-    currencies: ["KES", "NGN", "EGP", "ZAR", "TRY", "GHS", "AED", "SAR", "IQD", "MAD"],
+    currencies: [
+      "KES",
+      "NGN",
+      "EGP",
+      "ZAR",
+      "TRY",
+      "GHS",
+      "AED",
+      "SAR",
+      "IQD",
+      "MAD",
+      "TZS",
+      "UGX",
+      "RWF",
+      "ZMW",
+    ],
   },
 ];
 

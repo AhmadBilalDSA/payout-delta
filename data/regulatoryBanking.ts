@@ -7,10 +7,10 @@
  * intermediary cuts and local clearing rails), and the statutory withholding /
  * exemption tiers used to compute the "real bank take-home".
  *
- * The thirty-six fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
+ * The forty-three fully-audited corridors (PKR, INR, PHP, VND, KES, IDR, COP,
  * TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED, SAR, UAH, IQD, MAD, CLP,
- * PEN, HUF, BGN, RSD, SGD, HKD, SEK, NOK, DKK, BAM, GEL, UYU, CRC, HRK)
- * reference the underlying legislation by
+ * PEN, HUF, BGN, RSD, SGD, HKD, SEK, NOK, DKK, BAM, GEL, UYU, CRC, HRK, TZS,
+ * UGX, RWF, ZMW, NPR, LKR, KZT) reference the underlying legislation by
  * section; every remaining corridor falls back to accurate standard
  * intermediary bands ($15–$25) plus its national clearing network identifier
  * so the engine never renders empty on any audited route.
@@ -2384,6 +2384,475 @@ const hrkBanks: RegulatoryBank[] = [
 ];
 
 /* ---------------------------------------------------------------------------
+ * Tanzania — USD → TZS
+ * Value Added Tax Act Cap. 148 & Income Tax Act Cap. 332 — TRA.
+ * ------------------------------------------------------------------------- */
+
+const tzsTiers: StatutoryTier[] = [
+  {
+    id: "tanzania-e-services",
+    name: "Export of Electronic Services",
+    authority: "VAT Act Cap. 148 Sec. 68(5)",
+    rate: 0,
+    purposeCode: "e-services export",
+    exemption: true,
+    note: "0% VAT on electronic services exported to a foreign consumer upon proof of foreign residency under Section 68(5).",
+  },
+  {
+    id: "tanzania-digital-withholding",
+    name: "Withholding on Digital Services",
+    authority: "Income Tax Act Cap. 332 Sec. 83B (Finance Act)",
+    rate: 0.05,
+    purposeCode: "83B digital content",
+    note: "5% final withholding on payments for digital content / online services sourced from Tanzania.",
+  },
+];
+
+const tzsBanks: RegulatoryBank[] = [
+  {
+    id: "crdb",
+    name: "CRDB Bank",
+    displayName: "CRDB Bank (Tanzania)",
+    swiftCode: "CORUTZTZ",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "TISS 1 day · BOT RTGS same-day",
+    localCurrency: "TZS",
+  },
+  {
+    id: "nmb",
+    name: "NMB Bank",
+    displayName: "NMB Bank (Tanzania)",
+    swiftCode: "NMBLTZTZ",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "TISS 1 day · BOT RTGS same-day",
+    localCurrency: "TZS",
+  },
+  {
+    id: "scb-tz",
+    name: "Standard Chartered Tanzania",
+    displayName: "Standard Chartered (Tanzania)",
+    swiftCode: "SCBLTZTX",
+    intermediaryUSD: 18,
+    intermediaryMinUSD: 15,
+    intermediaryMaxUSD: 22,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "TISS 1 day · BOT RTGS same-day",
+    localCurrency: "TZS",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Uganda — USD → UGX
+ * Income Tax Act Cap 340 & Value Added Tax Act Cap 349 — URA.
+ * ------------------------------------------------------------------------- */
+
+const ugxTiers: StatutoryTier[] = [
+  {
+    id: "uganda-export-services",
+    name: "Export of Services Exemption",
+    authority: "VAT Act Cap 349 Sec. 24",
+    rate: 0,
+    purposeCode: "services export",
+    exemption: true,
+    note: "0% VAT rating on exported services under Section 24 of the VAT Act.",
+  },
+  {
+    id: "uganda-business-income",
+    name: "Business Income (Individual Rates)",
+    authority: "Income Tax Act Cap 340",
+    rate: 0.3,
+    purposeCode: "ILP FY",
+    note: "Progressive business income rates up to 30% for resident individuals after the minimum threshold.",
+  },
+];
+
+const ugxBanks: RegulatoryBank[] = [
+  {
+    id: "stanbic-ug",
+    name: "Stanbic Bank Uganda",
+    displayName: "Stanbic Bank (Uganda)",
+    swiftCode: "SBICUGKX",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "UNISS 1 day · BOU RTGS same-day",
+    localCurrency: "UGX",
+  },
+  {
+    id: "centenary",
+    name: "Centenary Bank",
+    displayName: "Centenary Bank (Uganda)",
+    swiftCode: "CERBUGKA",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 17,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "UNISS 1 day · BOU RTGS same-day",
+    localCurrency: "UGX",
+  },
+  {
+    id: "absa-ug",
+    name: "Absa Bank Uganda",
+    displayName: "Absa (Uganda)",
+    swiftCode: "BARCUGKX",
+    intermediaryUSD: 16,
+    intermediaryMinUSD: 13,
+    intermediaryMaxUSD: 19,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "UNISS 1 day · BOU RTGS same-day",
+    localCurrency: "UGX",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Rwanda — USD → RWF
+ * Law No 027/2022 on taxes on income — RRA.
+ * ------------------------------------------------------------------------- */
+
+const rwfTiers: StatutoryTier[] = [
+  {
+    id: "rwanda-ict-export",
+    name: "ICT & Software Export Exemption",
+    authority: "Law No 037/2012 on VAT",
+    rate: 0,
+    purposeCode: "ICT export",
+    exemption: true,
+    note: "Special digital export incentive — 0% VAT on ICT & software services exported under RRA recognition.",
+  },
+  {
+    id: "rwanda-pit",
+    name: "Standard PIT Brackets",
+    authority: "Law No 027/2022 Art. 15",
+    rate: 0.3,
+    purposeCode: "PIT resident",
+    note: "Progressive personal income tax brackets up to 30% for resident employment/business income.",
+  },
+];
+
+const rwfBanks: RegulatoryBank[] = [
+  {
+    id: "bkr",
+    name: "Bank of Kigali",
+    displayName: "Bank of Kigali (Rwanda)",
+    swiftCode: "BKIGRWRW",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 17,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RIPPS 1 day · BNR RTGS same-day",
+    localCurrency: "RWF",
+  },
+  {
+    id: "imb-rw",
+    name: "I&M Bank Rwanda",
+    displayName: "I&M Bank (Rwanda)",
+    swiftCode: "BCRWRWRW",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RIPPS 1 day · BNR RTGS same-day",
+    localCurrency: "RWF",
+  },
+  {
+    id: "equity-rw",
+    name: "Equity Bank Rwanda",
+    displayName: "Equity Bank (Rwanda)",
+    swiftCode: "EQBLRWRW",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 17,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "RIPPS 1 day · BNR RTGS same-day",
+    localCurrency: "RWF",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Zambia — USD → ZMW
+ * Value Added Tax Act Chapter 331 & Income Tax Act Chapter 323 — ZRA.
+ * ------------------------------------------------------------------------- */
+
+const zmwTiers: StatutoryTier[] = [
+  {
+    id: "zambia-zero-rated-export",
+    name: "Zero-Rated Export Services",
+    authority: "VAT Act Cap 331 Export Schedule",
+    rate: 0,
+    purposeCode: "services export",
+    exemption: true,
+    note: "0% VAT on exported services under the VAT Export Schedule when the consumer is outside Zambia.",
+  },
+  {
+    id: "zambia-turnover-tax",
+    name: "Turnover Tax Regime",
+    authority: "Income Tax Act Cap 323",
+    rate: 0.04,
+    purposeCode: "TT small business",
+    note: "4% turnover tax for small businesses below the VAT threshold, replacing standard income tax.",
+  },
+];
+
+const zmwBanks: RegulatoryBank[] = [
+  {
+    id: "zanaco",
+    name: "Zanaco",
+    displayName: "Zanaco (Zambia)",
+    swiftCode: "ZNCOZMLX",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "ZECHL 1 day · ZIPSS RTGS",
+    localCurrency: "ZMW",
+  },
+  {
+    id: "stanbic-zm",
+    name: "Stanbic Bank Zambia",
+    displayName: "Stanbic Bank (Zambia)",
+    swiftCode: "SBICZMLX",
+    intermediaryUSD: 16,
+    intermediaryMinUSD: 13,
+    intermediaryMaxUSD: 19,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "ZECHL 1 day · ZIPSS RTGS",
+    localCurrency: "ZMW",
+  },
+  {
+    id: "absa-zm",
+    name: "Absa Bank Zambia",
+    displayName: "Absa (Zambia)",
+    swiftCode: "BARCZMLX",
+    intermediaryUSD: 15,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 18,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "ZECHL 1 day · ZIPSS RTGS",
+    localCurrency: "ZMW",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Nepal — USD → NPR
+ * Income Tax Act 2058 (2002) & NRB Foreign Remittance By-laws — IRD Nepal.
+ * ------------------------------------------------------------------------- */
+
+const nprTiers: StatutoryTier[] = [
+  {
+    id: "nepal-it-export",
+    name: "IT/BPO Software Export Incentive",
+    authority: "Finance Act 2080 IT Export Sec.",
+    rate: 0.01,
+    purposeCode: "inward IT remittance",
+    exemption: true,
+    note: "1% final advance withholding tax (reduced rate) on foreign inward IT/BPO remittances per NRB circular.",
+  },
+  {
+    id: "nepal-pit",
+    name: "Standard PIT",
+    authority: "Income Tax Act 2058 (2002)",
+    rate: 0.36,
+    purposeCode: "PIT resident",
+    note: "Progressive personal income tax up to 36% for resident individuals on taxable income.",
+  },
+];
+
+const nprBanks: RegulatoryBank[] = [
+  {
+    id: "nabil",
+    name: "Nabil Bank",
+    displayName: "Nabil Bank (Nepal)",
+    swiftCode: "NARINPKA",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "connectIPS same-day · NRB RTGS",
+    localCurrency: "NPR",
+  },
+  {
+    id: "global-ime",
+    name: "Global IME Bank",
+    displayName: "Global IME Bank (Nepal)",
+    swiftCode: "GLBLNPKA",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "connectIPS same-day · NRB RTGS",
+    localCurrency: "NPR",
+  },
+  {
+    id: "nibl-mega",
+    name: "Nepal Investment Mega Bank",
+    displayName: "NIMB (Nepal)",
+    swiftCode: "NIBLNPKT",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 17,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "connectIPS same-day · NRB RTGS",
+    localCurrency: "NPR",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Sri Lanka — USD → LKR
+ * Inland Revenue Act No. 24 of 2017 & CBSL Foreign Exchange Act — IRD.
+ * ------------------------------------------------------------------------- */
+
+const lkrTiers: StatutoryTier[] = [
+  {
+    id: "lanka-export-services",
+    name: "Foreign Service Export Exemption",
+    authority: "Inland Revenue Act No. 24 Sec. 7",
+    rate: 0,
+    purposeCode: "foreign currency services",
+    exemption: true,
+    note: "0% income tax on services supplied to a person outside Sri Lanka where the consideration is received in foreign currency.",
+  },
+  {
+    id: "lanka-remittance-rebate",
+    name: "CBSL Inward Remittance Rebate",
+    authority: "CBSL FX Operating Instructions",
+    rate: 0,
+    purposeCode: "inward remittance",
+    note: "Foreign-currency inward remittances channel through CBSL-authorized banks; franchising credits offset final tax.",
+  },
+];
+
+const lkrBanks: RegulatoryBank[] = [
+  {
+    id: "combank",
+    name: "Commercial Bank of Ceylon",
+    displayName: "ComBank (Sri Lanka)",
+    swiftCode: "COMBCEKX",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "LankaPay SLIPS 1 day · CBSL RTGS",
+    localCurrency: "LKR",
+  },
+  {
+    id: "hnb",
+    name: "Hatton National Bank (HNB)",
+    displayName: "HNB (Sri Lanka)",
+    swiftCode: "HNBLLKLX",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "LankaPay SLIPS 1 day · CBSL RTGS",
+    localCurrency: "LKR",
+  },
+  {
+    id: "boc",
+    name: "Bank of Ceylon",
+    displayName: "Bank of Ceylon",
+    swiftCode: "BCEYLKLX",
+    intermediaryUSD: 14,
+    intermediaryMinUSD: 12,
+    intermediaryMaxUSD: 17,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "LankaPay SLIPS 1 day · CBSL RTGS",
+    localCurrency: "LKR",
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Kazakhstan — USD → KZT
+ * Tax Code of the Republic of Kazakhstan & Astana Hub regime — SRC.
+ * ------------------------------------------------------------------------- */
+
+const kztTiers: StatutoryTier[] = [
+  {
+    id: "kazakh-astana-hub",
+    name: "Astana Hub IT Exemption",
+    authority: "Tax Code Art. 293 & 394",
+    rate: 0,
+    purposeCode: "Astana Hub IT exporter",
+    exemption: true,
+    note: "0% Corporate Income Tax, 0% VAT and 0% Individual Income Tax for accredited Astana Hub IT exporters.",
+  },
+  {
+    id: "kazakh-simplified",
+    name: "Simplified Tax Declaration",
+    authority: "Tax Code Art. 683",
+    rate: 0.03,
+    purposeCode: "simplified 3%",
+    note: "3% flat rate on turnover for sole proprietors under the simplified declaration regime.",
+  },
+];
+
+const kztBanks: RegulatoryBank[] = [
+  {
+    id: "kaspi",
+    name: "Kaspi Bank",
+    displayName: "Kaspi Bank (Kazakhstan)",
+    swiftCode: "CASPKZKA",
+    intermediaryUSD: 10,
+    intermediaryMinUSD: 8,
+    intermediaryMaxUSD: 13,
+    localFeeDefault: 0,
+    speed: "Instant",
+    clearance: "KISC IMTS instant · NBK RTGS",
+    localCurrency: "KZT",
+  },
+  {
+    id: "halyk",
+    name: "Halyk Bank",
+    displayName: "Halyk Bank (Kazakhstan)",
+    swiftCode: "HSBKKZKX",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "KISC IMTS instant · NBK RTGS",
+    localCurrency: "KZT",
+  },
+  {
+    id: "fortebank",
+    name: "ForteBank",
+    displayName: "ForteBank (Kazakhstan)",
+    swiftCode: "IRTYKZKA",
+    intermediaryUSD: 12,
+    intermediaryMinUSD: 10,
+    intermediaryMaxUSD: 15,
+    localFeeDefault: 0,
+    speed: "Fast",
+    clearance: "KISC IMTS instant · NBK RTGS",
+    localCurrency: "KZT",
+  },
+];
+
+/* ---------------------------------------------------------------------------
  * Global fallback engine — EUR / GBP / BRL / NGN / BDT / EGP / ZAR.
  * Standard intermediary deduction $15–$25, national clearing network, and a
  * statutory export-tax compliance notice.
@@ -2928,6 +3397,104 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     ],
     banks: hrkBanks,
     tiers: hrkTiers,
+    generic: false,
+  },
+  "usd-to-tzs": {
+    slug: "usd-to-tzs",
+    authority:
+      "Tanzania Revenue Authority (TRA) · Value Added Tax Act Cap. 148 & Income Tax Act Cap. 332",
+    clearingNetwork: "TISS",
+    citations: [
+      "TRA VAT Act Cap. 148",
+      "Income Tax Act Cap. 332 Sec. 83B",
+      "BOT TISS Settlement",
+    ],
+    banks: tzsBanks,
+    tiers: tzsTiers,
+    generic: false,
+  },
+  "usd-to-ugx": {
+    slug: "usd-to-ugx",
+    authority:
+      "Uganda Revenue Authority (URA) · Income Tax Act Cap 340 & Value Added Tax Act Cap 349",
+    clearingNetwork: "UNISS",
+    citations: [
+      "URA VAT Act Cap 349 Sec 24",
+      "Income Tax Act Cap 340",
+      "BOU UNISS Clearing",
+    ],
+    banks: ugxBanks,
+    tiers: ugxTiers,
+    generic: false,
+  },
+  "usd-to-rwf": {
+    slug: "usd-to-rwf",
+    authority:
+      "Rwanda Revenue Authority (RRA) · Law No 027/2022 establishing taxes on income",
+    clearingNetwork: "RIPPS",
+    citations: [
+      "RRA Law No 027/2022",
+      "BNR RIPPS System",
+      "Law No 37/2012 on VAT",
+    ],
+    banks: rwfBanks,
+    tiers: rwfTiers,
+    generic: false,
+  },
+  "usd-to-zmw": {
+    slug: "usd-to-zmw",
+    authority:
+      "Zambia Revenue Authority (ZRA) · Value Added Tax Act Chapter 331 & Income Tax Act Chapter 323",
+    clearingNetwork: "ZECHL / ZIPSS",
+    citations: [
+      "ZRA VAT Act Cap 331",
+      "Income Tax Act Cap 323",
+      "BOZ ZIPSS System",
+    ],
+    banks: zmwBanks,
+    tiers: zmwTiers,
+    generic: false,
+  },
+  "usd-to-npr": {
+    slug: "usd-to-npr",
+    authority:
+      "Inland Revenue Department (IRD) Nepal · Income Tax Act 2058 (2002) & NRB Foreign Remittance By-laws",
+    clearingNetwork: "NCHL / connectIPS / RTGS",
+    citations: [
+      "Finance Act 2080 Section on IT Export",
+      "NRB Foreign Exchange By-laws",
+      "NCHL connectIPS",
+    ],
+    banks: nprBanks,
+    tiers: nprTiers,
+    generic: false,
+  },
+  "usd-to-lkr": {
+    slug: "usd-to-lkr",
+    authority:
+      "Inland Revenue Department (IRD) · Inland Revenue Act No. 24 of 2017 & CBSL Foreign Exchange Act",
+    clearingNetwork: "LankaPay / SLIPS",
+    citations: [
+      "Inland Revenue Act No. 24 Sec 7",
+      "CBSL FX Operating Instructions",
+      "LankaPay SLIPS",
+    ],
+    banks: lkrBanks,
+    tiers: lkrTiers,
+    generic: false,
+  },
+  "usd-to-kzt": {
+    slug: "usd-to-kzt",
+    authority:
+      "State Revenue Committee (SRC) · Tax Code of the Republic of Kazakhstan & Astana Hub Tax Regime",
+    clearingNetwork: "KISC / IMTS",
+    citations: [
+      "Tax Code Art. 293 (Astana Hub)",
+      "Tax Code Art. 394 (0% Export VAT)",
+      "NBK IMTS Settlement",
+    ],
+    banks: kztBanks,
+    tiers: kztTiers,
     generic: false,
   },
 };

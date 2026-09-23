@@ -34,7 +34,7 @@ zero tracking, zero data retention, zero sign-up.
 
 ## 2. Codebase Audit — Permanent Inventory
 
-### 2.1 Corridors (43 standard, `data/fees.json`)
+### 2.1 Corridors (50 standard, `data/fees.json`)
 
 | Slug | From → To | Country / Currency |
 | --- | --- | --- |
@@ -81,6 +81,13 @@ zero tracking, zero data retention, zero sign-up.
 | `usd-to-uyu` | USD → UYU | Uruguay |
 | `usd-to-crc` | USD → CRC | Costa Rica |
 | `usd-to-hrk` | USD → EUR | Croatia |
+| `usd-to-tzs` | USD → TZS | Tanzania |
+| `usd-to-ugx` | USD → UGX | Uganda |
+| `usd-to-rwf` | USD → RWF | Rwanda |
+| `usd-to-zmw` | USD → ZMW | Zambia |
+| `usd-to-npr` | USD → NPR | Nepal |
+| `usd-to-lkr` | USD → LKR | Sri Lanka |
+| `usd-to-kzt` | USD → KZT | Kazakhstan |
 
 Authoring of banks & statutory tiers (`data/regulatoryBanking.ts`): **PKR, INR,
 PHP, VND, KES, IDR, COP, TRY, MXN, ARS, PLN, RON, CZK, THB, MYR, GHS, AED,
@@ -322,3 +329,4 @@ compatibility is a merge blocker.
 - `a66422c` — sitemap `/api-access/` entry.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.
 - `acf8c60` — statutory settlement engine, dynamic waterfall, invoice sync, UI stabilization.
+- `(ui-corridors-batch4)` — Phase 10 (Batch 4 of 50): final 7 corridors complete the 50-country milestone — TZS / UGX / RWF / ZMW / NPR / LKR / KZT (per-corridor provider fee models in `data/fees.json`, authored statutory/bank records in `regulatoryBanking.ts` → 43 fully-audited corridors, 14 new long-tail slugs in `corridors.ts` → 50 base & 137 English corridor routes, `CorridorSwitcher` capsule + `CorridorDirectory` region pills regrouped / Central Asia & APAC added, corpus/long-tail audit + docs totals updated).

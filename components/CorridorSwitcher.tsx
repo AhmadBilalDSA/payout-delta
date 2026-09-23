@@ -15,10 +15,10 @@ import type { Corridor } from "@/lib/types";
  * island).
  *
  * `[🌐 USD → PKR ▾][⇄]` capsule set in the header that jumps straight to any
- * of the 43 audited corridors' live calculation page. The dropdown groups the
+ * of the 50 audited corridors' live calculation page. The dropdown groups the
  * target currencies by receiving region (South Asia / Asia Pacific / East
- * Africa & EMEA / Latin America / Europe & UK) so high-volume markets are
- * reachable in one glance.
+ * Africa & EMEA / Latin America / Europe & UK / Central Asia & APAC) so
+ * high-volume markets are reachable in one glance.
  *
  * The `⇄` quick-swap button inverts the active pair. When the inverted route
  * exists in the dataset (e.g. a genuine `pkr-to-usd` corridor) it navigates
@@ -39,11 +39,12 @@ import type { Corridor } from "@/lib/types";
  * the dataset actually contains at least one audited corridor for it.
  */
 const REGIONS: { label: string; currencies: string[] }[] = [
-  { label: "South Asia", currencies: ["PKR", "INR", "BDT"] },
+  { label: "South Asia", currencies: ["PKR", "INR", "BDT", "NPR", "LKR"] },
   { label: "Asia Pacific", currencies: ["PHP", "VND", "IDR", "THB", "MYR", "SGD", "HKD"] },
-  { label: "East Africa & EMEA", currencies: ["KES", "NGN", "EGP", "ZAR", "TRY", "GHS", "AED", "SAR", "IQD", "MAD"] },
+  { label: "East Africa & EMEA", currencies: ["KES", "NGN", "EGP", "ZAR", "TRY", "GHS", "AED", "SAR", "IQD", "MAD", "TZS", "UGX", "RWF", "ZMW"] },
   { label: "Latin America", currencies: ["BRL", "COP", "MXN", "ARS", "CLP", "PEN", "UYU", "CRC"] },
   { label: "Europe & UK", currencies: ["EUR", "GBP", "PLN", "RON", "CZK", "UAH", "HUF", "BGN", "RSD", "SEK", "NOK", "DKK", "BAM", "GEL", "HRK"] },
+  { label: "Central Asia & APAC", currencies: ["KZT"] },
 ];
 
 const NEW_CORRIDOR_ISSUE_URL =
