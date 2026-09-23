@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { CalcMode, Corridor } from "@/lib/types";
 import { formatLocal, formatUSD } from "@/utils/format";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
+import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import {
   INVOICE_SYNC_EVENT,
   INVOICE_SYNC_KEY,
@@ -44,6 +45,7 @@ export default function TransactionCostingWidget({
   mode,
   targetNetLocal,
   requiredGrossUsd,
+  onGenerateLetter,
 }: {
   corridor: Corridor;
   grossUSD: number;
@@ -56,6 +58,11 @@ export default function TransactionCostingWidget({
   mode?: CalcMode;
   targetNetLocal?: number;
   requiredGrossUsd?: number;
+  /** Phase C — live PRC/FIRC prefill reporter: the parent Calculator owns a
+   *  single emitter snapshot so the 1-click letter modal always opens with
+   *  the bank/tier/amounts exactly as last shown in the waterfall, even when
+   *  the user moved a slider afterwards. */
+  onGenerateLetter?: (snapshot: PrcLetterPrefill) => void;
 }) {
   const { t } = useLanguage();
   const isTarget = mode === "net-to-gross";
@@ -116,6 +123,41 @@ export default function TransactionCostingWidget({
   const takeHomeLocal = Math.max(0, landedLocal - taxLocal);
 
   const taxPct = Math.round(safeTax * 10000) / 100;
+
+  // Phase C — stream a stable emulator snapshot upward whenever the widget's
+  // inputs pin a new bank / tier / amount / take-home. The parent renders the
+  // pill & modal, so the letter always opens pre-filled with the exact bank,
+  // purpose code, gross and net-in-hand from the live waterfall. The callback
+  // lives in a ref so freshly-arriving props beat stale closures.
+  const onGenerateLetterRef = useRef(onGenerateLetter);
+  useEffect(() => {
+    onGenerateLetterRef.current = onGenerateLetter;
+  });
+
+  useEffect(() => {
+    onGenerateLetterRef.current?.({
+      corridorSlug: corridor.slug,
+      currency: corridor.to,
+      currencySymbol: corridor.currencySymbol,
+      bankName: bank?.name ?? "",
+      bankSwift: bank?.swiftCode ?? "",
+      grossUsd: safeGross,
+      netRealizationLocal: takeHomeLocal,
+      tierName: tier?.name ?? "",
+      tierRate: tier?.rate ?? 0,
+      purposeCode: tier?.purposeCode ?? "",
+      authority: regulation.authority
+        ? `${regulation.authority} · ${tier?.authority ?? ""}`
+        : "",
+    });
+  }, [
+    corridor,
+    bank,
+    tier,
+    regulation,
+    safeGross,
+    takeHomeLocal,
+  ]);
 
   const handleSync = () => {
     if (!bank || !tier || synced) return;

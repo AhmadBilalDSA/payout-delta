@@ -309,3 +309,39 @@ body {
   tr, .invoice-table-row, .invoice-addendum, .invoice-summary-box { break-inside: avoid !important; page-break-inside: avoid !important; }
   @page { size: A4 portrait; margin: 0; }
 }
+
+/* ---------------------------------------------------------------------------
+ * Phase C — 1-click Bank PRC / FIRC statutory export-exemption letter.
+ *
+ * PrcLetterModal opens the native Save-as-PDF dialog with exactly one clean
+ * A4 letter: the dialog chrome carries `.no-print` (dropped in the generic
+ * hiders above), and the only visible print target is the
+ * `.print-area.prc-letter` copy mounted inside the modal's
+ * `hidden print:block` wrapper. `.print-area` pins the overlay absolute at
+ * the page origin; this block (last in cascade) hard-clips it to a fixed
+ * 210×297mm box with `overflow: hidden`, so no trailing blank page can ever
+ * escape — the letter is always the single page of the PDF.
+ * ------------------------------------------------------------------------- */
+@media print {
+  .prc-letter {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 13mm 16mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+  }
+}

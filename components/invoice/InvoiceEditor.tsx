@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { WithdrawalChannel } from "@/lib/types";
 import type {
@@ -31,6 +31,8 @@ import {
 } from "@/lib/invoiceTypes";
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
+import PrcLetterModal from "@/components/compliance/PrcLetterModal";
+import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
@@ -56,6 +58,31 @@ export default function InvoiceEditor({
   const [syncedBank, setSyncedBank] = useState<string | null>(null);
   const [syncLoaded, setSyncLoaded] = useState(false);
   const appliedSyncRef = useRef(false);
+  // Phase C — 1-click bank PRC/FIRC letter generator overlay for the studio.
+  const [prcOpen, setPrcOpen] = useState(false);
+
+  // Phase C — prefill the statutory letter from the live draft: freelancer
+  // name, banking & clearing fields, invoice currency symbol and the first
+  // line-item amount as the inward gross.
+  const prcPrefill = useMemo<PrcLetterPrefill>(() => {
+    const symbol =
+      CURRENCIES.find((currency) => currency.code === draft.meta.currency)
+        ?.symbol ?? "";
+    const firstLine = draft.lineItems[0];
+    const gross = parseAmount(firstLine?.unitRate ?? "") || 0;
+    return {
+      currency: draft.meta.currency,
+      currencySymbol: symbol,
+      beneficiaryName: draft.identity.freelancerName,
+      accountNumber: draft.banking.beneficiaryAccount,
+      bankName: draft.banking.receivingBank,
+      bankSwift: draft.banking.swiftCode,
+      purposeCode: draft.banking.purposeCode,
+      authority: draft.banking.authority,
+      tierName: draft.banking.tierLabel,
+      grossUsd: gross,
+    };
+  }, [draft]);
 
   // Debounced auto-save on every change; the "Saved locally" badge refreshes.
   // `loadInvoiceDraft()` is safe to call during prerender (returns a pristine
@@ -476,6 +503,16 @@ export default function InvoiceEditor({
                 )}
               </div>
             )}
+
+            {/* Phase C — 1-click statutory PRC / FIRC export exemption letter
+                prefilled from this draft's banking & clearing fields. */}
+            <button
+              type="button"
+              onClick={() => setPrcOpen(true)}
+              className="flex w-fit items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-600 transition-all duration-150 ease-out hover:bg-emerald-500/20 active:scale-[0.98] dark:text-emerald-400"
+            >
+              📄 Generate Bank Settlement Letter
+            </button>
           </div>
         </Section>
 
@@ -737,6 +774,15 @@ export default function InvoiceEditor({
         </div>
         <InvoicePreview draft={draft} channels={channels} />
       </div>
+
+      {/* Phase C — statutory letter generator overlay (client-only). */}
+      {prcOpen && (
+        <PrcLetterModal
+          open={prcOpen}
+          onClose={() => setPrcOpen(false)}
+          prefill={prcPrefill}
+        />
+      )}
     </div>
   );
 }

@@ -97,6 +97,24 @@ export default), banking & clearing details, **statutory tax & purpose-code
 addendum** (PRC 9111 / P0802 legalese), and print-isolated clean PDF export.
 Calculator ↔ invoice **sync with one click**.
 
+### 📄 1-Click Bank PRC / FIRC Export Exemption Letter (Phase C)
+On every audited corridor the emerald **"Generate Bank PRC / Exemption
+Letter"** pill under the costing waterfall opens a statutory bank
+correspondence generator pre-filled with the **live settlement snapshot**
+(receiving bank + SWIFT, purpose code, inward gross and net-in-hand). The
+Invoice Studio adds a matching **"Generate Bank Settlement Letter"** entry
+pre-filled from the draft's banking fields. The on-device engine
+([`lib/prcLetterEngine.ts`](lib/prcLetterEngine.ts)) maps each corridor / purpose
+code onto six export jurisdictions — SBP FE Manual Ch. 13 · PC 9111 (PKR),
+RBI · P0802 + Rule 96A LUT (INR), BSP Circular 980 · 0% VAT (PHP), LIVA Art.
+29-D + RESICO 113-E (MXN), VAT Art. 28b reverse charge (PLN), and a Global
+SWIFT MT103 fallback — and renders a formal letterhead asserting the statutory
+purpose code, the zero-rate / exemption regime and a sworn declaration that the
+services were performed outside the tax territory. Export as **one clean A4
+PDF** (native print, hard-clipped to a single page) or **copy the plain-text
+letter**; shells persist per corridor under
+`payoutdelta_prc_letter_<slug>`. 100% in-browser, no network, no i18n churn.
+
 ### 🌍 Global Localization
 Fully translated UI in **7 languages (EN, UR, HI, FIL, ES, PT, AR)** with
 automatic **RTL + Nastaliq** layout handling and zero-latency switching.
@@ -202,7 +220,7 @@ npm run lint      # ESLint
   no database, no API dependency in the app.
 - **Zero telemetry, zero tracking, zero data retention** — every input stays
   on-device. The only "storage" is your browser's own `localStorage`
-  (draft invoice, language preference, bank-sync).
+  (draft invoice, language preference, bank-sync, PRC letter shells).
 - **Versioned fee dataset** — `data/fees.json` is the single source of truth;
   corridor pages, sitemap and static JSON regenerate from one snapshot.
 
@@ -216,7 +234,9 @@ npm run lint      # ESLint
 | `data/corridors.ts` | Programmatic long-tail platform corridor registry |
 | `lib/seoSchemas.ts` | Dedicated financial Schema.org builders (one `@graph` per corridor) |
 | `lib/aeoFaqs.ts` | Shared AEO FAQ generator (accordion + FAQPage JSON-LD) |
-| `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine |
+| `lib/prcLetterEngine.ts` | Phase C — statutory PRC / FIRC export-exemption letter engine (6 jurisdictions) |
+| `components/compliance/PrcLetterModal.tsx` | Phase C — 1-click letter generator (form, live preview, print/copy, per-corridor persist) |
+| `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
 | `edge-api/` | Cloudflare Worker rate router (`?corridor` / `?pair` routes) |
@@ -241,6 +261,8 @@ npm run lint      # ESLint
 | 8 | 50-country expansion — Batches 1 & 2: 20 high-demand corridors across LatAm, Europe, MEA & APAC (MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR + UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD) | Shipped (`38b4e97`) |
 | 9 | UI refresh — color palette modernization, full-width verdict CTA + `ShareUtilityTray`, and zero-runtime SVG trendline engine on every corridor page | Shipped |
 | 10 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
+| Phase B | Target Net gross-up — closed-form 7-layer inversion solver + invoice milestone sync | Shipped |
+| Phase C | 1-click Bank PRC / FIRC export exemption letter generator (6 statutory jurisdictions, single-page PDF, live settlement prefill) | Shipped |
 
 ---
 

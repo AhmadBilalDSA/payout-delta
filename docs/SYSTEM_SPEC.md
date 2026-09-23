@@ -144,6 +144,25 @@ that every language must preserve verbatim.
   print isolation (`no-print`, `#invoice-document`), logo upload via FileReader,
   per-line GST %, bank-clearing section auto-filled from the widget sync,
   statutory addendum, local persistence under `payoutdelta_draft_invoice`.
+- **Phase C — 1-Click Bank PRC / FIRC Export Exemption Letter**
+  (`components/compliance/PrcLetterModal.tsx` + `lib/prcLetterEngine.ts`) — on
+  every audited corridor the emerald "Generate Bank PRC / Exemption Letter"
+  pill under the costing waterfall opens the generator pre-filled with the
+  *live* settlement snapshot (bank, SWIFT, purpose code, gross, net-in-hand,
+  streamed upward by `TransactionCostingWidget.onGenerateLetter`); the Invoice
+  Studio adds a "Generate Bank Settlement Letter" button pre-filled from the
+  draft's banking & clearing fields. The statutory engine maps each corridor /
+  purpose code onto six export jurisdictions (SBP Ch. 13 · PC 9111, RBI ·
+  P0802, BSP Circular 980, LIVA Art. 29-D / RESICO 113-E, VAT Art. 28b, Global
+  SWIFT fallback) and renders a formal bank letterhead — beneficiary
+  particulars, governing citation, purpose code, zero-tax / exemption
+  declaration and indemnity. Actions: native one-page PDF via
+  `window.print()` (`@media print` clips the `.prc-letter` overlay to exactly
+  210×297mm with `overflow: hidden`, so no trailing blank page escapes),
+  "Copy Letter Text" (clipboard + 2.5s toast), Escape/backdrop dismiss. Form
+  shells persist per corridor under `payoutdelta_prc_letter_<slug>`; the
+  document text is statutory-legal English and hardcoded (i18n dictionaries
+  pinned to full `Record<UiKey, string>`), so no new translation keys.
 
 ### 2.5 Statutory & banking database (`data/regulatoryBanking.ts`)
 
@@ -254,7 +273,7 @@ that every language must preserve verbatim.
 | Translation | Client-side `LanguageProvider`; SSR is always English (hydration-safe); stored/browser locale applied post-mount; flips `document.documentElement` `lang`/`dir` | Zero-latency switching, no network |
 | RTL | `[dir="rtl"]` Nastaliq-first stack + looser line-height; mono stays LTR for numerics | Urdu/Arabic legibility |
 | Finance | Pure math modules (`utils/calculateRoute.ts`, `lib/invoiceTypes.ts`) with finite guards + clamps | Deterministic, SSR-safe, no server needed |
-| Persistence | `localStorage` only (`payoutdelta_draft_invoice`, `payoutdelta_lang`, `payoutdelta_banksync`) | Zero-server promise |
+| Persistence | `localStorage` only (`payoutdelta_draft_invoice`, `payoutdelta_lang`, `payoutdelta_banksync`, `payoutdelta_prc_letter_<slug>`) | Zero-server promise |
 | CI/CD | GitHub Actions `.github/workflows/deploy.yml` on `main`; nightly rates sync (`workflow_run`) | Fully automated deploys |
 
 **Static-export hard rules:**
@@ -349,6 +368,24 @@ upserts in `SliderControls` (tiered take-home presets + new label), `VerdictCard
 (target anchor + milestone line-item sync), `InvoiceEditor` (no-clobber
 line-item upsert), 8 new i18n keys across all 7 catalogs, and docs.
 
+**Phase C (1-Click Bank PRC / FIRC Export Exemption Letter)** is delivered on
+top of the same roadmap as a fully client-side compliance generator:
+`lib/prcLetterEngine.ts` (six statutory schemes: PKR · SBP FE Manual Ch. 13 /
+PC 9111, INR · RBI / P0802 + Rule 96A LUT, PHP · BSP Circular 980 / 0% VAT,
+MXN · LIVA Art. 29-D + LISR 113-E RESICO, PLN · VAT Art. 28b reverse charge,
+Global SWIFT MT103 fallback; `prcSchemeForSlug` corridor mapping + purpose-code
+hint inference; `buildPrcLetter`/`buildPrcLetterText` pure renderers;
+localStorage load/save under `payoutdelta_prc_letter_<slug>`),
+`components/compliance/PrcLetterModal.tsx` (form rail + live letterhead
+preview, print-only single-page `.print-area.prc-letter` copy, clipboard copy
+toast, Escape/backdrop dismiss, init-on-mount so no cascade-set effect),
+`TransactionCostingWidget.onGenerateLetter` streaming the live settlement
+snapshot to the parent, the exact-spec emerald pill in `Calculator.tsx`, the
+Invoice Studio "Generate Bank Settlement Letter" entry point, the single-page
+`@media print` rules (210×297mm hard clip, `overflow: hidden`) in
+`globals.css`, and docs. All new UI text is hardcoded statutory-legal English
+to keep the full-`Record` i18n catalogs untouched.
+
 ---
 
 ## 7. Existing Commits That Anchor This Spec
@@ -370,3 +407,5 @@ line-item upsert), 8 new i18n keys across all 7 catalogs, and docs.
 - `4ccd72b` — regional bank directory + provincial tax selector + costing formula engine.
 - `acf8c60` — statutory settlement engine, dynamic waterfall, invoice sync, UI stabilization.
 - `e753011` — Phase 10 (Batch 4 of 50): final 7 corridors complete the 50-country milestone — TZS / UGX / RWF / ZMW / NPR / LKR / KZT (per-corridor provider fee models in `data/fees.json`, authored statutory/bank records in `regulatoryBanking.ts` → 43 fully-audited corridors, 14 new long-tail slugs in `corridors.ts` → 50 base & 137 English corridor routes, `CorridorSwitcher` capsule + `CorridorDirectory` region pills regrouped / Central Asia & APAC added, corpus/long-tail audit + docs totals updated).
+- `ec8c06e` — Phase B: closed-form Target Net gross-up solver + invoice sync.
+- *this commit* — **Phase C**: 1-click Bank PRC / FIRC statutory export exemption letter generator (`lib/prcLetterEngine.ts` six-scheme engine, `components/compliance/PrcLetterModal.tsx`, exact-spec emerald pill in `Calculator.tsx` wired to `TransactionCostingWidget`'s live `onGenerateLetter` snapshot, Invoice Studio entry point, single-page `.prc-letter` print clip in `globals.css`, docs).

@@ -29,6 +29,8 @@ import FeeBreakdownList from "@/components/FeeBreakdownList";
 import TaxImpactCard from "@/components/TaxImpactCard";
 import TransactionCostingWidget from "@/components/TransactionCostingWidget";
 import AuditReceipt from "@/components/AuditReceipt";
+import PrcLetterModal from "@/components/compliance/PrcLetterModal";
+import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 /**
@@ -91,6 +93,13 @@ export default function Calculator({
     return platforms[0]?.id ?? "upwork";
   });
   const [printQuote, setPrintQuote] = useState<ChannelQuote | null>(null);
+
+  // Phase C — 1-click Bank PRC / FIRC export-exemption letter. `prcSnapshot`
+  // is the live emulator state the widget streams upward; the pill opens the
+  // modal with that snapshot first, falling back to a statutory default
+  // snapshot computed straight off the route/corridor for the first paint.
+  const [prcOpen, setPrcOpen] = useState(false);
+  const [prcSnapshot, setPrcSnapshot] = useState<PrcLetterPrefill | null>(null);
 
   const platform =
     platforms.find((item) => item.id === platformId) ?? platforms[0];
@@ -160,6 +169,40 @@ export default function Calculator({
       effectiveRate: quote.effectiveRate,
     };
   }, [isTarget, inverseRoute, route, amount, corridor]);
+
+  // Phase C — statutory-fallback snapshot for the 1-click letter: whatever the
+  // widget reports wins, but on the very first paint (before any streamed
+  // snapshot) we compute the same default bank/tier bench as the solver so the
+  // letter never opens blank. Currency & amounts follow the active mode.
+  const defaultPrcSnapshot = useMemo<PrcLetterPrefill | null>(() => {
+    const regulation = getRegulatoryBanking(corridor.slug);
+    const bank = regulation.banks[0];
+    const tier = regulation.tiers[0];
+    if (!bank || !tier) return null;
+    const localNet =
+      isTarget && inverseRoute.verdict.best
+        ? inverseRoute.verdict.best.targetNetLocal
+        : route.verdict.best
+          ? route.verdict.best.localAmount
+          : 0;
+    return {
+      corridorSlug: corridor.slug,
+      currency: corridor.to,
+      currencySymbol: corridor.currencySymbol,
+      bankName: bank.name,
+      bankSwift: bank.swiftCode !== "—" ? bank.swiftCode : "",
+      grossUsd: amount,
+      netRealizationLocal: localNet,
+      tierName: tier.name,
+      tierRate: tier.rate,
+      purposeCode: tier.purposeCode ?? "",
+      authority: regulation.authority
+        ? `${regulation.authority} · ${tier.authority}`
+        : "",
+    };
+  }, [corridor, isTarget, inverseRoute, route, amount]);
+
+  const openPrcLetter = () => setPrcOpen(true);
 
   const targetBounds = useMemo(() => localSliderBounds(corridor), [corridor]);
 
@@ -356,11 +399,24 @@ export default function Calculator({
             target mode the widget is anchored on the solver's gross-up so the
             waterfall lands exactly on the target at its default bank/tier. */}
         {costingAnchor !== null && (
-          <TransactionCostingWidget
-            corridor={corridor}
-            mode={mode}
-            {...costingAnchor}
-          />
+          <>
+            <TransactionCostingWidget
+              corridor={corridor}
+              mode={mode}
+              {...costingAnchor}
+              onGenerateLetter={setPrcSnapshot}
+            />
+
+            {/* Phase C — 1-click Bank PRC / FIRC statutory export exemption
+                letter. Opens the generator with the live waterfall snapshot. */}
+            <button
+              type="button"
+              onClick={openPrcLetter}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
+            >
+              📄 Generate Bank PRC / Exemption Letter
+            </button>
+          </>
         )}
 
         {/* Nominative fair use — mandatory legal line. */}
@@ -402,6 +458,16 @@ export default function Calculator({
             platform={platform}
           />
         </div>
+      )}
+
+      {/* Phase C — statutory letter generator overlay (prefilled from the
+          live waterfall snapshot, or the statutory default fallback). */}
+      {prcOpen && (
+        <PrcLetterModal
+          open={prcOpen}
+          onClose={() => setPrcOpen(false)}
+          prefill={prcSnapshot ?? defaultPrcSnapshot}
+        />
       )}
     </div>
   );
