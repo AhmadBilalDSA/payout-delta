@@ -161,8 +161,28 @@ that every language must preserve verbatim.
   210×297mm with `overflow: hidden`, so no trailing blank page escapes),
   "Copy Letter Text" (clipboard + 2.5s toast), Escape/backdrop dismiss. Form
   shells persist per corridor under `payoutdelta_prc_letter_<slug>`; the
-  document text is statutory-legal English and hardcoded (i18n dictionaries
-  pinned to full `Record<UiKey, string>`), so no new translation keys.
+document text is statutory-legal English and hardcoded (i18n dictionaries
+   pinned to full `Record<UiKey, string>`), so no new translation keys.
+- **Phase E — Year-End Remittance & Tax Ledger** (
+  `components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/` + `lib/ledgerEngine.ts`)
+  — every invoice saved from the studio's Settlement & Realization panel lands
+  in a durable on-device ledger under `payoutdelta:remittance_ledger` as a
+  `RemittanceRecord` (gross billed, gross in USD via the approximate anchor
+  table, platform % and SWIFT-cut USD deductions, net USD, the corridor FX
+  applied at save time, converted local, landing fee, realized take-home,
+  OUR/SHA wire instruction and the statutory citation). The dashboard rolls up
+  KPIs (gross USD, deductible fees USD incl. landing fee converted back at the
+  record's FX, realized take-home per target currency), filters by year /
+  corridor, expands per-record detail, deletes with a two-step guard, wipes the
+  season with a two-step confirm, downloads a BOM-prefixed RFC 4180 CSV and
+  prints a dedicated white multi-page annual audit package
+  (`.tax-ledger-print-area` re-shown while the dashboard `.no-print` chrome
+  hides). The editor's Settlement & Realization section (toggle, corridor
+  select, platform % / SWIFT cut / landing-fee fields, OUR/SHA select, live
+  realization projection, "Save Invoice to Tax Ledger") is mirrored verbatim on
+  the printed invoice as a **Settlement Schedule** block when
+  `includeSettlementSchedule` is on (gross → net USD → converted → take-home
+  rows + status pill). Line items gained ↑/↓ reordering in the studio.
 
 ### 2.5 Statutory & banking database (`data/regulatoryBanking.ts`)
 
@@ -352,8 +372,8 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # 157 static routes → ./out
-node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, exit 0
+npm run build                 # 158 static routes → ./out
+node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, ledger/tax-ledger audits, exit 0
 ```
 
 Commit convention follows the project template
@@ -414,7 +434,35 @@ resolves the draft's banking fields (BIC → name → currency) back to the
 directory, the sitemap `/swift-auditor/` entry, and docs. All routing icons are
 inline SVG — zero external packages, zero network, static-export budget intact
 (50 base + 93 long-tail + 5 localized corridor pages + invoice studio +
-swift-auditor + legal/utility routes = 157+ static routes).
+swift-auditor + tax-ledger + legal/utility routes = 158+ static routes).
+
+**Phase E (Multi-Milestone Invoicing & Year-End Tax Season Remittance Ledger)**
+is delivered on top of the same roadmap as a fully client-side annual records
+office: `lib/ledgerEngine.ts` (deterministic `RemittanceRecord` build from any
+studio draft — `grandTotal` → approximate-USD anchor conversion → platform %
+fee → SWIFT cut → net USD → corridor FX → landing fee → realized take-home,
+OUR/SHA wire instruction and statutory citation resolution via the
+`STATUTORY_CITATIONS` map, defaulting to `SWIFT MT103`; `LedgerStatus` =
+Realized when a positive take-home landed at a usable rate; sanitized
+localStorage persistence under `payoutdelta:remittance_ledger`;
+`calculateAnnualSummary` gross / deductible-fee / per-currency realized totals;
+RFC 4180 CSV with CRLF endings + UTF-8 BOM download; browser-only APIs
+guarded for the static-export prerender),
+`components/invoice/InvoiceEditor.tsx` (Settlement & Realization section:
+`includeSettlementSchedule` toggle, corridor select, platform % / SWIFT cut USD
+/ landing-fee local fields, OUR/SHA charge-instruction select, live realization
+projection box and the "Save Invoice to Tax Ledger" action with a toast;
+line items gained deterministic ↑/↓ reordering),
+`components/invoice/InvoicePreview.tsx` (a Settlement Schedule print block
+mirroring the projection — gross billed → net USD → converted → take-home with
+status pill — appended to `#invoice-document` only when toggled on),
+`components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/page.tsx` (KPI cards,
+year / corridor filters, expandable rows, two-step delete + wipe guards,
+`📥 Download Tax CSV` and `🖨️ Print Annual Audit Package` over a dedicated
+white multi-page `.tax-ledger-print-area` re-shown by the `@media print`
+rules in `globals.css`), a header nav "Tax Ledger" link + the `taxLedger` key
+across all 7 i18n catalogs, the `/tax-ledger/` sitemap entry, `auditTaxLedger`
+in the corridor audit script, and docs.
 
 ---
 
@@ -438,5 +486,6 @@ swift-auditor + legal/utility routes = 157+ static routes).
 - `acf8c60` — statutory settlement engine, dynamic waterfall, invoice sync, UI stabilization.
 - `e753011` — Phase 10 (Batch 4 of 50): final 7 corridors complete the 50-country milestone — TZS / UGX / RWF / ZMW / NPR / LKR / KZT (per-corridor provider fee models in `data/fees.json`, authored statutory/bank records in `regulatoryBanking.ts` → 43 fully-audited corridors, 14 new long-tail slugs in `corridors.ts` → 50 base & 137 English corridor routes, `CorridorSwitcher` capsule + `CorridorDirectory` region pills regrouped / Central Asia & APAC added, corpus/long-tail audit + docs totals updated).
 - `ec8c06e` — Phase B: closed-form Target Net gross-up solver + invoice sync.
-- *this commit* — **Phase C**: 1-click Bank PRC / FIRC statutory export exemption letter generator (`lib/prcLetterEngine.ts` six-scheme engine, `components/compliance/PrcLetterModal.tsx`, exact-spec emerald pill in `Calculator.tsx` wired to `TransactionCostingWidget`'s live `onGenerateLetter` snapshot, Invoice Studio entry point, single-page `.prc-letter` print clip in `globals.css`, docs).
-- THIS COMMIT — **Phase D**: SWIFT Intermediary Leakage & BIC Route Inspector (`lib/swiftRoutingEngine.ts` correspondent registry + route derivation + wire-instructions template, `components/compliance/SwiftRouteInspector.tsx` 3-node SVG transit inspector + studio modal, `components/compliance/SwiftAuditorTerminal.tsx` + `app/swift-auditor/` 50-country searchable terminal, `Calculator.tsx` Tab 2 bank-sync mount, Invoice Studio "Inspect SWIFT Route", sitemap entry, docs).
+- `3dd1165` — Phase C: 1-click Bank PRC / FIRC statutory export exemption letter generator (`lib/prcLetterEngine.ts` six-scheme engine, `components/compliance/PrcLetterModal.tsx`, exact-spec emerald pill in `Calculator.tsx` wired to `TransactionCostingWidget`'s live `onGenerateLetter` snapshot, Invoice Studio entry point, single-page `.prc-letter` print clip in `globals.css`, docs).
+- `b92f7a6` — Phase D: SWIFT Intermediary Leakage & BIC Route Inspector (`lib/swiftRoutingEngine.ts` correspondent registry + route derivation + wire-instructions template, `components/compliance/SwiftRouteInspector.tsx` 3-node SVG transit inspector + studio modal, `components/compliance/SwiftAuditorTerminal.tsx` + `app/swift-auditor/` 50-country searchable terminal, `Calculator.tsx` Tab 2 bank-sync mount, Invoice Studio "Inspect SWIFT Route", sitemap entry, docs).
+- *this commit* — **Phase E**: Multi-Milestone Invoicing & Year-End Tax Season Remittance Ledger (`lib/ledgerEngine.ts` record engine + annual summary + RFC 4180 CSV, `components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/` KPI/filter/CSV/print dashboard, Invoice Studio Settlement & Realization panel + "Save Invoice to Tax Ledger" + line-item reordering, InvoicePreview Settlement Schedule print block, `globals.css` `.tax-ledger-print-area` print rules, header nav + `taxLedger` key ×7 catalogs, sitemap entry, `auditTaxLedger`, docs).

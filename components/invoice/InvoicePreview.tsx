@@ -1,7 +1,8 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import type { WithdrawalChannel } from "@/lib/types";
+import { useMemo } from "react";
+import type { Corridor, WithdrawalChannel } from "@/lib/types";
 import {
   TransparencyClauseBlock,
   BankSettlementBlock,
@@ -20,6 +21,12 @@ import {
   subtotal,
   totalLineGst,
 } from "@/lib/invoiceTypes";
+import { formatUSD } from "@/utils/format";
+import {
+  buildLedgerRecordFromDraft,
+  ledgerRecordStatus,
+} from "@/lib/ledgerEngine";
+import type { RemittanceRecord } from "@/lib/ledgerEngine";
 
 /**
  * Live 1:1 document canvas. Renders the invoice at A4-proportioned scale and
@@ -33,9 +40,11 @@ import {
 export default function InvoicePreview({
   draft,
   channels,
+  corridors,
 }: {
   draft: InvoiceDraft;
   channels: WithdrawalChannel[];
+  corridors: Corridor[];
 }) {
   const accent = accentByKey(draft.accent);
   const ccy = draft.meta.currency;
@@ -47,6 +56,25 @@ export default function InvoicePreview({
     (item) => parseAmount(item.gstPercent) > 0
   );
   const fmt = (value: number) => formatCurrency(value, ccy);
+
+  // Phase E — the settlement & realization corridor is resolved once per
+  // render (falls back to the default corridor when the persisted slug no
+  // longer matches the dataset), then the schedule projects the identical
+  // ledger math that the studio's "Save to Tax Ledger" writes.
+  const settlementCorridor = useMemo(
+    () =>
+      corridors.find(
+        (corridor) => corridor.slug === draft.settlement.corridorSlug
+      ) ?? corridors[0] ?? null,
+    [corridors, draft.settlement.corridorSlug]
+  );
+  const settlementProjection = useMemo(
+    () =>
+      settlementCorridor
+        ? buildLedgerRecordFromDraft(draft, settlementCorridor)
+        : null,
+    [draft, settlementCorridor]
+  );
 
   return (
     <div
@@ -254,6 +282,16 @@ export default function InvoicePreview({
           <StatutoryComplianceBlock banking={draft.banking} />
         )}
 
+        {draft.includeSettlementSchedule &&
+          settlementCorridor &&
+          settlementProjection && (
+            <SettlementScheduleBlock
+              record={settlementProjection}
+              corridor={settlementCorridor}
+              platformPercent={draft.settlement.platformPercent}
+            />
+          )}
+
         <div className="mt-8 border-t border-slate-200 pt-3 text-[10px] leading-relaxed text-slate-400">
           <p>
             Generated with the PayoutDelta Freelance Invoice Studio — fully
@@ -265,5 +303,110 @@ export default function InvoicePreview({
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+ * Phase E — Settlement & Realization Schedule (printed addendum).
+ * ------------------------------------------------------------------------- */
+
+function SettlementRow({
+  label,
+  value,
+  mono = false,
+  strong = false,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  strong?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-1">
+      <dt className="text-slate-500">{label}</dt>
+      <dd
+        className={`text-right font-medium text-slate-800 ${
+          strong ? "text-sm" : ""
+        } ${mono ? "font-mono tabular-nums" : ""}`}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function SettlementScheduleBlock({
+  record,
+  corridor,
+  platformPercent,
+}: {
+  record: RemittanceRecord;
+  corridor: Corridor;
+  platformPercent: string;
+}) {
+  const safePct = parseAmount(platformPercent);
+  const local = (value: number) =>
+    `${corridor.currencySymbol} ${Math.round(value).toLocaleString("en-US")}`;
+  const status = ledgerRecordStatus(record);
+
+  return (
+    <section
+      aria-label="Settlement and realization schedule"
+      className="invoice-addendum mt-8 rounded-lg border border-slate-200 p-4"
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+        Settlement &amp; Realization Schedule
+      </p>
+      <dl className="mt-2 divide-y divide-slate-100 border-t border-slate-100 text-[11px]">
+        <SettlementRow
+          label="Corridor"
+          value={`${corridor.from} → ${corridor.to} · ${record.statutoryCitation}`}
+        />
+        <SettlementRow
+          label="Gross billed"
+          value={formatCurrency(record.grossAmount, record.invoiceCurrency)}
+          mono
+        />
+        <SettlementRow label="Gross (USD)" value={formatUSD(record.grossUsd)} mono />
+        <SettlementRow
+          label={`Platform fee (${safePct}%)`}
+          value={formatUSD(record.platformFeeUsd)}
+          mono
+        />
+        <SettlementRow
+          label="Intermediary SWIFT cut"
+          value={formatUSD(record.swiftCutUsd)}
+          mono
+        />
+        <SettlementRow label="Net realized (USD)" value={formatUSD(record.netUsd)} mono strong />
+        <SettlementRow
+          label="Applied FX rate"
+          value={record.appliedExchangeRate.toFixed(4)}
+          mono
+        />
+        <SettlementRow
+          label="Converted local"
+          value={local(record.convertedLocal)}
+          mono
+        />
+        <SettlementRow
+          label="Local landing fee"
+          value={local(record.landingFeeLocal)}
+          mono
+        />
+        <SettlementRow
+          label="Realized take-home"
+          value={local(record.realizedTakeHome)}
+          mono
+          strong
+        />
+        <SettlementRow label="Wire instruction" value={record.wireProtocol} mono />
+        <SettlementRow label="Status" value={status} mono strong />
+      </dl>
+      <p className="mt-2 text-[10px] leading-relaxed text-slate-400">
+        Projected from the platform % and corridor rate above — confirm the
+        exact SWIFT / landing deduction on the bank credit advice.
+      </p>
+    </section>
   );
 }

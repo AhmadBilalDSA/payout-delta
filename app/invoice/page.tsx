@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import InvoiceEditor from "@/components/invoice/InvoiceEditor";
 import InvoiceHero from "@/components/invoice/InvoiceHero";
-import { getChannels } from "@/lib/db";
+import { getChannels, getCorridors } from "@/lib/db";
 
 const SITE_URL = "https://payoutdelta.com";
 const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
@@ -90,6 +90,7 @@ const serviceLd = {
 
 export default function InvoicePage() {
   const channels = getChannels();
+  const corridors = getCorridors();
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
@@ -115,7 +116,7 @@ export default function InvoicePage() {
       <InvoiceHero />
 
       <div className="mt-8">
-        <InvoiceEditor channels={channels} />
+        <InvoiceEditor channels={channels} corridors={corridors} />
       </div>
 
       <p className="no-print mt-10 text-xs leading-relaxed text-slate-500 dark:text-white/50">

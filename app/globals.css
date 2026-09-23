@@ -398,3 +398,50 @@ body {
     break-inside: avoid !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Phase E — annual tax ledger print surface (.tax-ledger-print-area).
+ *
+ * TaxLedgerView mounts a dedicated white document (own <header>/<footer>,
+ * fixed light classes, Tailwind `hidden` on screen) that this block — last in
+ * the cascade — turns into the printable audit package. Two print systems are
+ * overridden here:
+ *   (1) Tailwind's `.hidden` (display:none) is held as static flow so the
+ *       multi-page ledger paginates naturally under the A4 portrait @page;
+ *   (2) the generic `body * { visibility: hidden }` + display hiders (header,
+ *       footer, .no-print) leave the dashboard off the page while this
+ *       document's own chrome is re-shown at higher specificity.
+ * Unlike the single-sheet PRC overlay, this surface must NOT be clipped to
+ * one 210×297mm box — it flows across pages, so rows opt out of shattering
+ * instead of the whole document.
+ * ------------------------------------------------------------------------- */
+@media print {
+  .tax-ledger-print-area {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12mm 16mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    visibility: visible !important;
+  }
+
+  .tax-ledger-print-area * {
+    visibility: visible !important;
+  }
+
+  .tax-ledger-print-area header,
+  .tax-ledger-print-area footer {
+    display: block !important;
+  }
+
+  .tax-ledger-print-area .tax-ledger-row,
+  .tax-ledger-print-area .ledger-print-kpis > div,
+  .tax-ledger-print-area table thead {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

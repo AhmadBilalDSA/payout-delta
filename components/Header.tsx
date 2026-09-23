@@ -70,6 +70,12 @@ export default function Header() {
             {t("invoiceStudio")}
           </Link>
           <Link
+            href="/tax-ledger/"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
+          >
+            {t("taxLedger")}
+          </Link>
+          <Link
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"

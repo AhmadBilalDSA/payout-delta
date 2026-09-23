@@ -58,6 +58,7 @@ export const enStrings = {
   // ── Header navigation ────────────────────────────────────────────────
   calculator: "Calculator",
   invoiceStudio: "Invoice Studio",
+  taxLedger: "Tax Ledger",
   openDataset: "Open dataset",
   apiAccess: "API Access",
   theme: "Theme",
@@ -321,6 +322,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
     strings: {
       calculator: "کیلکولیٹر",
       invoiceStudio: "انوائس اسٹوڈیو",
+      taxLedger: "ٹیکس لیجر",
       openDataset: "ڈیٹاسیٹ کھولیں",
       apiAccess: "API تک رسائی",
       theme: "تھیم",
@@ -566,6 +568,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
     strings: {
       calculator: "कैलकुलेटर",
       invoiceStudio: "इनवॉइस स्टूडियो",
+      taxLedger: "टैक्स लेज़र",
       openDataset: "डेटासेट खोलें",
       apiAccess: "API एक्सेस",
       theme: "थीम",
@@ -810,6 +813,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
     strings: {
       calculator: "Calculator",
       invoiceStudio: "Invoice Studio",
+      taxLedger: "Tax Ledger",
       openDataset: "Buksan ang dataset",
       apiAccess: "API Access",
       theme: "Tema",
@@ -1056,6 +1060,7 @@ swiftBic: "SWIFT / BIC code",
     strings: {
       calculator: "Calculadora",
       invoiceStudio: "Estudio de facturas",
+      taxLedger: "Registro tributario",
       openDataset: "Abrir dataset",
       apiAccess: "Acceso a la API",
       theme: "Tema",
@@ -1302,6 +1307,7 @@ swiftBic: "SWIFT / BIC code",
     strings: {
       calculator: "Calculadora",
       invoiceStudio: "Estúdio de faturas",
+      taxLedger: "Registro tributário",
       openDataset: "Abrir dataset",
       apiAccess: "Acesso à API",
       theme: "Tema",
@@ -1548,6 +1554,7 @@ swiftBic: "SWIFT / BIC code",
     strings: {
       calculator: "حاسبة",
       invoiceStudio: "استوديو الفواتير",
+      taxLedger: "دفتر الضرائب",
       openDataset: "فتح مجموعة البيانات",
       apiAccess: "الوصول إلى API",
       theme: "المظهر",

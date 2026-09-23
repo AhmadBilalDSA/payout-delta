@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import type { WithdrawalChannel } from "@/lib/types";
+import type { Corridor, WithdrawalChannel } from "@/lib/types";
 import type {
   CurrencyCode,
   InvoiceDraft,
   InvoiceLineItem,
+  InvoiceSettlement,
   InvoiceSyncPayload,
 } from "@/lib/invoiceTypes";
 import {
@@ -29,6 +30,8 @@ import {
   subtotal,
   totalLineGst,
 } from "@/lib/invoiceTypes";
+import { addLedgerRecord, buildLedgerRecordFromDraft } from "@/lib/ledgerEngine";
+import { formatUSD } from "@/utils/format";
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
@@ -49,8 +52,10 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
  */
 export default function InvoiceEditor({
   channels,
+  corridors,
 }: {
   channels: WithdrawalChannel[];
+  corridors: Corridor[];
 }) {
   const { t } = useLanguage();
   const [draft, setDraft] = useState<InvoiceDraft>(() => loadInvoiceDraft());
@@ -63,6 +68,8 @@ export default function InvoiceEditor({
   const [prcOpen, setPrcOpen] = useState(false);
   // Phase D — SWIFT route inspector overlay for the Banking & Clearing panel.
   const [routeOpen, setRouteOpen] = useState(false);
+  // Phase E — "Saved to Tax Ledger" transient confirmation toast.
+  const [ledgerToast, setLedgerToast] = useState<string | null>(null);
 
   // Phase C — prefill the statutory letter from the live draft: freelancer
   // name, banking & clearing fields, invoice currency symbol and the first
@@ -192,6 +199,23 @@ export default function InvoiceEditor({
   const globalTax = globalTaxAmount(draft);
   const total = grandTotal(draft);
 
+  // Phase E — settle on the corridor the draft names (fallback to the first
+  // available corridor when a persisted slug no longer matches the dataset).
+  const settlementCorridor = useMemo(
+    () =>
+      corridors.find(
+        (corridor) => corridor.slug === draft.settlement.corridorSlug
+      ) ?? corridors[0] ?? null,
+    [corridors, draft.settlement.corridorSlug]
+  );
+  const settlementProjection = useMemo(
+    () =>
+      settlementCorridor
+        ? buildLedgerRecordFromDraft(draft, settlementCorridor)
+        : null,
+    [draft, settlementCorridor]
+  );
+
   const patchIdentity = (patch: Partial<InvoiceDraft["identity"]>) =>
     setDraft((current) => ({
       ...current,
@@ -209,6 +233,23 @@ export default function InvoiceEditor({
       ...current,
       meta: { ...current.meta, ...patch },
     }));
+
+  const patchSettlement = (patch: Partial<InvoiceSettlement>) =>
+    setDraft((current) => ({
+      ...current,
+      settlement: { ...current.settlement, ...patch },
+    }));
+
+  /** Phase E — lift a line item one position up/down (multi-milestone order). */
+  const moveItem = (index: number, direction: -1 | 1) =>
+    setDraft((current) => {
+      const target = index + direction;
+      if (target < 0 || target >= current.lineItems.length) return current;
+      const items = [...current.lineItems];
+      const [moving] = items.splice(index, 1);
+      items.splice(target, 0, moving);
+      return { ...current, lineItems: items };
+    });
 
   const updateItem = (id: string, patch: Partial<InvoiceLineItem>) =>
     setDraft((current) => ({
@@ -259,6 +300,32 @@ export default function InvoiceEditor({
   const handlePrint = () => {
     window.print();
   };
+
+  // Phase E — transient toast confirmation helper.
+  const showToast = (message: string) => {
+    setLedgerToast(message);
+    window.setTimeout(() => setLedgerToast(null), 2600);
+  };
+
+  // Phase E — persist the live draft's settlement math into the annual tax
+  // ledger (localStorage only). The corridor must resolve before saving.
+  const handleSaveToLedger = () => {
+    if (!settlementCorridor) {
+      showToast("Pick a settlement corridor before saving to the ledger.");
+      return;
+    }
+    const record = buildLedgerRecordFromDraft(draft, settlementCorridor);
+    addLedgerRecord(record);
+    showToast(`Saved ${record.invoiceNumber} · ${formatUSD(record.netUsd)} net USD → tax ledger.`);
+  };
+
+  // Phase E — projection box local-currency formatting.
+  const formatSettlementLocal = (value: number) =>
+    settlementCorridor
+      ? `${settlementCorridor.currencySymbol} ${Math.round(value).toLocaleString(
+          "en-US"
+        )}`
+      : String(Math.round(value));
 
   return (
     <div className="invoice-editor-grid grid items-start gap-8 lg:grid-cols-2">
@@ -398,13 +465,39 @@ export default function InvoiceEditor({
                     className="font-mono tabular-nums"
                   />
                 </div>
-                <div className="mt-2 flex items-center justify-between border-t border-black/[0.06] pt-2">
-                  <span className="text-xs tabular-nums text-slate-500">
-                    {t("lineTotal")}{" "}
-                    <span className="font-mono font-medium text-slate-900">
-                      {formatCurrency(lineTotal(item), ccy)}
+                <div className="mt-2 flex items-center justify-between gap-2 border-t border-black/[0.06] pt-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      role="group"
+                      aria-label={`Reorder item ${index + 1}`}
+                      className="inline-flex items-center overflow-hidden rounded-full border border-black/[0.12] dark:border-white/15"
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Move item ${index + 1} up`}
+                        onClick={() => moveItem(index, -1)}
+                        disabled={index === 0}
+                        className="px-2 py-0.5 text-xs text-slate-500 transition-colors duration-150 ease-out hover:bg-neutral-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white dark:disabled:hover:bg-transparent"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Move item ${index + 1} down`}
+                        onClick={() => moveItem(index, 1)}
+                        disabled={index === draft.lineItems.length - 1}
+                        className="border-l border-black/[0.12] px-2 py-0.5 text-xs text-slate-500 transition-colors duration-150 ease-out hover:bg-neutral-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent dark:border-white/15 dark:text-white/50 dark:hover:bg-white/[0.06] dark:hover:text-white dark:disabled:hover:bg-transparent"
+                      >
+                        ↓
+                      </button>
                     </span>
-                  </span>
+                    <span className="text-xs tabular-nums text-slate-500">
+                      {t("lineTotal")}{" "}
+                      <span className="font-mono font-medium text-slate-900">
+                        {formatCurrency(lineTotal(item), ccy)}
+                      </span>
+                    </span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => removeItem(item.id)}
@@ -525,6 +618,172 @@ export default function InvoiceEditor({
                 Inspect SWIFT Route
               </button>
             </div>
+          </div>
+        </Section>
+
+        <Section title="Settlement & Realization (Tax Ledger)">
+          <div className="flex flex-col gap-3">
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/[0.06] bg-white p-4 transition-all duration-150 ease-out hover:border-black/[0.15] active:scale-[0.99] dark:border-white/[0.08] dark:bg-zinc-900/60 dark:hover:border-zinc-700">
+              <input
+                type="checkbox"
+                className="peer sr-only"
+                checked={draft.includeSettlementSchedule}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    includeSettlementSchedule: event.target.checked,
+                  }))
+                }
+              />
+              <span
+                aria-hidden="true"
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ease-out peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 peer-focus-visible:ring-offset-2 ${
+                  draft.includeSettlementSchedule
+                    ? "border-emerald-600 bg-emerald-600 text-white"
+                    : "border-black/20 bg-white text-transparent dark:border-white/25 dark:bg-neutral-900"
+                }`}
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="h-3 w-3"
+                >
+                  <path
+                    d="m3 8.5 3.2 3L13 4.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-slate-900 dark:text-white">
+                  Include Settlement Schedule on Print
+                </span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-slate-500 dark:text-white/55">
+                  Appends the corridor settlement &amp; realization schedule
+                  (gross → net USD → converted → take-home) below the invoice.
+                </span>
+              </span>
+            </label>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  Settlement corridor
+                </span>
+                <select
+                  value={draft.settlement.corridorSlug}
+                  onChange={(event) =>
+                    patchSettlement({ corridorSlug: event.target.value })
+                  }
+                  className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] dark:border-white/10 dark:bg-neutral-900 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/[0.06]"
+                >
+                  {corridors.map((corridor) => (
+                    <option key={corridor.slug} value={corridor.slug}>
+                      {corridor.from} → {corridor.to} · {corridor.country}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Field
+                label="Platform fee %"
+                inputMode="decimal"
+                value={draft.settlement.platformPercent}
+                onChange={(value) =>
+                  patchSettlement({ platformPercent: value })
+                }
+                placeholder="10"
+                className="font-mono"
+              />
+              <Field
+                label="Intermediary SWIFT cut (USD)"
+                inputMode="decimal"
+                value={draft.settlement.swiftCutUsd}
+                onChange={(value) => patchSettlement({ swiftCutUsd: value })}
+                placeholder="15"
+                className="font-mono"
+              />
+              <Field
+                label={`Landing fee (${settlementCorridor?.currencySymbol ?? "local"})`}
+                inputMode="decimal"
+                value={draft.settlement.landingFeeLocal}
+                onChange={(value) =>
+                  patchSettlement({ landingFeeLocal: value })
+                }
+                placeholder="0"
+                className="font-mono"
+              />
+            </div>
+
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                SWIFT charge instruction
+              </span>
+              <select
+                value={draft.settlement.wireProtocol}
+                onChange={(event) =>
+                  patchSettlement({
+                    wireProtocol: event.target.value as "OUR" | "SHA",
+                  })
+                }
+                className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-slate-900 transition-colors duration-200 ease-out focus:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/[0.06] dark:border-white/10 dark:bg-neutral-900 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/[0.06]"
+              >
+                <option value="OUR">OUR — invoice bearer pays correspondent fees</option>
+                <option value="SHA">SHA — charges shared with the beneficiary</option>
+              </select>
+            </label>
+
+            {settlementProjection && (
+              <div className="rounded-xl bg-[#F5F5F7] p-3 transition-colors duration-200 dark:bg-white/[0.04]">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  Realization projection
+                </p>
+                <dl className="mt-1.5 space-y-1 text-xs tabular-nums">
+                  <div className="flex justify-between text-slate-500">
+                    <dt>Gross billed</dt>
+                    <dd className="font-mono text-slate-900 dark:text-white/80">
+                      {formatCurrency(settlementProjection.grossAmount, ccy)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <dt>Net USD after platform + SWIFT</dt>
+                    <dd className="font-mono text-slate-900 dark:text-white/80">
+                      {formatUSD(settlementProjection.netUsd)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <dt>Converted local</dt>
+                    <dd className="font-mono text-slate-900 dark:text-white/80">
+                      {formatSettlementLocal(settlementProjection.convertedLocal)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <dt>Realized take-home</dt>
+                    <dd className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                      {formatSettlementLocal(
+                        settlementProjection.realizedTakeHome
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleSaveToLedger}
+              disabled={!settlementCorridor}
+              className="flex w-fit items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-700 transition-all duration-150 ease-out hover:bg-emerald-500/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 dark:text-emerald-400"
+            >
+              💾 Save Invoice to Tax Ledger
+            </button>
+            <p className="text-[11px] leading-relaxed text-slate-400">
+              Saves a year-attributable remittance record — gross, platform,
+              SWIFT, FX and realized take-home — to this browser&apos;s annual
+              ledger. Opened from the header&apos;s “Tax Ledger” link.
+            </p>
           </div>
         </Section>
 
@@ -784,7 +1043,7 @@ export default function InvoiceEditor({
             {t("downloadPdf")}
           </button>
         </div>
-        <InvoicePreview draft={draft} channels={channels} />
+        <InvoicePreview draft={draft} channels={channels} corridors={corridors} />
       </div>
 
       {/* Phase C — statutory letter generator overlay (client-only). */}
@@ -808,6 +1067,17 @@ export default function InvoiceEditor({
           recipientName={draft.identity.freelancerName}
           account={draft.banking.beneficiaryAccount}
         />
+      )}
+
+      {/* Phase E — transient "saved to tax ledger" toast (client-only). */}
+      {ledgerToast !== null && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full border border-emerald-500/30 bg-slate-900/95 px-4 py-2.5 text-xs font-medium text-emerald-300 shadow-lg shadow-black/40 backdrop-blur"
+        >
+          ✓ {ledgerToast}
+        </div>
       )}
     </div>
   );

@@ -102,6 +102,36 @@ export interface InvoiceBanking {
   tierLabel: string;
 }
 
+/** SWIFT charge instruction — bearer (OUR) or shared (SHA). */
+export type WireProtocol = "OUR" | "SHA";
+
+/**
+ * Phase E — settlement & realization parameters captured per invoice so the
+ * studio can project, print and persist a multi-milestone remittance ledger
+ * entry. All amounts are user-typed strings (matching the studio convention);
+ * `platformPercent` and `swiftCutUsd` are USD-side, `landingFeeLocal` lives in
+ * the corridor's target currency.
+ */
+export interface InvoiceSettlement {
+  /** Platform commission % applied to the gross (e.g. "10"). */
+  platformPercent: string;
+  /** Intermediary correspondent SWIFT cut, USD ("0" default). */
+  swiftCutUsd: string;
+  /** Local receiving-bank landing fee, target currency ("0" default). */
+  landingFeeLocal: string;
+  wireProtocol: WireProtocol;
+  /** Corridor the settlement realizes on, matching a `Corridor.slug`. */
+  corridorSlug: string;
+}
+
+export const DEFAULT_SETTLEMENT: InvoiceSettlement = {
+  platformPercent: "0",
+  swiftCutUsd: "0",
+  landingFeeLocal: "0",
+  wireProtocol: "OUR",
+  corridorSlug: "usd-to-pkr",
+};
+
 export interface InvoiceDraft {
   identity: InvoiceIdentity;
   meta: InvoiceMeta;
@@ -116,6 +146,9 @@ export interface InvoiceDraft {
   /** Phase 9 — banking, purpose code & statutory withholding addendum. */
   banking: InvoiceBanking;
   includeStatutoryAddendum: boolean;
+  /** Phase E — settlement & realization schedule shown on the document. */
+  settlement: InvoiceSettlement;
+  includeSettlementSchedule: boolean;
 }
 
 /** `INV-2026-001` — default invoice numbering, editable in the studio. */
@@ -190,6 +223,14 @@ export function createEmptyDraft(): InvoiceDraft {
       tierLabel: "",
     },
     includeStatutoryAddendum: false,
+    settlement: {
+      platformPercent: "0",
+      swiftCutUsd: "0",
+      landingFeeLocal: "0",
+      wireProtocol: "OUR",
+      corridorSlug: "usd-to-pkr",
+    },
+    includeSettlementSchedule: false,
   };
 }
 
@@ -298,6 +339,26 @@ function asGstPercent(value: unknown): string {
   return String(Math.min(100, Math.max(0, n)));
 }
 
+/** Normalize a settlement % / fee string to a clamped non-negative string. */
+function asFeeString(value: unknown, maxPercent = false): string {
+  if (typeof value !== "string") return "0";
+  const n = Number.parseFloat(value.replace(/,/g, "").trim());
+  if (!Number.isFinite(n) || n < 0) return "0";
+  return maxPercent ? String(Math.min(100, n)) : String(n);
+}
+
+/** Coerce a persisted settlement block into the phase-E shape. */
+function sanitizeSettlement(parsed: unknown): InvoiceSettlement {
+  const block = isRecord(parsed) ? parsed : {};
+  return {
+    platformPercent: asFeeString(block.platformPercent, true),
+    swiftCutUsd: asFeeString(block.swiftCutUsd),
+    landingFeeLocal: asFeeString(block.landingFeeLocal),
+    wireProtocol: block.wireProtocol === "SHA" ? "SHA" : "OUR",
+    corridorSlug: asString(block.corridorSlug, DEFAULT_SETTLEMENT.corridorSlug),
+  };
+}
+
 export function persistInvoiceDraft(draft: InvoiceDraft): void {
   if (typeof window === "undefined") return;
   try {
@@ -393,6 +454,11 @@ function sanitizeDraft(parsed: unknown, fallback: InvoiceDraft): InvoiceDraft {
       typeof parsed.includeStatutoryAddendum === "boolean"
         ? parsed.includeStatutoryAddendum
         : fallback.includeStatutoryAddendum,
+    settlement: sanitizeSettlement(parsed.settlement),
+    includeSettlementSchedule:
+      typeof parsed.includeSettlementSchedule === "boolean"
+        ? parsed.includeSettlementSchedule
+        : fallback.includeSettlementSchedule,
   };
 }
 

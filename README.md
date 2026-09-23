@@ -139,6 +139,22 @@ Route"** on its Banking & Clearing panel, and the dedicated
 50 countries' banks — all pure inline SVG, zero external packages, zero
 network.
 
+### 🧾 Year-End Remittance & Tax Ledger (Phase E)
+Every invoice saved from the studio lands in an on-device **annual tax-season
+ledger** ([`lib/ledgerEngine.ts`](lib/ledgerEngine.ts)) as a durable
+`RemittanceRecord` — gross billed, platform % + SWIFT-cut USD deductions, net
+USD at the corridor FX applied on save, local landing fee and realized
+take-home, with the OUR/SHA wire instruction and statutory citation. The
+[`/tax-ledger/`](app/tax-ledger) dashboard rolls up **gross billed (USD)**,
+**deductible fees (USD)** and **realized take-home per currency**, filters by
+year / corridor, expands per-record detail (two-step delete), and exports a
+**BOM-prefixed spreadsheet-ready CSV** or prints a dedicated **white annual
+audit package**. The studio adds a Settlement & Realization panel (corridor +
+OUR/SHA select, platform / SWIFT / landing-fee fields, live realization
+projection, **"Save Invoice to Tax Ledger"**), an opt-in **Settlement Schedule**
+print block on the invoice PDF, and ↑/↓ line-item reordering — all fully
+client-side under `payoutdelta:remittance_ledger`.
+
 ### 🌍 Global Localization
 Fully translated UI in **7 languages (EN, UR, HI, FIL, ES, PT, AR)** with
 automatic **RTL + Nastaliq** layout handling and zero-latency switching.
@@ -244,7 +260,8 @@ npm run lint      # ESLint
   no database, no API dependency in the app.
 - **Zero telemetry, zero tracking, zero data retention** — every input stays
   on-device. The only "storage" is your browser's own `localStorage`
-  (draft invoice, language preference, bank-sync, PRC letter shells).
+  (draft invoice, language preference, bank-sync, PRC letter shells, annual
+  tax ledger).
 - **Versioned fee dataset** — `data/fees.json` is the single source of truth;
   corridor pages, sitemap and static JSON regenerate from one snapshot.
 
@@ -264,6 +281,9 @@ npm run lint      # ESLint
 | `components/compliance/SwiftRouteInspector.tsx` | Phase D — 3-node SVG transit inspector + Invoice Studio modal |
 | `components/compliance/SwiftAuditorTerminal.tsx` | Phase D — searchable `/swift-auditor` terminal island (BIC / bank / country / clearing-leg filters) |
 | `app/swift-auditor/` | Phase D — standalone static SWIFT intermediary route auditor |
+| `lib/ledgerEngine.ts` | Phase E — remittance ledger engine (record math, annual summary, RFC 4180 CSV, localStorage persistence) |
+| `components/ledger/TaxLedgerView.tsx` | Phase E — tax-ledger dashboard (KPIs, year/corridor filters, CSV download, printable audit package) |
+| `app/tax-ledger/` | Phase E — standalone static annual remittance & tax ledger route |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -292,6 +312,7 @@ npm run lint      # ESLint
 | Phase B | Target Net gross-up — closed-form 7-layer inversion solver + invoice milestone sync | Shipped |
 | Phase C | 1-click Bank PRC / FIRC export exemption letter generator (6 statutory jurisdictions, single-page PDF, live settlement prefill) | Shipped |
 | Phase D | SWIFT intermediary leakage & BIC route inspector — correspondent routing, SHA cut band, rail efficiency score, double-dip risk, 1-click wire instructions + searchable `/swift-auditor` terminal | Shipped |
+| Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (this commit) |
 
 ---
 

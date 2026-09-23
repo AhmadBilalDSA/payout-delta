@@ -645,6 +645,50 @@ console.log(
   `\nHreflang alternates (Phase 5): ${hreflangFailures === 0 ? `PASS — ${EXPECTED_LOCALIZED.length} localized variant(s) wired into corridor heads` : `FAIL — ${hreflangFailures} corridor(s) missing alternates`}`
 );
 
+/**
+ * Phase E — Year-End Remittance & Tax Ledger: ./out/tax-ledger/index.html
+ * must exist, carry valid metadata (title + meta description +
+ * SoftwareApplication / BreadcrumbList / Service JSON-LD), and serve
+ * basePath-prefixed assets that resolve on disk. Because the header nav now
+ * links to /tax-ledger/, every exported page implicitly verifies its export.
+ */
+function auditTaxLedger() {
+  const htmlFile = join(OUT, "tax-ledger", "index.html");
+  const row = { slug: "tax-ledger" };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.metadata = false;
+    row.assets = false;
+    row.links = { total: 0, bad: 0 };
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const titleOk = /<title[^>]*>[^<]*Remittance &amp; Tax Ledger|Remittance & Tax Ledger/i.test(html);
+  const descriptionTag =
+    html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
+  const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
+  const schemaTypes = collectTypes(html);
+  row.schemaMissing = [];
+  for (const t of ["SoftwareApplication", "BreadcrumbList", "Service"]) {
+    if (!schemaTypes.has(t)) row.schemaMissing.push(t);
+  }
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
+  row.metadata =
+    titleOk && descriptionOk && row.schemaMissing.length === 0;
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
 console.log("\nInvoice Studio audit (Phase 4):");
 const invoice = auditInvoice();
 const invoiceFlags = `${invoice.html ? "PASS" : "FAIL"}`;
@@ -671,6 +715,34 @@ console.log(
 );
 console.log(
   `  ${"internal links".padEnd(38)}${(invoice.links && invoice.links.bad === 0 ? "PASS" : "FAIL").padEnd(10)}${invoice.links ? invoice.links.total : 0} verified`
+);
+
+console.log("\nRemittance & Tax Ledger audit (Phase E):");
+const taxLedger = auditTaxLedger();
+const taxLedgerFlags = `${taxLedger.html ? "PASS" : "FAIL"}`;
+if (!taxLedger.html) {
+  fail("page not exported", "tax-ledger/index.html");
+}
+if (taxLedger.html && !taxLedger.metadata) {
+  fail("metadata missing", "tax-ledger: title + description + SoftwareApplication/BreadcrumbList/Service required");
+}
+if (taxLedger.html && !taxLedger.ldParse) {
+  fail("malformed JSON-LD", "tax-ledger");
+}
+if (taxLedger.assetDetails && taxLedger.assetDetails.bad > 0) {
+  fail("asset errors", "tax-ledger");
+}
+if (taxLedger.links && taxLedger.links.bad > 0) {
+  fail("internal links broken", "tax-ledger");
+}
+console.log(
+  `  ${"tax-ledger/index.html".padEnd(38)}${taxLedgerFlags.padEnd(10)}Metadata ${taxLedger.html ? (taxLedger.metadata ? "PASS" : "FAIL") : "n/a"}`
+);
+console.log(
+  `  ${"assets".padEnd(38)}${(taxLedger.assets ? "PASS" : "FAIL").padEnd(10)}${`${taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0} checked`}`
+);
+console.log(
+  `  ${"internal links".padEnd(38)}${(taxLedger.links && taxLedger.links.bad === 0 ? "PASS" : "FAIL").padEnd(10)}${taxLedger.links ? taxLedger.links.total : 0} verified`
 );
 
 console.log("\nGlobal ./out hygiene:");
@@ -857,12 +929,19 @@ const invoiceFailures =
   (invoice.assets ? 0 : 1) +
   (invoice.links ? invoice.links.bad : 0);
 
+const taxLedgerFailures =
+  (!taxLedger.html ? 1 : 0) +
+  (taxLedger.html && !taxLedger.metadata ? 1 : 0) +
+  (taxLedger.html && !taxLedger.ldParse ? 1 : 0) +
+  (taxLedger.assets ? 0 : 1) +
+  (taxLedger.links ? taxLedger.links.bad : 0);
+
 console.log(`\n${"-".repeat(header.length)}`);
-console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio`);
-console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0)}`);
-console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0)}`);
+console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger`);
+console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0)}`);
+console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0) + (taxLedger.links ? taxLedger.links.total : 0)}`);
 console.log(`  JSON-LD blocks scanned   ${ldScanned}`);
-console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures}`);
+console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures}`);
 
 const ok =
   failures === 0 &&
@@ -871,7 +950,8 @@ const ok =
   linkFailures === 0 &&
   invoiceFailures === 0 &&
   localizedFailures === 0 &&
-  hreflangFailures === 0;
+  hreflangFailures === 0 &&
+  taxLedgerFailures === 0;
 if (ok) {
   console.log("\n  ALL CHECKS PASSED\n");
   process.exit(0);
