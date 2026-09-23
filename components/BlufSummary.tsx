@@ -95,7 +95,7 @@ export default function BlufSummary({
     <section
       aria-label="AEO verified answer — bottom line payout takeaway"
       data-aeo="answer-block"
-      className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 shadow-md backdrop-blur-md"
+      className="relative w-full min-w-0 rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 sm:p-6 shadow-md backdrop-blur-md"
     >
       <div className="flex items-center gap-2">
         <span aria-hidden="true" className="text-sm leading-none">

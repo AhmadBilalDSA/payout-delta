@@ -445,7 +445,7 @@ export default function TransactionCostingWidget({
             </dt>
             <dd className="text-right font-mono tabular-nums text-black dark:text-white">
               + {formatLocal(convertedLocal, corridor)}
-              <span className="block text-[11px] text-black/[0.4] dark:text-white/[0.4]">
+              <span className="block text-[11px] font-mono tabular-nums tracking-tight text-black/[0.4] dark:text-white/[0.4]">
                 {channelName} @ {safeRate.toFixed(4)}
               </span>
             </dd>
@@ -469,7 +469,7 @@ export default function TransactionCostingWidget({
             <dt className="font-semibold text-black/80 dark:text-white/80">
               {t("rowTakeHome")}
             </dt>
-            <dd className="font-bold tabular-nums text-emerald-600">
+            <dd className="font-mono font-bold tabular-nums tracking-tight text-emerald-600">
               + {formatLocal(takeHomeLocal, corridor)}
             </dd>
           </div>

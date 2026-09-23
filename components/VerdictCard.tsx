@@ -131,7 +131,7 @@ if (mode === "net-to-gross") {
     return (
       <section
         aria-label="Invoice requirement verdict"
-        className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 text-white shadow-md backdrop-blur-md sm:p-6"
+        className="relative w-full min-w-0 rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 text-white shadow-md backdrop-blur-md sm:p-6"
       >
         <div
           aria-hidden="true"

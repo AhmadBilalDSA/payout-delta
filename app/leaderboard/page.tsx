@@ -237,7 +237,7 @@ export default function LeaderboardPage() {
           <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
             Average retail bank spread
           </p>
-          <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-amber-300">
+          <p className="mt-1 font-mono text-3xl font-bold tabular-nums tracking-tight text-amber-300">
             3.8%
           </p>
           <p className="mt-1 text-xs leading-relaxed text-white/50">
@@ -248,7 +248,7 @@ export default function LeaderboardPage() {
           <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
             Modern digital rails
           </p>
-          <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-emerald-300">
+          <p className="mt-1 font-mono text-3xl font-bold tabular-nums tracking-tight text-emerald-300">
             0.45%
           </p>
           <p className="mt-1 text-xs leading-relaxed text-white/50">
@@ -259,7 +259,7 @@ export default function LeaderboardPage() {
           <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-400">
             Worst corridor penalty
           </p>
-          <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-white">
+          <p className="mt-1 font-mono text-3xl font-bold tabular-nums tracking-tight text-white">
             {worst ? formatPenalty(worst.penaltyUsd) : "—"}
           </p>
           <p className="mt-1 text-xs leading-relaxed text-white/50">
@@ -290,7 +290,7 @@ export default function LeaderboardPage() {
                   key={row.slug}
                   className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03]"
                 >
-                  <td className="px-4 py-3 font-mono tabular-nums text-white/70">
+                  <td className="px-4 py-3 font-mono tabular-nums tracking-tight text-white/70">
                     #{row.rank}
                   </td>
                   <td className="px-4 py-3">
@@ -300,7 +300,7 @@ export default function LeaderboardPage() {
                     </p>
                   </td>
                   <td
-                    className={`px-4 py-3 font-mono font-bold tabular-nums ${
+                    className={`px-4 py-3 font-mono font-bold tabular-nums tracking-tight ${
                       row.rank <= 10
                         ? "text-amber-300"
                         : "text-emerald-300"
@@ -309,7 +309,7 @@ export default function LeaderboardPage() {
                     {formatPenalty(row.penaltyUsd)}
                   </td>
                   <td className="px-4 py-3 text-white/80">{row.bestRail}</td>
-                  <td className="px-4 py-3 font-mono tabular-nums text-white/60">
+                  <td className="px-4 py-3 font-mono tabular-nums tracking-tight text-white/60">
                     {row.savingsPct.toFixed(1)}%
                   </td>
                   <td className="px-4 py-3">

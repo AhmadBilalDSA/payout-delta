@@ -79,8 +79,16 @@ export default function InvoicePreview({
   return (
     <div
       id="invoice-document"
-      className="invoice-document mx-auto aspect-[210/297] w-full overflow-hidden rounded-lg bg-white text-sm text-slate-900 shadow-[var(--apple-glass-shadow)] ring-1 ring-black/[0.06]"
-      style={{ "--invoice-accent": accent.value } as CSSProperties}
+      className="invoice-document mx-auto aspect-[210/297] w-full overflow-hidden rounded-lg bg-white text-sm text-slate-900 ring-1 ring-black/[0.06]"
+      style={
+        {
+          "--invoice-accent": accent.value,
+          backgroundColor: "#FFFFFF",
+          color: "#0F172A",
+          borderRadius: "8px",
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)",
+        } as CSSProperties
+      }
     >
       <div className="flex h-full flex-col p-8 sm:p-10">
         <div
@@ -264,7 +272,7 @@ export default function InvoicePreview({
           </div>
 
           {draft.note && draft.note.trim() !== "" && (
-            <p className="mt-6 whitespace-pre-line text-[11px] leading-relaxed text-slate-500">
+            <p className="mt-4 whitespace-pre-line text-xs leading-relaxed text-slate-600">
               {draft.note}
             </p>
           )}

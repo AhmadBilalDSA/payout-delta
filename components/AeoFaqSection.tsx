@@ -83,7 +83,7 @@ export default function AeoFaqSection({
         type="multiple"
         value={openValues}
         onValueChange={setOpenValues}
-        className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2"
+        className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"
       >
         {items.map((item, index) => (
           <Accordion.Item
