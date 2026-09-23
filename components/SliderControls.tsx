@@ -9,13 +9,14 @@ import {
   MIN_GROSS_USD,
   SLIDER_STEP_USD,
 } from "@/utils/calculateRoute";
-import { localSliderBounds } from "@/utils/inverseMath";
+import {
+  corridorTargetPresets,
+  localSliderBounds,
+} from "@/utils/inverseMath";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { platformUiKey } from "@/lib/i18n/helpers";
 
 const PRESET_AMOUNTS: readonly number[] = [500, 1000, 2500, 5000, 10000];
-const HIGH_PRESETS: readonly number[] = [50000, 150000, 300000, 500000];
-const LOW_PRESETS: readonly number[] = [500, 1000, 2500, 5000];
 
 /**
  * iOS-style audit inputs — Phase 3 adds the operating-mode capsule:
@@ -59,8 +60,11 @@ export default function SliderControls({
   const formatLocal = (value: number) =>
     `${corridor.currencySymbol} ${Math.round(value).toLocaleString("en-US")}`;
 
-  const localPresets =
-    corridor.rate >= 10 ? HIGH_PRESETS : LOW_PRESETS;
+  // Phase B — corridor-tiered take-home chips: high-denomination central-bank
+  // floats (PKR/INR/PHP/NGN/VND) get six-figure local chips, pegged rails and
+  // mid-tier rates get USD-equivalent chips, and sub-1 corridors (EUR/GBP)
+  // get the 1.5k–5k local presets. Backed by `corridorTargetPresets`.
+  const localPresets = corridorTargetPresets(corridor);
 
   /* Phase 6 — editable numeric input pill. Directly bound to the parent engine:
      typing updates the slider amount / target goal immediately and is clamped
@@ -147,7 +151,9 @@ export default function SliderControls({
         <fieldset>
           <legend className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-black/70 dark:text-white/70">
             <span>
-              {isTargetGoal ? t("targetLocalPayout") : t("grossClientPayment")}
+              {isTargetGoal
+                ? t("targetTakeHomeLabel", { currency: corridor.to })
+                : t("grossClientPayment")}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-xl border border-black/10 bg-black/[0.04] px-3 py-1.5 transition focus-within:ring-2 focus-within:ring-emerald-500/50 dark:border-white/10 dark:bg-white/[0.06]">
               <span

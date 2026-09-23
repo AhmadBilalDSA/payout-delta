@@ -95,6 +95,22 @@ export interface InvertedQuote {
   fixedFeeUSD: number;
   platformFeeUSD: number;
   platformFeePercent: number;
+  /** Intermediary correspondent SWIFT cut fed into the gross-up solver (USD). */
+  wireUSD: number;
+  /** Local receiving / landing fee fed into the gross-up solver (domestic). */
+  landingFeeLocal: number;
+  /** Statutory withholding rate grossed-up by the solver (decimal fraction). */
+  tierRate: number;
+  /** Channel FX spread applied to the corridor mid-rate (decimal fraction). */
+  fxSpread: number;
+  /** Value eroded by the hidden FX spread, expressed in USD. */
+  spreadLeakageUsd: number;
+  /** Value eroded by the hidden FX spread, expressed in local currency. */
+  spreadLeakageLocal: number;
+  /** fixedFee + SWIFT cut + landing fee converted — the USD-side banking cut. */
+  bankAndWireCutUSD: number;
+  /** Net local deposit the required invoice actually realizes (== target). */
+  realizedTakeHomeLocal: number;
   /** Raw (unclamped) solver output, kept for OOB detection. */
   grossRequiredRaw: number;
   /** Clamped into the [MIN_GROSS_USD, MAX_GROSS_USD] invoice range. */

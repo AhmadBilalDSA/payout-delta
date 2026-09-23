@@ -532,6 +532,9 @@ export interface InvoiceSyncPayload {
   taxRate: number;
   currency: string;
   timestamp: number;
+  /** Phase B — optional target-net line item (USD-milestone invoice). */
+  lineItemAmount?: number;
+  lineItemDescription?: string;
 }
 
 function sanitizeInvoiceSync(parsed: unknown): InvoiceSyncPayload | null {
@@ -558,6 +561,16 @@ function sanitizeInvoiceSync(parsed: unknown): InvoiceSyncPayload | null {
     taxRate: toNumber(parsed.taxRate, 0),
     currency: typeof parsed.currency === "string" ? parsed.currency : "USD",
     timestamp: toNumber(parsed.timestamp, 0),
+    lineItemAmount:
+      typeof parsed.lineItemAmount === "number" &&
+      Number.isFinite(parsed.lineItemAmount)
+        ? parsed.lineItemAmount
+        : undefined,
+    lineItemDescription:
+      typeof parsed.lineItemDescription === "string" &&
+      parsed.lineItemDescription.trim() !== ""
+        ? parsed.lineItemDescription
+        : undefined,
   };
 }
 

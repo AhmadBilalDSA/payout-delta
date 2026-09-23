@@ -180,6 +180,7 @@ export default function TaxImpactCard({
   channelCutUSD,
   channelName,
   effectiveRate,
+  tierRate,
 }: {
   corridor: Corridor;
   mode: CalcMode;
@@ -191,6 +192,8 @@ export default function TaxImpactCard({
   channelCutUSD: number;
   channelName: string;
   effectiveRate: number;
+  /** Phase B — the solver's grossed-up statutory tier (target mode only). */
+  tierRate?: number;
 }) {
   const { t } = useLanguage();
   const isTargetMode = mode === "net-to-gross";
@@ -204,8 +207,22 @@ export default function TaxImpactCard({
     profileSet.profiles.find((profile) => profile.id === activeId) ??
     profileSet.profiles[0];
 
-  const taxLocal = safe(netLocalPreTax * activeProfile.rate);
+  // Phase B — in target mode the statutory tier is owned by the gross-up
+  // solver (it was already baked into the invoice), so the local profile board
+  // is replaced by a read-only "grossed-up" pill and the tax math uses the
+  // solver's exact rate. Quote mode keeps the interactive exemption toggle.
+  const solverTier =
+    isTargetMode && tierRate !== undefined
+      ? Math.max(0, Math.min(1, safe(tierRate)))
+      : null;
+  const taxMultiplier = solverTier ?? safe(activeProfile.rate);
+
+  const taxLocal = safe(netLocalPreTax * taxMultiplier);
   const realizationLocal = safe(netLocalPreTax - taxLocal);
+  const taxSub =
+    solverTier !== null
+      ? `${Math.round(solverTier * 10000) / 100}% statutory tier`
+      : `${activeProfile.badge} · ${activeProfile.detail}`;
 
   /* Live numeric pill — mirrors the parent amount/target state. Edits are
       tracked in local state while focused, then the displayed value is derived
@@ -261,7 +278,7 @@ export default function TaxImpactCard({
       corridor
     )} @ ${safe(effectiveRate).toFixed(4)}`,
     `Channel cut: -${formatUSD(safe(channelCutUSD))} (${channelName})`,
-    `Legal withholding: ${formatLocal(taxLocal, corridor)} (${activeProfile.badge} · ${activeProfile.detail})`,
+    `Legal withholding: ${formatLocal(taxLocal, corridor)} (${taxSub})`,
     `Bank realization: ${formatLocal(realizationLocal, corridor)}`,
   ];
 
@@ -309,7 +326,7 @@ export default function TaxImpactCard({
       key: "tax",
       label: t("legalWithholding"),
       value: formatLocal(taxLocal, corridor),
-      sub: `${activeProfile.badge} · ${activeProfile.detail}`,
+      sub: taxSub,
       tone: "amber",
     },
     {
@@ -375,40 +392,61 @@ export default function TaxImpactCard({
         ))}
       </div>
 
-      {/* iOS segmented toggle — tax exemption status. */}
-      <div
-        role="group"
-        aria-label={t("taxStatus")}
-        className="mt-4 flex gap-1 rounded-full bg-white/[0.06] p-1 ring-1 ring-inset ring-white/[0.08]"
-      >
-        {profileSet.profiles.map((profile) => {
-          const isActive = profile.id === activeProfile.id;
-          return (
-            <button
-              key={profile.id}
-              type="button"
-              aria-pressed={isActive}
-              onClick={() => setActiveId(profile.id)}
-              className={`min-w-0 flex-1 rounded-full px-3 py-2 text-center transition-all duration-200 ease-out active:scale-[0.98] ${
-                isActive
-                  ? "bg-white text-black shadow-lg"
-                  : "text-white/60 hover:text-white/90"
-              }`}
-            >
-              <span className="block text-[11px] font-semibold leading-tight">
-                {profileLabel(profile)}
-              </span>
-              <span
-                className={`mt-0.5 block font-mono text-[11px] font-bold tabular-nums ${
-                  isActive ? "text-black/55" : "text-white/45"
+      {/* iOS segmented toggle — tax exemption status. In target mode the
+          solver already grossed the statutory tier into the invoice, so this
+          becomes a read-only "grossed-up" pill instead of an interactive
+          board (toggling a profile would desync the card from the verdict). */}
+      {solverTier === null ? (
+        <div
+          role="group"
+          aria-label={t("taxStatus")}
+          className="mt-4 flex gap-1 rounded-full bg-white/[0.06] p-1 ring-1 ring-inset ring-white/[0.08]"
+        >
+          {profileSet.profiles.map((profile) => {
+            const isActive = profile.id === activeProfile.id;
+            return (
+              <button
+                key={profile.id}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => setActiveId(profile.id)}
+                className={`min-w-0 flex-1 rounded-full px-3 py-2 text-center transition-all duration-200 ease-out active:scale-[0.98] ${
+                  isActive
+                    ? "bg-white text-black shadow-lg"
+                    : "text-white/60 hover:text-white/90"
                 }`}
               >
-                {profile.badge}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                <span className="block text-[11px] font-semibold leading-tight">
+                  {profileLabel(profile)}
+                </span>
+                <span
+                  className={`mt-0.5 block font-mono text-[11px] font-bold tabular-nums ${
+                    isActive ? "text-black/55" : "text-white/45"
+                  }`}
+                >
+                  {profile.badge}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div
+          role="status"
+          className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-emerald-400/[0.06] px-4 py-3 ring-1 ring-inset ring-emerald-400/15"
+        >
+          <span className="flex items-center gap-2 text-[11px] font-semibold leading-tight text-white/70">
+            <span
+              aria-hidden="true"
+              className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400"
+            />
+            {t("grossedUpWithholding")}
+          </span>
+          <span className="shrink-0 rounded-full bg-emerald-400/15 px-2.5 py-1 font-mono text-[10px] font-bold tabular-nums text-emerald-300 ring-1 ring-emerald-400/20">
+            {Math.round(solverTier * 10000) / 100}%
+          </span>
+        </div>
+      )}
 
       {/* Custom numeric input pill — syncs with the main engine. */}
       <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white/[0.05] px-4 py-3 ring-1 ring-inset ring-white/[0.08] transition focus-within:ring-white/30">
@@ -473,7 +511,11 @@ export default function TaxImpactCard({
       {/* Footer: context note + copy-tax-summary. */}
       <div className="mt-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <p className="max-w-[38ch] text-[11px] leading-relaxed text-white/45">
-          {isTargetMode ? t("taxFooterTarget") : t("taxFooterQuote")}
+          {isTargetMode
+            ? solverTier !== null
+              ? t("taxFooterTargetGrossUp")
+              : t("taxFooterTarget")
+            : t("taxFooterQuote")}
         </p>
         <button
           type="button"

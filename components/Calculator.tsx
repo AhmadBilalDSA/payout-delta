@@ -19,8 +19,10 @@ import {
 import {
   computeInverseRoute,
   localSliderBounds,
+  type SettlementOverrides,
 } from "@/utils/inverseMath";
 import { formatUSD } from "@/utils/format";
+import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import VerdictCard from "@/components/VerdictCard";
 import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
@@ -98,9 +100,29 @@ export default function Calculator({
     [amount, platform, corridor, channels]
   );
 
+  // Phase B — the inverse solver grosses up the full statutory settlement
+  // stack. The same first-bank / first-tier bench the TransactionCostingWidget
+  // defaults to becomes the solver's overrides, so the verdict invoice and the
+  // 7-step waterfall agree out of the box (PKR: Meezan wire $15 + PSEB tier).
+  const settlementOverrides = useMemo<SettlementOverrides>(() => {
+    const regulation = getRegulatoryBanking(corridor.slug);
+    return {
+      wireUSD: regulation.banks[0]?.intermediaryUSD ?? 0,
+      localFee: regulation.banks[0]?.localFeeDefault ?? 0,
+      tierRate: regulation.tiers[0]?.rate ?? 0,
+    };
+  }, [corridor.slug]);
+
   const inverseRoute = useMemo(
-    () => computeInverseRoute(targetNet, platform, corridor, channels),
-    [targetNet, platform, corridor, channels]
+    () =>
+      computeInverseRoute(
+        targetNet,
+        platform,
+        corridor,
+        channels,
+        settlementOverrides
+      ),
+    [targetNet, platform, corridor, channels, settlementOverrides]
   );
 
   const isTarget = mode === "net-to-gross";
@@ -112,13 +134,19 @@ export default function Calculator({
     if (isTarget) {
       const quote = inverseRoute.verdict.best ?? inverseRoute.quotes[0];
       if (!quote) return null;
+      // Phase B — the solver already grossed the target up over the statutory
+      // tier, so the "pre-tax landed" figure is the target divided by (1−tier)
+      // and the realization cell lands exactly on the target.
+      const preTaxLocal =
+        quote.tierRate > 0 ? quote.targetNetLocal / (1 - quote.tierRate) : quote.targetNetLocal;
       return {
         grossUSD: quote.grossRequired,
         grossLocal: quote.grossRequired * corridor.rate,
-        netLocalPreTax: Math.max(0, quote.targetNetLocal),
+        netLocalPreTax: preTaxLocal,
         channelCutUSD: quote.totalCostUSD,
         channelName: quote.channelName,
         effectiveRate: quote.effectiveRate,
+        tierRate: quote.tierRate,
       };
     }
     const quote = route.verdict.best ?? route.quotes[0];
@@ -147,6 +175,8 @@ export default function Calculator({
         platformFeeUSD: quote.platformFeeUSD,
         effectiveRate: quote.effectiveRate,
         channelName: quote.channelName,
+        requiredGrossUsd: quote.grossRequired,
+        targetNetLocal: quote.targetNetLocal,
       };
     }
     const quote = route.verdict.best ?? route.quotes[0];
@@ -252,15 +282,29 @@ export default function Calculator({
                       </p>
                       <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
                         {quote.effectiveRate.toFixed(4)} {corridor.to} ·{" "}
-                        {t("allInCostPercent", {
-                          pct: quote.totalCostPercent.toFixed(2),
+                        {t("spreadLabel", {
+                          pct: (quote.fxSpread * 100).toFixed(2),
                         })}
                       </p>
                     </div>
                   </div>
-                  <p className="shrink-0 text-sm font-bold tabular-nums text-black dark:text-white sm:text-right">
-                    {t("invoiceRequired", { amount: formatUSD(quote.grossRequired) })}
-                  </p>
+                  <div className="shrink-0 text-right">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+                      {t("invoiceToClient")}
+                    </p>
+                    <p className="text-sm font-bold tabular-nums text-black dark:text-white">
+                      {formatUSD(quote.grossRequired)}
+                    </p>
+                    <p className="text-xs tabular-nums text-black/[0.45] dark:text-white/[0.45]">
+                      {t("feesToHitTarget", {
+                        fees: formatUSD(quote.totalCostUSD),
+                        amount: Math.round(quote.targetNetLocal).toLocaleString(
+                          "en-US"
+                        ),
+                        currency: corridor.to,
+                      })}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -303,13 +347,20 @@ export default function Calculator({
             channelCutUSD={taxSnapshot.channelCutUSD}
             channelName={taxSnapshot.channelName}
             effectiveRate={taxSnapshot.effectiveRate}
+            tierRate={taxSnapshot.tierRate}
           />
         )}
 
-        {/* Phase 8 — local bank settlement & custom costing under the ranked
-            breakdown and tax card, shared by every corridor page variant. */}
+        {/* Phase 8/9 — local bank settlement & custom costing under the ranked
+            breakdown and tax card, shared by every corridor page variant. In
+            target mode the widget is anchored on the solver's gross-up so the
+            waterfall lands exactly on the target at its default bank/tier. */}
         {costingAnchor !== null && (
-          <TransactionCostingWidget corridor={corridor} {...costingAnchor} />
+          <TransactionCostingWidget
+            corridor={corridor}
+            mode={mode}
+            {...costingAnchor}
+          />
         )}
 
         {/* Nominative fair use — mandatory legal line. */}

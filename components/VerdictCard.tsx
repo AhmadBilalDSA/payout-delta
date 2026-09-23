@@ -14,7 +14,6 @@ import type {
 import { formatLocal, formatUSD } from "@/utils/format";
 import RateSparkline from "@/components/RateSparkline";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import { platformUiKey } from "@/lib/i18n/helpers";
 import { getPartnerConfig } from "@/data/affiliatePartners";
 
 /**
@@ -117,17 +116,22 @@ export default function VerdictCard({
 
   const showSparkline = history.length >= 2;
 
-  if (mode === "net-to-gross") {
+if (mode === "net-to-gross") {
     const best = inverseVerdict.best;
     const worst = inverseVerdict.worst;
     if (best === null || worst === null) {
       return null;
     }
 
+    // Phase B — the target-mode verdict leads with the exact USD the client
+    // must be billed to net the target in full; the partner CTA reuses the
+    // central `getPartnerConfig` directory (affiliate vs advisory).
+    const partner = getPartnerConfig(best.channelId);
+
     return (
       <section
         aria-label="Invoice requirement verdict"
-className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 text-white shadow-md backdrop-blur-md sm:p-8"
+        className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 text-white shadow-md backdrop-blur-md sm:p-8"
       >
         <div
           aria-hidden="true"
@@ -147,11 +151,13 @@ className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-sla
           </p>
 
           <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            {t("quoteRequired", {
-              invoice: formatUSD(best.grossRequired),
-              platform: t(platformUiKey(platform.id)),
+            {t("toNetBill", {
+              amount: formatLocal(best.targetNetLocal, corridor),
             })}
           </h2>
+          <p className="mt-1 font-mono text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
+            {formatUSD(best.grossRequired)}
+          </p>
           <p className="mt-1 text-sm text-white/50">
             {t("toNetExactly", {
               amount: formatLocal(best.targetNetLocal, corridor),
@@ -162,16 +168,15 @@ className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-sla
           <p className="mt-5 text-xs font-medium uppercase tracking-widest text-white/40">
             {t("targetNetDeposit")}
           </p>
-          <p className="mt-1 font-mono text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
-            {formatLocal(best.targetNetLocal, corridor)}
+          <p className="mt-1 font-mono text-2xl font-bold tracking-tight tabular-nums text-white sm:text-3xl">
+            {formatLocal(best.realizedTakeHomeLocal, corridor)}
           </p>
 
           <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full bg-violet-500/15 px-3 py-1 text-xs font-semibold tabular-nums text-violet-300 ring-1 ring-violet-400/20">
-                {t("requiresLess", {
+                {t("savesVsBankWire", {
                   savings: formatUSD(inverseVerdict.savingsUSD),
-                  channel: worst.channelName,
                 })}
               </span>
               {inverseVerdict.outOfBounds && (
@@ -202,6 +207,60 @@ className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-sla
               {copied ? t("copied") : t("copyAudit")}
             </button>
           </div>
+
+          {/* Phase B — invoice-lock CTA routed through the partner directory.
+              Affiliate rails grow a sponsored outbound CTA; unpartnered rails
+              surface the neutral advisory card. */}
+          {partner.kind === "affiliate" ? (
+            <>
+              <a
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                title={partner.disclosure}
+                className="mt-4 flex w-full items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-md shadow-violet-500/20 transition-all text-sm"
+              >
+                <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                  {partner.partnerBadge}
+                </span>
+                <span className="text-center">
+                  {t("lockInRateVia", { channel: best.channelName })}
+                </span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4 shrink-0"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M8 7h9v9" />
+                </svg>
+              </a>
+
+              <p className="mt-3 text-[10px] leading-relaxed text-white/40">
+                {partner.disclosure}
+              </p>
+            </>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-white/[0.08] bg-white/[0.05] p-4">
+              <p className="text-sm font-semibold text-white">
+                {partner.partnerBadge}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-white/50">
+                {partner.disclosure}
+              </p>
+            </div>
+          )}
+
+          {partner.kind === "affiliate" && (
+            <p className="mt-3 text-[11px] leading-relaxed text-white/40">
+              {t("affiliateDisclaimer")}
+            </p>
+          )}
 
           <ShareUtilityTray
             labels={exportLabels}
@@ -472,7 +531,8 @@ function buildTargetAudit(
     `Target net deposit: ${formatLocal(best.targetNetLocal, corridor)}`,
     `Cheapest invoice: ${best.channelName}`,
     `Required invoice: ${formatUSD(best.grossRequired)}`,
-    `All-in cost: ${best.totalCostPercent.toFixed(2)}%`,
+    `Realized take-home: ${formatLocal(best.realizedTakeHomeLocal, corridor)}`,
+    `Total fees: ${formatUSD(best.totalCostUSD)} (${best.totalCostPercent.toFixed(2)}%)`,
     `Bill this much less vs ${worst.channelName}: ${formatUSD(
       verdict.savingsUSD
     )}`,

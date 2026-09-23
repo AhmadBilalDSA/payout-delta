@@ -121,6 +121,18 @@ that every language must preserve verbatim.
   interactive inputs + waterfall, the right rail (sticky `lg:top-20`,
   `order-first` on mobile) hosts the server-rendered `bluf`/`faq` slot props
   around the live verdict card.
+- **Target Net (net → gross) mode — Phase B gross-up solver** — flip the
+  calculator into "Target Take-Home" and the verdict solves the *inverse* of
+  the full waterfall: given the local amount the business must keep, it returns
+  the exact USD to bill the client after the platform cut, the intermediary
+  SWIFT cut, the local landing fee and the statutory withholding — all grossed
+  up in closed form (`lib/calculatorEngine.ts`, `calculateGrossFromTargetNet`).
+  The solver's defaults come from the first bank / first statutory tier of
+  `data/regulatoryBanking.ts`. The verdict card leads with the billable USD and
+  the "Lock In Rate via {channel}" partner CTA; the Tax card swaps its
+  exemption toggle for a read-only grossed-up pill; and the costing widget's
+  "Sync to Invoice" upserts the gross-up as the milestone line item in the
+  Invoice Studio.
 - **7-step liquid waterfall** (`components/TransactionCostingWidget.tsx`) —
   bank selector, statutory tier selector (purpose code chips), SWIFT slider
   ($0–$40), local clearing fee, custom surcharge/retainer slider (0–15%), and
@@ -278,6 +290,26 @@ Ranking on the calculator uses the first two terms plus channel
 `fxSpread`; the widget layers the receiving side on top. Both stay in sync
 because they share the same dataset and quote math.
 
+**Phase B — the closed-form gross-up** (`lib/calculatorEngine.ts`). Given a
+target net deposit in local currency, the solver walks the identity in the
+backwards direction and lands exactly on the target:
+
+```
+netUsdNeeded        = (targetNetLocal / (1 − withholdingTax)) / effectiveRate
+bankAndWireCutUSD   = fixedFeeUSD + wireUSD + (localLandingFee / baseRate)
+usdBeforeWires      = netUsdNeeded + bankAndWireCutUSD
+requiredGrossBill   = usdBeforeWires / (1 − platformRate)   // ≈ platformFee > 0 ? usdBeforeWires + platformCut
+realizedTakeHome    = netUsdNeeded · effectiveRate · (1 − withholdingTax) ≡ targetNetLocal
+```
+
+With no overrides (wire $0, landing fee 0, tier 0) this reduces exactly to the
+Phase 3 `gross = ((targetNetLocal / effectiveRate) + fixedFeeUSD) / (1 −
+platformRate)` solver — legacy verdict numbers are bit-for-bit preserved.
+`corridorTargetPresets` tiers the local slider chips by corridor rate
+(≥100 → 100k/250k/500k, ≥20 → 50k/150k/300k, ≥5 → 10k/25k/50k, <1 → 1.5k/3k/5k,
+else 1k/2.5k/5k). In target mode `localSliderBounds` maxes at a $20k-equivalent
+cap so both rails stay inside the 100k gross clamp regardless of rate.
+
 ---
 
 ## 5. Ten-Phase Dominance Roadmap
@@ -308,6 +340,14 @@ node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, 
 Commit convention follows the project template
 `feat(scope): summary of what actually changed`. Subpath/static-export
 compatibility is a merge blocker.
+
+**Phase B (Target Net gross-up)** is delivered on top of the ten-phase roadmap:
+a closed-form 7-layer inversion solver (`lib/calculatorEngine.ts`), UI
+upserts in `SliderControls` (tiered take-home presets + new label), `VerdictCard`
+(to-net billable USD + realized take-home + lock-in CTA), `TaxImpactCard`
+(read-only grossed-up pill + `taxFooterTargetGrossUp`), `TransactionCostingWidget`
+(target anchor + milestone line-item sync), `InvoiceEditor` (no-clobber
+line-item upsert), 8 new i18n keys across all 7 catalogs, and docs.
 
 ---
 

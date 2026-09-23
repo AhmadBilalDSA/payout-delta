@@ -157,6 +157,15 @@ export const enStrings = {
     "Figures update live from the best audited quote; conversion is at the live interbank mid.",
   taxFooterTarget:
     "Withholding applies on top of your target — raise the invoice to take home the full net.",
+  taxFooterTargetGrossUp:
+    "The target grosses up the statutory withholding, SWIFT intermediary and local landing fee — bill the client below and net the full target.",
+  grossedUpWithholding: "Grossed-up statutory withholding",
+  targetTakeHomeLabel: "Target Take-Home in Bank ({currency})",
+  invoiceToClient: "Invoice to client",
+  feesToHitTarget: "{fees} total fees to hit {amount} {currency}",
+  toNetBill: "To net {amount}, bill:",
+  savesVsBankWire: "Saves you {savings} vs traditional bank wire proposal",
+  lockInRateVia: "Lock In Rate via {channel}",
 
   // ── Freelance Invoice Studio ─────────────────────────────────────────
   studioTitle: "Freelance Invoice Studio",
@@ -405,6 +414,16 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "اعداد و شمار بہترین آڈٹ شدہ کوٹ سے لائیو اپ ڈیٹ ہوتے ہیں؛ تبدیلی لائیو انٹربینک مڈ ریٹ پر ہوتی ہے۔",
       taxFooterTarget:
         "ودہولڈنگ آپ کے ہدف کے اوپر لگتی ہے — مکمل نیٹ حاصل کرنے کے لیے انوائس بڑھائیں۔",
+      taxFooterTargetGrossUp:
+        "ہدف کٹوتی، SWIFT انٹرمیڈیری اور مقامی لینڈنگ فیس پر گروس اپ کرتا ہے — کلائنٹ کو کم بل دیں اور مکمل نیٹ حاصل کریں۔",
+      grossedUpWithholding: "گروس شدہ قانونی کٹوتی",
+      targetTakeHomeLabel: "ہدف بینک ٹیک ہوم ({currency})",
+      invoiceToClient: "کلائنٹ کو انوائس",
+      feesToHitTarget: "{fees} کل فیسوں سے {amount} {currency} حاصل ہوں گے",
+      toNetBill: "مجموعی {amount} صاف کرنے کے لیے بل:",
+      savesVsBankWire:
+        "روایتی بینک وائر تجویز کے مقابلے میں {savings} بچت",
+      lockInRateVia: "{channel} کے ذریعے ریٹ لاک کریں",
 
       studioTitle: "فری لانس انوائس اسٹوڈیو",
       studioSubtitle:
@@ -640,6 +659,16 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "आंकड़े सर्वोत्तम ऑडिटेड कोट से लाइव अपडेट होते हैं; रूपांतरण लाइव इंटरबैंक मिड रेट पर होता है।",
       taxFooterTarget:
         "कटौती आपके लक्ष्य के ऊपर लागू होती है — पूरा नेट पाने के लिए इनवॉइस बढ़ाएँ।",
+      taxFooterTargetGrossUp:
+        "लक्ष्य क़ानूनी कटौती, SWIFT मध्यस्थ और स्थानीय लैंडिंग शुल्क पर ग्रॉस-अप करता है — क्लाइंट को कम बिल करें और पूरा नेट प्राप्त करें।",
+      grossedUpWithholding: "ग्रॉस-अप क़ानूनी कटौती",
+      targetTakeHomeLabel: "बैंक में टार्गेट टेक-होम ({currency})",
+      invoiceToClient: "क्लाइंट को इनवॉइस",
+      feesToHitTarget: "{fees} कुल शुल्क, {amount} {currency} तक पहुँचने हेतु",
+      toNetBill: "{amount} नेट करने हेतु बिल:",
+      savesVsBankWire:
+        "पारंपरिक बैंक वायर प्रस्ताव की तुलना में {savings} बचत",
+      lockInRateVia: "{channel} के ज़रिए रेट लॉक करें",
 
       studioTitle: "फ्रीलांस इनवॉइस स्टूडियो",
       studioSubtitle:
@@ -875,6 +904,16 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
         "Live na ina-update ang mga numero mula sa pinakamahusay na audited quote; ang conversion ay nasa live interbank mid.",
       taxFooterTarget:
         "Nalalapat ang withholding sa itaas ng iyong target — taasan ang invoice para makuha ang buong net.",
+      taxFooterTargetGrossUp:
+        "Nagsasagawa ang target ng gross-up ng statutory withholding, SWIFT intermediary at lokal na landing fee — mag-bill nang mas mababa at makuha ang buong net.",
+      grossedUpWithholding: "Na-gross-up na statutory withholding",
+      targetTakeHomeLabel: "Target Take-Home sa Bangko ({currency})",
+      invoiceToClient: "Invoice sa kliyente",
+      feesToHitTarget: "{fees} kabuuang bayad para maabot ang {amount} {currency}",
+      toNetBill: "Upang i-net ang {amount}, i-bill ang kliyente:",
+      savesVsBankWire:
+        "Nakatitipid ng {savings} kumpara sa tradisyunal na bank wire",
+      lockInRateVia: "I-lock ang rate sa pamamagitan ng {channel}",
 
       studioTitle: "Freelance Invoice Studio",
       studioSubtitle:
@@ -1111,6 +1150,16 @@ swiftBic: "SWIFT / BIC code",
         "Las cifras se actualizan desde la mejor cotización auditada; la conversión usa el tipo interbancario del momento.",
       taxFooterTarget:
         "La retención se aplica sobre tu objetivo — sube la factura para recibir el neto completo.",
+      taxFooterTargetGrossUp:
+        "El objetivo bruto-infla la retención estatutaria, el intermediario SWIFT y la comisión local — factura por menos y recibirás el neto completo.",
+      grossedUpWithholding: "Retención estatutaria bruto-inflada",
+      targetTakeHomeLabel: "Objetivo neto en el banco ({currency})",
+      invoiceToClient: "Factura al cliente",
+      feesToHitTarget: "{fees} comisiones totales para alcanzar {amount} {currency}",
+      toNetBill: "Para netear {amount}, factura:",
+      savesVsBankWire:
+        "Ahorras {savings} frente a una transferencia bancaria tradicional",
+      lockInRateVia: "Fija la tasa vía {channel}",
 
       studioTitle: "Estudio de facturación freelance",
       studioSubtitle:
@@ -1347,6 +1396,16 @@ swiftBic: "SWIFT / BIC code",
         "Os números são atualizados ao vivo a partir da melhor cotação auditada; a conversão usa a taxa interbancária do momento.",
       taxFooterTarget:
         "A retenção incide sobre o seu alvo — aumente a fatura para receber o líquido completo.",
+      taxFooterTargetGrossUp:
+        "O alvo inflaciona a retenção estatutária, o intermediário SWIFT e a taxa local — fature por menos e receba o líquido completo.",
+      grossedUpWithholding: "Retenção estatutária inflacionada",
+      targetTakeHomeLabel: "Meta na conta no banco ({currency})",
+      invoiceToClient: "Fatura para o cliente",
+      feesToHitTarget: "{fees} taxas totais para atingir {amount} {currency}",
+      toNetBill: "Para liquidar {amount}, fature:",
+      savesVsBankWire:
+        "Economiza {savings} em comparação a uma transferência bancária tradicional",
+      lockInRateVia: "Trave a taxa via {channel}",
 
       studioTitle: "Estúdio de faturas freelance",
       studioSubtitle:
@@ -1583,6 +1642,16 @@ swiftBic: "SWIFT / BIC code",
         "تتحدث الأرقام مباشرة من أفضل عرض مُدقق؛ يتم التحويل بسعر السوق بين البنوك المباشر.",
       taxFooterTarget:
         "يُطبق الاقتطاع فوق هدفك — ارفع الفاتورة لتحصل على الصافي كاملًا.",
+      taxFooterTargetGrossUp:
+        "يقوم الهدف بتضخيم الاقتطاع القانوني والوسيط SWIFT والرسوم المحلية — فوترة بأقل لتحصل على الصافي كاملًا.",
+      grossedUpWithholding: "اقتطاع قانوني مضخم",
+      targetTakeHomeLabel: "الهدف الصافي في البنك ({currency})",
+      invoiceToClient: "الفاتورة للعميل",
+      feesToHitTarget: "{fees} رسوم إجمالية للوصول إلى {amount} {currency}",
+      toNetBill: "لتحصيل {amount} صافٍ، الفاتورة:",
+      savesVsBankWire:
+        "توفر {savings} مقابل عرض الحوالة البنكية التقليدية",
+      lockInRateVia: "ثبّت السعر عبر {channel}",
 
       studioTitle: "استوديو فواتير الفريلانسر",
       studioSubtitle:

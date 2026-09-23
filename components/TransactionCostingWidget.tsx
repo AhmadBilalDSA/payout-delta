@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import type { Corridor } from "@/lib/types";
+import type { CalcMode, Corridor } from "@/lib/types";
 import { formatLocal, formatUSD } from "@/utils/format";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
@@ -41,14 +41,24 @@ export default function TransactionCostingWidget({
   platformFeeUSD,
   effectiveRate,
   channelName,
+  mode,
+  targetNetLocal,
+  requiredGrossUsd,
 }: {
   corridor: Corridor;
   grossUSD: number;
   platformFeeUSD: number;
   effectiveRate: number;
   channelName: string;
+  /** Phase B — net-to-gross anchor: bills `requiredGrossUsd` to land exactly
+   *  `targetNetLocal`; the default bank/tier mirror the solver's overrides so
+   *  the waterfall agrees with the verdict out of the box. */
+  mode?: CalcMode;
+  targetNetLocal?: number;
+  requiredGrossUsd?: number;
 }) {
   const { t } = useLanguage();
+  const isTarget = mode === "net-to-gross";
   const regulation = useMemo(
     () => getRegulatoryBanking(corridor.slug),
     [corridor.slug]
@@ -109,6 +119,23 @@ export default function TransactionCostingWidget({
 
   const handleSync = () => {
     if (!bank || !tier || synced) return;
+    // Phase B — in target mode the invoice line item is the exact gross-up so
+    // the studio bills the milestone first: "Target Take-Home Contract
+    // Milestone (300,000 PKR net realization via Meezan Bank)". The billing
+    // currency stays USD; the bank/purpose/SWIFT/withholding are preserved.
+    const lineItemAmount =
+      isTarget && requiredGrossUsd != null && requiredGrossUsd > 0
+        ? Math.round(requiredGrossUsd)
+        : undefined;
+    const lineItemDescription =
+      isTarget && targetNetLocal != null && targetNetLocal > 0
+        ? `Target Take-Home Contract Milestone (${Math.round(
+            targetNetLocal
+          ).toLocaleString("en-US")} ${corridor.to} net realization via ${
+            bank.name
+          })`
+        : undefined;
+
     writeBankSync({
       bankName: bank.name,
       swiftCode: bank.swiftCode,
@@ -129,8 +156,10 @@ export default function TransactionCostingWidget({
       statutoryAuthority: `${regulation.authority} · ${tier.authority}`,
       purposeCode: tier.purposeCode ?? "",
       taxRate: tier.rate,
-      currency: corridor.to,
+      currency: isTarget ? "USD" : corridor.to,
       timestamp: Date.now(),
+      lineItemAmount,
+      lineItemDescription,
     };
     try {
       window.localStorage.setItem(INVOICE_SYNC_KEY, JSON.stringify(syncPayload));
@@ -161,6 +190,23 @@ export default function TransactionCostingWidget({
       <p className="mt-2 text-xs leading-relaxed text-black/[0.55] dark:text-white/[0.55]">
         {t("txCostingLead")}
       </p>
+
+      {/* Phase B — target-mode anchor chip: the widget renders the gross-up
+          invoice the verdict computed, so the waterfall confirms the net. */}
+      {isTarget &&
+        requiredGrossUsd != null &&
+        requiredGrossUsd > 0 &&
+        targetNetLocal != null && (
+          <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-full bg-violet-500/10 px-3 py-1.5 text-xs font-semibold tabular-nums text-violet-700 ring-1 ring-violet-500/20 dark:text-violet-300">
+            <span aria-hidden="true" className="text-violet-500">
+              ✓
+            </span>
+            {t("invoiceRequired", {
+              amount: formatUSD(requiredGrossUsd),
+            })}{" "}
+            → {formatLocal(targetNetLocal, corridor)}
+          </p>
+        )}
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <label className="block">

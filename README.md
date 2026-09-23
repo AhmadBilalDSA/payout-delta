@@ -57,6 +57,17 @@ South Asia (Nepal, Sri Lanka) and Central Asia (Kazakhstan) — 50 fully
 audited corridors, every one carrying statutory tiers, real bank benches and
 per-corridor provider spreads.
 
+### 🎯 Target Net Gross-Up (Phase B)
+Flip any corridor into **Target Take-Home** mode and the solver inverts the
+full 7-step waterfall in closed form (`lib/calculatorEngine.ts`): given the
+local amount your business must keep, it returns the exact USD to bill the
+client after the platform cut, the intermediary SWIFT cut, the local landing
+fee and the statutory withholding — with corridor-tiered take-home chips, a
+billable-USD verdict plus realized take-home, a read-only grossed-up
+withholding pill, and an Invoice Studio "Sync" that upserts the gross-up as
+the milestone line item (`TaxImpactCard` swaps its exemption toggle for the
+grossed-up tier; see `docs/SYSTEM_SPEC.md` §4).
+
 ### 🧭 Currency Pair Switcher & Anti-Collapse Grid
 The header carries a tactile `USD → PKR` capsule grouped by receiving region
 (South Asia / Asia Pacific / East Africa & EMEA / Latin America / Europe &

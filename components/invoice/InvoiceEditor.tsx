@@ -22,6 +22,7 @@ import {
   grandTotal,
   lineTotal,
   loadInvoiceDraft,
+  parseAmount,
   persistInvoiceDraft,
   readDataUrl,
   readInvoiceSync,
@@ -79,6 +80,14 @@ export default function InvoiceEditor({
       const tierPct = Number.isFinite(payload.taxRate)
         ? String(Math.round(payload.taxRate * 10000) / 100)
         : "";
+      // Phase B — target-net milestone sync: upsert the required gross as the
+      // first line item ONLY when that line is still empty (unitRate 0 or
+      // blank). Pre-existing user edits are never clobbered.
+      const hasLineItem =
+        typeof payload.lineItemAmount === "number" &&
+        payload.lineItemAmount > 0 &&
+        typeof payload.lineItemDescription === "string" &&
+        payload.lineItemDescription.trim() !== "";
       setDraft((current) => ({
         ...current,
         meta: {
@@ -110,6 +119,21 @@ export default function InvoiceEditor({
               ? current.banking.authority
               : payload.statutoryAuthority,
         },
+        lineItems:
+          hasLineItem &&
+          parseAmount(current.lineItems[0]?.unitRate ?? "") === 0
+            ? current.lineItems.map((item, index) =>
+                index === 0
+                  ? {
+                      ...item,
+                      description: String(payload.lineItemDescription),
+                      quantity:
+                        parseAmount(item.quantity) > 0 ? item.quantity : "1",
+                      unitRate: String(Math.round(payload.lineItemAmount ?? 0)),
+                    }
+                  : item
+              )
+            : current.lineItems,
       }));
       setSyncedBank(payload.receivingBank);
       setSyncLoaded(true);
