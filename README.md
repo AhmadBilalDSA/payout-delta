@@ -234,6 +234,27 @@ crash anywhere confines to an obsidian **"Component Fault Guard"** fallback
 card with a one-click **↻ Reset Module to Defaults** re-mount instead of
 blanking the route. Zero external packages, still fully static.
 
+### 🧾 Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants (Phase S2)
+A data-drift SRE layer sitting on top of the static export.
+[`scripts/test_corridors.mjs`](scripts/test_corridors.mjs) gains three Phase S2
+batteries: **(1)** an **ISO 9362 SWIFT/BIC syntax gate** that reads every
+authored receiving-bank `swiftCode` + correspondent-node `bic` literal straight
+off the TypeScript source (CI-safe on Node 20) and requires `^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$`
+— no lowercase, no spaces, no malformed lengths, with a documented
+local-clearing sentinel exemption (`""` / `-` / `—`). It caught and fixed the
+Bosnia & Herzegovina bench (`RZBAB2B` → `RZBABA2S`). **(2)** a **financial
+range invariant pass** over the whole static surface: every corridor `rate`
+finite and `> 0`, platform cuts `≤ 50%`, every channel/provider `fxSpread ≤ 15%`,
+and every `intermediaryUSD` literal + derived per-corridor
+`defaultIntermediaryCut` within `$0–100`. **(3)** a **leaderboard consistency
+assertion** that re-derives `buildLeaderboard()` and verifies all 50 corridors
+rank with positive savings %, non-zero `≥ $25` wire penalties, and variance
+(fails on any 10 consecutive identical rows). The same doctrine ships to the
+client: [`lib/schemaValidator.ts`](lib/schemaValidator.ts) exposes a
+non-throwing `validateCorridorRuntime` that silently hydrates malformed
+corridor props before `Calculator` / `InvoiceEditor` render. Zero external
+packages, still fully static.
+
 ### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
 The repo ships a free-tier **OpenSEO worker**
 ([`scripts/openseo_worker.js`](scripts/openseo_worker.js)) that tracks the top
@@ -394,7 +415,8 @@ npm run lint      # ESLint
 | `app/api-access/` | Developer API reference, quick-start snippets & playground |
 | `public/api/fees.json` | Versioned static JSON feed (mirrors `data/fees.json` via prebuild) |
 | `scripts/sync_api_feed.mjs` | Static feed sync for the API portal |
-| `scripts/test_corridors.mjs` | Link + JSON-LD + static-feed integrity audit |
+| `scripts/test_corridors.mjs` | Link + JSON-LD + static-feed integrity audit + Phase S2 schema gates (ISO 9362 BICs · financial ranges · leaderboard consistency) |
+| `lib/schemaValidator.ts` | Phase S2 — non-throwing runtime corridor guard (`validateCorridorRuntime` hydrates malformed props) |
 | `.github/ISSUE_TEMPLATE/` | Structured corridor & statutory request forms |
 | `CONTRIBUTING.md` | Contribution guide, gates & data conventions |
 
@@ -418,6 +440,7 @@ npm run lint      # ESLint
 | Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (`ab8f7bf`) |
 | Phase F | High-variance WhatsApp consulting funnel — thresholds (spread ≥ $150 or ≥ 5% of gross), context-specific `wa.me` deep-link, per-session dismiss, env-configured line + Cloudflare OpenSEO rank monitor (top 20 programmatic queries, SERP sweep, static rankings mirror) with footer transparency badge | Shipped (this commit) |
 | Phase H | FX Contract Protection Addendum Generator — "📜 Generate Contract Addendum" in the Invoice Studio, fixed statutory-English Clauses A/B/C (OUR wire-fee allocation, 3.0% devaluation buffer, tax-exemption affirmation), white executive preview + plain-text copy, single-page `.contract-addendum` PDF print · Local-First Rate Alert Watchlist — above/below target pins per corridor in `payoutdelta:rate_alerts`, emerald "🎯 Target Rate Triggered" badge + optional native desktop notification, `useSyncExternalStore` hydration (no setState-in-effect) | Shipped (this commit) |
+| Phase S2 | Static schema SRE gates, ISO 9362 SWIFT validation & financial range invariants — `test_corridors.mjs` Phase S2 batteries (BIC syntax gate over the literal TS bank + correspondent corpus incl. the corrected `RZBAB2B` → `RZBABA2S`, range invariants over rates / platform cuts / fx spreads / intermediary cuts, and a `buildLeaderboard()` replication asserting 50/50 rows, positive savings, non-zero `≥ $25` penalties, ranked variance) + non-throwing `lib/schemaValidator.ts` `validateCorridorRuntime` wired through `Calculator` / `InvoiceEditor` | Shipped (this commit) |
 | Phase S1 | Enterprise fault isolation & defensive mathematical guards — `lib/safeMath.ts` guarded arithmetic (`safeDivide` epsilon-clamp + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in the calculator gross-up + inverse solver wrapped, early zero-stack bail on degenerate target/rate, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) around the calculator (English + localized pages), Invoice Studio and leaderboard index | Shipped (this commit) |
 
 ---

@@ -2152,7 +2152,7 @@ const bamBanks: RegulatoryBank[] = [
     id: "raiffeisen-bh",
     name: "Raiffeisen Bank d.d.",
     displayName: "Raiffeisen (BiH)",
-    swiftCode: "RZBAB2B",
+    swiftCode: "RZBABA2S",
     intermediaryUSD: 12,
     intermediaryMinUSD: 10,
     intermediaryMaxUSD: 16,

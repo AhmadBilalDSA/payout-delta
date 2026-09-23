@@ -31,6 +31,7 @@ import {
   totalLineGst,
 } from "@/lib/invoiceTypes";
 import { addLedgerRecord, buildLedgerRecordFromDraft } from "@/lib/ledgerEngine";
+import { validateCorridorRuntime } from "@/lib/schemaValidator";
 import { formatUSD } from "@/utils/format";
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
@@ -53,12 +54,22 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
  */
 export default function InvoiceEditor({
   channels,
-  corridors,
+  corridors: rawCorridors,
 }: {
   channels: WithdrawalChannel[];
   corridors: Corridor[];
 }) {
   const { t } = useLanguage();
+  // Phase S2 — runtime schema guard: every corridor slot is hydrated through
+  // `validateCorridorRuntime` so a stale or malformed static payload can never
+  // break the settlement selector or the PDF preview (never throws).
+  const corridors = useMemo(
+    () =>
+      Array.isArray(rawCorridors)
+        ? rawCorridors.map(validateCorridorRuntime)
+        : [],
+    [rawCorridors]
+  );
   const [draft, setDraft] = useState<InvoiceDraft>(() => loadInvoiceDraft());
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);

@@ -1066,6 +1066,268 @@ const leaderboardFailures =
   (leaderboard.assets ? 0 : 1) +
   (leaderboard.links ? leaderboard.links.bad : 0);
 
+/**
+ * Phase S2 — Static Schema SRE Gates: ISO 9362 SWIFT/BIC syntax validation,
+ * financial range invariants and leaderboard consistency assertion.
+ *
+ * The receiving-bank registry (`data/regulatoryBanking.ts`) and the
+ * correspondent clearing network (`lib/swiftRoutingEngine.ts`) are authored in
+ * TypeScript; the static build on CI (Node 20) cannot import TS types, so
+ * these gates read the literal comma-separated source text on disk and audit
+ * every authored BIC / numeric literal directly. `buildLeaderboard()` is
+ * re-derived from the same `data/fees.json` corpus + statutory bank database
+ * the page is compiled from, then checked against the invariants the index
+ * page itself claims (positive savings, non-zero penalty, ranked variance).
+ */
+console.log("\nPhase S2 — static schema SRE gates:");
+
+const SWIFT_BIC_RE = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+const BIC_SENTINELS = new Set(["", "-", "—"]);
+const SPREAD_CAP = 0.15;
+const PLATFORM_FEE_CAP = 0.5;
+const INTERMEDIARY_CAP_USD = 100;
+const WIRE_BENCHMARK_USD = 1000;
+const DEFAULT_WIRE_FEE_USD = 18;
+const DEFAULT_WIRE_SPREAD = 0.032;
+const DEFAULT_INTERMEDIARY_CUT_USD = 18;
+const MIN_REALISTIC_WIRE_LEAKAGE_USD = 25;
+const IDENTICAL_RUN_LIMIT = 10;
+
+const bankingSource = readFileSync(
+  join(ROOT, "data", "regulatoryBanking.ts"),
+  "utf8"
+);
+const routingSource = readFileSync(
+  join(ROOT, "lib", "swiftRoutingEngine.ts"),
+  "utf8"
+);
+
+const s2GateFailures = [0, 0, 0];
+function s2fail(gateIndex, label, detail) {
+  s2GateFailures[gateIndex - 1] += 1;
+  fail(label, detail);
+}
+
+/** S2.1 — ISO 9362 BIC syntax gate over authored `field` literals in `source`. */
+let bicAuthorized = 0;
+let bicSentinels = 0;
+function auditBicSource(source, field, fileLabel) {
+  const re = new RegExp(`${field}:\\s*"([^"]*)"`, "g");
+  let match;
+  while ((match = re.exec(source)) !== null) {
+    const bic = match[1].trim();
+    if (BIC_SENTINELS.has(bic)) {
+      bicSentinels += 1;
+      continue;
+    }
+    bicAuthorized += 1;
+    if (!SWIFT_BIC_RE.test(bic)) {
+      s2fail(
+        1,
+        "SWIFT/BIC violates ISO 9362",
+        `${bic} (${bic.length} chars) in ${fileLabel} — expected 8 or 11 uppercase alphanumeric chars, no spaces`
+      );
+    }
+  }
+}
+auditBicSource(bankingSource, "swiftCode", "data/regulatoryBanking.ts");
+auditBicSource(routingSource, "swiftCode", "lib/swiftRoutingEngine.ts");
+auditBicSource(routingSource, "bic", "lib/swiftRoutingEngine.ts");
+console.log(
+  `  ${(s2GateFailures[0] === 0 ? "PASS  " : "FAIL  ") + "SWIFT/BIC syntax (ISO 9362)".padEnd(34)}${bicAuthorized} authorized BICs valid, ${bicSentinels} local-clearing sentinels exempt`
+);
+
+/** S2.2 — financial range invariants over the static corpus + bank database. */
+let spreadCount = 0;
+function checkSpread(value, label) {
+  spreadCount += 1;
+  if (!Number.isFinite(value) || value < 0 || value > SPREAD_CAP) {
+    s2fail(2, "spread invariant", `${label}: ${value} outside [0, ${SPREAD_CAP}]`);
+  }
+}
+for (const corridor of corpus.corridors) {
+  if (!Number.isFinite(corridor.rate) || corridor.rate <= 0) {
+    s2fail(2, "baseRate invariant", `${corridor.slug}: rate ${corridor.rate} must be finite and > 0`);
+  }
+}
+for (const platform of corpus.platforms) {
+  const fraction = platform.feePercent / 100;
+  if (!Number.isFinite(fraction) || fraction < 0 || fraction > PLATFORM_FEE_CAP) {
+    s2fail(2, "platform fee invariant", `${platform.id}: ${platform.feePercent}% outside [0, ${PLATFORM_FEE_CAP * 100}%]`);
+  }
+}
+for (const channel of corpus.channels) {
+  checkSpread(channel.fxSpread, `channel ${channel.id}`);
+}
+for (const corridor of corpus.corridors) {
+  for (const provider of corridor.providers ?? []) {
+    checkSpread(provider.fxSpread, `provider ${provider.id} on ${corridor.slug}`);
+  }
+}
+function auditNumericLiterals(source, field, min, max, label) {
+  const re = new RegExp(`${field}:\\s*([0-9]+(?:\\.[0-9]+)?)`, "g");
+  let count = 0;
+  let match;
+  while ((match = re.exec(source)) !== null) {
+    const value = Number(match[1]);
+    count += 1;
+    if (!Number.isFinite(value) || value < min || value > max) {
+      s2fail(2, label, `${value} outside [${min}, ${max}]`);
+    }
+  }
+  return count;
+}
+const intermediaryLiteralsChecked =
+  auditNumericLiterals(
+    bankingSource,
+    "intermediaryUSD",
+    0,
+    INTERMEDIARY_CAP_USD,
+    "intermediaryUSD invariant"
+  ) +
+  auditNumericLiterals(
+    routingSource,
+    "intermediaryUSD",
+    0,
+    INTERMEDIARY_CAP_USD,
+    "intermediaryUSD invariant"
+  );
+
+/** S2.3 — leaderboard consistency (mirrors `buildLeaderboard()`). */
+function buildIntermediaryMap() {
+  const firstBankCut = new Map();
+  const arrayRe = /const\s+(\w+)\s*:\s*RegulatoryBank\[\]\s*=\s*\[([\s\S]*?)\n\];/g;
+  let match;
+  while ((match = arrayRe.exec(bankingSource)) !== null) {
+    const value = /\bintermediaryUSD:\s*([0-9]+(?:\.[0-9]+)?)/.exec(match[2]);
+    firstBankCut.set(
+      match[1],
+      value ? Number(value[1]) : DEFAULT_INTERMEDIARY_CUT_USD
+    );
+  }
+  const arrayBySlug = new Map();
+  const entryRe = /"([a-z0-9-]+)":\s*\{\s*slug:\s*"[^"]*",[\s\S]*?banks:\s*(\w+)/g;
+  let entry;
+  while ((entry = entryRe.exec(bankingSource)) !== null) {
+    arrayBySlug.set(entry[1], entry[2]);
+  }
+  const map = new Map();
+  for (const corridor of corpus.corridors) {
+    const arrayName = arrayBySlug.get(corridor.slug);
+    map.set(
+      corridor.slug,
+      arrayName && firstBankCut.has(arrayName)
+        ? firstBankCut.get(arrayName)
+        : DEFAULT_INTERMEDIARY_CUT_USD
+    );
+  }
+  return map;
+}
+const intermediaryBySlug = buildIntermediaryMap();
+const distinctCuts = new Set();
+for (const corridor of corpus.corridors) {
+  const cut = intermediaryBySlug.get(corridor.slug) ?? DEFAULT_INTERMEDIARY_CUT_USD;
+  distinctCuts.add(cut);
+  if (!Number.isFinite(cut) || cut < 0 || cut > INTERMEDIARY_CAP_USD) {
+    s2fail(2, "defaultIntermediaryCut invariant", `${corridor.slug}: ${cut} outside [0, ${INTERMEDIARY_CAP_USD}]`);
+  }
+}
+console.log(
+  `  ${(s2GateFailures[1] === 0 ? "PASS  " : "FAIL  ") + "financial range invariants".padEnd(34)}${corpus.corridors.length} rates · ${corpus.platforms.length} platform cuts · ${spreadCount} fx spreads · ${intermediaryLiteralsChecked + corpus.corridors.length} intermediary checks`
+);
+
+function buildLeaderboardRows() {
+  const channels = corpus.channels;
+  const direct =
+    corpus.platforms.find((platform) => platform.id === "direct") ??
+    corpus.platforms[0];
+
+  return corpus.corridors
+    .map((corridor) => {
+      const quotes = channels
+        .map((channel) => {
+          const platformFeeUSD = (WIRE_BENCHMARK_USD * direct.feePercent) / 100;
+          const netAfter = WIRE_BENCHMARK_USD - platformFeeUSD;
+          const feeDeducted = Math.min(
+            channel.fixedFeeUSD,
+            Math.max(0, netAfter)
+          );
+          const usdConverted = Math.max(0, netAfter - feeDeducted);
+          const effectiveRate =
+            corridor.rate * (1 - Math.max(0, channel.fxSpread));
+          return {
+            channelId: channel.id,
+            localAmount: usdConverted * effectiveRate,
+          };
+        })
+        .sort((a, b) => b.localAmount - a.localAmount);
+      const winner = quotes[0];
+      if (!winner) return null;
+
+      const directWire = corridor.providers?.find(
+        (provider) => provider.id === "swift"
+      );
+      const wireFee = directWire?.fixedFeeUSD ?? DEFAULT_WIRE_FEE_USD;
+      const wireSpread = directWire?.fxSpread ?? DEFAULT_WIRE_SPREAD;
+      const wireIntermediary =
+        intermediaryBySlug.get(corridor.slug) ?? DEFAULT_INTERMEDIARY_CUT_USD;
+      const wirePenaltyUsd =
+        wireFee + wireIntermediary + WIRE_BENCHMARK_USD * wireSpread;
+
+      const winningProvider = corridor.providers?.find(
+        (provider) => provider.id === winner.channelId
+      );
+      const winningChannel = channels.find(
+        (channel) => channel.id === winner.channelId
+      );
+      const bestCostUsd =
+        (winningProvider?.fixedFeeUSD ?? winningChannel?.fixedFeeUSD ?? 0) +
+        WIRE_BENCHMARK_USD *
+          (winningProvider?.fxSpread ?? winningChannel?.fxSpread ?? 0);
+
+      const netSavingsUsd = Math.max(0, wirePenaltyUsd - bestCostUsd);
+      const savingsPct = Math.max(0, (netSavingsUsd / WIRE_BENCHMARK_USD) * 100);
+      return { slug: corridor.slug, penaltyUsd: wirePenaltyUsd, savingsPct };
+    })
+    .filter((row) => row !== null)
+    .sort((a, b) => b.penaltyUsd - a.penaltyUsd);
+}
+
+const leaderboardRows = buildLeaderboardRows();
+if (leaderboardRows.length !== corpus.corridors.length) {
+  s2fail(3, "leaderboard completeness", `${leaderboardRows.length}/${corpus.corridors.length} corridors ranked`);
+}
+for (const row of leaderboardRows) {
+  if (!Number.isFinite(row.penaltyUsd) || row.penaltyUsd <= 0) {
+    s2fail(3, "non-zero wire penalty", `${row.slug}: $${row.penaltyUsd}`);
+  }
+  if (row.penaltyUsd < MIN_REALISTIC_WIRE_LEAKAGE_USD) {
+    s2fail(3, "hard minimum wire leakage", `${row.slug}: $${row.penaltyUsd} below $${MIN_REALISTIC_WIRE_LEAKAGE_USD}`);
+  }
+  if (!(row.savingsPct > 0)) {
+    s2fail(3, "positive net savings", `${row.slug}: ${row.savingsPct}%`);
+  }
+}
+let identicalRun = 1;
+for (let i = 1; i < leaderboardRows.length; i += 1) {
+  const identical =
+    leaderboardRows[i].penaltyUsd === leaderboardRows[i - 1].penaltyUsd &&
+    leaderboardRows[i].savingsPct === leaderboardRows[i - 1].savingsPct;
+  identicalRun = identical ? identicalRun + 1 : 1;
+  if (identicalRun >= IDENTICAL_RUN_LIMIT) {
+    const startSlug = leaderboardRows[i - IDENTICAL_RUN_LIMIT + 1]?.slug ?? "?";
+    s2fail(
+      3,
+      "leaderboard variance",
+      `10 consecutive corridors identical at $${leaderboardRows[i].penaltyUsd}/${leaderboardRows[i].savingsPct.toFixed(2)}% starting at ${startSlug}`
+    );
+    identicalRun = 1;
+  }
+}
+console.log(
+  `  ${(s2GateFailures[2] === 0 ? "PASS  " : "FAIL  ") + "leaderboard consistency".padEnd(34)}${leaderboardRows.length}/${corpus.corridors.length} corridors ranked, ${distinctCuts.size} distinct intermediary cuts, no ${IDENTICAL_RUN_LIMIT}-row identical cluster`
+);
+
 console.log(`\n${"-".repeat(header.length)}`);
 console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index`);
 console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0) + (leaderboard.assetDetails ? leaderboard.assetDetails.checked : 0)}`);

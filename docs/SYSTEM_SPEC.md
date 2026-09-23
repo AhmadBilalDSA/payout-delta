@@ -418,6 +418,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 | 11 | **Configurable Monetization Engine, High-Ticket WhatsApp Funnel & Global Leakage Index** — monetizationConfig repo (consulting line + thresholds + canonical affiliate links + wa.me builder), `WhatsAppConsultingCard` high-ticket advisory funnel (≥$120 leakage or ≥$2,500 gross), dynamic "Save $X via {partner} →" verdict CTA + trust subtext, Remitly partner rail, `app/leaderboard/` 50-corridor leakage index (metric banner + ranked table + one-click shareable benchmark), header nav link + sitemap + `auditLeaderboard` checks | **Shipped** (this commit) |
 | 12 | **FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist** — legal-tech: "📜 Generate Contract Addendum" in the studio (Clauses A/B/C fixed statutory English, white executive preview + plain-text copy, single-page `.contract-addendum` PDF print); "alert me when the rate hits X" watchlist in the calculator settlement tab (mid-market base rate, above/below threshold pill, `payoutdelta:rate_alerts` localStorage, emerald triggered badge, optional native desktop notification via `useSyncExternalStore` hydration, zero setState-in-effect) | **Shipped** (this commit) |
 | S1 | **Enterprise Fault Isolation & Defensive Mathematical Guards** — centralized `lib/safeMath.ts` primitives (`safeDivide` epsilon-clamps zero/sub-epsilon denominators + finite-guards, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`), every division in `lib/calculatorEngine.ts` + `utils/inverseMath.ts` wrapped through the guards with an early zero-stack bail on `targetNetLocal <= 0` / `baseRate <= 0`, and a native React class `ErrorBoundary` (obsidian "Component Fault Guard" card + ↻ reset) wired around `<Calculator>` (English + localized corridor pages), `<InvoiceEditor>` and the leaderboard index table | **Shipped** (this commit) |
+| S2 | **Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants** — three build-time SRE gate batteries in `scripts/test_corridors.mjs` Phase S2: (1) every authored receiving-bank `swiftCode` + correspondent-node `bic` literal (read straight off the TS source, CI-safe on Node 20) validated against ISO 9362 8/11-char syntax — no lowercase, no spaces, no malformed lengths; (2) financial range invariants across the full static surface (`baseRate > 0` finite, `0 ≤ platformFee ≤ 50%`, `0 ≤ fxSpread ≤ 15%`, `0 ≤ intermediaryUSD ≤ $100`); (3) a `buildLeaderboard()` replication asserting 50/50 corridors ranked with positive savings %, non-zero `≥ $25` wire penalties and no 10-consecutive identical cluster. Includes the corrected Bosnia & Herzegovina BIC (`RZBAB2B` → `RZBABA2S`), and a client-side no-throw `lib/schemaValidator.ts` `validateCorridorRuntime` that hydrates malformed corridor props before `Calculator.tsx` / `InvoiceEditor.tsx` render | **Shipped** (this commit) |
 
 ---
 
@@ -426,7 +427,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
 npm run build                 # 159+ static routes → ./out
-node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, ledger/tax-ledger audits, exit 0
+node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, ledger/tax-ledger audits, Phase S2 schema gates (ISO 9362 BICs · financial ranges · leaderboard consistency), exit 0
 ```
 
 Commit convention follows the project template
@@ -611,6 +612,42 @@ A header nav "Leaderboard" link, the `/leaderboard/` sitemap entry, and an
 `auditLeaderboard` corridor check (export, metadata, single-graph JSON-LD,
 ranked rows, basePath assets/links) complete the route.
 
+**Phase S2 (Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial
+Range Invariants)** hardens the build against silent data drift with three
+static schema gate batteries added to `scripts/test_corridors.mjs`:
+
+`auditBicSource` (S2.1) reads the literal comma-separated TypeScript corpus on
+disk — the `data/regulatoryBanking.ts` `swiftCode:` literals across the 43
+authored bank benches plus the 7 fallback benches, and the
+`lib/swiftRoutingEngine.ts` correspondent-node `bic:` literals (USD — CHASUS33
+/ CITIUS33 / IRVTUS3N / SCBLUS33, EUR — DEUTDEFF / BNPAFRPA, GBP — BARCGB22 /
+MIDLGB22) — and requires every non-sentinel value to match ISO 9362
+(`^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$`), rejecting lowercase characters,
+spaces and malformed 1/7-character lengths while exempting the authored Local
+Clearing sentinels (`""` / `-` / `—`). The gate caught and fixed the Bosnia &
+Herzegovina receiving-bank BIC on the Raiffeisen Bank d.d. bench
+(`RZBAB2B` → `RZBABA2S`).
+
+The financial-range pass (S2.2) enforces the statutory bounds over the full
+static surface: every corridor `rate` is finite and `> 0`; every platform
+`feePercent / 100 ∈ [0, 0.50]`; every global channel and per-corridor provider
+`fxSpread ∈ [0, 0.15]`; and every authored bank `intermediaryUSD` literal plus
+every derived per-corridor `defaultIntermediaryCut` lies in `[0, 100]`.
+
+`buildLeaderboardRows` (S2.3) replicates `buildLeaderboard()` from the same
+`data/fees.json` corpus + first-bank intermediary map and asserts the index
+claims: all 50 corridors ranked, every row's wire penalty non-zero and `≥ $25`
+(realistic SWIFT leakage floor), every `savingsPct > 0`, and the ranked list
+shows variance — the gate fails if any 10 consecutive corridors share
+identical penalty + savings values.
+
+The same doctrine ships to the client: `lib/schemaValidator.ts` exposes a
+non-throwing `validateCorridorRuntime(corridor)` that silently hydrates any
+missing or malformed corridor field to safe statutory fallbacks, and both
+`components/Calculator.tsx` and `components/invoice/InvoiceEditor.tsx` run
+every incoming corridor prop through it before rendering — so a stale static
+payload can never take down an island.
+
 ---
 
 ## 7. Existing Commits That Anchor This Spec
@@ -640,3 +677,4 @@ ranked rows, basePath assets/links) complete the route.
 - *this commit* — **Phase G**: Configurable Monetization Repository, High-Ticket WhatsApp Funnel & Global Leakage Index (`data/monetizationConfig.ts` consulting line `consultingWhatsAppNumber` default `923041943795` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` override, `consultingThresholdUsd` 120 / `consultingGrossThresholdUsd` 2500, canonical `affiliateLinks` Wise/Payoneer/Remitly, `generateWhatsAppLeadUrl` builder; `components/leads/WhatsAppConsultingCard.tsx` session-dismissable high-ticket advisory card mounted under the verdict card; `VerdictCard` "Save $X via {partner} →" dynamic CTA + "Official partner rate · Regulated local clearing · Zero hidden spreads" subtext; `data/affiliatePartners.ts` consolidated onto `affiliateLinks` + Remitly partner rail; `app/leaderboard/` 50-corridor "Global Cross-Border Banking Leakage Index (2026)" + `LeaderboardShareCard` shareable benchmark, header nav link, sitemap entry, Phase G `auditLeaderboard` corridor checks; `WhatsAppLeadCta.tsx` superseded and removed, docs).
 - *this commit* — **Phase H**: FX Contract Protection Addendum Generator & Local-First Rate Alert Watchlist (`components/invoice/ContractAddendumModal.tsx` + `components/RateWatchlistWidget.tsx`: "📜 Generate Contract Addendum" studio button beside "Generate Bank Settlement Letter", Clauses A/B/C fixed statutory English, live white-card executive preview, "📋 Copy Legal Addendum Text" + 2.5s toast, "🖨️ Print / Download PDF" via single-page `.contract-addendum` `@media print` hard-clip in `globals.css`, prefill from draft identity/meta, `payoutdelta:addendum_form` persistence; calculator Tab 2 `RateWatchlistWidget` under the costing waterfall — mid-market `corridor.rate`, above/below target pills, `payoutdelta:rate_alerts` localStorage keyed by corridor slug, emerald "🎯 Target Rate Triggered" badge, "🔔 Enable Desktop Rate Alerts" native notification, rendered via `useSyncExternalStore` with `storage`-event + external-permission stores (no setState-in-effect), docs).
 - *this commit* — **Phase S1**: Enterprise Fault Isolation & Defensive Mathematical Guards (`lib/safeMath.ts` centralized primitives — `safeDivide` epsilon-clamps zero / sub-epsilon denominators and finite-guards null/NaN/Infinity operands with a caller `fallback`, `safeMultiply`, `clampNumber`, `sanitizeFinancialInput`; `lib/calculatorEngine.ts` routes every division through `safeDivide` + bails to the safe zero stack when `targetNetLocal <= 0` or `baseRate <= 0`, `utils/inverseMath.ts` guards platform-cut / cost-percentage divisions and clamps the target via `clampNumber`; `components/ErrorBoundary.tsx` native React class boundary (`getDerivedStateFromError` + `componentDidCatch`) rendering the obsidian "Component Fault Guard" fallback card with an emerald ↻ Reset Module to Defaults action, wired around `<Calculator>` on English + localized corridor pages ("Payout Calculator Guard"), `<InvoiceEditor>` ("Invoice Studio Guard") and the leaderboard index table ("Leaderboard Guard"), docs).
+- *this commit* — **Phase S2**: Static Schema SRE Gates, ISO 9362 SWIFT Validation & Financial Range Invariants (`scripts/test_corridors.mjs` Phase S2 batteries — `auditBicSource` ISO 9362 BIC syntax gate over the literal TS receiving-bank + correspondent corpus (caught + fixed Bosnia & Herzegovina `RZBAB2B` → `RZBABA2S`), financial range invariants across rates / platform cuts / fx spreads / `intermediaryUSD` literals + derived `defaultIntermediaryCut`, and a `buildLeaderboard()` replication asserting 50/50 corridors with positive savings %, non-zero `≥ $25` wire penalties and no 10-row identical cluster; `lib/schemaValidator.ts` non-throwing `validateCorridorRuntime` hydrating malformed corridor props before `components/Calculator.tsx` + `components/invoice/InvoiceEditor.tsx` render, docs).

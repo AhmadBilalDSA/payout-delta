@@ -23,6 +23,7 @@ import {
 } from "@/utils/inverseMath";
 import { formatUSD } from "@/utils/format";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
+import { validateCorridorRuntime } from "@/lib/schemaValidator";
 import VerdictCard from "@/components/VerdictCard";
 import WhatsAppConsultingCard from "@/components/leads/WhatsAppConsultingCard";
 import SliderControls from "@/components/SliderControls";
@@ -59,7 +60,7 @@ function defaultTargetNet(corridor: Corridor): number {
 }
 
 export default function Calculator({
-  corridor,
+  corridor: rawCorridor,
   platforms,
   channels,
   history,
@@ -85,6 +86,13 @@ export default function Calculator({
   faq?: ReactNode;
 }) {
   const { t } = useLanguage();
+  // Phase S2 — runtime schema guard: a malformed corridor prop from a stale
+  // HTML payload is silently hydrated to safe statutory defaults before any
+  // render reads it (never throws, never changes the prop identity).
+  const corridor = useMemo(
+    () => validateCorridorRuntime(rawCorridor),
+    [rawCorridor]
+  );
   const [mode, setMode] = useState<CalcMode>("gross-to-net");
   const [amount, setAmount] = useState<number>(DEFAULT_GROSS_USD);
   const [targetNet, setTargetNet] = useState<number>(() =>
