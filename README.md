@@ -155,18 +155,38 @@ projection, **"Save Invoice to Tax Ledger"**), an opt-in **Settlement Schedule**
 print block on the invoice PDF, and ↑/↓ line-item reordering — all fully
 client-side under `payoutdelta:remittance_ledger`.
 
-### 💬 High-Variance WhatsApp Consulting Funnel (Phase F)
-When the live audit exposes real leakage — the gap between the costliest and
-cheapest rail on the active route crossing **$150 per transfer** or **5% of
-the gross invoice** — the verdict rail surfaces an obsidian **VIP advisory
-card** ([`components/leads/WhatsAppLeadCta.tsx`](components/leads/WhatsAppLeadCta.tsx)):
-"⚠️ High Fee Leakage Detected on this Route" with a yearlyized loss figure and
-an emerald **"Audit Your Corporate Rail via WhatsApp →"** deep link. The
-pre-filled message is built entirely in-browser from the on-screen numbers
-(`wa.me` deep-link, no tracking, no telemetry) and the card dismisses per
-session via `sessionStorage`. The line number is configured in
-[`data/config.ts`](data/config.ts) with a `NEXT_PUBLIC_CONSULTING_WHATSAPP`
-build-time override.
+### 💬 High-Ticket WhatsApp Consulting Funnel & Monetization Engine (Phase G)
+When the live audit exposes high-value leakage — the on-screen loss crossing
+**$120** (or the gross invoice crossing **$2,500**) — the verdict rail
+surfaces an obsidian **VIP advisory card**
+([`components/leads/WhatsAppConsultingCard.tsx`](components/leads/WhatsAppConsultingCard.tsx)):
+"⚠️ HIGH-VALUE TRANSFER LEAKAGE DETECTED" with the concrete USD + local
+leakage, a ~annualized loss figure, and an emerald **"💬 Book Cross-Border
+Rail Advisory via WhatsApp →"** deep link. The pre-filled client inquiry is
+built entirely in-browser from the on-screen numbers (`wa.me` deep-link, no
+tracking, no telemetry) and the card dismisses per session via
+`sessionStorage`. Every monetization knob now lives in
+[`data/monetizationConfig.ts`](data/monetizationConfig.ts) — the consulting
+line (`consultingWhatsAppNumber`, default `923041943795`), the trigger
+thresholds, and the canonical affiliate links (Wise / Payoneer / Remitly) —
+with a `NEXT_PUBLIC_CONSULTING_WHATSAPP` build-time override. Affiliate links
+route from the verdict CTA too, which now names your exact savings:
+**"Save $X via {winning provider} →"** with the trust line "Official partner
+rate · Regulated local clearing · Zero hidden spreads" beneath the button.
+
+### 🌍 Global Cross-Border Banking Leakage Index (Phase G)
+The repo ships a static SEO-magnet comparison page —
+[`app/leaderboard/`](app/leaderboard/page.tsx) — ranking **all 50 corridors**
+from worst to best traditional **bank-wire penalty on a $1,000 direct invoice**
+(with the metric banner: Average Retail Bank Spread **3.8%** vs Modern Digital
+Rails **0.45%**). Every row names your **best digital rail** and the
+**savings %**, links straight to that corridor's live audit, and a one-click
+**shareable benchmark** card ([`components/LeaderboardShareCard.tsx`](components/LeaderboardShareCard.tsx))
+packages a clean quote-ready comparison for LinkedIn / X ("Did you know
+traditional banks take an average of 4.2% on international wires to Asia and
+LatAm? …"). All numbers are computed at build time from `data/fees.json` with
+the exact same quote engine as the calculator, so the index and your verdicts
+always agree.
 
 ### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
 The repo ships a free-tier **OpenSEO worker**
@@ -311,8 +331,9 @@ npm run lint      # ESLint
 | `lib/ledgerEngine.ts` | Phase E — remittance ledger engine (record math, annual summary, RFC 4180 CSV, localStorage persistence) |
 | `components/ledger/TaxLedgerView.tsx` | Phase E — tax-ledger dashboard (KPIs, year/corridor filters, CSV download, printable audit package) |
 | `app/tax-ledger/` | Phase E — standalone static annual remittance & tax ledger route |
-| `data/config.ts` | Phase F — build-time runtime config (WhatsApp consulting line + SEO badge constants) |
-| `components/leads/WhatsAppLeadCta.tsx` | Phase F — high-variance WhatsApp lead funnel (thresholds, wa.me deep-link, session dismiss) |
+| `data/monetizationConfig.ts` | Phase G — configurable monetization repo (consulting WhatsApp line + thresholds, canonical affiliate links, wa.me inquiry builder) |
+| `components/leads/WhatsAppConsultingCard.tsx` | Phase G — high-ticket WhatsApp consulting funnel (≥$120 leakage / ≥$2,500 gross, session dismiss) |
+| `app/leaderboard/` + `components/LeaderboardShareCard.tsx` | Phase G — global cross-border banking leakage index (50-corridor ranked table + shareable benchmark card) |
 | `scripts/openseo_worker.js` | Phase F — Cloudflare OpenSEO rank monitor (top 20 queries → SERP sweep → JSON) |
 | `public/seo_rankings.json` | Phase F — committed OpenSEO rankings mirror (transparency stats + footer badge target) |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |

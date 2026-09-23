@@ -1,5 +1,5 @@
 /**
- * PayoutDelta — build-time runtime configuration (Phase F).
+ * PayoutDelta — build-time runtime configuration (Phase F/G).
  *
  * Centralizes the growth-system constants so client islands never hardcode
  * contact details or marketing copy. All environment knobs follow the repo's
@@ -8,24 +8,16 @@
  * fully client-side with zero runtime configuration.
  */
 
-/** WhatsApp line for the Phase F high-variance consulting funnel. */
-export const CONSULTING_PHONE_ENV = "NEXT_PUBLIC_CONSULTING_WHATSAPP";
-
 /**
- * Resolves the consulting WhatsApp number. Operators override it with
- * `NEXT_PUBLIC_CONSULTING_WHATSAPP="<country_code><digits>"` (E.164, no "+",
- * e.g. `923001234567`). Digits are stripped defensively; the placeholder
- * keeps the wa.me deep-link well-formed until a real line is configured.
+ * Resolves the consulting WhatsApp number. The canonical line and its env
+ * override live in the monetization repository
+ * (`data/monetizationConfig.ts`); this export is kept as a thin backward-
+ * compatible facade for older call sites so the number has exactly one home.
  */
+import { getConsultingWhatsAppNumber } from "@/data/monetizationConfig";
+
 export function getConsultingWhatsAppPhone(): string {
-  const override = process.env[CONSULTING_PHONE_ENV];
-  if (override && override.length > 0) {
-    const digits = override.replace(/\D/g, "");
-    if (digits.length > 0) {
-      return digits;
-    }
-  }
-  return "923000000000";
+  return getConsultingWhatsAppNumber();
 }
 
 /**

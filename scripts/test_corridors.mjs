@@ -689,6 +689,51 @@ function auditTaxLedger() {
   return row;
 }
 
+/**
+ * Phase G — Global Cross-Border Banking Leakage Index: ./out/leaderboard/
+ * index.html must exist, carry valid metadata (title + meta description +
+ * WebApplication / BreadcrumbList JSON-LD), and serve basePath-prefixed
+ * assets that resolve on disk. Because the header nav now links to
+ * /leaderboard/, every exported page implicitly verifies its export.
+ */
+function auditLeaderboard() {
+  const htmlFile = join(OUT, "leaderboard", "index.html");
+  const row = { slug: "leaderboard" };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.metadata = false;
+    row.assets = false;
+    row.links = { total: 0, bad: 0 };
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const titleOk = /<title[^>]*>[^<]*Leakage Index/i.test(html);
+  const descriptionTag =
+    html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
+  const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
+  const schemaTypes = collectTypes(html);
+  row.schemaMissing = [];
+  for (const t of ["WebApplication", "BreadcrumbList"]) {
+    if (!schemaTypes.has(t)) row.schemaMissing.push(t);
+  }
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
+  row.hasRows = (html.match(/calculator\//g) ?? []).length >= 50;
+  row.metadata =
+    titleOk && descriptionOk && row.schemaMissing.length === 0;
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
 console.log("\nInvoice Studio audit (Phase 4):");
 const invoice = auditInvoice();
 const invoiceFlags = `${invoice.html ? "PASS" : "FAIL"}`;
@@ -743,6 +788,37 @@ console.log(
 );
 console.log(
   `  ${"internal links".padEnd(38)}${(taxLedger.links && taxLedger.links.bad === 0 ? "PASS" : "FAIL").padEnd(10)}${taxLedger.links ? taxLedger.links.total : 0} verified`
+);
+
+console.log("\nGlobal Leakage Index (leaderboard) audit (Phase G):");
+const leaderboard = auditLeaderboard();
+const leaderboardFlags = `${leaderboard.html ? "PASS" : "FAIL"}`;
+if (!leaderboard.html) {
+  fail("page not exported", "leaderboard/index.html");
+}
+if (leaderboard.html && !leaderboard.metadata) {
+  fail("metadata missing", "leaderboard: title + description + WebApplication/BreadcrumbList required");
+}
+if (leaderboard.html && !leaderboard.ldParse) {
+  fail("malformed JSON-LD", "leaderboard");
+}
+if (leaderboard.html && !leaderboard.hasRows) {
+  fail("corridor rows missing", "leaderboard must rank the full 50-corridor index");
+}
+if (leaderboard.assetDetails && leaderboard.assetDetails.bad > 0) {
+  fail("asset errors", "leaderboard");
+}
+if (leaderboard.links && leaderboard.links.bad > 0) {
+  fail("internal links broken", "leaderboard");
+}
+console.log(
+  `  ${"leaderboard/index.html".padEnd(38)}${leaderboardFlags.padEnd(10)}Metadata ${leaderboard.html ? (leaderboard.metadata ? "PASS" : "FAIL") : "n/a"}`
+);
+console.log(
+  `  ${"assets".padEnd(38)}${(leaderboard.assets ? "PASS" : "FAIL").padEnd(10)}${`${leaderboard.assetDetails ? leaderboard.assetDetails.checked : 0} checked`}`
+);
+console.log(
+  `  ${"internal links".padEnd(38)}${(leaderboard.links && leaderboard.links.bad === 0 ? "PASS" : "FAIL").padEnd(10)}${leaderboard.links ? leaderboard.links.total : 0} verified`
 );
 
 console.log("\nOpenSEO rankings mirror audit (Phase F):");
@@ -982,12 +1058,20 @@ const taxLedgerFailures =
   (taxLedger.assets ? 0 : 1) +
   (taxLedger.links ? taxLedger.links.bad : 0);
 
+const leaderboardFailures =
+  (!leaderboard.html ? 1 : 0) +
+  (leaderboard.html && !leaderboard.metadata ? 1 : 0) +
+  (leaderboard.html && !leaderboard.ldParse ? 1 : 0) +
+  (leaderboard.html && !leaderboard.hasRows ? 1 : 0) +
+  (leaderboard.assets ? 0 : 1) +
+  (leaderboard.links ? leaderboard.links.bad : 0);
+
 console.log(`\n${"-".repeat(header.length)}`);
-console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger`);
-console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0)}`);
-console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0) + (taxLedger.links ? taxLedger.links.total : 0)}`);
+console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index`);
+console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0) + (leaderboard.assetDetails ? leaderboard.assetDetails.checked : 0)}`);
+console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0) + (taxLedger.links ? taxLedger.links.total : 0) + (leaderboard.links ? leaderboard.links.total : 0)}`);
 console.log(`  JSON-LD blocks scanned   ${ldScanned}`);
-console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures}`);
+console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures + leaderboardFailures}`);
 
 const ok =
   failures === 0 &&
@@ -997,7 +1081,8 @@ const ok =
   invoiceFailures === 0 &&
   localizedFailures === 0 &&
   hreflangFailures === 0 &&
-  taxLedgerFailures === 0;
+  taxLedgerFailures === 0 &&
+  leaderboardFailures === 0;
 if (ok) {
   console.log("\n  ALL CHECKS PASSED\n");
   process.exit(0);

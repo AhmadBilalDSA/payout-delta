@@ -282,6 +282,13 @@ if (mode === "net-to-gross") {
     wireQuote === undefined
       ? 0
       : Math.max(0, best.localAmount - wireQuote.localAmount);
+  // Phase G — the conversion CTA names the concrete USD saved versus the
+  // traditional direct wire (recomputed via the winning rail's effective rate
+  // so the claimed number always matches the local take-home delta on screen).
+  const wireSavingsUsd =
+    wireQuote === undefined || best.effectiveRate <= 0
+      ? 0
+      : wireSavings / best.effectiveRate;
 
   return (
     <section
@@ -369,7 +376,11 @@ if (mode === "net-to-gross") {
               title={partner.disclosure}
               className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/20 transition-all text-sm mt-4"
             >
-              <span>Lock In Best Rate via {best.channelName}</span>
+              <span>
+                {wireSavingsUsd > 0
+                  ? `Save ${formatUSD(wireSavingsUsd)} via ${best.channelName}`
+                  : `Lock In Best Rate via ${best.channelName}`}
+              </span>
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -383,6 +394,11 @@ if (mode === "net-to-gross") {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
+
+            <p className="mt-2 text-[11px] font-semibold text-emerald-300/90">
+              Official partner rate · Regulated local clearing · Zero hidden
+              spreads
+            </p>
 
             <ShareUtilityTray
               labels={exportLabels}

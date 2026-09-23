@@ -363,8 +363,9 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 | 6 | **GitHub Community Engine & Developer API Documentation** — 1-click viral Reddit/X/LinkedIn audit export on the verdict card, full API reference (cURL / TypeScript / Python quick-start, response-schema & SLA panels, static feed + edge worker), structured `.github/ISSUE_TEMPLATE` forms, `CONTRIBUTING.md`, `?pair=` alias + statutory citation objects on the edge worker, static `api/fees.json` feed | **Shipped** (`9ef48f6`) |
 | 7 | **UI Anti-Collapse Grid Overhaul, Currency Pair Switcher & 5 High-Volume Corridors (VND / KES / IDR / COP / TRY)** — two-rail anti-collapse corridor grid (interactive waterfall left, sticky AEO + verdict + FAQ right, `min-w-0` guards, enforced 1.8 RTL line-height), header currency capsule grouped by region + one-tap `⇄` invert with "not audited" status pill, five new fully-audited corridors with real banks/SWIFT/statutory tiers (15 base + 17 long-tail → 32 English corridor routes), corpus & long-tail audit expanded | **Shipped** (`8fc8730`) |
 | 8 | **50-Country Expansion — Batches 1 & 2: 20 High-Demand International Corridors (Batch 1: MXN / ARS / PLN / RON / CZK / THB / MYR / GHS / AED / SAR; Batch 2: UAH / IQD / MAD / CLP / PEN / HUF / BGN / RSD / SGD / HKD)** — LatAm, Europe, MEA & APAC authored statutory/bank records (20 new base corridors + 40 long-tail → 35 base & 92 English corridor pages; regional currency capsule regrouped, Asia Pacific relabel), corpus & long-tail audit extended | **Shipped** (`38b4e97` + Batch 2 `6b3892a`) |
-| 9 | **UI Refresh — Color Palette Modernization, Full-Width Verdict CTA & Zero-Runtime SVG Trendline Engine** — light slate canvas + obsidian dark deck tokens in `globals.css` (`:root` / `[data-theme="dark"]`, `@custom-variant dark`), unified translucent card backdrops across VerdictCard / Calculator rails / FeeBreakdownList / TransactionCostingWidget / TaxImpactCard / ComplianceGuide / FaqAccordion / InvoiceEditor / CorridorCard / SliderControls, rebalanced `Header` (emerald live-badge, ghost nav, API Access pill·CorridorSwitcher), `VerdictCard` redesigned around a full-width gradient partner CTA (provider badge pill + external-link arrow) with the `AuditExportMenu` superseded by a wrap-friendly RTL-safe `ShareUtilityTray` (Reddit / X · LinkedIn / Copy Link), trust markers, wire-penalty callout & affiliate disclosure preserved, and a new deterministic `CurrencyTrendSparkline` (slug-seeded FNV-1a → mulberry32, 30-day mean-reverting smooth-Bézier SVG with low/high/volatility readout) mounted on every English + localized corridor page | **Shipped** (this commit) |
+| 9 | **UI Refresh — Color Palette Modernization, Full-Width Verdict CTA & Zero-Runtime SVG Trendline Engine** — light slate canvas + obsidian dark deck tokens in `globals.css` (`:root` / `[data-theme="dark"]`, `@custom-variant dark`), unified translucent card backdrops across VerdictCard / Calculator rails / FeeBreakdownList / TransactionCostingWidget / TaxImpactCard / ComplianceGuide / FaqAccordion / InvoiceEditor / CorridorCard / SliderControls, rebalanced `Header` (emerald live-badge, ghost nav, API Access pill·CorridorSwitcher), `VerdictCard` redesigned around a full-width gradient partner CTA (provider badge pill + external-link arrow) with the `AuditExportMenu` superseded by a wrap-friendly RTL-safe `ShareUtilityTray` (Reddit / X · LinkedIn / Copy Link), trust markers, wire-penalty callout & affiliate disclosure preserved, and a new deterministic `CurrencyTrendSparkline` (slug-seeded FNV-1a → mulberry32, 30-day mean-reverting smooth-Bézier SVG with low/high/volatility readout) mounted on every English + localized corridor page | **Shipped** (`3ef8c73`) |
 | 10 | **Automated Edge Cache Sync & Dynamic OpenGraph Social Engine** — edge-fresh dataset + social cards | Planned |
+| 11 | **Configurable Monetization Engine, High-Ticket WhatsApp Funnel & Global Leakage Index** — monetizationConfig repo (consulting line + thresholds + canonical affiliate links + wa.me builder), `WhatsAppConsultingCard` high-ticket advisory funnel (≥$120 leakage or ≥$2,500 gross), dynamic "Save $X via {partner} →" verdict CTA + trust subtext, Remitly partner rail, `app/leaderboard/` 50-corridor leakage index (metric banner + ranked table + one-click shareable benchmark), header nav link + sitemap + `auditLeaderboard` checks | **Shipped** (this commit) |
 
 ---
 
@@ -372,7 +373,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # 158 static routes → ./out
+npm run build                 # 159+ static routes → ./out
 node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, ledger/tax-ledger audits, exit 0
 ```
 
@@ -470,28 +471,32 @@ only fires inside the calculator client island when the active route actually
 loses money at meaningful scale and (b) a free-tier click-to-rank tracking
 engine for the site's programmatic query footprint:
 
-`components/leads/WhatsAppLeadCta.tsx` — a pure client island mounted in the
-`Calculator` audit rail directly beneath the `VerdictCard` / share tray. Its
-input is derived mode-aware from the live verdicts via a `whatsappLead` memo
-(tab 1 forward audits compare `worst.totalCostUSD − best.totalCostUSD` and the
-realized local payout gap `best.localAmount − worst.localAmount`; target-mode
-audits compare the extra gross-usd an invoice must bill,
-`worst.grossRequired − best.grossRequired`, converted at the corridor rate).
-The component renders *only* when
-`spreadDeltaUsd ≥ WHATSAPP_LEAD_HARD_FLOOR_USD (150)` **or**
-`spreadDeltaUsd ≥ grossUSD × WHATSAPP_LEAD_PCT_OF_GROSS (5%)`, shows an
-obsidian VIP advisory card ("⚠️ High Fee Leakage Detected on this Route", a
-yearlyized loss figure, and an emerald-gradient "Audit Your Corporate Rail via
-WhatsApp →" action), and builds the audit's contextual message — "Hi! I was
-auditing a $X transfer on the US → PKR corridor (Upwork). The calculator shows
-I am losing ~Rs Y (Z USD) in intermediary fees and spreads…" — into a
-`https://wa.me/<phone>?text=<encoded>` deep link. Everything is computed
-in-memory (zero telemetry, no network beyond the visitor's own WhatsApp tab),
-the phone number resolves through `data/config.ts` with a
-`NEXT_PUBLIC_CONSULTING_WHATSAPP` build-time fallback (E.164 digits, digits
-stripped defensively), and the card is dismissable for the current session via
-a `sessionStorage` marker read through `useSyncExternalStore` (hydration-safe,
-`react-hooks/set-state-in-effect`-clean, private-browsing-`try/catch`-guarded).
+`components/leads/WhatsAppConsultingCard.tsx` — the high-ticket WhatsApp
+consulting funnel, a pure client island mounted in the `Calculator` audit rail
+directly beneath the `VerdictCard` share tray. Its input is derived
+mode-aware from the live verdicts via a `whatsappLead` memo (tab 1 forward
+audits compare `worst.totalCostUSD − best.totalCostUSD` and the realized local
+payout gap `best.localAmount − worst.localAmount`; target-mode audits compare
+the extra gross-usd an invoice must bill, `worst.grossRequired −
+best.grossRequired`, converted at the corridor rate). The card renders *only*
+when the leakage clears the monetization thresholds —
+`leakageUsd ≥ consultingThresholdUsd (120)` **or**
+`grossPayment ≥ consultingGrossThresholdUsd (2,500)` — and shows an obsidian
+VIP advisory card ("⚠️ HIGH-VALUE TRANSFER LEAKAGE DETECTED", the yearlyized
+loss figure, and an emerald "💬 Book Cross-Border Rail Advisory via WhatsApp
+→" action). The pre-filled client inquiry is built inside
+`data/monetizationConfig.ts` (`generateWhatsAppLeadUrl`) — "Hi! I was auditing
+a $X transfer on the US → PKR corridor (Upwork) via PayoutDelta. The
+calculator shows I am losing ~Rs Y (Z USD) in intermediary fees and spreads.
+I'd like to consult on optimizing my cross-border payout setup and export tax
+structure." — into a `https://wa.me/<phone>?text=<encoded>` deep link, with
+the canonical line `consultingWhatsAppNumber` (default `923041943795`) and a
+`NEXT_PUBLIC_CONSULTING_WHATSAPP` build-time override (E.164 digits, digits
+stripped defensively). Everything is computed in-memory (zero telemetry, no
+network beyond the visitor's own WhatsApp tab) and the card dismisses per
+session via a `sessionStorage` marker read through `useSyncExternalStore`
+(hydration-safe, `react-hooks/set-state-in-effect`-clean, private-browsing-
+`try/catch`-guarded).
 
 `scripts/openseo_worker.js` — a zero-dependency Cloudflare Worker whose
 `TOP_20_QUERIES` list tracks the top 20 programmatic calculator queries
@@ -508,6 +513,51 @@ static builds green with 0 dependencies and doubles as the footer's
 through `next/link` so the `/payout-delta` `basePath` is applied), and
 `auditOpenSeo` in the corridor audit script verifies the exported mirror +
 badge wiring on every build.
+
+**Phase G (Configurable Monetization Engine, High-Ticket WhatsApp Funnel &
+Global Leakage Index)** is delivered on top of the same roadmap as a single,
+build-time monetization repository plus an SEO-magnet comparison route:
+
+`data/monetizationConfig.ts` — the single source of truth for the consulting
+line (`consultingWhatsAppNumber`, default `923041943795`; env override via
+`NEXT_PUBLIC_CONSULTING_WHATSAPP`), the funnel trigger thresholds
+(`consultingThresholdUsd` = 120 and `consultingGrossThresholdUsd` = 2500),
+canonical affiliate links (`affiliateLinks`: Wise / Payoneer / Remitly — each
+with the calculator UTM attribution) and the authoritative pre-filled client
+inquiry builder `generateWhatsAppLeadUrl(grossUsd, corridor, platform,
+leakageUsd, leakageLocal, targetCurrency)` returning a
+`https://wa.me/<phone>?text=<encoded>` deep link. `data/affiliatePartners.ts`
+now inherits its canonical URLs from this repository and adds Remitly as a
+sponsored partner rail; `data/config.ts`'s WhatsApp accessor delegates to it
+so the number has exactly one home.
+
+`components/leads/WhatsAppConsultingCard.tsx` — the Phase G high-ticket
+advisory card (see Phase F paragraph above): mounts under the verdict card
+only for `leakageUsd ≥ $120` or `grossPayment ≥ $2,500`, shows the concrete
+USD + local leakage and the ~annualized cost, and books a cross-border rail
+advisory through the pre-filled `wa.me` deep link, dismissable per session.
+
+`components/VerdictCard.tsx` — the primary affiliate CTA now names the exact
+USD saved vs the traditional direct wire: "Save ${savingsUsd} via
+{winningProvider} →" with the trust subtext "Official partner rate ·
+Regulated local clearing · Zero hidden spreads" beneath the button (computed
+via the winner's effective rate so the claim matches the on-screen local
+take-home delta).
+
+`app/leaderboard/` + `components/LeaderboardShareCard.tsx` — "The Global
+Cross-Border Banking Leakage Index (2026)": a static SEO-magnet page ranking
+all 50 corridors from worst to best bank-wire leakage on a $1,000 gross
+direct invoice (0% platform cut isolates the banking layer), with the metric
+banner (Average Retail Bank Spread 3.8% vs Modern Digital Rails 0.45%), a
+ranked table (Rank # · Country & Currency · Bank Wire Penalty ($ on $1k) ·
+Best Digital Rail · Savings % · Direct Audit Link), and a one-click
+shareable-benchmark card ("Did you know traditional banks take an average of
+4.2% on international wires to Asia and LatAm? …") with Copy / X / LinkedIn
+actions — all data computed at build time from `data/fees.json` with the same
+quote math as the calculator, so the index and the corridor verdicts agree.
+A header nav "Leaderboard" link, the `/leaderboard/` sitemap entry, and an
+`auditLeaderboard` corridor check (export, metadata, single-graph JSON-LD,
+ranked rows, basePath assets/links) complete the route.
 
 ---
 
@@ -534,4 +584,5 @@ badge wiring on every build.
 - `3dd1165` — Phase C: 1-click Bank PRC / FIRC statutory export exemption letter generator (`lib/prcLetterEngine.ts` six-scheme engine, `components/compliance/PrcLetterModal.tsx`, exact-spec emerald pill in `Calculator.tsx` wired to `TransactionCostingWidget`'s live `onGenerateLetter` snapshot, Invoice Studio entry point, single-page `.prc-letter` print clip in `globals.css`, docs).
 - `b92f7a6` — Phase D: SWIFT Intermediary Leakage & BIC Route Inspector (`lib/swiftRoutingEngine.ts` correspondent registry + route derivation + wire-instructions template, `components/compliance/SwiftRouteInspector.tsx` 3-node SVG transit inspector + studio modal, `components/compliance/SwiftAuditorTerminal.tsx` + `app/swift-auditor/` 50-country searchable terminal, `Calculator.tsx` Tab 2 bank-sync mount, Invoice Studio "Inspect SWIFT Route", sitemap entry, docs).
 - `ab8f7bf` — **Phase E**: Multi-Milestone Invoicing & Year-End Tax Season Remittance Ledger (`lib/ledgerEngine.ts` record engine + annual summary + RFC 4180 CSV, `components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/` KPI/filter/CSV/print dashboard, Invoice Studio Settlement & Realization panel + "Save Invoice to Tax Ledger" + line-item reordering, InvoicePreview Settlement Schedule print block, `globals.css` `.tax-ledger-print-area` print rules, header nav + `taxLedger` key ×7 catalogs, sitemap entry, `auditTaxLedger`, docs).
-- *this commit* — **Phase F**: High-Variance WhatsApp Consulting Funnel & Cloudflare OpenSEO Rank Monitor (`data/config.ts` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` line, `components/leads/WhatsAppLeadCta.tsx` threshold-gated VIP advisory card with `wa.me` deep-link + session dismiss, `Calculator.tsx` `whatsappLead` mode-aware memo + audit-rail mount, `scripts/openseo_worker.js` top-20 SERP rank worker, `public/seo_rankings.json` mirror, footer "Ranked #1 Real-Time Settlement Engine" badge, Phase F `auditOpenSeo` corridor checks, docs).
+- `3ef8c73` — **Phase F**: High-Variance WhatsApp Consulting Funnel & Cloudflare OpenSEO Rank Monitor (`data/config.ts` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` line, `components/leads/WhatsAppLeadCta.tsx` threshold-gated VIP advisory card with `wa.me` deep-link + session dismiss, `Calculator.tsx` `whatsappLead` mode-aware memo + audit-rail mount, `scripts/openseo_worker.js` top-20 SERP rank worker, `public/seo_rankings.json` mirror, footer "Ranked #1 Real-Time Settlement Engine" badge, Phase F `auditOpenSeo` corridor checks, docs).
+- *this commit* — **Phase G**: Configurable Monetization Repository, High-Ticket WhatsApp Funnel & Global Leakage Index (`data/monetizationConfig.ts` consulting line `consultingWhatsAppNumber` default `923041943795` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` override, `consultingThresholdUsd` 120 / `consultingGrossThresholdUsd` 2500, canonical `affiliateLinks` Wise/Payoneer/Remitly, `generateWhatsAppLeadUrl` builder; `components/leads/WhatsAppConsultingCard.tsx` session-dismissable high-ticket advisory card mounted under the verdict card; `VerdictCard` "Save $X via {partner} →" dynamic CTA + "Official partner rate · Regulated local clearing · Zero hidden spreads" subtext; `data/affiliatePartners.ts` consolidated onto `affiliateLinks` + Remitly partner rail; `app/leaderboard/` 50-corridor "Global Cross-Border Banking Leakage Index (2026)" + `LeaderboardShareCard` shareable benchmark, header nav link, sitemap entry, Phase G `auditLeaderboard` corridor checks; `WhatsAppLeadCta.tsx` superseded and removed, docs).

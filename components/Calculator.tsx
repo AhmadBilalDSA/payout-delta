@@ -24,7 +24,7 @@ import {
 import { formatUSD } from "@/utils/format";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import VerdictCard from "@/components/VerdictCard";
-import WhatsAppLeadCta from "@/components/leads/WhatsAppLeadCta";
+import WhatsAppConsultingCard from "@/components/leads/WhatsAppConsultingCard";
 import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
 import TaxImpactCard from "@/components/TaxImpactCard";
@@ -263,11 +263,12 @@ export default function Calculator({
     };
   }, [isTarget, inverseRoute, route, amount]);
 
-  // Phase F — high-variance WhatsApp consulting funnel input. Mode-aware:
+  // Phase G — high-ticket WhatsApp consulting funnel input. Mode-aware:
   // forward audits compare realized local payouts on `route.verdict`, while
   // target-mode audits compare the extra USD the invoice must bill on
-  // `inverseRoute.verdict`. The CTA itself renders nothing unless the spread
-  // clears the 150 USD / 5%-of-gross thresholds.
+  // `inverseRoute.verdict`. The card itself renders nothing unless the
+  // leakage clears the monetization thresholds (USD 120 leakage or a
+  // USD 2,500+ gross payment).
   const whatsappLead = useMemo(() => {
     const safeDelta = (value: number) =>
       Number.isFinite(value) ? Math.max(0, value) : 0;
@@ -578,12 +579,12 @@ export default function Calculator({
               sparklineStats={sparklineStats}
             />
             {whatsappLead !== null && (
-              <WhatsAppLeadCta
+              <WhatsAppConsultingCard
                 corridor={whatsappLead.corridor}
                 platform={whatsappLead.platform}
                 grossUSD={whatsappLead.grossUSD}
-                spreadDeltaUsd={whatsappLead.spreadDeltaUsd}
-                spreadDeltaLocal={whatsappLead.spreadDeltaLocal}
+                leakageUsd={whatsappLead.spreadDeltaUsd}
+                leakageLocal={whatsappLead.spreadDeltaLocal}
               />
             )}
             {faq}
