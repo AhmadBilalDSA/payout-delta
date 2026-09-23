@@ -1,0 +1,40 @@
+{
+  "mode": "mock",
+  "generatedAt": "2026-09-23T00:00:00.000Z",
+  "targetDomain": "ahmadbilaldsa.github.io/payout-delta",
+  "meta": {
+    "source": "committed static fallback",
+    "totalQueries": 20,
+    "refreshHint": "curl the Cloudflare OpenSEO worker (scripts/openseo_worker.js) and commit its JSON here to refresh the static mirror."
+  },
+  "summary": {
+    "rankedQueries": 20,
+    "queriesInTopTen": 15,
+    "bestRank": 1,
+    "avgRank": 7.2,
+    "weightedScore": 86
+  },
+  "rankings": [
+    { "query": "best way to receive upwork payments in india", "rank": 4 },
+    { "query": "best way to receive upwork payments in pakistan", "rank": 1 },
+    { "query": "cheapest transfer usd to inr freelance", "rank": 7 },
+    { "query": "cheapest transfer usd to pkr freelance", "rank": 3 },
+    { "query": "cross-border payout audit calculator freelance", "rank": 9 },
+    { "query": "deel usd to inr payout fee calculator", "rank": 12 },
+    { "query": "deel usd to pkr payout fee calculator", "rank": 10 },
+    { "query": "fiverr usd to inr withdrawal fee calculator", "rank": 8 },
+    { "query": "fiverr usd to pkr withdrawal fee calculator", "rank": 2 },
+    { "query": "fiverr wise vs payoneer fee comparison", "rank": 14 },
+    { "query": "payout calculator upwork $500 transfer fees", "rank": 6 },
+    { "query": "remittance cost comparison usd to pkr 2026", "rank": 15 },
+    { "query": "upwork usd to inr fee calculator", "rank": 5 },
+    { "query": "upwork usd to pkr fee calculator", "rank": 1 },
+    { "query": "upwork wise vs payoneer fee comparison", "rank": 13 },
+    { "query": "usd to inr freelancer payout calculator", "rank": 8 },
+    { "query": "usd to ngn freelancing withdrawal fee calculator", "rank": 11 },
+    { "query": "usd to pkr bank wire intermediary fee calculator", "rank": 4 },
+    { "query": "usd to pkr freelancer payout calculator", "rank": 2 },
+    { "query": "usd to php freelance payment fee calculator", "rank": 9 }
+  ],
+  "note": "Mock snapshot of rank positions for static builds and rollouts; replace with a live sweep output from the OpenSEO worker. Query text matches scripts/openseo_worker.js TOP_20_QUERIES."
+}

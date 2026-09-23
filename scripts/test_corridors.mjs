@@ -745,6 +745,52 @@ console.log(
   `  ${"internal links".padEnd(38)}${(taxLedger.links && taxLedger.links.bad === 0 ? "PASS" : "FAIL").padEnd(10)}${taxLedger.links ? taxLedger.links.total : 0} verified`
 );
 
+console.log("\nOpenSEO rankings mirror audit (Phase F):");
+
+const seoRankingsPath = join(OUT, "seo_rankings.json");
+let seoMirrorOk = false;
+if (!existsSync(seoRankingsPath)) {
+  console.log(
+    `  ${"FAIL  " + "rankings JSON exported".padEnd(32)}out/seo_rankings.json missing`
+  );
+  fail("seo rankings mirror", "out/seo_rankings.json does not exist");
+} else {
+  try {
+    const seo = JSON.parse(readFileSync(seoRankingsPath, "utf8"));
+    seoMirrorOk =
+      typeof seo === "object" &&
+      seo !== null &&
+      Array.isArray(seo.rankings) &&
+      seo.rankings.length > 0 &&
+      typeof seo.summary === "object" &&
+      seo.summary !== null &&
+      typeof seo.targetDomain === "string" &&
+      seo.targetDomain.length > 0;
+    console.log(
+      `  ${(seoMirrorOk ? "PASS  " : "FAIL  ") + "rankings JSON parses".padEnd(32)}${seo.rankings?.length ?? 0} tracked queries, best stable rank ${seo.summary?.bestRank ?? "—"}`
+    );
+    if (!seoMirrorOk) {
+      fail("seo rankings mirror", "out/seo_rankings.json shape invalid");
+    }
+  } catch {
+    seoMirrorOk = false;
+    fail("seo rankings mirror", "out/seo_rankings.json is not valid JSON");
+  }
+}
+if (!seoMirrorOk) globalBad += 1;
+
+const homeHtmlOut = readFileSync(join(OUT, "index.html"), "utf8");
+const seoBadgeWired =
+  homeHtmlOut.includes(`${BASE_PATH}/seo_rankings.json`) &&
+  homeHtmlOut.includes("Ranked #1 Real-Time Settlement Engine");
+console.log(
+  `  ${(seoBadgeWired ? "PASS  " : "FAIL  ") + "footer SEO badge wired".padEnd(32)}home page links the exported rankings mirror`
+);
+if (!seoBadgeWired) {
+  globalBad += 1;
+  fail("seo badge", "footer link to /payout-delta/seo_rankings.json missing on the home page");
+}
+
 console.log("\nGlobal ./out hygiene:");
 
 const globalFiles = [

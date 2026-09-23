@@ -464,6 +464,51 @@ rules in `globals.css`), a header nav "Tax Ledger" link + the `taxLedger` key
 across all 7 i18n catalogs, the `/tax-ledger/` sitemap entry, `auditTaxLedger`
 in the corridor audit script, and docs.
 
+**Phase F (High-Variance WhatsApp Consulting Funnel & Cloudflare OpenSEO Rank
+Monitor)** is delivered on top of the same roadmap as (a) a growth funnel that
+only fires inside the calculator client island when the active route actually
+loses money at meaningful scale and (b) a free-tier click-to-rank tracking
+engine for the site's programmatic query footprint:
+
+`components/leads/WhatsAppLeadCta.tsx` — a pure client island mounted in the
+`Calculator` audit rail directly beneath the `VerdictCard` / share tray. Its
+input is derived mode-aware from the live verdicts via a `whatsappLead` memo
+(tab 1 forward audits compare `worst.totalCostUSD − best.totalCostUSD` and the
+realized local payout gap `best.localAmount − worst.localAmount`; target-mode
+audits compare the extra gross-usd an invoice must bill,
+`worst.grossRequired − best.grossRequired`, converted at the corridor rate).
+The component renders *only* when
+`spreadDeltaUsd ≥ WHATSAPP_LEAD_HARD_FLOOR_USD (150)` **or**
+`spreadDeltaUsd ≥ grossUSD × WHATSAPP_LEAD_PCT_OF_GROSS (5%)`, shows an
+obsidian VIP advisory card ("⚠️ High Fee Leakage Detected on this Route", a
+yearlyized loss figure, and an emerald-gradient "Audit Your Corporate Rail via
+WhatsApp →" action), and builds the audit's contextual message — "Hi! I was
+auditing a $X transfer on the US → PKR corridor (Upwork). The calculator shows
+I am losing ~Rs Y (Z USD) in intermediary fees and spreads…" — into a
+`https://wa.me/<phone>?text=<encoded>` deep link. Everything is computed
+in-memory (zero telemetry, no network beyond the visitor's own WhatsApp tab),
+the phone number resolves through `data/config.ts` with a
+`NEXT_PUBLIC_CONSULTING_WHATSAPP` build-time fallback (E.164 digits, digits
+stripped defensively), and the card is dismissable for the current session via
+a `sessionStorage` marker read through `useSyncExternalStore` (hydration-safe,
+`react-hooks/set-state-in-effect`-clean, private-browsing-`try/catch`-guarded).
+
+`scripts/openseo_worker.js` — a zero-dependency Cloudflare Worker whose
+`TOP_20_QUERIES` list tracks the top 20 programmatic calculator queries
+("upwork usd to pkr fee calculator", "cheapest transfer usd to inr freelance",
+…). It fetches a Google SERP endpoint (`env.SERP_API_URL`, keyed by the
+`SERP_API_KEY` worker secret; waves of 4 for free-tier CPU parity), locates
+`ahmadbilaldsa.github.io/payout-delta` in `organic_results`, and emits one
+deterministic JSON report: `rankedQueries`, `queriesInTopTen`, `bestRank`,
+`avgRank`, and a top-ten proximity `weightedScore` (Σ `11 − rank` over ranks
+≤ 10). A `scheduled` cron trigger keeps it warm; `GET /` returns the same
+summary for ops to curl. The committed `public/seo_rankings.json` mirror keeps
+static builds green with 0 dependencies and doubles as the footer's
+"Ranked #1 Real-Time Settlement Engine" transparency badge target (linked
+through `next/link` so the `/payout-delta` `basePath` is applied), and
+`auditOpenSeo` in the corridor audit script verifies the exported mirror +
+badge wiring on every build.
+
 ---
 
 ## 7. Existing Commits That Anchor This Spec
@@ -488,4 +533,5 @@ in the corridor audit script, and docs.
 - `ec8c06e` — Phase B: closed-form Target Net gross-up solver + invoice sync.
 - `3dd1165` — Phase C: 1-click Bank PRC / FIRC statutory export exemption letter generator (`lib/prcLetterEngine.ts` six-scheme engine, `components/compliance/PrcLetterModal.tsx`, exact-spec emerald pill in `Calculator.tsx` wired to `TransactionCostingWidget`'s live `onGenerateLetter` snapshot, Invoice Studio entry point, single-page `.prc-letter` print clip in `globals.css`, docs).
 - `b92f7a6` — Phase D: SWIFT Intermediary Leakage & BIC Route Inspector (`lib/swiftRoutingEngine.ts` correspondent registry + route derivation + wire-instructions template, `components/compliance/SwiftRouteInspector.tsx` 3-node SVG transit inspector + studio modal, `components/compliance/SwiftAuditorTerminal.tsx` + `app/swift-auditor/` 50-country searchable terminal, `Calculator.tsx` Tab 2 bank-sync mount, Invoice Studio "Inspect SWIFT Route", sitemap entry, docs).
-- *this commit* — **Phase E**: Multi-Milestone Invoicing & Year-End Tax Season Remittance Ledger (`lib/ledgerEngine.ts` record engine + annual summary + RFC 4180 CSV, `components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/` KPI/filter/CSV/print dashboard, Invoice Studio Settlement & Realization panel + "Save Invoice to Tax Ledger" + line-item reordering, InvoicePreview Settlement Schedule print block, `globals.css` `.tax-ledger-print-area` print rules, header nav + `taxLedger` key ×7 catalogs, sitemap entry, `auditTaxLedger`, docs).
+- `ab8f7bf` — **Phase E**: Multi-Milestone Invoicing & Year-End Tax Season Remittance Ledger (`lib/ledgerEngine.ts` record engine + annual summary + RFC 4180 CSV, `components/ledger/TaxLedgerView.tsx` + `app/tax-ledger/` KPI/filter/CSV/print dashboard, Invoice Studio Settlement & Realization panel + "Save Invoice to Tax Ledger" + line-item reordering, InvoicePreview Settlement Schedule print block, `globals.css` `.tax-ledger-print-area` print rules, header nav + `taxLedger` key ×7 catalogs, sitemap entry, `auditTaxLedger`, docs).
+- *this commit* — **Phase F**: High-Variance WhatsApp Consulting Funnel & Cloudflare OpenSEO Rank Monitor (`data/config.ts` + `NEXT_PUBLIC_CONSULTING_WHATSAPP` line, `components/leads/WhatsAppLeadCta.tsx` threshold-gated VIP advisory card with `wa.me` deep-link + session dismiss, `Calculator.tsx` `whatsappLead` mode-aware memo + audit-rail mount, `scripts/openseo_worker.js` top-20 SERP rank worker, `public/seo_rankings.json` mirror, footer "Ranked #1 Real-Time Settlement Engine" badge, Phase F `auditOpenSeo` corridor checks, docs).

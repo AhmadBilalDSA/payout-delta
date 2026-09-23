@@ -24,6 +24,7 @@ import {
 import { formatUSD } from "@/utils/format";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import VerdictCard from "@/components/VerdictCard";
+import WhatsAppLeadCta from "@/components/leads/WhatsAppLeadCta";
 import SliderControls from "@/components/SliderControls";
 import FeeBreakdownList from "@/components/FeeBreakdownList";
 import TaxImpactCard from "@/components/TaxImpactCard";
@@ -261,6 +262,45 @@ export default function Calculator({
       channelName: quote.channelName,
     };
   }, [isTarget, inverseRoute, route, amount]);
+
+  // Phase F — high-variance WhatsApp consulting funnel input. Mode-aware:
+  // forward audits compare realized local payouts on `route.verdict`, while
+  // target-mode audits compare the extra USD the invoice must bill on
+  // `inverseRoute.verdict`. The CTA itself renders nothing unless the spread
+  // clears the 150 USD / 5%-of-gross thresholds.
+  const whatsappLead = useMemo(() => {
+    const safeDelta = (value: number) =>
+      Number.isFinite(value) ? Math.max(0, value) : 0;
+
+    if (isTarget) {
+      const best = inverseRoute.verdict.best;
+      const worst = inverseRoute.verdict.worst;
+      if (best === null || worst === null) {
+        return null;
+      }
+      const spreadDeltaUsd = safeDelta(worst.totalCostUSD - best.totalCostUSD);
+      return {
+        corridor,
+        platform,
+        grossUSD: best.grossRequired,
+        spreadDeltaUsd,
+        spreadDeltaLocal: spreadDeltaUsd * corridor.rate,
+      };
+    }
+
+    const best = route.verdict.best;
+    const worst = route.verdict.worst;
+    if (best === null || worst === null) {
+      return null;
+    }
+    return {
+      corridor,
+      platform,
+      grossUSD: amount,
+      spreadDeltaUsd: safeDelta(worst.totalCostUSD - best.totalCostUSD),
+      spreadDeltaLocal: safeDelta(best.localAmount - worst.localAmount),
+    };
+  }, [isTarget, inverseRoute, route, amount, corridor, platform]);
 
   // Phase 7 refresh — "Share calculation" deep-link hydration. When the page
   // loads with `?mode=&platform=&gross=` / `?mode=&platform=&target=` query
@@ -537,6 +577,15 @@ export default function Calculator({
               history={history}
               sparklineStats={sparklineStats}
             />
+            {whatsappLead !== null && (
+              <WhatsAppLeadCta
+                corridor={whatsappLead.corridor}
+                platform={whatsappLead.platform}
+                grossUSD={whatsappLead.grossUSD}
+                spreadDeltaUsd={whatsappLead.spreadDeltaUsd}
+                spreadDeltaLocal={whatsappLead.spreadDeltaLocal}
+              />
+            )}
             {faq}
           </>
         ) : (

@@ -155,6 +155,31 @@ projection, **"Save Invoice to Tax Ledger"**), an opt-in **Settlement Schedule**
 print block on the invoice PDF, and ↑/↓ line-item reordering — all fully
 client-side under `payoutdelta:remittance_ledger`.
 
+### 💬 High-Variance WhatsApp Consulting Funnel (Phase F)
+When the live audit exposes real leakage — the gap between the costliest and
+cheapest rail on the active route crossing **$150 per transfer** or **5% of
+the gross invoice** — the verdict rail surfaces an obsidian **VIP advisory
+card** ([`components/leads/WhatsAppLeadCta.tsx`](components/leads/WhatsAppLeadCta.tsx)):
+"⚠️ High Fee Leakage Detected on this Route" with a yearlyized loss figure and
+an emerald **"Audit Your Corporate Rail via WhatsApp →"** deep link. The
+pre-filled message is built entirely in-browser from the on-screen numbers
+(`wa.me` deep-link, no tracking, no telemetry) and the card dismisses per
+session via `sessionStorage`. The line number is configured in
+[`data/config.ts`](data/config.ts) with a `NEXT_PUBLIC_CONSULTING_WHATSAPP`
+build-time override.
+
+### 🔍 Cloudflare OpenSEO Ranking Monitor (Phase F)
+The repo ships a free-tier **OpenSEO worker**
+([`scripts/openseo_worker.js`](scripts/openseo_worker.js)) that tracks the top
+20 programmatic calculator queries (Upwork USD→PKR fee calculator, cheapest
+USD→INR freelance transfer, …) against a Google SERP endpoint and logs where
+`ahmadbilaldsa.github.io/payout-delta` ranks — no KV, no dependencies, cron +
+GET-sweep only. Its output mirrors the committed
+[`public/seo_rankings.json`](public/seo_rankings.json) transparency snapshot;
+every page's footer carries a tiny **"Ranked #1 Real-Time Settlement Engine"**
+badge linking to the static rankings JSON so the static export passes with 0
+runtime dependencies.
+
 ### 🌍 Global Localization
 Fully translated UI in **7 languages (EN, UR, HI, FIL, ES, PT, AR)** with
 automatic **RTL + Nastaliq** layout handling and zero-latency switching.
@@ -261,7 +286,9 @@ npm run lint      # ESLint
 - **Zero telemetry, zero tracking, zero data retention** — every input stays
   on-device. The only "storage" is your browser's own `localStorage`
   (draft invoice, language preference, bank-sync, PRC letter shells, annual
-  tax ledger).
+  tax ledger) plus the WhatsApp advisory card's per-session `sessionStorage`
+  dismiss marker — the lead deep-link itself is composed in-memory from the
+  on-screen numbers and never transmitted out of the page.
 - **Versioned fee dataset** — `data/fees.json` is the single source of truth;
   corridor pages, sitemap and static JSON regenerate from one snapshot.
 
@@ -284,6 +311,10 @@ npm run lint      # ESLint
 | `lib/ledgerEngine.ts` | Phase E — remittance ledger engine (record math, annual summary, RFC 4180 CSV, localStorage persistence) |
 | `components/ledger/TaxLedgerView.tsx` | Phase E — tax-ledger dashboard (KPIs, year/corridor filters, CSV download, printable audit package) |
 | `app/tax-ledger/` | Phase E — standalone static annual remittance & tax ledger route |
+| `data/config.ts` | Phase F — build-time runtime config (WhatsApp consulting line + SEO badge constants) |
+| `components/leads/WhatsAppLeadCta.tsx` | Phase F — high-variance WhatsApp lead funnel (thresholds, wa.me deep-link, session dismiss) |
+| `scripts/openseo_worker.js` | Phase F — Cloudflare OpenSEO rank monitor (top 20 queries → SERP sweep → JSON) |
+| `public/seo_rankings.json` | Phase F — committed OpenSEO rankings mirror (transparency stats + footer badge target) |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -312,7 +343,8 @@ npm run lint      # ESLint
 | Phase B | Target Net gross-up — closed-form 7-layer inversion solver + invoice milestone sync | Shipped |
 | Phase C | 1-click Bank PRC / FIRC export exemption letter generator (6 statutory jurisdictions, single-page PDF, live settlement prefill) | Shipped |
 | Phase D | SWIFT intermediary leakage & BIC route inspector — correspondent routing, SHA cut band, rail efficiency score, double-dip risk, 1-click wire instructions + searchable `/swift-auditor` terminal | Shipped |
-| Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (this commit) |
+| Phase E | Multi-milestone invoicing & year-end tax season remittance ledger — Settlement & Realization panel + "Save Invoice to Tax Ledger", settlement-schedule print block, `/tax-ledger` roll-up with CSV export & printable audit package, line-item reordering | Shipped (`ab8f7bf`) |
+| Phase F | High-variance WhatsApp consulting funnel — thresholds (spread ≥ $150 or ≥ 5% of gross), context-specific `wa.me` deep-link, per-session dismiss, env-configured line + Cloudflare OpenSEO rank monitor (top 20 programmatic queries, SERP sweep, static rankings mirror) with footer transparency badge | Shipped (this commit) |
 
 ---
 

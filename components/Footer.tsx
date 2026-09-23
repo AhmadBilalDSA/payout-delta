@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDataset } from "@/lib/db";
+import { SEO_RANKINGS_BADGE_LABEL, SEO_RANKINGS_DATA_PATH } from "@/data/config";
 
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
@@ -104,6 +105,24 @@ export default function Footer() {
               <li className="text-xs tabular-nums text-neutral-500 dark:text-neutral-400">
                 <span className="sr-only">Last Audited Date: </span>
                 {updatedAt}
+              </li>
+              <li>
+                <Link
+                  href={SEO_RANKINGS_DATA_PATH}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Live programmatic SEO rankings (top 20 calculator queries)"
+                  className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-600 transition-colors duration-150 ease-out hover:border-emerald-400/50 hover:bg-emerald-400/15 dark:text-emerald-300"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
+                  />
+                  {SEO_RANKINGS_BADGE_LABEL}
+                  <span aria-hidden="true" className="opacity-50">
+                    ↗
+                  </span>
+                </Link>
               </li>
             </ul>
           </div>
