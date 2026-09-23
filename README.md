@@ -115,6 +115,30 @@ PDF** (native print, hard-clipped to a single page) or **copy the plain-text
 letter**; shells persist per corridor under
 `payoutdelta_prc_letter_<slug>`. 100% in-browser, no network, no i18n churn.
 
+### 🔍 SWIFT Intermediary Route & BIC Inspector (Phase D)
+Track exactly where every inbound bank wire leaks. The **SWIFT Intermediary
+Leakage & BIC Route Inspector**
+([`lib/swiftRoutingEngine.ts`](lib/swiftRoutingEngine.ts)) maps the 50-country
+bank database onto its real U.S. / EU / UK correspondent clearing nodes — JP
+Morgan Chase NY `CHASUS33`, Citibank NY `CITIUS33`, BNY Mellon NY `IRVTUS3N`,
+Standard Chartered NY `SCBLUS33`, Deutsche Bank Frankfurt `DEUTDEFF`, BNP
+Paribas Paris `BNPAFRPA`, Barclays London `BARCGB22`, HSBC UK `MIDLGB22` — and
+renders the deterministic wire path **Origin Platform/Wire → Correspondent
+Node → Domestic Receiving Rail** (Raast, SPEI, RTGS, TISS, CHATS, MEPS+…) as a
+3-node SVG transit diagram under every calculation's settlement tab, synced to
+the selected bank. Each route reports the **expected SHA intermediary cut band**,
+the **settlement speed benchmark** (Instant / Same-Day Express RTGS vs 2–3
+Business Days standard telegraphic), a **Rail Efficiency score** (A+ for modern
+instant RTGS down to C for manual paper-advice clearing), and flags
+**double-dip risk** when both the correspondent and the receiving bank assess
+charges. A 1-click **"Copy Wire Instructions for Client"** button generates the
+beneficiary / account / SWIFT / intermediary-BIC template with OUR-vs-SHA
+charge guidance for the client email. The Invoice Studio adds **"Inspect SWIFT
+Route"** on its Banking & Clearing panel, and the dedicated
+[`/swift-auditor/`](app/swift-auditor) page is a searchable terminal across all
+50 countries' banks — all pure inline SVG, zero external packages, zero
+network.
+
 ### 🌍 Global Localization
 Fully translated UI in **7 languages (EN, UR, HI, FIL, ES, PT, AR)** with
 automatic **RTL + Nastaliq** layout handling and zero-latency switching.
@@ -236,6 +260,10 @@ npm run lint      # ESLint
 | `lib/aeoFaqs.ts` | Shared AEO FAQ generator (accordion + FAQPage JSON-LD) |
 | `lib/prcLetterEngine.ts` | Phase C — statutory PRC / FIRC export-exemption letter engine (6 jurisdictions) |
 | `components/compliance/PrcLetterModal.tsx` | Phase C — 1-click letter generator (form, live preview, print/copy, per-corridor persist) |
+| `lib/swiftRoutingEngine.ts` | Phase D — SWIFT correspondent registry, route derivation, wire-instructions template & 50-country bank index |
+| `components/compliance/SwiftRouteInspector.tsx` | Phase D — 3-node SVG transit inspector + Invoice Studio modal |
+| `components/compliance/SwiftAuditorTerminal.tsx` | Phase D — searchable `/swift-auditor` terminal island (BIC / bank / country / clearing-leg filters) |
+| `app/swift-auditor/` | Phase D — standalone static SWIFT intermediary route auditor |
 | `components/TransactionCostingWidget.tsx` | 7-step liquid waterfall engine + live PRC/FIRC prefill emitter |
 | `components/invoice/` | Invoice Studio (editor, preview, addendums) |
 | `lib/i18n/dictionaries.ts` | 7-language dictionary (compile-checked) |
@@ -263,6 +291,7 @@ npm run lint      # ESLint
 | 10 | Automated edge cache sync & dynamic OpenGraph social engine | Planned |
 | Phase B | Target Net gross-up — closed-form 7-layer inversion solver + invoice milestone sync | Shipped |
 | Phase C | 1-click Bank PRC / FIRC export exemption letter generator (6 statutory jurisdictions, single-page PDF, live settlement prefill) | Shipped |
+| Phase D | SWIFT intermediary leakage & BIC route inspector — correspondent routing, SHA cut band, rail efficiency score, double-dip risk, 1-click wire instructions + searchable `/swift-auditor` terminal | Shipped |
 
 ---
 

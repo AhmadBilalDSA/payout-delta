@@ -32,6 +32,7 @@ import {
 import InvoicePreview from "@/components/invoice/InvoicePreview";
 import TransparencyClause from "@/components/invoice/TransparencyClause";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
+import { SwiftRouteInspectorModal } from "@/components/compliance/SwiftRouteInspector";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -60,6 +61,8 @@ export default function InvoiceEditor({
   const appliedSyncRef = useRef(false);
   // Phase C — 1-click bank PRC/FIRC letter generator overlay for the studio.
   const [prcOpen, setPrcOpen] = useState(false);
+  // Phase D — SWIFT route inspector overlay for the Banking & Clearing panel.
+  const [routeOpen, setRouteOpen] = useState(false);
 
   // Phase C — prefill the statutory letter from the live draft: freelancer
   // name, banking & clearing fields, invoice currency symbol and the first
@@ -506,13 +509,22 @@ export default function InvoiceEditor({
 
             {/* Phase C — 1-click statutory PRC / FIRC export exemption letter
                 prefilled from this draft's banking & clearing fields. */}
-            <button
-              type="button"
-              onClick={() => setPrcOpen(true)}
-              className="flex w-fit items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-600 transition-all duration-150 ease-out hover:bg-emerald-500/20 active:scale-[0.98] dark:text-emerald-400"
-            >
-              📄 Generate Bank Settlement Letter
-            </button>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setPrcOpen(true)}
+                className="flex w-fit items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-600 transition-all duration-150 ease-out hover:bg-emerald-500/20 active:scale-[0.98] dark:text-emerald-400"
+              >
+                📄 Generate Bank Settlement Letter
+              </button>
+              <button
+                type="button"
+                onClick={() => setRouteOpen(true)}
+                className="flex w-fit items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-700 transition-all duration-150 ease-out hover:bg-amber-500/20 active:scale-[0.98] dark:text-amber-400"
+              >
+                Inspect SWIFT Route
+              </button>
+            </div>
           </div>
         </Section>
 
@@ -781,6 +793,20 @@ export default function InvoiceEditor({
           open={prcOpen}
           onClose={() => setPrcOpen(false)}
           prefill={prcPrefill}
+        />
+      )}
+
+      {/* Phase D — SWIFT intermediary route inspector overlay, resolved from
+          the draft's Banking & Clearing fields (client-only). */}
+      {routeOpen && (
+        <SwiftRouteInspectorModal
+          open={routeOpen}
+          onClose={() => setRouteOpen(false)}
+          bankName={draft.banking.receivingBank}
+          swiftCode={draft.banking.swiftCode}
+          currency={draft.meta.currency}
+          recipientName={draft.identity.freelancerName}
+          account={draft.banking.beneficiaryAccount}
         />
       )}
     </div>

@@ -30,6 +30,7 @@ import TaxImpactCard from "@/components/TaxImpactCard";
 import TransactionCostingWidget from "@/components/TransactionCostingWidget";
 import AuditReceipt from "@/components/AuditReceipt";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
+import SwiftRouteInspector from "@/components/compliance/SwiftRouteInspector";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -101,12 +102,37 @@ export default function Calculator({
   const [prcOpen, setPrcOpen] = useState(false);
   const [prcSnapshot, setPrcSnapshot] = useState<PrcLetterPrefill | null>(null);
 
+  // Phase D — the receiving bank currently active in the waterfall's selector,
+  // streamed up by TransactionCostingWidget so the SWIFT Route Inspector stays
+  // synchronized with the Local Bank selector underneath it.
+  const [selectedBankId, setSelectedBankId] = useState<string>(() => {
+    const regulation = getRegulatoryBanking(corridor.slug);
+    return regulation.banks[0]?.id ?? "";
+  });
+
   // Hotfix — segmented deck: "Payout Fee Comparison" (live audit rail) vs
   // "Local Bank & Tax Settlement" (statutory waterfall + tax + compliance).
   const [activeTab, setActiveTab] = useState<"audit" | "settlement">("audit");
 
   const platform =
     platforms.find((item) => item.id === platformId) ?? platforms[0];
+
+  // Phase D — sender identity for the wire-transit inspector, derived from the
+  // active client platform preset (long-tail corridors pre-set Upwork / Fiverr).
+  const senderLabel = useMemo(() => {
+    switch (platform?.id) {
+      case "upwork":
+        return "Upwork Platform Payout";
+      case "fiverr":
+        return "Fiverr Platform Payout";
+      case "deel":
+        return "Deel Payroll Payout";
+      case "direct":
+        return "Direct Client Wire";
+      default:
+        return "Upwork / Fiverr / Direct Client Wire";
+    }
+  }, [platform]);
 
   const route = useMemo(
     () => computeRoute(amount, platform, corridor, channels),
@@ -429,6 +455,15 @@ export default function Calculator({
                   mode={mode}
                   {...costingAnchor}
                   onGenerateLetter={setPrcSnapshot}
+                  onBankChange={setSelectedBankId}
+                />
+
+                {/* Phase D — SWIFT intermediary leakage & BIC route inspector,
+                    synced to the bank picked in the waterfall above. */}
+                <SwiftRouteInspector
+                  corridorSlug={corridor.slug}
+                  bankId={selectedBankId}
+                  senderLabel={senderLabel}
                 />
 
                 {/* Phase C — 1-click Bank PRC / FIRC statutory export exemption

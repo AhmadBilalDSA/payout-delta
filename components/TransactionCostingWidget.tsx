@@ -46,6 +46,7 @@ export default function TransactionCostingWidget({
   targetNetLocal,
   requiredGrossUsd,
   onGenerateLetter,
+  onBankChange,
 }: {
   corridor: Corridor;
   grossUSD: number;
@@ -63,6 +64,10 @@ export default function TransactionCostingWidget({
    *  the bank/tier/amounts exactly as last shown in the waterfall, even when
    *  the user moved a slider afterwards. */
   onGenerateLetter?: (snapshot: PrcLetterPrefill) => void;
+  /** Phase D — selected-bank reporter: lets the parent sync the SWIFT Route
+   *  Inspector to whichever domestic receiving bank is active in the
+   *  waterfall without lifting the widget's internal selector state. */
+  onBankChange?: (bankId: string) => void;
 }) {
   const { t } = useLanguage();
   const isTarget = mode === "net-to-gross";
@@ -133,6 +138,16 @@ export default function TransactionCostingWidget({
   useEffect(() => {
     onGenerateLetterRef.current = onGenerateLetter;
   });
+
+  // Phase D — report the active receiving bank upward so the parent's SWIFT
+  // Route Inspector stays synchronized with the waterfall's bank selector.
+  const onBankChangeRef = useRef(onBankChange);
+  useEffect(() => {
+    onBankChangeRef.current = onBankChange;
+  });
+  useEffect(() => {
+    if (bank) onBankChangeRef.current?.(bank.id);
+  }, [bank, regulation]);
 
   useEffect(() => {
     onGenerateLetterRef.current?.({

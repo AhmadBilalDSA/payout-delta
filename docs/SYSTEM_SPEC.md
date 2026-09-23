@@ -352,7 +352,7 @@ cap so both rails stay inside the 100k gross clamp regardless of rate.
 
 ```bash
 npm run lint                  # 0 errors (baseline: 1 pre-existing edge-api warning)
-npm run build                 # 111 static routes → ./out
+npm run build                 # 157 static routes → ./out
 node scripts/test_corridors.mjs  # 0 broken links, valid single @graph JSON-LD, static feed mirror, exit 0
 ```
 
@@ -386,6 +386,36 @@ Invoice Studio "Generate Bank Settlement Letter" entry point, the single-page
 `globals.css`, and docs. All new UI text is hardcoded statutory-legal English
 to keep the full-`Record` i18n catalogs untouched.
 
+**Phase D (SWIFT Intermediary Leakage & BIC Route Inspector)** is delivered on
+top of the same roadmap as a deterministic, 100% client-side correspondent
+routing auditor built over the 50-country statutory bank database:
+`lib/swiftRoutingEngine.ts` (central correspondent registry — USD · JP Morgan
+Chase NY `CHASUS33` / Citibank NY `CITIUS33` / BNY Mellon NY `IRVTUS3N` /
+Standard Chartered NY `SCBLUS33`, EUR · Deutsche Bank Frankfurt `DEUTDEFF` /
+BNP Paribas Paris `BNPAFRPA`, GBP · Barclays London `BARCGB22` / HSBC UK
+`MIDLGB22`; `deriveSwiftRoute` clearing-path derivation
+`Origin Platform/Wire → Correspondent Node → Domestic Receiving Rail`, expected
+SHA intermediary cut band, settlement-speed benchmark (Instant / Same-Day
+Express RTGS vs 2–3 Business Days standard telegraphic), rail-efficiency score
+(A+ for modern instant RTGS down to C for manual paper advice clearing) and the
+double-dip-risk flag when both the correspondent and the receiving bank assess
+charges; `buildWireInstructions` 1-click client template with OUR/SHA guidance;
+`buildSwiftBankIndex`/`searchSwiftBanks`/`resolveBankRoute` 50-country search
+spine), `components/compliance/SwiftRouteInspector.tsx` (interactive 3-node
+SVG transit diagram with deduction badge and rail badge, routing audit metrics
+and the amber "double-dip" flag + emerald "no double-dip" status; inline card
+for the calculator and a `SwiftRouteInspectorModal` for the Invoice Studio),
+`components/compliance/SwiftAuditorTerminal.tsx` + `app/swift-auditor/page.tsx`
+(a searchable standalone static route across all 50 countries' banks with
+clearing-leg filters), Calculator Tab 2 sync via
+`TransactionCostingWidget.onBankChange` streaming the selected bank into the
+mounted inspector, an Invoice Studio "Inspect SWIFT Route" entry point that
+resolves the draft's banking fields (BIC → name → currency) back to the
+directory, the sitemap `/swift-auditor/` entry, and docs. All routing icons are
+inline SVG — zero external packages, zero network, static-export budget intact
+(50 base + 93 long-tail + 5 localized corridor pages + invoice studio +
+swift-auditor + legal/utility routes = 157+ static routes).
+
 ---
 
 ## 7. Existing Commits That Anchor This Spec
@@ -409,3 +439,4 @@ to keep the full-`Record` i18n catalogs untouched.
 - `e753011` — Phase 10 (Batch 4 of 50): final 7 corridors complete the 50-country milestone — TZS / UGX / RWF / ZMW / NPR / LKR / KZT (per-corridor provider fee models in `data/fees.json`, authored statutory/bank records in `regulatoryBanking.ts` → 43 fully-audited corridors, 14 new long-tail slugs in `corridors.ts` → 50 base & 137 English corridor routes, `CorridorSwitcher` capsule + `CorridorDirectory` region pills regrouped / Central Asia & APAC added, corpus/long-tail audit + docs totals updated).
 - `ec8c06e` — Phase B: closed-form Target Net gross-up solver + invoice sync.
 - *this commit* — **Phase C**: 1-click Bank PRC / FIRC statutory export exemption letter generator (`lib/prcLetterEngine.ts` six-scheme engine, `components/compliance/PrcLetterModal.tsx`, exact-spec emerald pill in `Calculator.tsx` wired to `TransactionCostingWidget`'s live `onGenerateLetter` snapshot, Invoice Studio entry point, single-page `.prc-letter` print clip in `globals.css`, docs).
+- THIS COMMIT — **Phase D**: SWIFT Intermediary Leakage & BIC Route Inspector (`lib/swiftRoutingEngine.ts` correspondent registry + route derivation + wire-instructions template, `components/compliance/SwiftRouteInspector.tsx` 3-node SVG transit inspector + studio modal, `components/compliance/SwiftAuditorTerminal.tsx` + `app/swift-auditor/` 50-country searchable terminal, `Calculator.tsx` Tab 2 bank-sync mount, Invoice Studio "Inspect SWIFT Route", sitemap entry, docs).
