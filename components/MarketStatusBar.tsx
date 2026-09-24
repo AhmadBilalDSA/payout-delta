@@ -27,7 +27,7 @@ export default function MarketStatusBar() {
             {corridorCount} audited payout corridors · fee data revised {revised}
           </span>
         </span>
-        <span className="hidden shrink-0 truncate text-slate-500 sm:inline">
+        <span className="hidden shrink-0 truncate text-slate-400 dark:text-slate-300 sm:inline">
           Quote audit runs 100% client-side — nothing leaves your browser
         </span>
       </div>

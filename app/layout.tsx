@@ -88,6 +88,10 @@ export default function RootLayout({
       data-theme="dark"
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <meta
+        httpEquiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:;"
+      />
       <body className="flex min-h-full flex-col">
         <ThemeBootstrap />
         <script

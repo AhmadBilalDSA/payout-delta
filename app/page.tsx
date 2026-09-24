@@ -11,19 +11,7 @@ export default function Home() {
     <div className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
       <Hero />
 
-      <section
-        id="corridors"
-        aria-labelledby="corridor-heading"
-        className="mt-14 scroll-mt-20"
-      >
-        <h2
-          id="corridor-heading"
-          className="text-2xl font-bold text-slate-900 dark:text-white"
-        >
-          Audited corridors
-        </h2>
-        <CorridorDirectory corridors={corridors} />
-      </section>
+      <CorridorDirectory corridors={corridors} />
 
       <section
         aria-labelledby="how-it-works"
