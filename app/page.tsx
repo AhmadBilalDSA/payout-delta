@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCorridors, getDataset } from "@/lib/db";
 import CorridorDirectory from "@/components/CorridorDirectory";
 import Hero from "@/components/Hero";
+import AnnualLeakageCalculator from "@/components/AnnualLeakageCalculator";
 
 export default function Home() {
   const corridors = getCorridors();
@@ -12,6 +13,12 @@ export default function Home() {
       <Hero />
 
       <CorridorDirectory corridors={corridors} />
+
+      {/* Milestone UX — annual leakage estimator: one slider that converts
+          classic SWIFT friction bands into a yearly loss projection. */}
+      <div className="mt-14">
+        <AnnualLeakageCalculator />
+      </div>
 
       <section
         aria-labelledby="how-it-works"

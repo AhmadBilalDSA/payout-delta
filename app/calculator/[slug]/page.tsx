@@ -40,6 +40,8 @@ import BlufSummary from "@/components/BlufSummary";
 import AeoFaqSection from "@/components/AeoFaqSection";
 import ComplianceGuide from "@/components/ComplianceGuide";
 import CurrencyTrendSparkline from "@/components/CurrencyTrendSparkline";
+import WirePipelineMap from "@/components/WirePipelineMap";
+import AnnualLeakageCalculator from "@/components/AnnualLeakageCalculator";
 
 interface CorridorPageProps {
   params: Promise<{ slug: string }>;
@@ -296,6 +298,13 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         className="mt-6"
       />
 
+      {/* Milestone UX — 3-hop visual wire pipeline: zero-JS diagram that
+          shows the correspondent SHA cut and silent FX spread before the
+          interactive calculator ranks the rails. */}
+      <div className="mt-6">
+        <WirePipelineMap corridor={corridor} />
+      </div>
+
       {/* UI anti-collapse grid — Calculator renders the 12-column rail shell
           (interactive inputs / waterfall left, analytical AEO + verdict + FAQ
           right) and mounts the server-rendered BLUF + AEO FAQ slots beside the
@@ -331,6 +340,12 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
             }
           />
         </ErrorBoundary>
+      </div>
+
+      {/* Milestone UX — annualize the friction: slider projects silent
+          banking leakage over a year and pushes the Invoice Studio CTA. */}
+      <div className="mt-8">
+        <AnnualLeakageCalculator corridor={corridor} />
       </div>
 
       {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}
