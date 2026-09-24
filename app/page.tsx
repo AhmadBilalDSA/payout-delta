@@ -1,5 +1,6 @@
-import Link from "next/link";
-import { buildDirectoryIndex, getDataset } from "@/lib/db";
+﻿import Link from "next/link";
+import { getDataset } from "@/lib/db";
+import { buildDirectoryIndex } from "@/lib/directoryData";
 import DirectoryExplorer from "@/components/DirectoryExplorer";
 import Hero from "@/components/Hero";
 import AnnualLeakageCalculator from "@/components/AnnualLeakageCalculator";
@@ -14,7 +15,7 @@ export default function Home() {
 
       <DirectoryExplorer entries={entries} />
 
-      {/* Milestone UX — annual leakage estimator: one slider that converts
+      {/* Milestone UX â€” annual leakage estimator: one slider that converts
           classic SWIFT friction bands into a yearly loss projection. */}
       <div className="mt-14">
         <AnnualLeakageCalculator />
@@ -31,7 +32,7 @@ export default function Home() {
           <li className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md">
             <p className="font-semibold text-slate-900 dark:text-white">1. Pick the amount</p>
             <p className="mt-1 text-sm text-slate-600 dark:text-white/60">
-              Slide $100 to $100,000. Fixed fees amortize while spreads scale —
+              Slide $100 to $100,000. Fixed fees amortize while spreads scale â€”
               the best channel flips as you grow.
             </p>
           </li>

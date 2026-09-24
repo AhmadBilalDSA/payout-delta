@@ -434,3 +434,5 @@ export function searchBankDossiers(query: string): BankDossier[] {
       .includes(needle)
   );
 }
+export const GITHUB_REPO = 'https://github.com/AhmadBilalDSA/payout-delta';
+

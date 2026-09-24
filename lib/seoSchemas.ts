@@ -471,3 +471,5 @@ export function serializeSchemaGraph(blocks: JsonLdBlock[]): string {
   };
   return JSON.stringify(graph).replace(/</g, "\\u003c");
 }
+export const GITHUB_REPO = 'https://github.com/AhmadBilalDSA/payout-delta';
+
