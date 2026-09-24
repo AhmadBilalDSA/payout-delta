@@ -5528,6 +5528,132 @@ const GENERIC_BY_SLUG: Record<string, { label: string; currency: string; clearan
   "usd-to-zar": { label: "Local EFT bank", currency: "ZAR", clearance: "EFT / ACH 1 day" },
 };
 
+/* ---------------------------------------------------------------------------
+ * Global Expansion Wave 3 — Sub-Saharan Africa & Middle East (authored banks + tiers)
+ * ------------------------------------------------------------------------- */
+
+const etbTiers: StatutoryTier[] = [
+  { id: "etb-export", name: "Export Services — Zero-Rated VAT", authority: "Ethiopian Revenue & Customs Authority (ERCA) VAT Directive", rate: 0, purposeCode: "Export of services", exemption: true, note: "0% VAT on exported digital services; confirm with Commercial Bank of Ethiopia." },
+  { id: "etb-pit", name: "Standard PIT Bracket", authority: "ERCA Income Tax Proclamation Art. 58", rate: 0.15, purposeCode: "Service income", note: "Progressive PIT up to 35%; foreign-service remittances cleared via CBE." },
+];
+const etbBanks: RegulatoryBank[] = [
+  { id: "cbe", name: "Commercial Bank of Ethiopia", displayName: "CBE (Ethiopia)", swiftCode: "CBETETAA", intermediaryUSD: 16, intermediaryMinUSD: 14, intermediaryMaxUSD: 20, localFeeDefault: 0, speed: "Standard", clearance: "CBE RTGS / ACH 1–2 days", localCurrency: "ETB" },
+  { id: "dashen", name: "Dashen Bank", displayName: "Dashen Bank (Ethiopia)", swiftCode: "DASHETAA", intermediaryUSD: 15, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 50, speed: "Standard", clearance: "CBE clearing · local fee 50 ETB", localCurrency: "ETB" },
+];
+
+const xafTiers: StatutoryTier[] = [
+  { id: "xaf-export", name: "Export of Services — VAT Exempt", authority: "CEMAC VAT Regime Art. 13", rate: 0, purposeCode: "CEMAC export", exemption: true, note: "CFA-zone VAT exemption on exported IT services; cleared via BEAC." },
+];
+const xafBanks: RegulatoryBank[] = [
+  { id: "bicec", name: "Bank of Central African States (BEAC)", displayName: "BEAC / BICEC (Cameroon)", swiftCode: "BICECMCM", intermediaryUSD: 15, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Standard", clearance: "BEAC RTGS / ACH same-day", localCurrency: "XAF" },
+];
+
+const xofTiers: StatutoryTier[] = [
+  { id: "xof-export", name: "Export Services — VAT 0%", authority: "UEMOA VAT Regime Art. 12", rate: 0, purposeCode: "UEMOA export", exemption: true, note: "West African CFA export exemption; settled via BCEAO." },
+];
+const xofBanks: RegulatoryBank[] = [
+  { id: "bceao", name: "Central Bank of West African States", displayName: "BCEAO / BICIS (Senegal)", swiftCode: "BCEAOOLS", intermediaryUSD: 15, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Standard", clearance: "BCEAO RTGS / ACH 1 day", localCurrency: "XOF" },
+];
+
+const bwpTiers: StatutoryTier[] = [
+  { id: "bwp-export", name: "Export Services Exemption", authority: "Botswana Revenue Service (BURS) VAT Act", rate: 0, purposeCode: "Export service", exemption: true, note: "0% VAT on exported digital services; cleared via Bank of Botswana." },
+];
+const bwpBanks: RegulatoryBank[] = [
+  { id: "stanbic-bw", name: "Stanbic Bank Botswana", displayName: "Stanbic Bank (Botswana)", swiftCode: "SBICBWGZ", intermediaryUSD: 14, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Fast", clearance: "BOB RTGS / ACH 1 day", localCurrency: "BWP" },
+];
+
+const nadTiers: StatutoryTier[] = [
+  { id: "nad-export", name: "Export Services — Zero VAT", authority: "NamRA VAT Act Section 12", rate: 0, purposeCode: "Export of services", exemption: true, note: "Namibia VAT exemption on exported services; Bank of Namibia settlement." },
+];
+const nadBanks: RegulatoryBank[] = [
+  { id: "fnb-na", name: "First National Bank Namibia", displayName: "FNB (Namibia)", swiftCode: "FIRNNANX", intermediaryUSD: 14, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Fast", clearance: "NAMRTGS / ACH same-day", localCurrency: "NAD" },
+];
+
+const mznTiers: StatutoryTier[] = [
+  { id: "mzn-export", name: "Export Services VAT Exempt", authority: "Mozambique VAT Code Art. 15", rate: 0, purposeCode: "Export VAT", exemption: true, note: "0% VAT on exported IT services; Banco de Moçambique clearing." },
+];
+const mznBanks: RegulatoryBank[] = [
+  { id: "bci-mz", name: "Commercial and Investment Bank", displayName: "BCI (Mozambique)", swiftCode: "BCIOMZMC", intermediaryUSD: 15, intermediaryMinUSD: 13, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Standard", clearance: "BM RTGS / ACH 1–2 days", localCurrency: "MZN" },
+];
+
+const mwkTiers: StatutoryTier[] = [
+  { id: "mwk-export", name: "Export Services — VAT 0%", authority: "Malawi Revenue Authority (MRA) VAT Act", rate: 0, purposeCode: "MRA export", exemption: true, note: "Malawi VAT zero-rating on exported services; Reserve Bank of Malawi clearing." },
+];
+const mwkBanks: RegulatoryBank[] = [
+  { id: "nbs-mw", name: "National Bank of Malawi", displayName: "NBS (Malawi)", swiftCode: "NBSMMLNX", intermediaryUSD: 16, intermediaryMinUSD: 14, intermediaryMaxUSD: 20, localFeeDefault: 0, speed: "Standard", clearance: "RBM RTGS / ACH 1 day", localCurrency: "MWK" },
+];
+
+const aoaTiers: StatutoryTier[] = [
+  { id: "aoa-export", name: "Export Services — VAT Exempt", authority: "Angolan Tax Authority (AGT) VAT Code", rate: 0, purposeCode: "AGT export", exemption: true, note: "Angola VAT exemption on exported digital services; BNA settlement." },
+];
+const aoaBanks: RegulatoryBank[] = [
+  { id: "bfa-ao", name: "Banco de Fomento Angola", displayName: "BFA (Angola)", swiftCode: "BFAOAOAL", intermediaryUSD: 18, intermediaryMinUSD: 15, intermediaryMaxUSD: 22, localFeeDefault: 0, speed: "Standard", clearance: "BNA RTGS 2 days", localCurrency: "AOA" },
+];
+
+const mgaTiers: StatutoryTier[] = [
+  { id: "mga-export", name: "Export Services — VAT 0%", authority: "Madagascar Revenue Authority (DGI) VAT Act", rate: 0, purposeCode: "DGI export", exemption: true, note: "Madagascar VAT exemption on exported services; Bank of Madagascar clearing." },
+];
+const mgaBanks: RegulatoryBank[] = [
+  { id: "boa-mg", name: "Bank of Africa Madagascar", displayName: "BOA (Madagascar)", swiftCode: "BOAMMGMA", intermediaryUSD: 15, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Standard", clearance: "BAM RTGS / ACH 1 day", localCurrency: "MGA" },
+];
+
+const jodTiers: StatutoryTier[] = [
+  { id: "jod-export", name: "Export Services — Zero Withholding", authority: "Jordan Income Tax Law Art. 12 & BITS Code 1300", rate: 0, purposeCode: "BITS 1300 Foreign Inflow", exemption: true, note: "Jordanian Dinar wires settle via BITS with purpose code 1300 for foreign service export." },
+];
+const jodBanks: RegulatoryBank[] = [
+  { id: "arab-jordan", name: "Arab Bank Jordan", displayName: "Arab Bank (Jordan)", swiftCode: "ARABJOAX", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Fast", clearance: "BITS / JOCC 1 day", localCurrency: "JOD" },
+];
+
+const omrTiers: StatutoryTier[] = [
+  { id: "omr-export", name: "Export Services Exemption", authority: "Oman Income Tax Law Art. 8 & CBU Code 900", rate: 0, purposeCode: "Oman export remittance", exemption: true, note: "Omani Rial clearing via CBU; no withholding on foreign-service export." },
+];
+const omrBanks: RegulatoryBank[] = [
+  { id: "nbk-om", name: "National Bank of Oman", displayName: "NBO (Oman)", swiftCode: "NBOBOMRX", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Fast", clearance: "CBU / Oman Clearing 1 day", localCurrency: "OMR" },
+];
+
+const kwdTiers: StatutoryTier[] = [
+  { id: "kwd-export", name: "Export Services — Zero Tax", authority: "Kuwait Income Tax Decree Art. 3 & NBK Code 700", rate: 0, purposeCode: "Kuwait foreign inflow", exemption: true, note: "Kuwaiti Dinar settled via NBK; purpose code 700 for foreign-service remittance." },
+];
+const kwdBanks: RegulatoryBank[] = [
+  { id: "nbk-kw", name: "National Bank of Kuwait", displayName: "NBK (Kuwait)", swiftCode: "NBOKKWKW", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Fast", clearance: "NBK RTGS / ACH 1 day", localCurrency: "KWD" },
+];
+
+const bhdTiers: StatutoryTier[] = [
+  { id: "bhd-export", name: "Export Services — Zero VAT", authority: "Bahrain VAT Law (zero-rated exports) & BIB Code 900", rate: 0, purposeCode: "Bahrain export remittance", exemption: true, note: "Bahraini Dinar cleared via BIB / B NHB; zero VAT on exported digital services." },
+];
+const bhdBanks: RegulatoryBank[] = [
+  { id: "bib-bh", name: "Bahrain Islamic Bank", displayName: "BIB (Bahrain)", swiftCode: "BHBLBHBK", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Fast", clearance: "BIB / B NHB clearing 1 day", localCurrency: "BHD" },
+];
+
+const qarTiers: StatutoryTier[] = [
+  { id: "qar-export", name: "Export Services — VAT 0%", authority: "Qatar VAT Law Art. 10 & QNB Code 900", rate: 0, purposeCode: "Qatar export remittance", exemption: true, note: "Qatari Riyal settlement via QNB; zero VAT on exported services." },
+];
+const qarBanks: RegulatoryBank[] = [
+  { id: "qnb-qa", name: "Qatar National Bank", displayName: "QNB (Qatar)", swiftCode: "QNBQQQHB", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Fast", clearance: "QNB / QCHP 1 day", localCurrency: "QAR" },
+];
+
+const tndTiers: StatutoryTier[] = [
+  { id: "tnd-export", name: "Export Services — Reduced Rate", authority: "Tunisia VAT Code Art. 14 & BCT Code 700", rate: 0, purposeCode: "Tunisia foreign service", exemption: true, note: "Tunisian Dinar cleared via BCT; reduced VAT on exported IT services." },
+];
+const tndBanks: RegulatoryBank[] = [
+  { id: "bct-tn", name: "Central Bank of Tunisia", displayName: "BCT (Tunisia)", swiftCode: "BCTNTNTT", intermediaryUSD: 14, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Standard", clearance: "BCT RTGS / ACH 1–2 days", localCurrency: "TND" },
+];
+
+const dzdTiers: StatutoryTier[] = [
+  { id: "dzd-export", name: "Export Services — VAT Exempt", authority: "Algeria VAT Regime Art. 20 & BADR Code 700", rate: 0, purposeCode: "Algeria export remittance", exemption: true, note: "Algerian Dinar settled via BADR; VAT exemption on exported services." },
+];
+const dzdBanks: RegulatoryBank[] = [
+  { id: "bad-za", name: "Banque de l'Agriculture et du Développement Rural", displayName: "BADR (Algeria)", swiftCode: "BADZADAL", intermediaryUSD: 16, intermediaryMinUSD: 14, intermediaryMaxUSD: 20, localFeeDefault: 0, speed: "Standard", clearance: "BADR / SATIM 2 days", localCurrency: "DZD" },
+];
+
+const lbpTiers: StatutoryTier[] = [
+  { id: "lbp-export", name: "Foreign Inflow — No Withholding", authority: "Lebanon Tax Law Art. 11 & BDL Code 900", rate: 0, purposeCode: "BDL foreign inflow", exemption: true, note: "Lebanese Pound cleared via BDL correspondent; no withholding on foreign-service exports." },
+];
+const lbpBanks: RegulatoryBank[] = [
+  { id: "bl-om", name: "Banque Libano-Française", displayName: "BLF (Lebanon)", swiftCode: "BLOMLEBB", intermediaryUSD: 18, intermediaryMinUSD: 15, intermediaryMaxUSD: 22, localFeeDefault: 0, speed: "Standard", clearance: "BDL clearing / SWIFT 2–3 days", localCurrency: "LBP" },
+];
+
+
 const AUTHORED: Record<string, CorridorRegulation> = {
   "usd-to-pkr": {
     slug: "usd-to-pkr",
@@ -6789,6 +6915,23 @@ const AUTHORED: Record<string, CorridorRegulation> = {
     tiers: plnTiers,
     generic: false,
   },
+  "usd-to-etb": { slug: "usd-to-etb", authority: "ERCA / CBE · Ethiopia Tax Proclamation", clearingNetwork: "CBE RTGS / ACH", citations: ["ERCA VAT Directive", "Income Tax Proclamation Art. 58"], banks: etbBanks, tiers: etbTiers, generic: false },
+  "usd-to-xaf": { slug: "usd-to-xaf", authority: "CEMAC VAT / BEAC · Cameroon", clearingNetwork: "BEAC RTGS / ACH", citations: ["CEMAC VAT Regime Art. 13", "BEAC Clearing"], banks: xafBanks, tiers: xafTiers, generic: false },
+  "usd-to-xof": { slug: "usd-to-xof", authority: "UEMOA VAT / BCEAO · Senegal", clearingNetwork: "BCEAO RTGS / ACH", citations: ["UEMOA VAT Art. 12", "BCEAO Clearing"], banks: xofBanks, tiers: xofTiers, generic: false },
+  "usd-to-bwp": { slug: "usd-to-bwp", authority: "BURS VAT · Botswana", clearingNetwork: "BOB RTGS / ACH", citations: ["BURS VAT Act", "Bank of Botswana Clearing"], banks: bwpBanks, tiers: bwpTiers, generic: false },
+  "usd-to-nad": { slug: "usd-to-nad", authority: "NamRA VAT / Bank of Namibia · Namibia", clearingNetwork: "NAMRTGS / ACH", citations: ["NamRA VAT Art. 12", "Bank of Namibia Clearing"], banks: nadBanks, tiers: nadTiers, generic: false },
+  "usd-to-mzn": { slug: "usd-to-mzn", authority: "Mozambique VAT / BNM · Mozambique", clearingNetwork: "BM RTGS / ACH", citations: ["Mozambique VAT Code Art. 15", "Banco de Moçambique Clearing"], banks: mznBanks, tiers: mznTiers, generic: false },
+  "usd-to-mwk": { slug: "usd-to-mwk", authority: "MRA VAT / RBM · Malawi", clearingNetwork: "RBM RTGS / ACH", citations: ["MRA VAT Act", "Reserve Bank of Malawi Clearing"], banks: mwkBanks, tiers: mwkTiers, generic: false },
+  "usd-to-aoa": { slug: "usd-to-aoa", authority: "AGT VAT / BNA · Angola", clearingNetwork: "BNA RTGS", citations: ["AGT VAT Code", "Banco Nacional de Angola Clearing"], banks: aoaBanks, tiers: aoaTiers, generic: false },
+  "usd-to-mga": { slug: "usd-to-mga", authority: "DGI VAT / BAM · Madagascar", clearingNetwork: "BAM RTGS / ACH", citations: ["DGI VAT Act", "Bank of Madagascar Clearing"], banks: mgaBanks, tiers: mgaTiers, generic: false },
+  "usd-to-jod": { slug: "usd-to-jod", authority: "Jordan Income Tax / BITS · Jordan", clearingNetwork: "BITS / JOCC", citations: ["Income Tax Law Art. 12", "BITS Code 1300"], banks: jodBanks, tiers: jodTiers, generic: false },
+  "usd-to-omr": { slug: "usd-to-omr", authority: "Oman Tax / CBU · Oman", clearingNetwork: "CBU / Oman Clearing", citations: ["Oman Income Tax Art. 8", "CBU Clearing"], banks: omrBanks, tiers: omrTiers, generic: false },
+  "usd-to-kwd": { slug: "usd-to-kwd", authority: "Kuwait Tax / NBK · Kuwait", clearingNetwork: "NBK RTGS / ACH", citations: ["Kuwait Income Tax Decree", "NBK Code 700"], banks: kwdBanks, tiers: kwdTiers, generic: false },
+  "usd-to-bhd": { slug: "usd-to-bhd", authority: "Bahrain VAT / BIB · Bahrain", clearingNetwork: "BIB / B NHB", citations: ["Bahrain VAT Law", "BIB Clearing"], banks: bhdBanks, tiers: bhdTiers, generic: false },
+  "usd-to-qar": { slug: "usd-to-qar", authority: "Qatar VAT / QNB · Qatar", clearingNetwork: "QNB / QCHP", citations: ["Qatar VAT Art. 10", "QNB Clearing"], banks: qarBanks, tiers: qarTiers, generic: false },
+  "usd-to-tnd": { slug: "usd-to-tnd", authority: "Tunisia VAT / BCT · Tunisia", clearingNetwork: "BCT RTGS / ACH", citations: ["Tunisia VAT Art. 14", "BCT Clearing"], banks: tndBanks, tiers: tndTiers, generic: false },
+  "usd-to-dzd": { slug: "usd-to-dzd", authority: "Algeria VAT / BADR · Algeria", clearingNetwork: "BADR / SATIM", citations: ["Algeria VAT Art. 20", "BADR Clearing"], banks: dzdBanks, tiers: dzdTiers, generic: false },
+  "usd-to-lbp": { slug: "usd-to-lbp", authority: "Lebanon Tax / BDL · Lebanon", clearingNetwork: "BDL clearing / SWIFT", citations: ["Lebanon Tax Art. 11", "BDL Code 900"], banks: lbpBanks, tiers: lbpTiers, generic: false },
 };
 
 /** Phase 9 — resolves the statutory regulation profile for any audited corridor slug. */

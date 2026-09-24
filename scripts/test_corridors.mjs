@@ -158,6 +158,24 @@ const EXPECTED_SLUGS = [
   "gbp-to-zar",
   "gbp-to-ghs",
   "gbp-to-pln",
+  "usd-to-etb",
+  "usd-to-xaf",
+  "usd-to-xof",
+  "usd-to-bwp",
+  "usd-to-nad",
+  "usd-to-mzn",
+  "usd-to-mwk",
+  "usd-to-aoa",
+  "usd-to-mga",
+  "usd-to-jod",
+  "usd-to-omr",
+  "usd-to-kwd",
+  "usd-to-bhd",
+  "usd-to-qar",
+  "usd-to-tnd",
+  "usd-to-dzd",
+  "usd-to-lbp",
+
 ];
 
 /** Phase 4 — programmatic long-tail platform corridors (Upwork/Fiverr/Deel). */
