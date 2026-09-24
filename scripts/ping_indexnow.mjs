@@ -10,10 +10,22 @@
  * documented localized sub-paths — so the ping can never drift from the routes
  * that actually exist.
  *
- * The canonical host is `payoutdelta.com`, matching the sitemap / canonicals /
- * robots rules. Key hygiene: `public/indexnow-key.txt` holds the shared key,
- * and the key verification file is served verbatim as `public/<key>.txt`
- * (https://payoutdelta.com/<key>.txt) so search engines can confirm ownership.
+ * The host is resolved to the ACTIVE deployment: by default GitHub Pages at
+ * `ahmadbilaldsa.github.io/payout-delta` (matching `basePath: "/payout-delta"`
+ * in next.config.mjs while `USE_CUSTOM_DOMAIN` is false), so the submitted
+ * URLs and the key verification file live under the same subpath the export
+ * actually lands on. The IndexNow `host` field includes that subdirectory
+ * (`ahmadbilaldsa.github.io/payout-delta`), which is exactly how the protocol
+ * locates the `<key>.txt` verification file for sub-folder sites.
+ *
+ * Single-flag override: set `INDEXNOW_HOST` to the custom domain (e.g.
+ * `payoutdelta.com`) once `USE_CUSTOM_DOMAIN` flips to true and the export
+ * drops its basePath — the script then pings the root of that host instead.
+ *
+ * Key hygiene: `public/indexnow-key.txt` holds the shared key, and the key
+ * verification file is served verbatim as `public/<key>.txt`
+ * (https://ahmadbilaldsa.github.io/payout-delta/<key>.txt) so search engines
+ * can confirm ownership.
  *
  * Running this is OPT-IN. It is not wired into `prebuild` (a local build should
  * not nuke a remote search cache). Run it on deployment:
@@ -28,10 +40,18 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SITE_URL = "https://payoutdelta.com";
-const HOST = "payoutdelta.com";
 const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 const INDEXNOW_TIMEOUT_MS = 15000;
+
+/** Active live host (override when the custom domain takes over the export). */
+const INDEXNOW_HOST = String(
+  process.env.INDEXNOW_HOST ?? "ahmadbilaldsa.github.io"
+)
+  .replace(/^https?:\/\//i, "")
+  .replace(/\/+$/, "");
+const isGitHubPages = INDEXNOW_HOST.toLowerCase().endsWith(".github.io");
+const BASE_DIR = isGitHubPages ? "/payout-delta" : "";
+const SITE_URL = `https://${INDEXNOW_HOST}${BASE_DIR}`;
 
 /** Trailing slashes mirror the `trailingSlash: true` canonicals in the sitemap. */
 const STATIC_PATHS = [
@@ -96,7 +116,7 @@ async function main() {
 
   const urlList = derivePaths().map((path) => `${SITE_URL}${path}`);
   const payload = {
-    host: HOST,
+    host: `${INDEXNOW_HOST}${BASE_DIR}`,
     key,
     keyLocation: `${SITE_URL}/${key}.txt`,
     urlList,
@@ -123,7 +143,7 @@ async function main() {
 
     if (response.ok) {
       console.log(
-        `IndexNow: notified=${urlList.length} urls host=${HOST} status=${response.status}`
+        `IndexNow: notified=${urlList.length} urls host=${INDEXNOW_HOST}${BASE_DIR} keyLocation=${payload.keyLocation} status=${response.status}`
       );
     } else {
       console.warn(
