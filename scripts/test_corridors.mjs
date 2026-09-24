@@ -33,6 +33,13 @@
  * asset / link battery as the base corridors, and every long-tail slug
  * resolves against `data/fees.json` through its underlying currency corridor.
  *
+ * Phase 6 also verifies ./out/leaderboard/index.html (the 50-corridor leakage
+ * index) and ./out/seo_rankings.json + the footer "Ranked #1" badge wiring.
+ *
+ * Phase I also verifies every /embed/<slug>/ widget card exports with metadata,
+ * a "Verified by PayoutDelta" badge truthfully backlinking the full calculator
+ * route, and clean basePath-prefixed assets/links.
+ *
  * Also checks ./out hygiene: index/404/sitemap/robots exist and .nojekyll is
  * present so GitHub Pages serves the bare /payout-delta subpath.
  *
@@ -583,6 +590,91 @@ for (const row of report) {
   }
 }
 console.log("-".repeat(header.length));
+
+/**
+ * Phase I — embeddable backlink widget audit. Every base corridor must export
+ * an isolated card at ./out/embed/<slug>/index.html: valid metadata, a
+ * "Verified by PayoutDelta" badge linking back to the full calculator route,
+ * JSON-LD that parses, and basePath-prefixed assets/links that resolve.
+ */
+function auditEmbed(slug) {
+  const htmlFile = join(OUT, "embed", slug, "index.html");
+  const row = { slug: `embed/${slug}` };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.metadata = false;
+    row.badge = false;
+    row.backlink = false;
+    row.assets = false;
+    row.links = { total: 0, bad: 0 };
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const titleOk = /<title[^>]*>[^<]*PayoutDelta/i.test(html);
+  const descriptionTag =
+    html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
+  const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
+  row.badge = html.includes("Verified by PayoutDelta");
+  row.backlink = new RegExp(
+    `href="[^"]*/calculator/${slug}/"`,
+    "i"
+  ).test(html);
+  row.metadata = titleOk && descriptionOk;
+
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
+const embedRows = EXPECTED_SLUGS.map(auditEmbed);
+let embedFailures = 0;
+for (const row of embedRows) {
+  if (!row.html) {
+    embedFailures += 1;
+    fail("embed page not exported", row.slug);
+  }
+  if (row.html && !row.metadata) {
+    embedFailures += 1;
+    fail("embed metadata missing", `${row.slug}: title + description required`);
+  }
+  if (row.html && !row.badge) {
+    embedFailures += 1;
+    fail("embed badge missing", `${row.slug}: 'Verified by PayoutDelta' absent`);
+  }
+  if (row.html && !row.backlink) {
+    embedFailures += 1;
+    fail("embed backlink missing", `${row.slug}: calculator route not linked`);
+  }
+  if (row.html && !row.ldParse) {
+    embedFailures += 1;
+    fail("embed malformed JSON-LD", row.slug);
+  }
+  if (row.assetDetails && row.assetDetails.bad > 0) {
+    embedFailures += 1;
+    fail("embed asset errors", row.slug);
+  }
+  if (row.links && row.links.bad > 0) {
+    embedFailures += 1;
+    fail("embed links broken", row.slug);
+  }
+}
+console.log(
+  `\nEmbed widget audit (Phase I): ${
+    embedFailures === 0
+      ? `PASS — ${embedRows.length} /embed cards exported with badge + backlink`
+      : `FAIL — ${embedFailures} issue(s) across embed widgets`
+  }`
+);
 
 console.log("\nLocalized sub-path audit (Phase 5):");
 const localizedRows = EXPECTED_LOCALIZED.map(({ lang, slug, dir }) =>
@@ -1329,11 +1421,11 @@ console.log(
 );
 
 console.log(`\n${"-".repeat(header.length)}`);
-console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index`);
-console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0) + (leaderboard.assetDetails ? leaderboard.assetDetails.checked : 0)}`);
-console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0) + (taxLedger.links ? taxLedger.links.total : 0) + (leaderboard.links ? leaderboard.links.total : 0)}`);
+console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index + ${embedRows.length} embed widgets`);
+console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0) + (leaderboard.assetDetails ? leaderboard.assetDetails.checked : 0) + embedRows.reduce((sum, r) => sum + (r.assetDetails ? r.assetDetails.checked : 0), 0)}`);
+console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0) + (taxLedger.links ? taxLedger.links.total : 0) + (leaderboard.links ? leaderboard.links.total : 0) + embedRows.reduce((sum, r) => sum + (r.links ? r.links.total : 0), 0)}`);
 console.log(`  JSON-LD blocks scanned   ${ldScanned}`);
-console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures + leaderboardFailures}`);
+console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures + leaderboardFailures + embedFailures}`);
 
 const ok =
   failures === 0 &&
@@ -1344,7 +1436,8 @@ const ok =
   localizedFailures === 0 &&
   hreflangFailures === 0 &&
   taxLedgerFailures === 0 &&
-  leaderboardFailures === 0;
+  leaderboardFailures === 0 &&
+  embedFailures === 0;
 if (ok) {
   console.log("\n  ALL CHECKS PASSED\n");
   process.exit(0);

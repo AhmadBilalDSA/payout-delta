@@ -17,6 +17,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
+  const embedEntries: MetadataRoute.Sitemap = getCorridorSlugs().map(
+    (slug) => ({
+      url: `${SITE_URL}/embed/${slug}/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "weekly" as const,
+      priority: 0.4,
+    }),
+  );
+
   const localizedEntries: MetadataRoute.Sitemap = LOCALIZED_CORRIDORS.map(
     ({ lang, slug }) => ({
       url: `${SITE_URL}/${lang}/calculator/${slug}/`,
@@ -101,5 +110,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...staticEntries, ...corridorEntries, ...localizedEntries];
+  return [...staticEntries, ...corridorEntries, ...embedEntries, ...localizedEntries];
 }

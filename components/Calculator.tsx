@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 import type {
   CalcMode,
@@ -21,9 +22,15 @@ import {
   localSliderBounds,
   type SettlementOverrides,
 } from "@/utils/inverseMath";
-import { formatUSD } from "@/utils/format";
+import { formatLocal, formatUSD } from "@/utils/format";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { validateCorridorRuntime } from "@/lib/schemaValidator";
+import {
+  INVOICE_SYNC_EVENT,
+  INVOICE_SYNC_KEY,
+  type InvoiceSyncPayload,
+} from "@/lib/invoiceTypes";
+import { writeLocalStorage } from "@/lib/privacyGuard";
 import VerdictCard from "@/components/VerdictCard";
 import WhatsAppConsultingCard from "@/components/leads/WhatsAppConsultingCard";
 import SliderControls from "@/components/SliderControls";
@@ -33,6 +40,7 @@ import TransactionCostingWidget from "@/components/TransactionCostingWidget";
 import RateWatchlistWidget from "@/components/RateWatchlistWidget";
 import AuditReceipt from "@/components/AuditReceipt";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
+import EmbedSnippetModal from "@/components/EmbedSnippetModal";
 import SwiftRouteInspector from "@/components/compliance/SwiftRouteInspector";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -86,6 +94,7 @@ export default function Calculator({
   faq?: ReactNode;
 }) {
   const { t } = useLanguage();
+  const router = useRouter();
   // Phase S2 — runtime schema guard: a malformed corridor prop from a stale
   // HTML payload is silently hydrated to safe statutory defaults before any
   // render reads it (never throws, never changes the prop identity).
@@ -112,6 +121,9 @@ export default function Calculator({
   // snapshot computed straight off the route/corridor for the first paint.
   const [prcOpen, setPrcOpen] = useState(false);
   const [prcSnapshot, setPrcSnapshot] = useState<PrcLetterPrefill | null>(null);
+
+  // Embeddable backlink widget — snippet generator overlay state.
+  const [embedOpen, setEmbedOpen] = useState(false);
 
   // Phase D — the receiving bank currently active in the waterfall's selector,
   // streamed up by TransactionCostingWidget so the SWIFT Route Inspector stays
@@ -245,6 +257,46 @@ export default function Calculator({
 
   const openPrcLetter = () => setPrcOpen(true);
 
+  // Phase B + invoice sync — "Apply to Invoice Studio" writes the exact
+  // gross-up the solver declared as the milestone line item and forwards the
+  // statutory bank/tier bench to the studio's Banking & Clearing section,
+  // exactly like the TransactionCostingWidget sync bridge (write localStorage
+  // + fire the `payoutdelta:synced` event), then navigates to the studio.
+  const handleApplyToInvoice = () => {
+    const quote = inverseRoute.verdict.best;
+    if (!quote || typeof window === "undefined") {
+      return;
+    }
+    const regulation = getRegulatoryBanking(corridor.slug);
+    const bank = regulation.banks[0];
+    const tier = regulation.tiers[0];
+    const swiftBic = bank && bank.swiftCode !== "—" ? bank.swiftCode : "";
+    const syncPayload: InvoiceSyncPayload = {
+      receivingBank: bank?.name ?? "Local bank wire",
+      swiftBic,
+      statutoryAuthority: regulation.authority
+        ? `${regulation.authority}${tier ? ` · ${tier.authority}` : ""}`
+        : "",
+      purposeCode: tier?.purposeCode ?? "",
+      taxRate: tier?.rate ?? 0,
+      currency: "USD",
+      timestamp: Date.now(),
+      lineItemAmount: Math.round(quote.grossRequired),
+      lineItemDescription: `Invoice Solver — bill ${formatUSD(
+        quote.grossRequired
+      )} USD to net ${Math.round(targetNet).toLocaleString(
+        "en-US"
+      )} ${corridor.to} via ${quote.channelName}`,
+    };
+    writeLocalStorage(INVOICE_SYNC_KEY, JSON.stringify(syncPayload));
+    window.dispatchEvent(
+      new CustomEvent<InvoiceSyncPayload>(INVOICE_SYNC_EVENT, {
+        detail: syncPayload,
+      })
+    );
+    router.push("/invoice/");
+  };
+
   const targetBounds = useMemo(() => localSliderBounds(corridor), [corridor]);
 
   // Phase 8 — the TransactionCostingWidget anchors its 7-step settlement
@@ -361,6 +413,18 @@ export default function Calculator({
 
   return (
     <div className="w-full min-w-0">
+      {/* Embeddable backlink widget access — one-click snippet generator for
+          the static /embed card, available on every audit surface. */}
+      <div className="mb-3 flex w-full items-center justify-end">
+        <button
+          type="button"
+          onClick={() => setEmbedOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition-colors duration-200 ease-out hover:bg-neutral-50 hover:text-slate-900 dark:border-white/10 dark:bg-zinc-900 dark:text-white/80 dark:hover:bg-zinc-800 dark:hover:text-white"
+        >
+          Embed This Corridor
+        </button>
+      </div>
+
       {/* Segmented tab deck — "Payout Fee Comparison" (live audit) vs "Local
           Bank & Tax Settlement" (statutory waterfall). The control spans full
           width above both rails; the active surface is a white pill so the
@@ -419,6 +483,36 @@ export default function Calculator({
           platforms={platforms}
           corridor={corridor}
         />
+
+        {/* Reverse target-gross invoice solver callout — Mode B only. Shows the
+            exact USD invoice the solver grossed up for the current target and
+            forwards that exact line item + statutory bench to Invoice Studio. */}
+        {isTarget && inverseRoute.verdict.best !== null && (
+          <section
+            aria-label="Invoice solver"
+            className="flex flex-col gap-3 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.08] p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-semibold leading-snug text-emerald-700 dark:text-emerald-300">
+                To receive exactly {formatLocal(targetNet, corridor)}, invoice
+                your client for {formatUSD(inverseRoute.verdict.best.grossRequired)}{" "}
+                USD.
+              </p>
+              <p className="mt-0.5 text-xs leading-relaxed text-black/[0.5] dark:text-white/[0.5]">
+                Gross-up covers {formatUSD(inverseRoute.verdict.best.totalCostUSD)}{" "}
+                in fees via {inverseRoute.verdict.best.channelName} · statutory
+                withholding already included.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleApplyToInvoice}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-150 ease-out hover:bg-emerald-500 active:scale-[0.98] dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+            >
+              Apply to Invoice Studio
+            </button>
+          </section>
+        )}
 
         {isTarget ? (
           <section aria-labelledby="required-invoice-breakdown">
@@ -631,6 +725,16 @@ export default function Calculator({
           open={prcOpen}
           onClose={() => setPrcOpen(false)}
           prefill={prcSnapshot ?? defaultPrcSnapshot}
+        />
+      )}
+
+      {/* Embeddable backlink widget — snippet generator overlay (live preview
+          + 1-click HTML copy) for the static /embed card. */}
+      {embedOpen && (
+        <EmbedSnippetModal
+          open={embedOpen}
+          onClose={() => setEmbedOpen(false)}
+          corridor={corridor}
         />
       )}
       </div>

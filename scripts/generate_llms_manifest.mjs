@@ -257,6 +257,7 @@ function guidesSection() {
     `- [Invoice Studio](${SITE_URL}/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.`,
     `- [Regulatory / Tax Ledger](${SITE_URL}/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.`,
     `- [SWIFT Auditor](${SITE_URL}/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.`,
+    `- [Embeddable Payout Widget](${SITE_URL}/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all ${corridors.length} corridors live at /embed/<slug>/).`,
   ];
 }
 

@@ -11,6 +11,7 @@
 - [Invoice Studio](https://payoutdelta.com/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
 - [Regulatory / Tax Ledger](https://payoutdelta.com/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
 - [SWIFT Auditor](https://payoutdelta.com/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
+- [Embeddable Payout Widget](https://payoutdelta.com/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 50 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
 
