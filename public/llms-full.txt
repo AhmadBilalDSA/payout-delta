@@ -2,26 +2,26 @@
 
 > This is an llms-full.txt file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org
 
-> PayoutDelta is a cross-border remittance and intermediary-fee benchmarking engine for independent contractors: it models the settlement delta between direct local clearing (Raast, IMPS/NEFT/RTGS, SPEI, PIX, SEPA...) and a traditional SWIFT MT103 routed through JPMorgan Chase (CHASUS33), Citibank (CITIUS33), BNY Mellon (IRVTUS3N) or Standard Chartered (SCBLUS33). This full manifest enumerates every corridor in the dataset (120 corridors across USD, EUR and GBP origins as of 2026-09-24) with its benchmark intermediary deduction, correspondent BIC pool, statutory tax purpose code and recommended rail. Figures are informational benchmarks, not offers, and must be verified against the beneficiary bank's credit advice before invoicing.
+> PayoutDelta is a cross-border remittance and intermediary-fee benchmarking engine for independent contractors: it models the settlement delta between direct local clearing (Raast, IMPS/NEFT/RTGS, SPEI, PIX, SEPA...) and a traditional SWIFT MT103 routed through JPMorgan Chase (CHASUS33), Citibank (CITIUS33), BNY Mellon (IRVTUS3N) or Standard Chartered (SCBLUS33). This full manifest enumerates every corridor in the dataset (131 corridors across USD, EUR and GBP origins as of 2026-09-25) with its benchmark intermediary deduction, correspondent BIC pool, statutory tax purpose code and recommended rail. Figures are informational benchmarks, not offers, and must be verified against the beneficiary bank's credit advice before invoicing.
 
 ## PayoutDelta Guides
 
-- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 120 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 131 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
 - [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 145 long-tail routes.
 - [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
 - [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
 - [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
-- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 120 corridors live at /embed/<slug>/).
+- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 131 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
 
-- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 120-corridor dataset with per-platform fees and FX spreads, refreshed daily.
+- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 131-corridor dataset with per-platform fees and FX spreads, refreshed daily.
 - [API access & webhook contract](https://ahmadbilaldsa.github.io/payout-delta/api-access): integration reference for the static feed and derived endpoints.
-- [Full 120-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+- [Full 131-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
 
 ## Corridor Database
 
-Dataset snapshot: 2026-09-24T00:00:00Z — 120 corridors.
+Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
 
 | Corridor | Base → Target | Export Rate (per 1 base unit) | Intermediary Cut (USD) | Correspondent Clearing BICs | Statutory Tax Purpose Code | Recommended Rail |
 |---|---|---|---|---|---|---|
@@ -106,6 +106,17 @@ Dataset snapshot: 2026-09-24T00:00:00Z — 120 corridors.
 | [usd-to-nio](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-nio) | USD → NIO | 36.8 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Renta de servicios | Direct local clearing |
 | [usd-to-bsd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bsd) | USD → BSD | 1 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Foreign-source earnings | Direct local clearing |
 | [usd-to-bbd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bbd) | USD → BBD | 2 | $11 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Worldwide income | Direct local clearing |
+| [usd-to-all](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-all) | USD → ALL | 86.5 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-mkd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-mkd) | USD → MKD | 55.6 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-mdl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-mdl) | USD → MDL | 17.6 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-me-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-me-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-xk-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-xk-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | EUR par settlement | Direct local clearing |
+| [usd-to-isk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-isk) | USD → ISK | 131.5 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ISK export | Direct local clearing |
+| [usd-to-gyd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-gyd) | USD → GYD | 209 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-srd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-srd) | USD → SRD | 35.2 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-bzd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bzd) | USD → BZD | 2 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-szl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-szl) | USD → SZL | 18.4 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-lsl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-lsl) | USD → LSL | 18.3 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [eur-to-pkr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-pkr) | EUR → PKR | 300 | $16 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SBP 9111 | Direct local clearing |
 | [eur-to-inr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-inr) | EUR → INR | 91 | $14 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | RBI P0802 | Direct local clearing |
 | [eur-to-php](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-php) | EUR → PHP | 61 | $17 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BIR 8% Freelance Gross Income Tax | Direct local clearing |

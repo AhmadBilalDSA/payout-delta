@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-24T00:00:00Z",
+  "updatedAt": "2026-09-25T00:00:00Z",
   "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per payout corridor (USD, EUR and GBP base rails).",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
@@ -1159,6 +1159,171 @@
         { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.5, "fxSpread": 0.004 },
         { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.018 },
         { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.02 }
+      ]
+    },
+    {
+      "slug": "usd-to-all",
+      "from": "USD",
+      "to": "ALL",
+      "rate": 86.5,
+      "country": "Albania",
+      "countryCode": "AL",
+      "currencyName": "Albanian Lek",
+      "currencySymbol": "L",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.024 }
+      ]
+    },
+    {
+      "slug": "usd-to-mkd",
+      "from": "USD",
+      "to": "MKD",
+      "rate": 55.6,
+      "country": "North Macedonia",
+      "countryCode": "MK",
+      "currencyName": "Macedonian Denar",
+      "currencySymbol": "den",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 12, "fxSpread": 0.024 }
+      ]
+    },
+    {
+      "slug": "usd-to-mdl",
+      "from": "USD",
+      "to": "MDL",
+      "rate": 17.6,
+      "country": "Moldova",
+      "countryCode": "MD",
+      "currencyName": "Moldovan Leu",
+      "currencySymbol": "L",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.7, "fxSpread": 0.005 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 13, "fxSpread": 0.025 }
+      ]
+    },
+    {
+      "slug": "usd-to-me-eur",
+      "from": "USD",
+      "to": "EUR",
+      "rate": 0.87176,
+      "country": "Montenegro",
+      "countryCode": "ME",
+      "currencyName": "Euro",
+      "currencySymbol": "€",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.0 }
+      ]
+    },
+    {
+      "slug": "usd-to-xk-eur",
+      "from": "USD",
+      "to": "EUR",
+      "rate": 0.87176,
+      "country": "Kosovo",
+      "countryCode": "XK",
+      "currencyName": "Euro",
+      "currencySymbol": "€",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.0 }
+      ]
+    },
+    {
+      "slug": "usd-to-isk",
+      "from": "USD",
+      "to": "ISK",
+      "rate": 131.5,
+      "country": "Iceland",
+      "countryCode": "IS",
+      "currencyName": "Icelandic Krona",
+      "currencySymbol": "kr",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.8, "fxSpread": 0.005 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 14, "fxSpread": 0.025 }
+      ]
+    },
+    {
+      "slug": "usd-to-gyd",
+      "from": "USD",
+      "to": "GYD",
+      "rate": 209,
+      "country": "Guyana",
+      "countryCode": "GY",
+      "currencyName": "Guyanese Dollar",
+      "currencySymbol": "G$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.9, "fxSpread": 0.0065 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.021 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.028 }
+      ]
+    },
+    {
+      "slug": "usd-to-srd",
+      "from": "USD",
+      "to": "SRD",
+      "rate": 35.2,
+      "country": "Suriname",
+      "countryCode": "SR",
+      "currencyName": "Surinamese Dollar",
+      "currencySymbol": "SR$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.0, "fxSpread": 0.0065 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.022 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.03 }
+      ]
+    },
+    {
+      "slug": "usd-to-bzd",
+      "from": "USD",
+      "to": "BZD",
+      "rate": 2.0,
+      "country": "Belize",
+      "countryCode": "BZ",
+      "currencyName": "Belize Dollar",
+      "currencySymbol": "BZ$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.7, "fxSpread": 0.0015 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.012 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.014 }
+      ]
+    },
+    {
+      "slug": "usd-to-szl",
+      "from": "USD",
+      "to": "SZL",
+      "rate": 18.4,
+      "country": "Eswatini",
+      "countryCode": "SZ",
+      "currencyName": "Swazi Lilangeni",
+      "currencySymbol": "E",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0055 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.026 }
+      ]
+    },
+    {
+      "slug": "usd-to-lsl",
+      "from": "USD",
+      "to": "LSL",
+      "rate": 18.3,
+      "country": "Lesotho",
+      "countryCode": "LS",
+      "currencyName": "Lesotho Loti",
+      "currencySymbol": "L",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.6, "fxSpread": 0.0055 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.026 }
       ]
     },
     {

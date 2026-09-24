@@ -82,6 +82,12 @@ export interface CorridorRegulation {
    * corridor resolves an authentic, distinct figure.
    */
   defaultIntermediaryCut?: number;
+  /**
+   * Authorised retail FX spread (%). Euroized corridors (Montenegro,
+   * Kosovo) convert USD→EUR at par with a 0.0% retail spread — matching the
+   * provider fxSpread of 0 set in data/fees.json.
+   */
+  retailSpreadPercent?: number;
 }
 
 /* ---------------------------------------------------------------------------
@@ -5654,6 +5660,99 @@ const lbpBanks: RegulatoryBank[] = [
 ];
 
 
+/* Global Expansion Wave 4 - Non-Euro Europe & Extended Frontier Corridors ------------------------------------------------
+ * Euroized Montenegro (CBCG IPN) and Kosovo (CBK KIPS) settle USD->EUR at par with a 0.0% retail
+ * spread (fees.json provider fxSpread 0). ICS-frontier markets clear via national ACH / RTGS rails.
+ * --------------------------------------------------------------------------- */
+
+const allTiers: StatutoryTier[] = [
+  { id: "all-export", name: "Export Services \u2014 VAT Exempt", authority: "Ligji p\u00ebr TVSH nr. 92/2014 Art. 59", rate: 0, purposeCode: "Export of services", exemption: true, note: "0% VAT on exported digital/IT services; AIPS settlement via the Bank of Albania." },
+  { id: "all-se", name: "Self-Employment Advance", authority: "Ligji p\u00ebr Tatimin mbi t\u00eb Ardhurat Art. 15", rate: 0.15, purposeCode: "Freelance income", note: "15% taxing rate on income from self-employment; cleared via Bank of Albania AIPS." },
+];
+const allBanks: RegulatoryBank[] = [
+  { id: "bkt", name: "Banka Komb\u00ebtare Tregtare", displayName: "BKT (Albania)", swiftCode: "BKTBALTR", intermediaryUSD: 15, intermediaryMinUSD: 13, intermediaryMaxUSD: 18, localFeeDefault: 200, speed: "Fast", clearance: "AIPS RTGS (Bank of Albania) / ACH", localCurrency: "ALL" },
+];
+
+const mkdTiers: StatutoryTier[] = [
+  { id: "mkd-export", name: "Export Services \u2014 VAT 0%", authority: "ZDDV Art. 30 (exports)", rate: 0, purposeCode: "MKD export", exemption: true, note: "Zero-rated export of digital services; MIPS clearing via NBRM." },
+  { id: "mkd-pit", name: "Flat PIT 10%", authority: "Zakon za danok na lichniot dohod Art. 8", rate: 0.1, purposeCode: "Service income", note: "Flat 10% tax on self-employment income; MIPS (NBRM) instant settlement." },
+];
+const mkdBanks: RegulatoryBank[] = [
+  { id: "komsk", name: "Komercijalna banka ad Skopje", displayName: "Komercijalna banka (North Macedonia)", swiftCode: "KOBSMK2X", intermediaryUSD: 15, intermediaryMinUSD: 13, intermediaryMaxUSD: 18, localFeeDefault: 120, speed: "Fast", clearance: "MIPS / RTGS (NBRM)", localCurrency: "MKD" },
+];
+
+const mdlTiers: StatutoryTier[] = [
+  { id: "mdl-export", name: "Export Services \u2014 VAT 0%", authority: "Codul fiscal Art. 104 (zero VAT on exports)", rate: 0, purposeCode: "MDL export", exemption: true, note: "0% VAT on exported services; NBM RTGS settlement." },
+  { id: "mdl-cas", name: "Flat Income 12%", authority: "Codul fiscal Art. 15", rate: 0.12, purposeCode: "Prestation of services", note: "12% income tax on self-employment; verify micro-enterprise regime before invoicing." },
+];
+const mdlBanks: RegulatoryBank[] = [
+  { id: "maib", name: "moldova-agroindbank (MAIB)", displayName: "MAIB (Moldova)", swiftCode: "AGRNMD2X", intermediaryUSD: 17, intermediaryMinUSD: 15, intermediaryMaxUSD: 20, localFeeDefault: 50, speed: "Standard", clearance: "NBM RTGS / Interbank clearing", localCurrency: "MDL" },
+];
+
+const meEurTiers: StatutoryTier[] = [
+  { id: "me-eur-par", name: "Euroized \u2014 0.0% USD\u2192EUR FX Spread", authority: "CBCG (Central Bank of Montenegro)", rate: 0, purposeCode: "EUR par settlement", exemption: true, note: "Montenegro uses EUR as legal tender; incoming USD\u2192EUR conversion settles at par with a 0.0% retail spread \u2014 only intermediary wire deductions apply." },
+  { id: "me-cit", name: "Income / Corporate Tax 15%", authority: "Zakon o porezu na dohodak gra\u0111ana & Zakon o porezu na dobit", rate: 0.15, purposeCode: "Service income", note: "15% income/corporate tax; resident freelancers report worldwide income, foreign-source remittances held at par." },
+];
+const meEurBanks: RegulatoryBank[] = [
+  { id: "ckb", name: "Crnogorska komercijalna banka ad (NLB Group)", displayName: "CKB (Montenegro)", swiftCode: "CKBCMEPG", intermediaryUSD: 16, intermediaryMinUSD: 14, intermediaryMaxUSD: 19, localFeeDefault: 0, speed: "Fast", clearance: "CBCG RTGS / IPN \u2014 EUR par settlement", localCurrency: "EUR" },
+];
+
+const xkEurTiers: StatutoryTier[] = [
+  { id: "xk-eur-par", name: "Euroized \u2014 0.0% USD\u2192EUR FX Spread", authority: "CBK (Central Bank of Kosovo)", rate: 0, purposeCode: "EUR par settlement", exemption: true, note: "Kosovo unilaterally adopted EUR; incoming USD\u2192EUR conversion at par with a 0.0% retail spread \u2014 intermediary wire deductions still apply." },
+  { id: "xk-pit", name: "PIT 10%", authority: "Ligji p\u00ebr Tatimin n\u00eb t\u00eb Ardhurat Personale Art. 14", rate: 0.1, purposeCode: "Service income", note: "10% tax on income above the annual threshold; KIPS clearing via CBK." },
+];
+const xkEurBanks: RegulatoryBank[] = [
+  { id: "rbko", name: "Raiffeisen Bank Kosova", displayName: "Raiffeisen (Kosovo)", swiftCode: "RBKOXKPR", intermediaryUSD: 18, intermediaryMinUSD: 15, intermediaryMaxUSD: 21, localFeeDefault: 0, speed: "Fast", clearance: "KIPS Clearing (CBK) \u00b7 EUR par settlement", localCurrency: "EUR" },
+];
+
+const iskTiers: StatutoryTier[] = [
+  { id: "isk-export", name: "Export Services \u2014 VAT 0%", authority: "VSK nr. 163/2024 (0% export VAT)", rate: 0, purposeCode: "ISK export", exemption: true, note: "Zero-rated export of services; SEPA-mirrored Iceland clearing." },
+  { id: "isk-pit", name: "Progressive PIT", authority: "L\u00f6g um tekjuskatt nr. 90/2003", rate: 0.16, purposeCode: "Service income", note: "16% base rate plus municipal surcharge; foreign-source remittances assessable for residents." },
+];
+const iskBanks: RegulatoryBank[] = [
+  { id: "landsb", name: "Landsbankinn hf.", displayName: "Landsbankinn (Iceland)", swiftCode: "LAISISRE", intermediaryUSD: 14, intermediaryMinUSD: 12, intermediaryMaxUSD: 16, localFeeDefault: 150, speed: "Fast", clearance: "SEPA credit / Iceland Clearing House", localCurrency: "ISK" },
+];
+
+const gydTiers: StatutoryTier[] = [
+  { id: "gyd-export", name: "Export Services \u2014 VAT 0%", authority: "Guyana VAT Act Art. 46 (zero-rated exports)", rate: 0, purposeCode: "GYD export", exemption: true, note: "0% VAT on exported services; Bank of Guyana ACH settlement." },
+  { id: "gyd-cit", name: "Corporate Income Tax 25%", authority: "Income Tax Act Cap. 81:01", rate: 0.25, purposeCode: "Service income", note: "25% corporate income tax for companies; remittance treated as income when resident-engaged." },
+];
+const gydBanks: RegulatoryBank[] = [
+  { id: "rbgy", name: "Republic Bank Guyana", displayName: "Republic Bank (Guyana)", swiftCode: "RBGLGYGG", intermediaryUSD: 22, intermediaryMinUSD: 19, intermediaryMaxUSD: 25, localFeeDefault: 0, speed: "Standard", clearance: "Bank of Guyana ACH / RTGS", localCurrency: "GYD" },
+];
+
+const srdTiers: StatutoryTier[] = [
+  { id: "srd-export", name: "Export Services \u2014 outside VAT scope", authority: "Surinamese VAT Act (2023)", rate: 0, purposeCode: "SRD export", exemption: true, note: "Suriname VAT 10%; exported services generally outside scope \u2014 Surclear clearing." },
+  { id: "srd-pit", name: "Progressive Income Tax", authority: "Wet Inkomstenbelasting Suriname", rate: 0.1, purposeCode: "Service income", note: "Progressive PIT up to 45%; foreign-earned digital income assessed for resident taxpayers." },
+];
+const srdBanks: RegulatoryBank[] = [
+  { id: "rbnk", name: "Republic Bank Suriname NV", displayName: "Republic Bank (Suriname)", swiftCode: "RBNKSRPA", intermediaryUSD: 22, intermediaryMinUSD: 19, intermediaryMaxUSD: 26, localFeeDefault: 0, speed: "Standard", clearance: "Surclear Clearing / CBvS ACH", localCurrency: "SRD" },
+];
+
+const bzdTiers: StatutoryTier[] = [
+  { id: "bzd-export", name: "Export Services \u2014 GST 0%", authority: "Belize GST Act Part III (zero-rated exports)", rate: 0, purposeCode: "BZD export", exemption: true, note: "0% GST on exported services; Belize dollar pegged 2:1 to USD." },
+  { id: "bzd-peg", name: "Currency-Board Peg 2:1", authority: "Central Bank of Belize", rate: 0, purposeCode: "BZD peg \u00b7 USD 2:1", note: "BZD is pegged 2.00/USD with a currency-board reserve \u2014 retail USD\u2194BZD spreads are ~0%." },
+];
+const bzdBanks: RegulatoryBank[] = [
+  { id: "bblz", name: "Belize Bank Limited", displayName: "Belize Bank", swiftCode: "BBLZBZBZ", intermediaryUSD: 18, intermediaryMinUSD: 15, intermediaryMaxUSD: 21, localFeeDefault: 0, speed: "Fast", clearance: "CBB ACH / RTGS (2:1 peg)", localCurrency: "BZD" },
+];
+
+const szlTiers: StatutoryTier[] = [
+  { id: "szl-export", name: "Export Services \u2014 no employee tax", authority: "Eswatini VAT Act 2018 \u00a7 6(3)", rate: 0, purposeCode: "SZL export", exemption: true, note: "Eswatini has no general personal income tax on individuals; exports zero-rated under the VAT Act." },
+  { id: "szl-cit", name: "Corporate Income Tax", authority: "Income Tax Order 1975", rate: 0.275, purposeCode: "Service income", note: "27.5% corporate rate; SADC-RTGS settlement via CBE." },
+];
+const szlBanks: RegulatoryBank[] = [
+  { id: "sbiec", name: "Standard Bank Eswatini", displayName: "Standard Bank (Eswatini)", swiftCode: "SBICSZMX", intermediaryUSD: 19, intermediaryMinUSD: 16, intermediaryMaxUSD: 22, localFeeDefault: 20, speed: "Standard", clearance: "SADC-RTGS \u00b7 CBE EFT (Clearing)", localCurrency: "SZL" },
+];
+
+const lslTiers: StatutoryTier[] = [
+  { id: "lsl-export", name: "Export Services \u2014 VAT 0%", authority: "Lesotho VAT Act 2009 (exports zero-rated)", rate: 0, purposeCode: "LSL export", exemption: true, note: "Exported services zero-rated; Lesotho Loti pegs 1:1 to ZAR \u2014 SADC-RTGS clearing." },
+  { id: "lsl-pit", name: "PIT Progressive", authority: "Income Tax Act 1993 (Lesotho)", rate: 0.1, purposeCode: "Service income", note: "Individuals taxed above M 45,000 threshold (~10\u201325%); foreign income assessable for residents." },
+];
+const lslBanks: RegulatoryBank[] = [
+  { id: "fnbls", name: "First National Bank Lesotho", displayName: "FNB (Lesotho)", swiftCode: "FIRNLSMX", intermediaryUSD: 19, intermediaryMinUSD: 16, intermediaryMaxUSD: 22, localFeeDefault: 20, speed: "Standard", clearance: "SADC-RTGS \u00b7 CBL EFT (Clearing)", localCurrency: "LSL" },
+];
+
 const AUTHORED: Record<string, CorridorRegulation> = {
   "usd-to-pkr": {
     slug: "usd-to-pkr",
@@ -6932,6 +7031,17 @@ const AUTHORED: Record<string, CorridorRegulation> = {
   "usd-to-tnd": { slug: "usd-to-tnd", authority: "Tunisia VAT / BCT · Tunisia", clearingNetwork: "BCT RTGS / ACH", citations: ["Tunisia VAT Art. 14", "BCT Clearing"], banks: tndBanks, tiers: tndTiers, generic: false },
   "usd-to-dzd": { slug: "usd-to-dzd", authority: "Algeria VAT / BADR · Algeria", clearingNetwork: "BADR / SATIM", citations: ["Algeria VAT Art. 20", "BADR Clearing"], banks: dzdBanks, tiers: dzdTiers, generic: false },
   "usd-to-lbp": { slug: "usd-to-lbp", authority: "Lebanon Tax / BDL · Lebanon", clearingNetwork: "BDL clearing / SWIFT", citations: ["Lebanon Tax Art. 11", "BDL Code 900"], banks: lbpBanks, tiers: lbpTiers, generic: false },
+  "usd-to-all": { slug: "usd-to-all", authority: "Banka e Shqipërisë · Ligji për TVSH nr. 92/2014", clearingNetwork: "AIPS RTGS (Bank of Albania) / ACH", citations: ["TVSH Art. 59 export exemption", "PIT Art. 15 flat 15%", "AIPS instant (Bank of Albania)"], banks: allBanks, tiers: allTiers, generic: false },
+  "usd-to-mkd": { slug: "usd-to-mkd", authority: "NBRM · Zakon za danok na lichniot dohod", clearingNetwork: "MIPS / RTGS (NBRM)", citations: ["ZDDV Art. 30 exports", "PIT Art. 8 flat 10%", "MIPS instant clearing"], banks: mkdBanks, tiers: mkdTiers, generic: false },
+  "usd-to-mdl": { slug: "usd-to-mdl", authority: "BNM — Codul fiscal", clearingNetwork: "NBM RTGS / Interbank clearing", citations: ["Codul fiscal Art. 104 exports", "Codul fiscal Art. 15 flat 12%", "NBM RTGS"], banks: mdlBanks, tiers: mdlTiers, generic: false },
+  "usd-to-me-eur": { slug: "usd-to-me-eur", authority: "CBCG · Zakon o porezu na dohodak građana", clearingNetwork: "CBCG RTGS / IPN — EUR par settlement", citations: ["PIT 15% (građani)", "EUR legal tender", "0.0% retail spread"], banks: meEurBanks, tiers: meEurTiers, generic: false, retailSpreadPercent: 0 },
+  "usd-to-xk-eur": { slug: "usd-to-xk-eur", authority: "CBK · Ligji për Tatimin në të Ardhurat Personale", clearingNetwork: "KIPS Clearing (CBK) · EUR par settlement", citations: ["PIT Art. 14 10%", "EUR unilateral adoption", "0.0% retail spread"], banks: xkEurBanks, tiers: xkEurTiers, generic: false, retailSpreadPercent: 0 },
+  "usd-to-isk": { slug: "usd-to-isk", authority: "Ríkisskattstjóri · lög um tekjuskatt nr. 90/2003", clearingNetwork: "SEPA credit / Iceland Clearing House", citations: ["VSK nr. 163/2024 exports", "Tekjuskattur nr. 90/2003", "SEPA-mirrored Iceland"], banks: iskBanks, tiers: iskTiers, generic: false },
+  "usd-to-gyd": { slug: "usd-to-gyd", authority: "Guyana Revenue Authority · Income Tax Act", clearingNetwork: "Bank of Guyana ACH / RTGS", citations: ["VAT Act Art. 46 exports", "Income Tax Act Cap. 81:01", "BoG ACH"], banks: gydBanks, tiers: gydTiers, generic: false },
+  "usd-to-srd": { slug: "usd-to-srd", authority: "CBvS · Wet Inkomstenbelasting Suriname", clearingNetwork: "Surclear Clearing / CBvS ACH", citations: ["VAT Act 2023 services", "Income Tax non-resident", "Surclear ACH"], banks: srdBanks, tiers: srdTiers, generic: false },
+  "usd-to-bzd": { slug: "usd-to-bzd", authority: "Central Bank of Belize · GST Act", clearingNetwork: "CBB ACH / RTGS (2:1 peg)", citations: ["GST Part III exports", "2:1 currency-board peg", "CBB ACH/RTGS"], banks: bzdBanks, tiers: bzdTiers, generic: false },
+  "usd-to-szl": { slug: "usd-to-szl", authority: "Central Bank of Eswatini · VAT Act 2018", clearingNetwork: "SADC-RTGS · CBE EFT (Clearing)", citations: ["VAT § 6(3) exports", "Income Tax Order 1975", "SADC-RTGS"], banks: szlBanks, tiers: szlTiers, generic: false },
+  "usd-to-lsl": { slug: "usd-to-lsl", authority: "Central Bank of Lesotho · Income Tax Act 1993", clearingNetwork: "SADC-RTGS · CBL EFT (Clearing)", citations: ["VAT Act 2009 exports", "Income Tax Act 1993", "SADC-RTGS"], banks: lslBanks, tiers: lslTiers, generic: false },
 };
 
 /** Phase 9 — resolves the statutory regulation profile for any audited corridor slug. */

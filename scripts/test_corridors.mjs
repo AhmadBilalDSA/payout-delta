@@ -175,6 +175,17 @@ const EXPECTED_SLUGS = [
   "usd-to-tnd",
   "usd-to-dzd",
   "usd-to-lbp",
+  "usd-to-all",
+  "usd-to-mkd",
+  "usd-to-mdl",
+  "usd-to-me-eur",
+  "usd-to-xk-eur",
+  "usd-to-isk",
+  "usd-to-gyd",
+  "usd-to-srd",
+  "usd-to-bzd",
+  "usd-to-szl",
+  "usd-to-lsl",
 
 ];
 
