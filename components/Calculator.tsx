@@ -529,6 +529,13 @@ export default function Calculator({
               </>
             )}
 
+            {/* Legal-tech — local-first rate threshold watchlist, mounted
+                immediately below the settlement fee-breakdown sheet per the
+                Milestone 2 placement contract. Thresholds & pinned rates
+                persist per corridor in localStorage; the emerald trigger badge
+                + optional desktop notification are 100% on-device. */}
+            <RateWatchlistWidget corridor={corridor} />
+
             {/* Interactive tax & net take-home impact — binds live to the
                 settlement stack beside the waterfall; the amounts follow the
                 parent amount/target state. */}
@@ -553,12 +560,6 @@ export default function Calculator({
                 tierRate={taxSnapshot.tierRate}
               />
             )}
-
-            {/* Legal-tech — local-first rate threshold watchlist, mounted
-                directly below the costing widget. Thresholds & pinned rates
-                persist per corridor in localStorage; the emerald trigger badge
-                + optional desktop notification are 100% on-device. */}
-            <RateWatchlistWidget corridor={corridor} />
           </>
         )}
 
