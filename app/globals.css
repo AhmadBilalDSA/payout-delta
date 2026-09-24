@@ -408,6 +408,49 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+ * Milestone 7 — official client audit sheet (.audit-sheet). Last in cascade,
+ * single-page certificate: the print-only copy mounted by AuditSheetModal is
+ * hard-clipped to one 210×297mm box with `overflow: hidden`, exactly like
+ * .prc-letter / .contract-addendum, so the Save-as-PDF dialog produces one
+ * clean white A4 certificate (its own <header>/<footer> re-mounted at higher
+ * specificity against the generic hiders above).
+ * ------------------------------------------------------------------------- */
+@media print {
+  .audit-sheet {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 14mm 16mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+  }
+
+  .audit-sheet header,
+  .audit-sheet footer {
+    display: block !important;
+  }
+
+  .audit-sheet tr,
+  .audit-sheet .print-sheet {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * Hotfix — blank-page guard for every printable sheet (.print-sheet surfaces:
  * the invoice document, calculator audit receipt and PRC letter). Two failure
  * modes are closed here (last in cascade, matches/extends the isolation block

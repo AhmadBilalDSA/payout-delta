@@ -42,6 +42,8 @@ import AuditReceipt from "@/components/AuditReceipt";
 import PrcLetterModal from "@/components/compliance/PrcLetterModal";
 import EmbedSnippetModal from "@/components/EmbedSnippetModal";
 import SwiftRouteInspector from "@/components/compliance/SwiftRouteInspector";
+import AlternativeRailsCard from "@/components/AlternativeRailsCard";
+import AuditSheetModal from "@/components/AuditSheetModal";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -124,6 +126,9 @@ export default function Calculator({
 
   // Embeddable backlink widget — snippet generator overlay state.
   const [embedOpen, setEmbedOpen] = useState(false);
+
+  // Milestone 7 — official transit & deductions audit sheet overlay state.
+  const [auditSheetOpen, setAuditSheetOpen] = useState(false);
 
   // Phase D — the receiving bank currently active in the waterfall's selector,
   // streamed up by TransactionCostingWidget so the SWIFT Route Inspector stays
@@ -415,7 +420,14 @@ export default function Calculator({
     <div className="w-full min-w-0">
       {/* Embeddable backlink widget access — one-click snippet generator for
           the static /embed card, available on every audit surface. */}
-      <div className="mb-3 flex w-full items-center justify-end">
+      <div className="mb-3 flex w-full items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => setAuditSheetOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-700 transition-colors duration-200 ease-out hover:bg-emerald-500/20 dark:text-emerald-300"
+        >
+          📄 Client Audit Sheet
+        </button>
         <button
           type="button"
           onClick={() => setEmbedOpen(true)}
@@ -585,6 +597,24 @@ export default function Calculator({
             </div>
           </section>
         )}
+
+        {/* Milestone 7 — alternative rails monetization engine comparison card.
+            Visible on every corridor route (both modes): quantifies the classic
+            SWIFT correspondent-chain friction versus modern direct-clearing
+            rails and routes the sponsor CTA through the partner directory. */}
+        <AlternativeRailsCard
+          corridor={corridor}
+          grossUSD={
+            isTarget
+              ? inverseRoute.verdict.best?.grossRequired ?? amount
+              : amount
+          }
+          bestChannelId={
+            isTarget
+              ? inverseRoute.verdict.best?.channelId
+              : route.verdict.best?.channelId
+          }
+        />
           </>
         ) : (
           <>
@@ -737,6 +767,15 @@ export default function Calculator({
           corridor={corridor}
         />
       )}
+
+      {/* Milestone 7 — official client audit sheet + print-to-PDF overlay. */}
+      <AuditSheetModal
+        open={auditSheetOpen}
+        onClose={() => setAuditSheetOpen(false)}
+        corridor={corridor}
+        platform={platform}
+        quote={route.verdict.best}
+      />
       </div>
 
       {/* AEO audit FAQ spans the full page width below the two-column rail —
