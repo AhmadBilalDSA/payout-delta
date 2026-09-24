@@ -11,6 +11,8 @@
 - [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
 - [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
 - [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
+- [Bank Dossier Directory](https://ahmadbilaldsa.github.io/payout-delta/banks): 22 verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.
+- [Agency Treasury Leakage Engine](https://ahmadbilaldsa.github.io/payout-delta/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.
 - [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 131 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
@@ -164,6 +166,35 @@ Public SWIFT/BIC identifiers a traditional MT103 may clear through before the re
 - USD · JPMorgan Chase New York (CHASUS33), Citibank New York (CITIUS33), BNY Mellon New York (IRVTUS3N), Standard Chartered New York (SCBLUS33)
 - EUR · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA), Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF), BBVA Frankfurt (BBVADEFF)
 - GBP · Barclays London (BARCGB22), HSBC UK (MIDLGB22), Standard Chartered London (SCBLGB2L), HSBC Bank London (HSBCGB2L)
+
+## Bank Dossiers
+
+Verified ISO 9362 (8-character) BIC heads for the correspondent hubs and domestic beneficiary rails behind every corridor in this dataset — 22 full dossiers at /banks/<slug>. Always confirm the destination account and IBAN with the receiving bank.
+
+| Dossier | Bank | BIC |
+|---|---|---|
+| [jpmorgan-chase](https://ahmadbilaldsa.github.io/payout-delta/banks/jpmorgan-chase) | JPMorgan Chase Bank N.A. | CHASUS33 |
+| [citibank](https://ahmadbilaldsa.github.io/payout-delta/banks/citibank) | Citibank N.A. | CITIUS33 |
+| [bank-of-america](https://ahmadbilaldsa.github.io/payout-delta/banks/bank-of-america) | Bank of America N.A. | BOFAUS3N |
+| [deutsche-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/deutsche-bank) | Deutsche Bank AG | DEUTDEFF |
+| [commerzbank](https://ahmadbilaldsa.github.io/payout-delta/banks/commerzbank) | Commerzbank AG | COMMDEFF |
+| [barclays](https://ahmadbilaldsa.github.io/payout-delta/banks/barclays) | Barclays Bank UK PLC | BARCGB22 |
+| [standard-chartered-uk](https://ahmadbilaldsa.github.io/payout-delta/banks/standard-chartered-uk) | Standard Chartered Bank | SCBLGB2L |
+| [hsbc-bank-uk](https://ahmadbilaldsa.github.io/payout-delta/banks/hsbc-bank-uk) | HSBC UK Bank PLC | HSBCGB2L |
+| [habib-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/habib-bank) | Habib Bank Limited (HBL) | HABBPKKA |
+| [meezan-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/meezan-bank) | Meezan Bank Limited | MEZNPKKA |
+| [bank-alfalah](https://ahmadbilaldsa.github.io/payout-delta/banks/bank-alfalah) | Bank Alfalah Limited | ALFHPKKA |
+| [standard-chartered-pakistan](https://ahmadbilaldsa.github.io/payout-delta/banks/standard-chartered-pakistan) | Standard Chartered Bank (Pakistan) Limited | SCBLPKKA |
+| [icici-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/icici-bank) | ICICI Bank Limited | ICICINBB |
+| [state-bank-of-india](https://ahmadbilaldsa.github.io/payout-delta/banks/state-bank-of-india) | State Bank of India | SBININBB |
+| [bdo-unibank](https://ahmadbilaldsa.github.io/payout-delta/banks/bdo-unibank) | BDO Unibank Inc. | BNORPHMM |
+| [bank-central-asia](https://ahmadbilaldsa.github.io/payout-delta/banks/bank-central-asia) | PT Bank Central Asia Tbk (BCA) | CENAIDJA |
+| [bancolombia](https://ahmadbilaldsa.github.io/payout-delta/banks/bancolombia) | Bancolombia S.A. | COLOCOBM |
+| [commercial-bank-of-ceylon](https://ahmadbilaldsa.github.io/payout-delta/banks/commercial-bank-of-ceylon) | Commercial Bank of Ceylon PLC | CCEYLKLX |
+| [emirates-nbd](https://ahmadbilaldsa.github.io/payout-delta/banks/emirates-nbd) | Emirates NBD (PJSC) | EBILAEAD |
+| [al-rajhi](https://ahmadbilaldsa.github.io/payout-delta/banks/al-rajhi) | Al Rajhi Bank | RJHISARI |
+| [raiffeisen-srbija](https://ahmadbilaldsa.github.io/payout-delta/banks/raiffeisen-srbija) | Raiffeisen banka a.d. | RZBSRSBG |
+| [bkt-albania](https://ahmadbilaldsa.github.io/payout-delta/banks/bkt-albania) | Banka Kombëtare Tregtare (BKT) | BKTBALTR |
 
 ### Notes on the numbers
 

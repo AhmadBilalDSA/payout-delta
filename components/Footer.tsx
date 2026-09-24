@@ -18,6 +18,8 @@ const PRODUCT_LINKS: readonly FooterLink[] = [
   { label: "API Stubs", href: "/about" },
   { label: "Rate Drops", href: "/about" },
   { label: "Comparison Guides", href: "/compare/" },
+  { label: "Bank Dossiers", href: "/banks/" },
+  { label: "For Agencies", href: "/agencies/" },
 ] as const;
 
 const LEGAL_LINKS: readonly FooterLink[] = [

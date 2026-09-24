@@ -82,6 +82,18 @@ export default function Header() {
             Leaderboard
           </Link>
           <Link
+            href="/banks/"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
+          >
+            Banks
+          </Link>
+          <Link
+            href="/agencies/"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
+          >
+            Agencies
+          </Link>
+          <Link
             href="/compare/"
             className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
           >

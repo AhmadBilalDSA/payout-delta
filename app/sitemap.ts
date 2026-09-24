@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getCorridorSlugs } from "@/lib/db";
 import { LONG_TAIL_CORRIDORS } from "@/data/corridors";
 import { EDITORIAL_GUIDES } from "@/data/editorialGuides";
+import { BANK_DOSSIERS } from "@/data/banks";
 import { LOCALIZED_CORRIDORS } from "@/lib/localizedCorridors";
 import { SITE_URL } from "@/lib/seoSchemas";
 
@@ -102,6 +103,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: `${SITE_URL}/banks/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/agencies/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${SITE_URL}/privacy-policy/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "yearly",
@@ -130,10 +143,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
+  const bankEntries: MetadataRoute.Sitemap = BANK_DOSSIERS.map((bank) => ({
+    url: `${SITE_URL}/banks/${bank.slug}/`,
+    lastModified: LAST_MODIFIED,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   return [
     ...staticEntries,
     ...compareGuideEntries,
     ...corridorEntries,
+    ...bankEntries,
     ...embedEntries,
     ...localizedEntries,
   ];

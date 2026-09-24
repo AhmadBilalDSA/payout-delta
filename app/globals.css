@@ -541,3 +541,63 @@ body {
     break-inside: avoid !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Phase 5 — Agency treasury leakage report (.agency-print-area). Mirrors the
+ * .tax-ledger-print-area contract: the executive report mounted by
+ * AgencyAuditCalculator flows across pages (roster + rails comparison tables)
+ * under the A4 @page, re-shown against the generic print hiders.
+ * ------------------------------------------------------------------------- */
+@media print {
+  .agency-print-area {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12mm 16mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    visibility: visible !important;
+  }
+
+  .agency-print-area * {
+    visibility: visible !important;
+  }
+
+  .agency-print-area header,
+  .agency-print-area footer {
+    display: block !important;
+  }
+
+  .agency-print-area table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+
+  .agency-print-area th,
+  .agency-print-area td {
+    border: 0.5pt solid #cbd5e1;
+    padding: 4pt 6pt;
+    text-align: left;
+  }
+
+  .agency-print-area thead {
+    background: #f1f5f9;
+  }
+
+  .agency-print-area .agency-print-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6pt;
+    margin: 8pt 0;
+  }
+
+  .agency-print-area .agency-print-kpis > div,
+  .agency-print-area table thead {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

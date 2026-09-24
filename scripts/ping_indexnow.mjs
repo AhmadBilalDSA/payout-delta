@@ -58,7 +58,9 @@ const SITE_URL = `https://${INDEXNOW_HOST}${BASE_DIR}`;
 const STATIC_PATHS = [
   "/",
   "/about/",
+  "/agencies/",
   "/api-access/",
+  "/banks/",
   "/compare/",
   "/compare/swift-wire-vs-wise-business/",
   "/compare/sha-vs-our-swift-charges/",
@@ -82,22 +84,28 @@ const LOCALIZED = [
   ["pt", "usd-to-brl"],
 ];
 
-/** All static-export paths, exactly as the build emits them (204 URLs today). */
+/** All static-export paths, exactly as the build emits them (460+ URLs today). */
 function derivePaths() {
   const fees = JSON.parse(readFileSync(join(ROOT, "data", "fees.json"), "utf8"));
   const corridorsSource = readFileSync(join(ROOT, "data", "corridors.ts"), "utf8");
+  const banksSource = readFileSync(join(ROOT, "data", "banks.ts"), "utf8");
   const longTailSlugs = [
     ...corridorsSource.matchAll(/slug:\s*"([a-z0-9-]+)"/g),
   ].map((match) => match[1]);
+  const bankSlugs = [...banksSource.matchAll(/slug:\s*"([a-z0-9-]+)"\s*,/g)].map(
+    (match) => match[1]
+  );
   const baseSlugs = fees.corridors.map((corridor) => corridor.slug);
   const corridorPaths = [
     ...baseSlugs.map((slug) => `/calculator/${slug}/`),
     ...longTailSlugs.map((slug) => `/calculator/${slug}/`),
   ];
   const embedPaths = baseSlugs.map((slug) => `/embed/${slug}/`);
+  const bankPaths = bankSlugs.map((slug) => `/banks/${slug}/`);
   return [
     ...STATIC_PATHS,
     ...corridorPaths,
+    ...bankPaths,
     ...embedPaths,
     ...LOCALIZED.map(([lang, slug]) => `/${lang}/calculator/${slug}/`),
   ];

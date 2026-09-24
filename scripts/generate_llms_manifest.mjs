@@ -37,6 +37,25 @@ const routingSource = readFileSync(
   "utf8"
 );
 const corridorsSource = readFileSync(join(ROOT, "data", "corridors.ts"), "utf8");
+const banksSource = readFileSync(join(ROOT, "data", "banks.ts"), "utf8");
+
+/** Dossier profiles parsed from the Phase 5 bank registry. */
+function parseBanks() {
+  const banks = [];
+  const re =
+    /slug:\s*"([a-z0-9-]+)",\s*\n\s*name:\s*"([^"]*)",\s*\n\s*shortName:\s*"([^"]*)",\s*\n\s*bic:\s*"([A-Z0-9]{8})",/g;
+  let match;
+  while ((match = re.exec(banksSource)) !== null) {
+    banks.push({
+      slug: match[1],
+      name: match[2],
+      shortName: match[3],
+      bic: match[4],
+    });
+  }
+  return banks;
+}
+const BANKS = parseBanks();
 
 /** Short statutory-regulator label per receiving currency (task format "SBP 9111"). */
 const REGULATOR = {
@@ -293,6 +312,8 @@ function guidesSection() {
     `- [Invoice Studio](${SITE_URL}/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.`,
     `- [Regulatory / Tax Ledger](${SITE_URL}/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.`,
     `- [SWIFT Auditor](${SITE_URL}/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.`,
+    `- [Bank Dossier Directory](${SITE_URL}/banks): ${BANKS.length} verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.`,
+    `- [Agency Treasury Leakage Engine](${SITE_URL}/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.`,
     `- [Embeddable Payout Widget](${SITE_URL}/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all ${corridors.length} corridors live at /embed/<slug>/).`,
   ];
 }
@@ -348,6 +369,19 @@ const correspondentLegend = [
   `- GBP · Barclays London (BARCGB22), HSBC UK (MIDLGB22), Standard Chartered London (SCBLGB2L), HSBC Bank London (HSBCGB2L)`,
 ];
 
+const banksSection = [
+  "## Bank Dossiers",
+  "",
+  `Verified ISO 9362 (8-character) BIC heads for the correspondent hubs and domestic beneficiary rails behind every corridor in this dataset — ${BANKS.length} full dossiers at /banks/<slug>. Always confirm the destination account and IBAN with the receiving bank.`,
+  "",
+  "| Dossier | Bank | BIC |",
+  "|---|---|---|",
+  ...BANKS.map(
+    (bank) =>
+      `| [${bank.slug}](${SITE_URL}/banks/${bank.slug}) | ${bank.name} | ${bank.bic} |`
+  ),
+];
+
 const notes = [
   "### Notes on the numbers",
   "",
@@ -370,6 +404,7 @@ const llmsFullTxt =
     ].join("\n"),
     table.join("\n"),
     correspondentLegend.join("\n"),
+    banksSection.join("\n"),
     notes.join("\n"),
   ].join("\n\n") + "\n";
 
