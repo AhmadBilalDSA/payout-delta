@@ -329,6 +329,22 @@ document text is statutory-legal English and hardcoded (i18n dictionaries
   `/v1/corridors`, `/v1/corridors/:slug`, `/v1/rates` (FIFO-style
   `?corridor&gross&platform`). Quote math mirrors `utils/calculateRoute.ts`.
 - `app/api-access/` — developer playground page, live API explorer.
+- `app/developers/` — **Open Developer Data Hub & API documentation route**
+  (static, built into `./out/developers/index.html`). Hero + value
+  proposition ("Open Cross-Border Banking & Remittance Dataset"),
+  `download` action badges for `api/fees.json` and `llms-full.txt`, one
+  copyable code-snippet tab group (cURL / TypeScript `fetch` / Python
+  `requests`, each with a 2.5s "✓ Copied" toast via the client island
+  `components/developers/CodeSnippetTabs.tsx`), a corridor schema table
+  (`slug`, `baseCurrency`, `targetCurrency`, `baseRate`, `intermediaryUSD`,
+  `swiftCode`, `purposeCode` — examples derived live from the dataset +
+  `getRegulatoryBanking` at build time), and a Schema.org **`Dataset`**
+  JSON-LD block authored by `buildDatasetSchema()` in
+  `lib/seoSchemas.ts` (MIT / Open Data license, PayoutDelta publisher, two
+  `DataDownload` distributions). Registered in the header nav
+  (`components/Header.tsx`, `developers` i18n key across all 7 catalogs),
+  the footer "Open Data" column (`components/Footer.tsx`) and the sitemap
+  (`/developers/`). Zero third-party runtime dependencies.
 
 ---
 

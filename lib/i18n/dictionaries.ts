@@ -61,6 +61,7 @@ export const enStrings = {
   taxLedger: "Tax Ledger",
   openDataset: "Open dataset",
   apiAccess: "API Access",
+  developers: "Developers",
   theme: "Theme",
   clientSideBadge: "100% Client-Side · Private",
 
@@ -325,6 +326,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       taxLedger: "ٹیکس لیجر",
       openDataset: "ڈیٹاسیٹ کھولیں",
       apiAccess: "API تک رسائی",
+      developers: "ڈیویلپرز",
       theme: "تھیم",
       clientSideBadge: "100% کلائنٹ سائیڈ · پرائیویٹ",
 
@@ -571,6 +573,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       taxLedger: "टैक्स लेज़र",
       openDataset: "डेटासेट खोलें",
       apiAccess: "API एक्सेस",
+      developers: "डेवलपर्स",
       theme: "थीम",
       clientSideBadge: "100% क्लाइंट-साइड · प्राइवेट",
 
@@ -816,6 +819,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       taxLedger: "Tax Ledger",
       openDataset: "Buksan ang dataset",
       apiAccess: "API Access",
+      developers: "Mga Developer",
       theme: "Tema",
       clientSideBadge: "100% Client-Side · Pribado",
 
@@ -1063,6 +1067,7 @@ swiftBic: "SWIFT / BIC code",
       taxLedger: "Registro tributario",
       openDataset: "Abrir dataset",
       apiAccess: "Acceso a la API",
+      developers: "Desarrolladores",
       theme: "Tema",
       clientSideBadge: "100% en el cliente · Privado",
 
@@ -1310,6 +1315,7 @@ swiftBic: "SWIFT / BIC code",
       taxLedger: "Registro tributário",
       openDataset: "Abrir dataset",
       apiAccess: "Acesso à API",
+      developers: "Desenvolvedores",
       theme: "Tema",
       clientSideBadge: "100% no cliente · Privado",
 
@@ -1557,6 +1563,7 @@ swiftBic: "SWIFT / BIC code",
       taxLedger: "دفتر الضرائب",
       openDataset: "فتح مجموعة البيانات",
       apiAccess: "الوصول إلى API",
+      developers: "المطوّرون",
       theme: "المظهر",
       clientSideBadge: "100% على جهاز العميل · خصوصية",
 

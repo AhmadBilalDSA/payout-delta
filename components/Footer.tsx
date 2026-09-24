@@ -34,6 +34,7 @@ const OPEN_DATA_LINKS: readonly FooterLink[] = [
     href: `${GITHUB_URL}/blob/master/data/fees.json`,
     external: true,
   },
+  { label: "Developer Dataset & API", href: "/developers/" },
   { label: "Methodology", href: "/about" },
 ] as const;
 

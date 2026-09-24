@@ -317,6 +317,19 @@ A Cloudflare Worker **rate router** (`edge-api/`) serving the same versioned
 fee snapshot with sliding-window rate limiting — explorable live in the
 [developer playground](app/api-access).
 
+### 📡 Open Developer Data Hub & API Docs
+A dedicated static developer portal at
+[`/developers`](app/developers) — the "**Open Cross-Border Banking &
+Remittance Dataset**" landing page. It pairs direct download badges for
+[`fees.json`](public/api/fees.json) and [`llms-full.txt`](public/llms-full.txt)
+with copyable cURL / TypeScript / Python fetch snippets (2.5s "✓ Copied"
+toast), a live-value corridor schema table (`slug`, `baseCurrency`,
+`targetCurrency`, `baseRate`, `intermediaryUSD`, `swiftCode`,
+`purposeCode`) and a Schema.org **`Dataset`** JSON-LD block (MIT / Open Data
+license, publisher, `DataDownload` distributions). Purely static — zero
+runtime dependencies, invisible in the math and the bundle budget, and it
+renders straight into `./out/developers/index.html`.
+
 ### 🔎 AEO/GEO Direct-Answer Engine
 Every corridor page answers its money question **directly at the top** — "how
 much of $1,000 actually lands in PKR?" — with a bolded takeaway, statutory

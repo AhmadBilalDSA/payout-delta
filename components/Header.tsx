@@ -82,6 +82,12 @@ export default function Header() {
             Leaderboard
           </Link>
           <Link
+            href="/developers/"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
+          >
+            {t("developers")}
+          </Link>
+          <Link
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"

@@ -1,6 +1,7 @@
 import type {
   ChannelQuote,
   Corridor,
+  FeesDataset,
   Platform,
   WithdrawalChannel,
 } from "@/lib/types";
@@ -285,6 +286,115 @@ export function buildAeoFaqSchema(
     block.inLanguage = opts.inLanguage;
   }
   return block;
+}
+
+/**
+ * Dataset — the Developer Data Hub's canonical schema.org entity. Documents
+ * the open cross-border banking & remittance dataset as free, MIT-licensed
+ * open data with a pinned publisher and two machine-readable distributions
+ * (the `fees.json` JSON feed and the `llms-full.txt` corridor manifest) as
+ * `DataDownload` nodes, so search & agent surfaces can attribute, mirror and
+ * cite the feed directly from the `/developers` route's structured data.
+ */
+export function buildDatasetSchema(opts: {
+  dataset: FeesDataset;
+  feedUrl: string;
+  manifestUrl: string;
+}): JsonLdBlock {
+  const { dataset } = opts;
+  return {
+    "@type": "Dataset",
+    name: "Open Cross-Border Banking & Remittance Dataset",
+    alternateName: dataset.dataset,
+    description: `${dataset.description} ${dataset.corridors.length} freelance payout corridors with correspondent SWIFT BICs, retail FX spreads and statutory export tax codes.`,
+    url: opts.feedUrl,
+    keywords: [
+      "cross-border remittance",
+      "freelance payout corridors",
+      "SWIFT BIC",
+      "FX spread",
+      "statutory purpose code",
+      "open data",
+      "cross-border banking",
+    ],
+    license: "https://opensource.org/licenses/mit",
+    isAccessibleForFree: true,
+    inLanguage: ["en", "ur", "hi", "fil", "es", "pt", "ar"],
+    temporalCoverage: dataset.updatedAt.slice(0, 10),
+    dateCreated: dataset.updatedAt.slice(0, 10),
+    publisher: {
+      "@type": "Organization",
+      name: "PayoutDelta",
+      url: "https://payoutdelta.com/",
+      sameAs: "https://github.com/AhmadBilalDSA/payout-delta",
+    },
+    creator: {
+      "@type": "Organization",
+      name: "PayoutDelta",
+      url: "https://payoutdelta.com/",
+    },
+    distribution: [
+      {
+        "@type": "DataDownload",
+        name: "fees.json — platform fees, channels & corridor rates feed",
+        encodingFormat: "application/json",
+        contentUrl: opts.feedUrl,
+        description: `Versioned ${dataset.schemaVersion} schema feed — ${dataset.corridors.length} corridors, ${dataset.platforms.length} platforms and ${dataset.channels.length} withdrawal channels.`,
+      },
+      {
+        "@type": "DataDownload",
+        name: "llms-full.txt — full corridor manifest",
+        encodingFormat: "text/plain",
+        contentUrl: opts.manifestUrl,
+        description:
+          "Complete 50-corridor table of intermediary cuts, correspondent clearing BICs, statutory tax purpose codes and recommended rails.",
+      },
+    ],
+    variableMeasured: [
+      {
+        "@type": "PropertyValue",
+        name: "corridorSlug",
+        description: "Canonical corridor route id (e.g. usd-to-pkr).",
+        dataType: "Text",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "baseCurrency",
+        description: "Source settlement currency (ISO 4217).",
+        dataType: "Text",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "targetCurrency",
+        description: "Destination local payout currency (ISO 4217).",
+        dataType: "Text",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "baseRate",
+        description: "Reference mid-market rate per 1 baseCurrency.",
+        dataType: "Number",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "intermediaryUSD",
+        description: "Benchmark SHA intermediary SWIFT cut in USD.",
+        dataType: "Number",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "swiftCode",
+        description: "Recipient bank SWIFT/BIC identifier (ISO 9362).",
+        dataType: "Text",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "purposeCode",
+        description: "Statutory export tax / remittance purpose code.",
+        dataType: "Text",
+      },
+    ],
+  };
 }
 
 /**
