@@ -103,10 +103,22 @@ export default function CorridorDirectory({
 }) {
   const [query, setQuery] = useState("");
   const [region, setRegion] = useState("All");
+  const [sendCurrency, setSendCurrency] = useState("All");
+
+  const sendCurrencies = useMemo(
+    () =>
+      [...new Set(corridors.map((corridor) => corridor.from))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [corridors],
+  );
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return corridors
+      .filter((corridor) =>
+        sendCurrency === "All" ? true : corridor.from === sendCurrency,
+      )
       .filter((corridor) =>
         region === "All"
           ? true
@@ -122,7 +134,7 @@ export default function CorridorDirectory({
           .includes(needle);
       })
       .sort((a, b) => a.country.localeCompare(b.country));
-  }, [corridors, query, region]);
+  }, [corridors, query, region, sendCurrency]);
 
   // Last active target lives in the tabs: pill search on region switch.
   const shownRegions = [
@@ -141,10 +153,10 @@ export default function CorridorDirectory({
       <h2 id="corridor-heading" className="text-2xl font-bold text-slate-900 dark:text-white">
         Audited corridors
       </h2>
-      <p className="mt-2 text-slate-600 dark:text-slate-400">
-        {corridors.length} receiving corridors, filtered live in your browser —
-        every combination priced in the receiving currency.
-      </p>
+<p className="mt-2 text-slate-600 dark:text-slate-400">
+          {corridors.length} receiving corridors, filtered live in your browser —
+          USD, EUR and GBP priced into each local currency.
+        </p>
 
       <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="relative w-full lg:max-w-sm">
@@ -189,6 +201,24 @@ export default function CorridorDirectory({
               }`}
             >
               {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by sending currency">
+          {["All", ...sendCurrencies].map((currency) => (
+            <button
+              key={currency}
+              type="button"
+              aria-pressed={sendCurrency === currency}
+              onClick={() => setSendCurrency(currency)}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium uppercase tabular-nums transition-colors duration-150 ease-out ${
+                sendCurrency === currency
+                  ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-white"
+                  : "border border-slate-200/90 bg-white text-slate-600 hover:border-emerald-400 dark:border-slate-800/80 dark:bg-slate-900/70 dark:text-slate-400 dark:hover:border-emerald-400/60"
+              }`}
+            >
+              {currency === "All" ? "All send" : currency}
             </button>
           ))}
         </div>

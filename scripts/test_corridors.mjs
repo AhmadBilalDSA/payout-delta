@@ -33,7 +33,7 @@
  * asset / link battery as the base corridors, and every long-tail slug
  * resolves against `data/fees.json` through its underlying currency corridor.
  *
- * Phase 6 also verifies ./out/leaderboard/index.html (the 50-corridor leakage
+ * Phase 6 also verifies ./out/leaderboard/index.html (the full corridor leakage
  * index) and ./out/seo_rankings.json + the footer "Ranked #1" badge wiring.
  *
  * Phase I also verifies every /embed/<slug>/ widget card exports with metadata,
@@ -105,6 +105,28 @@ const EXPECTED_SLUGS = [
   "usd-to-npr",
   "usd-to-lkr",
   "usd-to-kzt",
+  "eur-to-pkr",
+  "eur-to-inr",
+  "eur-to-php",
+  "eur-to-bdt",
+  "eur-to-ngn",
+  "eur-to-egp",
+  "eur-to-brl",
+  "eur-to-vnd",
+  "eur-to-idr",
+  "eur-to-mxn",
+  "eur-to-try",
+  "eur-to-kes",
+  "gbp-to-pkr",
+  "gbp-to-inr",
+  "gbp-to-php",
+  "gbp-to-bdt",
+  "gbp-to-ngn",
+  "gbp-to-egp",
+  "gbp-to-kes",
+  "gbp-to-zar",
+  "gbp-to-ghs",
+  "gbp-to-pln",
 ];
 
 /** Phase 4 — programmatic long-tail platform corridors (Upwork/Fiverr/Deel). */
@@ -895,7 +917,7 @@ if (leaderboard.html && !leaderboard.ldParse) {
   fail("malformed JSON-LD", "leaderboard");
 }
 if (leaderboard.html && !leaderboard.hasRows) {
-  fail("corridor rows missing", "leaderboard must rank the full 50-corridor index");
+  fail("corridor rows missing", "leaderboard must rank the full corridor index");
 }
 if (leaderboard.assetDetails && leaderboard.assetDetails.bad > 0) {
   fail("asset errors", "leaderboard");

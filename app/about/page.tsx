@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "About",
@@ -8,6 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
+  const corridorCount = getCorridors().length;
+  const platformCount = getPlatforms().length;
+  const channelCount = getChannels().length;
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -29,8 +33,9 @@ export default function AboutPage() {
         <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs dark:bg-white/[0.12]">
           data/fees.json
         </code>{" "}
-        — a versioned, machine-readable snapshot of 50 corridors, 3 client
-        platforms and 5 withdrawal channels, carrying an{" "}
+        — a versioned, machine-readable snapshot of {corridorCount} corridors
+        across USD, EUR and GBP origins, {platformCount} client platforms and{" "}
+        {channelCount} withdrawal channels, carrying an{" "}
         <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs dark:bg-white/[0.12]">
           updatedAt
         </code>{" "}

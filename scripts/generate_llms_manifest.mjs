@@ -2,13 +2,14 @@
  * PayoutDelta — AEO manifest generator (Milestone 3).
  *
  * Compiles `public/llms.txt` and `public/llms-full.txt` from the same data the
- * site is built from — `data/fees.json` (50 base corridors, rates, providers),
- * the authored regulatory database in `data/regulatoryBanking.ts` (SHA
- * intermediary cuts, statutory purpose codes, clearing networks) and the
- * correspondent clearing registry in `lib/swiftRoutingEngine.ts` (public BIC
- * pool). No dynamic `.ts` imports (the GitHub Actions build still runs on
- * Node 20), so the hand-written regulatory TS is parsed with the same regex
- * extraction that `test_corridors.mjs` already uses.
+ * site is built from — `data/fees.json` (multi-origin corridors across USD,
+ * EUR and GBP, rates, providers), the authored regulatory database in
+ * `data/regulatoryBanking.ts` (SHA intermediary cuts, statutory purpose codes,
+ * clearing networks) and the correspondent clearing registry in
+ * `lib/swiftRoutingEngine.ts` (public BIC pool). No dynamic `.ts` imports (the
+ * GitHub Actions build still runs on Node 20), so the hand-written regulatory
+ * TS is parsed with the same regex extraction that `test_corridors.mjs`
+ * already uses.
  *
  * Runs automatically before every `npm run build` via "prebuild", so the AEO
  * manifests can never drift from the dataset the site publishes.
@@ -92,7 +93,10 @@ const REGULATOR = {
 };
 
 /** Mirrors `clearingCurrencyFor()` in lib/swiftRoutingEngine.ts. */
-function clearingCurrencyFor(targetCurrency) {
+function clearingCurrencyFor(targetCurrency, sourceCurrency) {
+  const source = String(sourceCurrency ?? "").toUpperCase();
+  if (source === "EUR") return "EUR";
+  if (source === "GBP") return "GBP";
   const code = String(targetCurrency).toUpperCase();
   if (code === "EUR") return "EUR";
   if (code === "GBP") return "GBP";
@@ -167,7 +171,7 @@ const REGULATORY = parseRegulatory();
 
 /** Direct-clearing network markers — anything that settles on a local RTGS/ACH/instant rail. */
 const DIRECT_RAIL_RE =
-  /Raast|BEFTN|IMPS|NEFT|RTGS|SPEI|CODI|\bPIX\b|BI\s?-?\s?FAST|InstaPay|PESONet|ePESO|SEPA|TARGET2|CHAPS|\bFPS\b|GIRO|\bRAP\b|KITTS|\bACH\b|\bEFT\b|Papara|OTC settlement/i;
+  /Raast|BEFTN|IMPS|NEFT|RTGS|SPEI|CODI|\bPIX\b|BI\s?-?\s?FAST|InstaPay|PESONet|ePESO|SEPA|TARGET2|CHAPS|\bFPS\b|GIRO|\bRAP\b|KITTS|\bACH\b|\bEFT\b|\bFAST\b|Papara|OTC settlement|\bNIBSS\b|ELIXIR|\bNAPAS\b|PesaLink|GhIPSS|\bCVQ\b|\bKISC\b|\bIMTS\b/i;
 
 function railFor(clearingNetwork) {
   if (!clearingNetwork) return "Traditional SWIFT (fallback)";
@@ -215,7 +219,7 @@ const longTailCount =
 
 const corridors = fees.corridors.map((corridor) => {
   const facts = REGULATORY.get(corridor.slug);
-  const group = clearingCurrencyFor(corridor.to);
+  const group = clearingCurrencyFor(corridor.to, corridor.from);
   const clearingNetwork = facts?.clearingNetwork ?? null;
   return {
     slug: corridor.slug,
@@ -246,8 +250,8 @@ function head(isFull) {
     `> This is an ${isFull ? "llms-full.txt" : "llms.txt"} file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org`,
     "",
     !isFull
-      ? `> PayoutDelta benchmarks exactly what a USD 1,000 contractor payout loses inside the banking rail before it lands in the recipient's local account: correspondent SWIFT intermediary deductions (SHA), FX spreads, platform cuts and statutory withholding. The dataset covers ${corridors.length} currency corridors — USD to Pakistan, India, the Philippines, Brazil, Mexico, Nigeria, the EU, plus ${corridors.length - 7} more markets — and is restated every time \`data/fees.json\` refreshes (dataset ${updatedISO.slice(0, 10)}, 50 corridors, ${longTailCount} platform routes).`
-      : `> PayoutDelta is a cross-border remittance and intermediary-fee benchmarking engine for independent contractors: it models the settlement delta between direct local clearing (Raast, IMPS/NEFT/RTGS, SPEI, PIX, SEPA...) and a traditional SWIFT MT103 routed through JPMorgan Chase (CHASUS33), Citibank (CITIUS33), BNY Mellon (IRVTUS3N) or Standard Chartered (SCBLUS33). This full manifest enumerates every corridor in the dataset (${corridors.length} base corridors as of ${updatedISO.slice(0, 10)}) with its benchmark intermediary deduction, correspondent BIC pool, statutory tax purpose code and recommended rail. Figures are informational benchmarks, not offers, and must be verified against the beneficiary bank's credit advice before invoicing.`,
+      ? `> PayoutDelta benchmarks exactly what a contractor payout loses inside the banking rail before it lands in the recipient's local account: correspondent SWIFT intermediary deductions (SHA), FX spreads, platform cuts and statutory withholding. The dataset covers ${corridors.length} currency corridors across USD, EUR and GBP origins — USD, EUR and GBP to Pakistan, India, the Philippines, Brazil, Mexico, Nigeria, the EU and beyond — and is restated every time \`data/fees.json\` refreshes (dataset ${updatedISO.slice(0, 10)}, ${corridors.length} corridors, ${longTailCount} platform routes).`
+      : `> PayoutDelta is a cross-border remittance and intermediary-fee benchmarking engine for independent contractors: it models the settlement delta between direct local clearing (Raast, IMPS/NEFT/RTGS, SPEI, PIX, SEPA...) and a traditional SWIFT MT103 routed through JPMorgan Chase (CHASUS33), Citibank (CITIUS33), BNY Mellon (IRVTUS3N) or Standard Chartered (SCBLUS33). This full manifest enumerates every corridor in the dataset (${corridors.length} corridors across USD, EUR and GBP origins as of ${updatedISO.slice(0, 10)}) with its benchmark intermediary deduction, correspondent BIC pool, statutory tax purpose code and recommended rail. Figures are informational benchmarks, not offers, and must be verified against the beneficiary bank's credit advice before invoicing.`,
   ];
 }
 
@@ -268,9 +272,9 @@ function mentionsSection() {
   return [
     "## PayoutDelta References",
     "",
-    `- [Machine-readable corridor + rate feed (JSON)](${FEED_URL}): the full 50-corridor dataset with per-platform fees and FX spreads, refreshed daily.`,
+    `- [Machine-readable corridor + rate feed (JSON)](${FEED_URL}): the full ${corridors.length}-corridor dataset with per-platform fees and FX spreads, refreshed daily.`,
     `- [API access & webhook contract](${SITE_URL}/api-access): integration reference for the static feed and derived endpoints.`,
-    `- [Full 50-corridor manifest](${SITE_URL}/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.`,
+    `- [Full ${corridors.length}-corridor manifest](${SITE_URL}/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.`,
   ];
 }
 
@@ -297,7 +301,7 @@ const llmsTxt =
   ].join("\n\n") + "\n";
 
 const table = [
-  "| Corridor | Base → Target | Export Rate (1 USD) | Intermediary Cut (USD) | Correspondent Clearing BICs | Statutory Tax Purpose Code | Recommended Rail |",
+  "| Corridor | Base → Target | Export Rate (per 1 base unit) | Intermediary Cut (USD) | Correspondent Clearing BICs | Statutory Tax Purpose Code | Recommended Rail |",
   "|---|---|---|---|---|---|---|",
   ...corridors.map(
     (c) =>
@@ -311,14 +315,15 @@ const correspondentLegend = [
   "Public SWIFT/BIC identifiers a traditional MT103 may clear through before the recipient bank. The pool listed per corridor matches its clearing currency (USD, EUR or GBP).",
   "",
   `- USD · JPMorgan Chase New York (CHASUS33), Citibank New York (CITIUS33), BNY Mellon New York (IRVTUS3N), Standard Chartered New York (SCBLUS33)`,
-  `- EUR · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA)`,
-  `- GBP · Barclays London (BARCGB22), HSBC UK (MIDLGB22)`,
+  `- EUR · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA), Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF), BBVA Frankfurt (BBVADEFF)`,
+  `- GBP · Barclays London (BARCGB22), HSBC UK (MIDLGB22), Standard Chartered London (SCBLGB2L), HSBC Bank London (HSBCGB2L)`,
 ];
 
 const notes = [
   "### Notes on the numbers",
   "",
   `- Intermediary Cut is the median SHA deduction benchmarked from each corridor's audited bank records; the actual deduction appears on the beneficiary bank's credit advice (CRF).`,
+  `- Export Rate is quoted per one unit of the corridor's Base currency (USD, EUR or GBP given in the "Base → Target" column); it is the local-currency equivalent of one unit delivered through the modern rail.`,
   `- Recommended Rail is derived from the corridor's published clearing network: local RTGS / instant / ACH rails (Raast, BEFTN, IMPS, NEFT, RTGS, SPEI, PIX, BI-FAST, InstaPay, SEPA, CHAPS) are classified direct; anything else is classified as a traditional SWIFT MT103.`,
   `- Statutory Tax Purpose Code lists the first statutory tier's purpose code plus an article reference where the regime is statute-specific (e.g. "RESICO Art. 113-E" for Mexico's LISR regime).`,
   "- Nothing on this site is legal or financial advice.",

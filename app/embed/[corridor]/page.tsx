@@ -110,7 +110,7 @@ export default async function EmbedCorridorPage({
           <p className="text-lg font-bold tabular-nums tracking-tight">
             {activeRate.toLocaleString("en-US", { maximumFractionDigits: 4 })}{" "}
             <span className="text-[10px] font-medium text-slate-400">
-              {corridor.to} per USD
+              {corridor.to} per {corridor.from}
             </span>
           </p>
         </div>

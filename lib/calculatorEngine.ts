@@ -39,7 +39,7 @@ export interface GrossUpInput {
   platformFeePercent: number;
   /** Channel FX spread as a decimal fraction (0–1, e.g. Wise 0.0045). */
   channelSpread: number;
-  /** Corridor interbank reference rate (domestic units per USD). */
+  /** Corridor interbank reference rate (domestic units per base-currency unit). */
   baseRate: number;
   /** Channel flat clearing / withdrawal fee in USD (e.g. Wise fixed fee). */
   fixedFeeUSD: number;

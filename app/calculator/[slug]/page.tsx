@@ -283,7 +283,7 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           {corridor.rate.toLocaleString("en-US", { maximumFractionDigits: 2 })}{" "}
           {corridor.to}
         </span>{" "}
-        per USD · fee data revision {datasetRevision}.{" "}
+        per {corridor.from} · fee data revision {datasetRevision}.{" "}
         {longTail && platformPreset
           ? `${longTail.label} default (${platformPreset.feePercent}% platform cut) is pre-selected; you can switch platforms below.`
           : "Every calculation runs in your browser; nothing is tracked."}

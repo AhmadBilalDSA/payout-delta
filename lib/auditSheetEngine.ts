@@ -124,7 +124,7 @@ export function buildAuditSheet({
     },
     {
       label: "Net realized payout",
-      detail: `${quote.channelName} @ ${quote.effectiveRate.toFixed(4)} ${corridor.to} per USD`,
+      detail: `${quote.channelName} @ ${quote.effectiveRate.toFixed(4)} ${corridor.to} per ${corridor.from}`,
       value: `+ ${formatLocal(quote.localAmount, corridor)}`,
       emphasized: true,
       status: "ok",

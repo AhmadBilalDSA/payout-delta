@@ -356,8 +356,7 @@ export function buildDatasetSchema(opts: {
         name: "llms-full.txt — full corridor manifest",
         encodingFormat: "text/plain",
         contentUrl: opts.manifestUrl,
-        description:
-          "Complete 50-corridor table of intermediary cuts, correspondent clearing BICs, statutory tax purpose codes and recommended rails.",
+        description: `Complete ${dataset.corridors.length}-corridor table of intermediary cuts, correspondent clearing BICs, statutory tax purpose codes and recommended rails.`,
       },
     ],
     variableMeasured: [

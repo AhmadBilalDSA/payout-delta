@@ -11,8 +11,11 @@
  * Correspondent registry (public SWIFT/BIC identifiers, per the brief):
  *   USD  · JPMorgan Chase NY (CHASUS33), Citibank NY (CITIUS33),
  *          BNY Mellon NY (IRVTUS3N), Standard Chartered NY (SCBLUS33)
- *   EUR  · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA)
- *   GBP  · Barclays London (BARCGB22), HSBC UK (MIDLGB22)
+ *   EUR  · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA),
+ *          Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF),
+ *          BBVA Frankfurt (BBVADEFF)
+ *   GBP  · Barclays London (BARCGB22), Standard Chartered London (SCBLGB2L),
+ *          HSBC London (HSBCGB2L)
  *
  * All figures are informational benchmarks drawn from the bank records — the
  * actual deduction lands on the beneficiary bank's credit advice (CRF) and
@@ -87,6 +90,30 @@ export const CORRESPONDENT_NODES: Record<ClearingCurrency, CorrespondentNode[]> 
       currency: "EUR",
       note: "Alternate euro clearing correspondent on SEPA-adjacent corridors.",
     },
+    {
+      id: "cmzb-fra",
+      bankName: "Commerzbank",
+      city: "Frankfurt, DE",
+      bic: "COMMDEFF",
+      currency: "EUR",
+      note: "Commonly instructed euro correspondent on PKR / VND / IDR receiving banks' SEPA legs.",
+    },
+    {
+      id: "stdc-fra",
+      bankName: "Santander",
+      city: "Frankfurt, DE",
+      bic: "SANBDEFF",
+      currency: "EUR",
+      note: "Euro clearing node for Iberian-linked receiving corridors (MXN, BRL nostros).",
+    },
+    {
+      id: "bbva-fra",
+      bankName: "BBVA",
+      city: "Frankfurt, DE",
+      bic: "BBVADEFF",
+      currency: "EUR",
+      note: "Group euro correspondent binding BBVA México and Latin-American receiving banks.",
+    },
   ],
   GBP: [
     {
@@ -105,11 +132,38 @@ export const CORRESPONDENT_NODES: Record<ClearingCurrency, CorrespondentNode[]> 
       currency: "GBP",
       note: "Alternate GBP correspondent frequently instructed for CHAPS / FPS payouts.",
     },
+    {
+      id: "scb-lon",
+      bankName: "Standard Chartered",
+      city: "London, UK",
+      bic: "SCBLGB2L",
+      currency: "GBP",
+      note: "Standard Chartered group GBP correspondent binding APAC / Africa receiving banks.",
+    },
+    {
+      id: "hsbc-lon-2",
+      bankName: "HSBC Bank",
+      city: "London, UK",
+      bic: "HSBCGB2L",
+      currency: "GBP",
+      note: "Sterling clearing node frequently instructed on sterling-priced PKR / INR / GHS corridors.",
+    },
   ],
 };
 
-/** The internal group single banks route through for a given receiving currency. */
-export function clearingCurrencyFor(targetCurrency: string): ClearingCurrency {
+/**
+ * Resolves the clearing currency for a corridor, preferring the wire's base
+ * (sending) currency when it is EUR/GBP and falling back to the receiving
+ * currency for USD-based corridors (so `usd-to-eur` still clears on EUR while
+ * `eur-to-pkr` clears on EUR rather than the PKR leg).
+ */
+export function clearingCurrencyFor(
+  targetCurrency: string,
+  sourceCurrency?: string
+): ClearingCurrency {
+  const source = (sourceCurrency ?? "").toUpperCase();
+  if (source === "EUR") return "EUR";
+  if (source === "GBP") return "GBP";
   const code = targetCurrency.toUpperCase();
   if (code === "EUR") return "EUR";
   if (code === "GBP") return "GBP";
@@ -118,18 +172,31 @@ export function clearingCurrencyFor(targetCurrency: string): ClearingCurrency {
   return "USD";
 }
 
+/** Base (sending) currency derived from a corridor slug prefix, if multi-origin. */
+export function baseCurrencyFromSlug(
+  slug: string
+): ClearingCurrency | undefined {
+  if (slug.startsWith("eur-")) return "EUR";
+  if (slug.startsWith("gbp-")) return "GBP";
+  return undefined;
+}
+
 /** Default correspondent node for a corridor (first in the currency group). */
-export function primaryCorrespondent(targetCurrency: string): CorrespondentNode {
-  const group = clearingCurrencyFor(targetCurrency);
+export function primaryCorrespondent(
+  targetCurrency: string,
+  sourceCurrency?: string
+): CorrespondentNode {
+  const group = clearingCurrencyFor(targetCurrency, sourceCurrency);
   return CORRESPONDENT_NODES[group][0];
 }
 
 /** Deterministic per-bank correspondent pick (FNV-1a over id + BIC). */
 export function correspondentForBank(
   bank: RegulatoryBank,
-  targetCurrency: string
+  targetCurrency: string,
+  sourceCurrency?: string
 ): CorrespondentNode {
-  const group = clearingCurrencyFor(targetCurrency);
+  const group = clearingCurrencyFor(targetCurrency, sourceCurrency);
   const nodes = CORRESPONDENT_NODES[group];
   const seed = `${bank.id}:${bank.swiftCode}`;
   const index = fnv1a(seed) % nodes.length;
@@ -197,6 +264,7 @@ export function deriveSwiftRoute(options: {
   const regulation = getRegulatoryBanking(options.corridorSlug);
   const bank: RegulatoryBank = options.bank ?? regulation.banks[0] ?? genericBench(options.corridorSlug);
   const targetCurrency = (options.targetCurrency ?? regulation.banks[0]?.localCurrency ?? "USD").toUpperCase();
+  const sourceCurrency = baseCurrencyFromSlug(options.corridorSlug);
   const senderLabel =
     options.senderLabel ?? "Upwork / Fiverr / Direct Client Wire";
   const railName =
@@ -205,8 +273,8 @@ export function deriveSwiftRoute(options: {
 
   const correspondent =
     bank.id === "manual-wire"
-      ? primaryCorrespondent(targetCurrency)
-      : correspondentForBank(bank, targetCurrency);
+      ? primaryCorrespondent(targetCurrency, sourceCurrency)
+      : correspondentForBank(bank, targetCurrency, sourceCurrency);
 
   const deduction = deductionBand(bank);
   const speed = speedBenchmark(bank);
@@ -220,7 +288,7 @@ export function deriveSwiftRoute(options: {
   return {
     corridorSlug: options.corridorSlug,
     targetCurrency,
-    clearingCurrency: clearingCurrencyFor(targetCurrency),
+    clearingCurrency: clearingCurrencyFor(targetCurrency, sourceCurrency),
     senderLabel,
     correspondent,
     beneficiaryBank: bank,

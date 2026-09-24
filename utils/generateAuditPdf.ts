@@ -81,7 +81,7 @@ export function buildAuditReceipt({
       },
       {
         label: "Net domestic deposit",
-        detail: `${quote.channelName} @ ${quote.effectiveRate.toFixed(4)} ${corridor.to} per USD`,
+        detail: `${quote.channelName} @ ${quote.effectiveRate.toFixed(4)} ${corridor.to} per ${corridor.from}`,
         value: `+ ${formatLocal(quote.localAmount, corridor)}`,
         emphasized: true,
       },

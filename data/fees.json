@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-23T21:00:00Z",
-  "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per USD corridor.",
+  "updatedAt": "2026-09-24T00:00:00Z",
+  "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per payout corridor (USD, EUR and GBP base rails).",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
     "base": "USD",
@@ -694,6 +694,336 @@
         { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.65, "fxSpread": 0.0045 },
         { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
         { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.022 }
+      ]
+    },
+    {
+      "slug": "eur-to-pkr",
+      "from": "EUR",
+      "to": "PKR",
+      "rate": 300.0,
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "currencyName": "Pakistani Rupee",
+      "currencySymbol": "Rs",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.4, "fxSpread": 0.004 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 22, "fxSpread": 0.03 }
+      ]
+    },
+    {
+      "slug": "eur-to-inr",
+      "from": "EUR",
+      "to": "INR",
+      "rate": 91.0,
+      "country": "India",
+      "countryCode": "IN",
+      "currencyName": "Indian Rupee",
+      "currencySymbol": "₹",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.3, "fxSpread": 0.0035 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.018 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.029 }
+      ]
+    },
+    {
+      "slug": "eur-to-php",
+      "from": "EUR",
+      "to": "PHP",
+      "rate": 61.0,
+      "country": "Philippines",
+      "countryCode": "PH",
+      "currencyName": "Philippine Peso",
+      "currencySymbol": "₱",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.5, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0195 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 24, "fxSpread": 0.031 }
+      ]
+    },
+    {
+      "slug": "eur-to-bdt",
+      "from": "EUR",
+      "to": "BDT",
+      "rate": 131.0,
+      "country": "Bangladesh",
+      "countryCode": "BD",
+      "currencyName": "Bangladeshi Taka",
+      "currencySymbol": "৳",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.1, "fxSpread": 0.005 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0195 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 25, "fxSpread": 0.032 }
+      ]
+    },
+    {
+      "slug": "eur-to-ngn",
+      "from": "EUR",
+      "to": "NGN",
+      "rate": 1750.0,
+      "country": "Nigeria",
+      "countryCode": "NG",
+      "currencyName": "Nigerian Naira",
+      "currencySymbol": "₦",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.4, "fxSpread": 0.0055 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.021 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 28, "fxSpread": 0.033 }
+      ]
+    },
+    {
+      "slug": "eur-to-egp",
+      "from": "EUR",
+      "to": "EGP",
+      "rate": 52.5,
+      "country": "Egypt",
+      "countryCode": "EG",
+      "currencyName": "Egyptian Pound",
+      "currencySymbol": "E£",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.7, "fxSpread": 0.005 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 23, "fxSpread": 0.03 }
+      ]
+    },
+    {
+      "slug": "eur-to-brl",
+      "from": "EUR",
+      "to": "BRL",
+      "rate": 6.0,
+      "country": "Brazil",
+      "countryCode": "BR",
+      "currencyName": "Brazilian Real",
+      "currencySymbol": "R$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.9, "fxSpread": 0.0048 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 26, "fxSpread": 0.032 }
+      ]
+    },
+    {
+      "slug": "eur-to-vnd",
+      "from": "EUR",
+      "to": "VND",
+      "rate": 27000.0,
+      "country": "Vietnam",
+      "countryCode": "VN",
+      "currencyName": "Vietnamese Dong",
+      "currencySymbol": "₫",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.2, "fxSpread": 0.0038 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0185 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 19, "fxSpread": 0.028 }
+      ]
+    },
+    {
+      "slug": "eur-to-idr",
+      "from": "EUR",
+      "to": "IDR",
+      "rate": 17200.0,
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "currencyName": "Indonesian Rupiah",
+      "currencySymbol": "Rp",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.6, "fxSpread": 0.0044 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 21, "fxSpread": 0.029 }
+      ]
+    },
+    {
+      "slug": "eur-to-mxn",
+      "from": "EUR",
+      "to": "MXN",
+      "rate": 21.5,
+      "country": "Mexico",
+      "countryCode": "MX",
+      "currencyName": "Mexican Peso",
+      "currencySymbol": "Mex$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.0, "fxSpread": 0.0052 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0205 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 25, "fxSpread": 0.031 }
+      ]
+    },
+    {
+      "slug": "eur-to-try",
+      "from": "EUR",
+      "to": "TRY",
+      "rate": 37.5,
+      "country": "Turkey",
+      "countryCode": "TR",
+      "currencyName": "Turkish Lira",
+      "currencySymbol": "₺",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.8, "fxSpread": 0.0056 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0215 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 27, "fxSpread": 0.033 }
+      ]
+    },
+    {
+      "slug": "eur-to-kes",
+      "from": "EUR",
+      "to": "KES",
+      "rate": 141.0,
+      "country": "Kenya",
+      "countryCode": "KE",
+      "currencyName": "Kenyan Shilling",
+      "currencySymbol": "KSh",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.2, "fxSpread": 0.0054 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.021 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 26, "fxSpread": 0.032 }
+      ]
+    },
+    {
+      "slug": "gbp-to-pkr",
+      "from": "GBP",
+      "to": "PKR",
+      "rate": 355.0,
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "currencyName": "Pakistani Rupee",
+      "currencySymbol": "Rs",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.5, "fxSpread": 0.004 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 22, "fxSpread": 0.03 }
+      ]
+    },
+    {
+      "slug": "gbp-to-inr",
+      "from": "GBP",
+      "to": "INR",
+      "rate": 108.0,
+      "country": "India",
+      "countryCode": "IN",
+      "currencyName": "Indian Rupee",
+      "currencySymbol": "₹",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.35, "fxSpread": 0.0035 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.018 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 20, "fxSpread": 0.029 }
+      ]
+    },
+    {
+      "slug": "gbp-to-php",
+      "from": "GBP",
+      "to": "PHP",
+      "rate": 72.0,
+      "country": "Philippines",
+      "countryCode": "PH",
+      "currencyName": "Philippine Peso",
+      "currencySymbol": "₱",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.55, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0195 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 24, "fxSpread": 0.031 }
+      ]
+    },
+    {
+      "slug": "gbp-to-bdt",
+      "from": "GBP",
+      "to": "BDT",
+      "rate": 155.0,
+      "country": "Bangladesh",
+      "countryCode": "BD",
+      "currencyName": "Bangladeshi Taka",
+      "currencySymbol": "৳",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.15, "fxSpread": 0.005 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0195 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 25, "fxSpread": 0.032 }
+      ]
+    },
+    {
+      "slug": "gbp-to-ngn",
+      "from": "GBP",
+      "to": "NGN",
+      "rate": 2070.0,
+      "country": "Nigeria",
+      "countryCode": "NG",
+      "currencyName": "Nigerian Naira",
+      "currencySymbol": "₦",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.45, "fxSpread": 0.0055 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.021 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 28, "fxSpread": 0.033 }
+      ]
+    },
+    {
+      "slug": "gbp-to-egp",
+      "from": "GBP",
+      "to": "EGP",
+      "rate": 62.0,
+      "country": "Egypt",
+      "countryCode": "EG",
+      "currencyName": "Egyptian Pound",
+      "currencySymbol": "E£",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.72, "fxSpread": 0.005 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 23, "fxSpread": 0.03 }
+      ]
+    },
+    {
+      "slug": "gbp-to-kes",
+      "from": "GBP",
+      "to": "KES",
+      "rate": 167.0,
+      "country": "Kenya",
+      "countryCode": "KE",
+      "currencyName": "Kenyan Shilling",
+      "currencySymbol": "KSh",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.25, "fxSpread": 0.0054 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.021 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 26, "fxSpread": 0.032 }
+      ]
+    },
+    {
+      "slug": "gbp-to-zar",
+      "from": "GBP",
+      "to": "ZAR",
+      "rate": 23.5,
+      "country": "South Africa",
+      "countryCode": "ZA",
+      "currencyName": "South African Rand",
+      "currencySymbol": "R",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.6, "fxSpread": 0.0046 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 24, "fxSpread": 0.031 }
+      ]
+    },
+    {
+      "slug": "gbp-to-ghs",
+      "from": "GBP",
+      "to": "GHS",
+      "rate": 20.5,
+      "country": "Ghana",
+      "countryCode": "GH",
+      "currencyName": "Ghanaian Cedi",
+      "currencySymbol": "GH₵",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 2.3, "fxSpread": 0.0056 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0215 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 27, "fxSpread": 0.033 }
+      ]
+    },
+    {
+      "slug": "gbp-to-pln",
+      "from": "GBP",
+      "to": "PLN",
+      "rate": 5.10,
+      "country": "Poland",
+      "countryCode": "PL",
+      "currencyName": "Polish Zloty",
+      "currencySymbol": "zł",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.85, "fxSpread": 0.0028 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.017 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.026 }
       ]
     }
   ]

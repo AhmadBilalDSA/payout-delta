@@ -9,10 +9,11 @@ import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { quoteAllChannels } from "@/utils/calculateRoute";
 import { SITE_URL } from "@/lib/seoSchemas";
 
+const CORRIDOR_MARKET_COUNT = getCorridors().length;
+
 export const metadata: Metadata = {
   title: "The Global Cross-Border Banking Leakage Index (2026)",
-  description:
-    "Comparing traditional correspondent wire deductions and hidden exchange rate markups across 50 international contractor markets.",
+  description: `Comparing traditional correspondent wire deductions and hidden exchange rate markups across ${CORRIDOR_MARKET_COUNT} international contractor markets.`,
   alternates: {
     canonical: "/leaderboard/",
   },
@@ -21,8 +22,7 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/leaderboard/`,
     siteName: "PayoutDelta",
     title: "The Global Cross-Border Banking Leakage Index (2026)",
-    description:
-      "Ranking 50 contractor markets by the hidden bank wire penalty and FX markup — and what modern digital rails save you on each.",
+    description: `Ranking ${CORRIDOR_MARKET_COUNT} contractor markets by the hidden bank wire penalty and FX markup — and what modern digital rails save you on each.`,
   },
 };
 
@@ -33,8 +33,7 @@ const webApplicationLd = {
   operatingSystem: "Web (React, static export)",
   applicationCategory: "FinanceApplication",
   url: `${SITE_URL}/leaderboard/`,
-  description:
-    "Ranked comparison of typical traditional-bank wire deductions and hidden FX markups across 50 international contractor markets, with the best digital rail and savings percentage per corridor.",
+  description: `Ranked comparison of typical traditional-bank wire deductions and hidden FX markups across ${CORRIDOR_MARKET_COUNT} international contractor markets, with the best digital rail and savings percentage per corridor.`,
   offers: {
     "@type": "Offer",
     price: "0",
@@ -221,7 +220,7 @@ export default function LeaderboardPage() {
       />
 
       <p className="text-sm font-medium text-slate-500 dark:text-white/50">
-        Leakage index · 50 international contractor markets ·{" "}
+        Leakage index · {CORRIDOR_MARKET_COUNT} international contractor markets ·{" "}
         {rows.length} corridors ranked
       </p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
@@ -229,7 +228,8 @@ export default function LeaderboardPage() {
       </h1>
       <p className="mt-2 max-w-3xl leading-relaxed text-slate-600 dark:text-white/60">
         Comparing traditional correspondent wire deductions and hidden exchange
-        rate markups across 50 international contractor markets.
+        rate markups across {CORRIDOR_MARKET_COUNT} international contractor
+        markets.
       </p>
 
       <div className="mt-6 flex w-full min-w-0 flex-col gap-4 sm:flex-row">
