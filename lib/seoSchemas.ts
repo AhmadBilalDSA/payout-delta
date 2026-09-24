@@ -299,6 +299,59 @@ export function buildAeoFaqSchema(
 }
 
 /**
+ * Article / TechArticle — the Schema.org entity every editorial comparison
+ * guide on `/compare/<slug>/` emits. Disambiguates the article (headline,
+ * description, publication timeline, section) and tags a single author +
+ * publisher URL, so search engines can attribute the guide instead of treating
+ * it as interchangeable landing-page copy. `isTechArticle` selects the
+ * TechArticle subtype used by the wire-engineering comparisons (SWIFT
+ * instruction engineering); plain Article covers the broader cost-reckoning
+ * guides.
+ */
+export function buildArticleSchema(opts: {
+  title: string;
+  description: string;
+  url: string;
+  publishedAt: string;
+  updatedAt: string;
+  wordCount?: number;
+  articleSection?: string;
+  isTechArticle?: boolean;
+}): JsonLdBlock {
+  const block: JsonLdBlock = {
+    "@type": opts.isTechArticle ? "TechArticle" : "Article",
+    headline: opts.title,
+    description: opts.description,
+    url: opts.url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": opts.url },
+    datePublished: opts.publishedAt,
+    dateModified: opts.updatedAt,
+    inLanguage: "en-US",
+    author: {
+      "@type": "Organization",
+      name: "PayoutDelta",
+      url: `${SITE_URL}/`,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "PayoutDelta",
+      url: `${SITE_URL}/`,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/favicon.ico`,
+      },
+    },
+  };
+  if (opts.wordCount && opts.wordCount > 0) {
+    block.wordCount = opts.wordCount;
+  }
+  if (opts.articleSection) {
+    block.articleSection = opts.articleSection;
+  }
+  return block;
+}
+
+/**
  * Dataset — the Developer Data Hub's canonical schema.org entity. Documents
  * the open cross-border banking & remittance dataset as free, MIT-licensed
  * open data with a pinned publisher and two machine-readable distributions

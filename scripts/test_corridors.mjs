@@ -698,6 +698,194 @@ console.log(
   }`
 );
 
+/**
+ * Milestone 9 — editorial comparison guide audit. Verifies the /compare hub
+ * and every guide route: exported HTML, non-empty metadata, an Article or
+ * TechArticle in the JSON-LD, a sponsor-compliant CTA
+ * (`rel="noopener noreferrer sponsored"`), a backlink to the hub, and the
+ * standard basePath asset/link battery. LENIENT by design: when ./out/compare
+ * does not exist (a stale or unbuilt ./out), the audit reports SKIPPED and
+ * contributes zero failures, so the gate never hard-fails a developer loop
+ * that has not rebuilt since the milestone landed.
+ */
+const EXPECTED_COMPARE_SLUGS = [
+  "swift-wire-vs-wise-business",
+  "sha-vs-our-swift-charges",
+  "direct-bank-wire-vs-payoneer",
+];
+
+function auditCompareHub() {
+  const htmlFile = join(OUT, "compare", "index.html");
+  const row = { slug: "compare" };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.metadata = false;
+    row.schema = false;
+    row.assets = false;
+    row.guideLinks = [];
+    row.links = { total: 0, bad: 0 };
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const titleOk = /<title[^>]*>[^<]*(Comparison Guides|Comparison)/i.test(html);
+  const descriptionTag =
+    html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
+  const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
+  const schemaTypes = collectTypes(html);
+  row.schema =
+    schemaTypes.has("BreadcrumbList") && schemaTypes.has("ItemList");
+  row.missingSchema = ["BreadcrumbList", "ItemList"].filter(
+    (t) => !schemaTypes.has(t)
+  );
+  row.guideLinks = EXPECTED_COMPARE_SLUGS.filter(
+    (slug) => !html.includes(`/compare/${slug}/`)
+  );
+  row.metadata = titleOk && descriptionOk && row.schema;
+
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
+function auditCompareGuide(slug) {
+  const htmlFile = join(OUT, "compare", slug, "index.html");
+  const row = { slug: `compare/${slug}` };
+
+  if (!existsSync(htmlFile)) {
+    row.html = false;
+    row.metadata = false;
+    row.schema = false;
+    row.sponsored = false;
+    row.backlink = false;
+    row.assets = false;
+    row.links = { total: 0, bad: 0 };
+    return row;
+  }
+  row.html = true;
+
+  const html = readFileSync(htmlFile, "utf8");
+  const titleOk = /<title[^>]*>[^<]{20,}/i.test(html);
+  const descriptionTag =
+    html.match(/<meta[^>]*name=["']description["'][^>]*>/i)?.[0] ?? "";
+  const descriptionOk = /content=["'][^"']{20,}["']/i.test(descriptionTag);
+  const schemaTypes = collectTypes(html);
+  row.schema =
+    schemaTypes.has("BreadcrumbList") &&
+    (schemaTypes.has("Article") || schemaTypes.has("TechArticle"));
+  row.missingSchema = ["BreadcrumbList"].filter((t) => !schemaTypes.has(t));
+  if (!schemaTypes.has("Article") && !schemaTypes.has("TechArticle")) {
+    row.missingSchema.push("Article|TechArticle");
+  }
+  row.sponsored = html.includes('rel="noopener noreferrer sponsored"');
+  row.backlink = html.includes("href=\"/payout-delta/compare/\"");
+  row.metadata = titleOk && descriptionOk;
+
+  const { blocks, broken } = countBrokenLdBlocks(html);
+  row.ldBlocks = blocks;
+  row.ldParse = broken === 0;
+
+  const { checked, bad } = verifyAssets(html);
+  row.assets = checked > 0 && bad === 0;
+  row.assetDetails = { checked, bad };
+
+  row.links = verifyInternalLinks(html);
+  return row;
+}
+
+console.log("\nEditorial comparison guides audit (Milestone 9):");
+const outCompareExists = existsSync(join(OUT, "compare"));
+let compareFailures = 0;
+if (!outCompareExists) {
+  console.log(
+    "  SKIPPED — ./out/compare missing (rebuild with `npm run build` before this milestone gate can audit the guides)"
+  );
+  compareFailures = 0;
+} else {
+  const hub = auditCompareHub();
+  if (!hub.html) {
+    compareFailures += 1;
+    fail("compare hub not exported", "compare/index.html");
+  }
+  if (hub.html && !hub.metadata) {
+    compareFailures += 1;
+    fail("compare hub metadata/schema missing", `requires BreadcrumbList + ItemList: ${(hub.missingSchema ?? []).join(", ")}`);
+  }
+  if (hub.html && !hub.ldParse) {
+    compareFailures += 1;
+    fail("compare hub malformed JSON-LD", "compare");
+  }
+  if (hub.guideLinks && hub.guideLinks.length > 0) {
+    compareFailures += 1;
+    fail("compare hub missing guide links", hub.guideLinks.join(", "));
+  }
+  if (hub.assetDetails && hub.assetDetails.bad > 0) {
+    compareFailures += 1;
+    fail("compare hub asset errors", "compare");
+  }
+  if (hub.links && hub.links.bad > 0) {
+    compareFailures += 1;
+    fail("compare hub links broken", "compare");
+  }
+  console.log(
+    `  ${`compare/index.html`.padEnd(38)}${hub.html ? (hub.metadata && hub.guideLinks.length === 0 ? "PASS" : "FAIL") : "n/a"} · ${hub.assetDetails ? hub.assetDetails.checked : 0} assets · ${hub.links ? hub.links.total : 0} links`
+  );
+
+  for (const slug of EXPECTED_COMPARE_SLUGS) {
+    const guide = auditCompareGuide(slug);
+    const detail = guide.html
+      ? `${guide.metadata ? "PASS" : "FAIL"} metadata · ${guide.schema ? "PASS" : "FAIL"} Article/TechArticle · ${guide.sponsored ? "PASS" : "FAIL"} sponsored CTA · ${guide.backlink ? "PASS" : "FAIL"} hub backlink · ${guide.assetDetails ? `${guide.assetDetails.checked} assets` : "-"} · ${guide.links ? `${guide.links.total} links` : "-"}`
+      : "page not exported";
+    console.log(`  ${`compare/${slug}/index.html`.padEnd(38)}${detail}`);
+    if (!guide.html) {
+      compareFailures += 1;
+      fail("guide not exported", `compare/${slug}/index.html`);
+    }
+    if (guide.html && !guide.metadata) {
+      compareFailures += 1;
+      fail("guide metadata missing", `compare/${slug}: title + description required`);
+    }
+    if (guide.html && !guide.schema) {
+      compareFailures += 1;
+      fail("guide schema missing", `compare/${slug}: requires ${(guide.missingSchema ?? []).join(", ")}`);
+    }
+    if (guide.html && !guide.ldParse) {
+      compareFailures += 1;
+      fail("guide malformed JSON-LD", `compare/${slug}`);
+    }
+    if (guide.html && guide.sponsored === false) {
+      compareFailures += 1;
+      fail("sponsored CTA missing", `compare/${slug}: rel='noopener noreferrer sponsored' absent`);
+    }
+    if (guide.html && guide.backlink === false) {
+      compareFailures += 1;
+      fail("hub backlink missing", `compare/${slug}: /compare/ not linked`);
+    }
+    if (guide.assetDetails && guide.assetDetails.bad > 0) {
+      compareFailures += 1;
+      fail("guide asset errors", `compare/${slug}`);
+    }
+    if (guide.links && guide.links.bad > 0) {
+      compareFailures += 1;
+      fail("guide links broken", `compare/${slug}`);
+    }
+  }
+}
+if (outCompareExists && compareFailures === 0) {
+  console.log(
+    `\nEditorial comparison guides: PASS — hub + ${EXPECTED_COMPARE_SLUGS.length} guides audited`
+  );
+}
+
 console.log("\nLocalized sub-path audit (Phase 5):");
 const localizedRows = EXPECTED_LOCALIZED.map(({ lang, slug, dir }) =>
   auditLocalized(lang, slug, dir)
@@ -1443,11 +1631,11 @@ console.log(
 );
 
 console.log(`\n${"-".repeat(header.length)}`);
-console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index + ${embedRows.length} embed widgets`);
+console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index + ${embedRows.length} embed widgets + ${outCompareExists ? EXPECTED_COMPARE_SLUGS.length + 1 : "skipped (unbuilt ./out)"} compare routes`);
 console.log(`  assets verified          ${assetTotal + localizedAssetTotal + (invoice.assetDetails ? invoice.assetDetails.checked : 0) + (taxLedger.assetDetails ? taxLedger.assetDetails.checked : 0) + (leaderboard.assetDetails ? leaderboard.assetDetails.checked : 0) + embedRows.reduce((sum, r) => sum + (r.assetDetails ? r.assetDetails.checked : 0), 0)}`);
 console.log(`  internal links verified  ${linkTotal + localizedLinkTotal + (invoice.links ? invoice.links.total : 0) + (taxLedger.links ? taxLedger.links.total : 0) + (leaderboard.links ? leaderboard.links.total : 0) + embedRows.reduce((sum, r) => sum + (r.links ? r.links.total : 0), 0)}`);
 console.log(`  JSON-LD blocks scanned   ${ldScanned}`);
-console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures + leaderboardFailures + embedFailures}`);
+console.log(`  failures                 ${failures + globalBad + pageFailures + linkFailures + invoiceFailures + localizedFailures + hreflangFailures + taxLedgerFailures + leaderboardFailures + embedFailures + compareFailures}`);
 
 const ok =
   failures === 0 &&
@@ -1459,7 +1647,8 @@ const ok =
   hreflangFailures === 0 &&
   taxLedgerFailures === 0 &&
   leaderboardFailures === 0 &&
-  embedFailures === 0;
+  embedFailures === 0 &&
+  compareFailures === 0;
 if (ok) {
   console.log("\n  ALL CHECKS PASSED\n");
   process.exit(0);

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getCorridorSlugs } from "@/lib/db";
 import { LONG_TAIL_CORRIDORS } from "@/data/corridors";
+import { EDITORIAL_GUIDES } from "@/data/editorialGuides";
 import { LOCALIZED_CORRIDORS } from "@/lib/localizedCorridors";
 import { SITE_URL } from "@/lib/seoSchemas";
 
@@ -45,6 +46,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: LAST_MODIFIED,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${SITE_URL}/compare/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${SITE_URL}/about/`,
@@ -114,5 +121,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...staticEntries, ...corridorEntries, ...embedEntries, ...localizedEntries];
+  const compareGuideEntries: MetadataRoute.Sitemap = EDITORIAL_GUIDES.map(
+    (guide) => ({
+      url: `${SITE_URL}/compare/${guide.slug}/`,
+      lastModified: new Date(guide.updatedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }),
+  );
+
+  return [
+    ...staticEntries,
+    ...compareGuideEntries,
+    ...corridorEntries,
+    ...embedEntries,
+    ...localizedEntries,
+  ];
 }

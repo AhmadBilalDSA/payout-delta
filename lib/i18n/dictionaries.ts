@@ -62,6 +62,7 @@ export const enStrings = {
   openDataset: "Open dataset",
   apiAccess: "API Access",
   developers: "Developers",
+  compare: "Compare",
   theme: "Theme",
   clientSideBadge: "100% Client-Side · Private",
 
@@ -327,6 +328,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       openDataset: "ڈیٹاسیٹ کھولیں",
       apiAccess: "API تک رسائی",
       developers: "ڈیویلپرز",
+      compare: "موازنہ",
       theme: "تھیم",
       clientSideBadge: "100% کلائنٹ سائیڈ · پرائیویٹ",
 
@@ -574,6 +576,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       openDataset: "डेटासेट खोलें",
       apiAccess: "API एक्सेस",
       developers: "डेवलपर्स",
+      compare: "तुलना",
       theme: "थीम",
       clientSideBadge: "100% क्लाइंट-साइड · प्राइवेट",
 
@@ -820,6 +823,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       openDataset: "Buksan ang dataset",
       apiAccess: "API Access",
       developers: "Mga Developer",
+      compare: "Ihambing",
       theme: "Tema",
       clientSideBadge: "100% Client-Side · Pribado",
 
@@ -1068,6 +1072,7 @@ swiftBic: "SWIFT / BIC code",
       openDataset: "Abrir dataset",
       apiAccess: "Acceso a la API",
       developers: "Desarrolladores",
+      compare: "Comparar",
       theme: "Tema",
       clientSideBadge: "100% en el cliente · Privado",
 
@@ -1316,6 +1321,7 @@ swiftBic: "SWIFT / BIC code",
       openDataset: "Abrir dataset",
       apiAccess: "Acesso à API",
       developers: "Desenvolvedores",
+      compare: "Comparar",
       theme: "Tema",
       clientSideBadge: "100% no cliente · Privado",
 
@@ -1564,6 +1570,7 @@ swiftBic: "SWIFT / BIC code",
       openDataset: "فتح مجموعة البيانات",
       apiAccess: "الوصول إلى API",
       developers: "المطوّرون",
+      compare: "قارن",
       theme: "المظهر",
       clientSideBadge: "100% على جهاز العميل · خصوصية",
 

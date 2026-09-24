@@ -17,6 +17,7 @@ const PRODUCT_LINKS: readonly FooterLink[] = [
   { label: "Invoice Studio", href: "/invoice/" },
   { label: "API Stubs", href: "/about" },
   { label: "Rate Drops", href: "/about" },
+  { label: "Comparison Guides", href: "/compare/" },
 ] as const;
 
 const LEGAL_LINKS: readonly FooterLink[] = [
