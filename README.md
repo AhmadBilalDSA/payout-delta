@@ -402,7 +402,7 @@ purpose code, direct-vs-SWIFT recommended rail) are compiled automatically by
 `data/fees.json` + `data/regulatoryBanking.ts` + `lib/swiftRoutingEngine.ts`
 with Node-20-safe regex extraction, so the manifests can never drift from the
 data the site serves. `scripts/ping_indexnow.mjs` (`npm run indexnow`) is the
-offline-safe deploy-time IndexNow notification for all **153 canonical routes**
+offline-safe deploy-time IndexNow notification for all **204 canonical routes**
 (`https://payoutdelta.com/...`) — key verification lives at
 [`public/indexnow-key.txt`](public/indexnow-key.txt) /
 [`public/72dac6815d6f33c974d9fe3546bd3daa.txt`](public/72dac6815d6f33c974d9fe3546bd3daa.txt).

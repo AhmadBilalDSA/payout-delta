@@ -34,15 +34,23 @@ export async function generateMetadata({
   }
   const title = `${corridor.from} → ${corridor.to} live payout widget`;
   const description = `Embeddable PayoutDelta ${corridor.from} to ${corridor.to} payout widget: active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice.`;
+  const ogDescription = `Benchmark SWIFT intermediary deductions (CHASUS33/CITIUS33), retail FX spreads, and tax purpose codes for ${corridor.from} to ${corridor.to} on PayoutDelta.`;
   return {
     title,
     description,
     alternates: { canonical: `${SITE_URL}/embed/${slug}/` },
     openGraph: {
       type: "website",
+      siteName: "PayoutDelta",
       url: `${SITE_URL}/embed/${slug}/`,
       title,
-      description,
+      description: ogDescription,
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: ogDescription,
     },
   };
 }

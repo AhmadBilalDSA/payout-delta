@@ -6,9 +6,10 @@
  * static export changed, so the fresh pages get re-crawled promptly instead of
  * waiting for the next natural discovery cycle. The URL list is derived from
  * the same sources of truth the site builds from — `data/fees.json` base
- * corridors, `data/corridors.ts` programmatic long-tail routes and the
- * documented localized sub-paths — so the ping can never drift from the routes
- * that actually exist.
+ * corridors (which also back the 50 `/embed/<slug>/` widget routes),
+ * `data/corridors.ts` programmatic long-tail routes and the documented
+ * localized sub-paths — so the ping can never drift from the routes that
+ * actually exist.
  *
  * The host is resolved to the ACTIVE deployment: by default GitHub Pages at
  * `ahmadbilaldsa.github.io/payout-delta` (matching `basePath: "/payout-delta"`
@@ -77,20 +78,23 @@ const LOCALIZED = [
   ["pt", "usd-to-brl"],
 ];
 
-/** All static-export paths, exactly as the build emits them (154 URLs today). */
+/** All static-export paths, exactly as the build emits them (204 URLs today). */
 function derivePaths() {
   const fees = JSON.parse(readFileSync(join(ROOT, "data", "fees.json"), "utf8"));
   const corridorsSource = readFileSync(join(ROOT, "data", "corridors.ts"), "utf8");
   const longTailSlugs = [
     ...corridorsSource.matchAll(/slug:\s*"([a-z0-9-]+)"/g),
   ].map((match) => match[1]);
+  const baseSlugs = fees.corridors.map((corridor) => corridor.slug);
   const corridorPaths = [
-    ...fees.corridors.map((corridor) => `/calculator/${corridor.slug}/`),
+    ...baseSlugs.map((slug) => `/calculator/${slug}/`),
     ...longTailSlugs.map((slug) => `/calculator/${slug}/`),
   ];
+  const embedPaths = baseSlugs.map((slug) => `/embed/${slug}/`);
   return [
     ...STATIC_PATHS,
     ...corridorPaths,
+    ...embedPaths,
     ...LOCALIZED.map(([lang, slug]) => `/${lang}/calculator/${slug}/`),
   ];
 }

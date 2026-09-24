@@ -80,6 +80,7 @@ export async function generateMetadata({
   if (longTail) {
     const title = `${longTail.label} ${parsed.sourceCurrency} to ${parsed.targetCurrency} Payout Calculator — Real Bank Deductions & Net Take-Home`;
     const description = `Calculate exact net ${parsed.targetCurrency} payout from ${longTail.label}. Audits ${longTail.label} fee, intermediary SWIFT cuts, local bank landing charges, and statutory tax withholding.`;
+    const ogDescription = `Benchmark SWIFT intermediary deductions (CHASUS33/CITIUS33), retail FX spreads, and tax purpose codes for ${longTail.label} ${parsed.sourceCurrency} to ${parsed.targetCurrency} on PayoutDelta.`;
     return {
       title,
       description,
@@ -88,14 +89,22 @@ export async function generateMetadata({
       },
       openGraph: {
         type: "website",
+        siteName: "PayoutDelta",
         url: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
         title,
-        description,
+        description: ogDescription,
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description: ogDescription,
       },
     };
   }
 
   const content = getCorridorContent(corridor.slug);
+  const ogDescription = `Benchmark SWIFT intermediary deductions (CHASUS33/CITIUS33), retail FX spreads, and tax purpose codes for ${corridor.from} to ${corridor.to} on PayoutDelta.`;
   return {
     title: `${corridor.from} to ${corridor.to} — Payout Fee Audit (${corridor.country})`,
     description: `${content.overview.slice(0, 150)}`,
@@ -105,9 +114,16 @@ export async function generateMetadata({
     },
     openGraph: {
       type: "website",
+      siteName: "PayoutDelta",
       url: `${SITE_URL}/calculator/${corridor.slug}/`,
       title: `${corridor.from}→${corridor.to} payout fee audit`,
-      description: content.overview.slice(0, 150),
+      description: ogDescription,
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${corridor.from}→${corridor.to} payout fee audit`,
+      description: ogDescription,
     },
   };
 }
