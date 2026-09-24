@@ -1,0 +1,29 @@
+# PayoutDelta - Cross-Border Remittance & Intermediary Fee Benchmark
+
+> This is an llms.txt file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org
+
+> PayoutDelta benchmarks exactly what a USD 1,000 contractor payout loses inside the banking rail before it lands in the recipient's local account: correspondent SWIFT intermediary deductions (SHA), FX spreads, platform cuts and statutory withholding. The dataset covers 50 currency corridors — USD to Pakistan, India, the Philippines, Brazil, Mexico, Nigeria, the EU, plus 43 more markets — and is restated every time `data/fees.json` refreshes (dataset 2026-09-23, 50 corridors, 87 platform routes).
+
+## PayoutDelta Guides
+
+- [Rate Leaderboard](https://payoutdelta.com/leaderboard): ranks all 50 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Payout Calculator](https://payoutdelta.com/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 87 long-tail routes.
+- [Invoice Studio](https://payoutdelta.com/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
+- [Regulatory / Tax Ledger](https://payoutdelta.com/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
+- [SWIFT Auditor](https://payoutdelta.com/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
+
+## PayoutDelta References
+
+- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 50-corridor dataset with per-platform fees and FX spreads, refreshed daily.
+- [API access & webhook contract](https://payoutdelta.com/api-access): integration reference for the static feed and derived endpoints.
+- [Full 50-corridor manifest](https://payoutdelta.com/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+
+## PayoutDelta Legal
+
+- [Terms of Service](https://payoutdelta.com/terms-of-service)
+- [Privacy Policy](https://payoutdelta.com/privacy-policy)
+- [Disclaimer](https://payoutdelta.com/disclaimer)
+
+## Contact
+
+- [Contact](https://payoutdelta.com/contact)

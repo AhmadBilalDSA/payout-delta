@@ -379,6 +379,21 @@ obsidian dark deck, unified every translucent card backdrop across the
 calculator rails, and rebalanced the header (emerald live-badge, ghost nav,
 API Access pill).
 
+### 🤖 llms.txt Manifests & IndexNow Ping (AEO/LLM-Agents)
+Two static, machine-readable discovery surfaces keep the site visible to LLM
+agents and search crawlers. `public/llms.txt` (intro + Guides/References/Legal
+links) and `public/llms-full.txt` (the full **50-corridor benchmark table**:
+slug → rate, SHA intermediary cut, correspondent clearing BICs, statutory tax
+purpose code, direct-vs-SWIFT recommended rail) are compiled automatically by
+`scripts/generate_llms_manifest.mjs` on every `npm run build` — parsed from
+`data/fees.json` + `data/regulatoryBanking.ts` + `lib/swiftRoutingEngine.ts`
+with Node-20-safe regex extraction, so the manifests can never drift from the
+data the site serves. `scripts/ping_indexnow.mjs` (`npm run indexnow`) is the
+offline-safe deploy-time IndexNow notification for all **153 canonical routes**
+(`https://payoutdelta.com/...`) — key verification lives at
+[`public/indexnow-key.txt`](public/indexnow-key.txt) /
+[`public/72dac6815d6f33c974d9fe3546bd3daa.txt`](public/72dac6815d6f33c974d9fe3546bd3daa.txt).
+
 ---
 
 ## Who it's for

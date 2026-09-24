@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/sync_api_feed.mjs",
+    "prebuild": "node scripts/sync_api_feed.mjs && node scripts/generate_llms_manifest.mjs",
     "build": "next build",
     "start": "next start",
+    "indexnow": "node scripts/ping_indexnow.mjs",
     "lint": "eslint",
     "test": "npm run lint && node scripts/test_corridors.mjs && npm run test:simulation",
     "test:simulation": "node scripts/simulate_edge_cases.mjs"
