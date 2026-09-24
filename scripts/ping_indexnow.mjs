@@ -59,6 +59,7 @@ const STATIC_PATHS = [
   "/about/",
   "/api-access/",
   "/contact/",
+  "/developers/",
   "/disclaimer/",
   "/invoice/",
   "/leaderboard/",
@@ -76,7 +77,7 @@ const LOCALIZED = [
   ["pt", "usd-to-brl"],
 ];
 
-/** All static-export paths, exactly as the build emits them (153 URLs today). */
+/** All static-export paths, exactly as the build emits them (154 URLs today). */
 function derivePaths() {
   const fees = JSON.parse(readFileSync(join(ROOT, "data", "fees.json"), "utf8"));
   const corridorsSource = readFileSync(join(ROOT, "data", "corridors.ts"), "utf8");
