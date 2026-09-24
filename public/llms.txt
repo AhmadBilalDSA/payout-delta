@@ -2,22 +2,22 @@
 
 > This is an llms.txt file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org
 
-> PayoutDelta benchmarks exactly what a contractor payout loses inside the banking rail before it lands in the recipient's local account: correspondent SWIFT intermediary deductions (SHA), FX spreads, platform cuts and statutory withholding. The dataset covers 72 currency corridors across USD, EUR and GBP origins — USD, EUR and GBP to Pakistan, India, the Philippines, Brazil, Mexico, Nigeria, the EU and beyond — and is restated every time `data/fees.json` refreshes (dataset 2026-09-24, 72 corridors, 87 platform routes).
+> PayoutDelta benchmarks exactly what a contractor payout loses inside the banking rail before it lands in the recipient's local account: correspondent SWIFT intermediary deductions (SHA), FX spreads, platform cuts and statutory withholding. The dataset covers 103 currency corridors across USD, EUR and GBP origins — USD, EUR and GBP to Pakistan, India, the Philippines, Brazil, Mexico, Nigeria, the EU and beyond — and is restated every time `data/fees.json` refreshes (dataset 2026-09-24, 103 corridors, 145 platform routes).
 
 ## PayoutDelta Guides
 
-- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 72 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
-- [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 87 long-tail routes.
+- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 103 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 145 long-tail routes.
 - [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
 - [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
 - [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
-- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 72 corridors live at /embed/<slug>/).
+- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 103 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
 
-- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 72-corridor dataset with per-platform fees and FX spreads, refreshed daily.
+- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 103-corridor dataset with per-platform fees and FX spreads, refreshed daily.
 - [API access & webhook contract](https://ahmadbilaldsa.github.io/payout-delta/api-access): integration reference for the static feed and derived endpoints.
-- [Full 72-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+- [Full 103-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
 
 ## PayoutDelta Legal
 

@@ -90,6 +90,35 @@ const REGULATOR = {
   NPR: "NRB",
   LKR: "CBSL",
   KZT: "NBK",
+  DOP: "DGII",
+  GTQ: "SAT",
+  PAB: "MEF",
+  BOB: "SIN",
+  PYG: "DNIT",
+  JMD: "TAJ",
+  TTD: "BIR",
+  HNL: "SAR",
+  NIO: "DGII",
+  BSD: "MOF",
+  BBD: "BRA",
+  UZS: "STC",
+  KHR: "GDT",
+  MNT: "GAT",
+  AMD: "SRC",
+  AZN: "STS",
+  KGS: "STS",
+  TJS: "TC",
+  MVR: "MIRA",
+  BND: "MOFE",
+  LAK: "MOF",
+  BTN: "DRC",
+  FJD: "FRCA",
+  PGK: "IRC",
+  WST: "IRD",
+  TOP: "MOR",
+  VUV: "CTO",
+  SBD: "IRD",
+  MUR: "MRA",
 };
 
 /** Mirrors `clearingCurrencyFor()` in lib/swiftRoutingEngine.ts. */
@@ -171,7 +200,7 @@ const REGULATORY = parseRegulatory();
 
 /** Direct-clearing network markers — anything that settles on a local RTGS/ACH/instant rail. */
 const DIRECT_RAIL_RE =
-  /Raast|BEFTN|IMPS|NEFT|RTGS|SPEI|CODI|\bPIX\b|BI\s?-?\s?FAST|InstaPay|PESONet|ePESO|SEPA|TARGET2|CHAPS|\bFPS\b|GIRO|\bRAP\b|KITTS|\bACH\b|\bEFT\b|\bFAST\b|Papara|OTC settlement|\bNIBSS\b|ELIXIR|\bNAPAS\b|PesaLink|GhIPSS|\bCVQ\b|\bKISC\b|\bIMTS\b/i;
+  /Raast|BEFTN|IMPS|NEFT|RTGS|SPEI|CODI|\bPIX\b|BI\s?-?\s?FAST|InstaPay|PESONet|ePESO|SEPA|TARGET2|CHAPS|\bFPS\b|GIRO|\bRAP\b|KITTS|\bACH\b|\bEFT\b|\bFAST\b|Papara|OTC settlement|\bNIBSS\b|ELIXIR|\bNAPAS\b|PesaLink|GhIPSS|\bCVQ\b|\bKISC\b|\bIMTS\b|\bSTP\b|DECEP|CENDEE|\bIPS\b|Interbank|Clearing|\bBCRD?\b/i;
 
 function railFor(clearingNetwork) {
   if (!clearingNetwork) return "Traditional SWIFT (fallback)";
