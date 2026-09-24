@@ -1,0 +1,24 @@
+﻿name: Update Bank Wire Tariff
+description: Report an updated retail FX margin, intermediary cut, or domestic rail
+body:
+  - type: input
+    id: bank_name
+    attributes:
+      label: Bank Name & Country
+      placeholder: e.g. Habib Bank Limited (Pakistan)
+    validations:
+      required: true
+  - type: input
+    id: bic
+    attributes:
+      label: SWIFT BIC (ISO 9362)
+      placeholder: e.g. HABBPKKA
+    validations:
+      required: true
+  - type: textarea
+    id: tariff_change
+    attributes:
+      label: Tariff or Cut Details
+      placeholder: e.g. Intermediary deduction updated from $15 to $25 via CHASUS33
+    validations:
+      required: true

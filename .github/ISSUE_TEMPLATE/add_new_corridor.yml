@@ -1,0 +1,17 @@
+﻿name: Request New Corridor
+description: Propose adding a new sovereign country corridor or clearing rail
+body:
+  - type: input
+    id: corridor_pair
+    attributes:
+      label: Currency Pair
+      placeholder: e.g. USD to TND (Tunisian Dinar)
+    validations:
+      required: true
+  - type: input
+    id: central_bank
+    attributes:
+      label: Central Bank / Clearing Rail
+      placeholder: e.g. Central Bank of Tunisia / Domestic RTGS
+    validations:
+      required: true

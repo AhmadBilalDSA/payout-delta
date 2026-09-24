@@ -109,10 +109,10 @@ export default function Header() {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 lg:inline"
+            className="hidden items-center whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20 dark:text-emerald-400 md:inline-flex"
           >
-            {t("openDataset")}
-            <span aria-hidden="true" className="ml-0.5 opacity-50">
+            Open Data
+            <span aria-hidden="true" className="ml-0.5 opacity-60">
               ↗
             </span>
           </Link>

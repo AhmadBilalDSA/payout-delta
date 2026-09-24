@@ -22,6 +22,7 @@ import { hreflangMap } from "@/lib/localizedCorridors";
 import { getAeoFaqEntries } from "@/lib/aeoFaqs";
 import {
   BREADCRUMB_ORIGIN,
+  GITHUB_REPO,
   SITE_URL,
   buildAeoFaqSchema,
   buildBreadcrumbLd,
@@ -290,6 +291,18 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           ? `${longTail.label} default (${platformPreset.feePercent}% platform cut) is pre-selected; you can switch platforms below.`
           : "Every calculation runs in your browser; nothing is tracked."}
       </p>
+
+      <a
+        href={`${GITHUB_REPO}/blob/master/data/fees.json`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:border-emerald-500/40 hover:text-emerald-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-emerald-400/40 dark:hover:text-emerald-400"
+      >
+        Edit this record on GitHub
+        <span aria-hidden="true" className="text-emerald-600 dark:text-emerald-400">
+          ↗
+        </span>
+      </a>
 
       <CurrencyTrendSparkline
         slug={slug}

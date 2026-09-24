@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { BANK_DOSSIERS, getBankDossierBySlug, type BankDossier } from "@/data/banks";
+import {
+  BANK_DOSSIERS,
+  GITHUB_REPO,
+  getBankDossierBySlug,
+  type BankDossier,
+} from "@/data/banks";
 import { getCorridorBySlug } from "@/lib/db";
 import {
   buildBreadcrumbLd,
@@ -175,6 +180,18 @@ export default async function BankDossierPage({
           <p className="mt-3 text-sm leading-relaxed text-black/[0.7] dark:text-white/75">
             {bank.field71aGuidance}
           </p>
+
+          <a
+            href={`${GITHUB_REPO}/blob/master/data/banks.ts`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400"
+          >
+            Edit this record on GitHub
+            <span aria-hidden="true" className="text-emerald-600 dark:text-emerald-400">
+              ↗
+            </span>
+          </a>
         </section>
 
         <section className="w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">

@@ -1,18 +1,18 @@
 import Link from "next/link";
-import { getCorridors, getDataset } from "@/lib/db";
-import CorridorDirectory from "@/components/CorridorDirectory";
+import { buildDirectoryIndex, getDataset } from "@/lib/db";
+import DirectoryExplorer from "@/components/DirectoryExplorer";
 import Hero from "@/components/Hero";
 import AnnualLeakageCalculator from "@/components/AnnualLeakageCalculator";
 
 export default function Home() {
-  const corridors = getCorridors();
+  const entries = buildDirectoryIndex();
   const datasetRevision = getDataset().updatedAt.slice(0, 10);
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
       <Hero />
 
-      <CorridorDirectory corridors={corridors} />
+      <DirectoryExplorer entries={entries} />
 
       {/* Milestone UX — annual leakage estimator: one slider that converts
           classic SWIFT friction bands into a yearly loss projection. */}

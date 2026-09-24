@@ -91,8 +91,19 @@ export default function Footer() {
           <FooterColumn title="Open Data" links={OPEN_DATA_LINKS} />
           <div>
             <h2 className="text-xs font-semibold text-slate-900 dark:text-white">
-              System Status
+              Open Data
             </h2>
+            <Link
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20 dark:text-emerald-400"
+            >
+              Open Data
+              <span aria-hidden="true" className="opacity-60">
+                ↗
+              </span>
+            </Link>
             <ul className="mt-3 space-y-2">
               <li>
                 <Link
