@@ -29,13 +29,13 @@ export const metadata: Metadata = {
   },
 };
 
-const FEED_URL = "https://ahmadbilaldsa.github.io/payout-delta/api/fees.json";
-const MANIFEST_URL = "https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt";
+const FEED_URL = `${SITE_URL}/api/fees.json`;
+const MANIFEST_URL = `${SITE_URL}/llms-full.txt`;
 
 const CODE_SAMPLES: Record<SnippetLang, string> = {
-  curl: `curl -s https://ahmadbilaldsa.github.io/payout-delta/api/fees.json`,
+  curl: `curl -s ${SITE_URL}/api/fees.json`,
   ts: `const response = await fetch(
-  "https://ahmadbilaldsa.github.io/payout-delta/api/fees.json",
+  "${SITE_URL}/api/fees.json",
 );
 const dataset = await response.json();
 
@@ -47,7 +47,7 @@ console.log(pkr.country); // Pakistan`,
   python: `import requests
 
 dataset = requests.get(
-    "https://ahmadbilaldsa.github.io/payout-delta/api/fees.json",
+    "${SITE_URL}/api/fees.json",
     timeout=15,
 ).json()
 

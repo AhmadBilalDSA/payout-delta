@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getCorridorSlugs } from "@/lib/db";
+import { LONG_TAIL_CORRIDORS } from "@/data/corridors";
 import { LOCALIZED_CORRIDORS } from "@/lib/localizedCorridors";
+import { SITE_URL } from "@/lib/seoSchemas";
 
-const SITE_URL = "https://payoutdelta.com";
 const LAST_MODIFIED = new Date("2026-09-22");
 
 /** Required so the sitemap prerenders under `output: "export"`. */
@@ -10,7 +11,10 @@ export const dynamic = "force-static";
 
 /** Paths use trailing slashes to mirror `trailingSlash: true` canonicals. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const corridorEntries = getCorridorSlugs().map((slug) => ({
+  const corridorEntries = [
+    ...getCorridorSlugs(),
+    ...LONG_TAIL_CORRIDORS.map((spec) => spec.slug),
+  ].map((slug) => ({
     url: `${SITE_URL}/calculator/${slug}/`,
     lastModified: LAST_MODIFIED,
     changeFrequency: "weekly" as const,

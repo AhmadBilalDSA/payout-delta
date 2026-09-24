@@ -6,25 +6,25 @@
 
 ## PayoutDelta Guides
 
-- [Rate Leaderboard](https://payoutdelta.com/leaderboard): ranks all 50 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
-- [Payout Calculator](https://payoutdelta.com/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 87 long-tail routes.
-- [Invoice Studio](https://payoutdelta.com/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
-- [Regulatory / Tax Ledger](https://payoutdelta.com/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
-- [SWIFT Auditor](https://payoutdelta.com/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
-- [Embeddable Payout Widget](https://payoutdelta.com/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 50 corridors live at /embed/<slug>/).
+- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 50 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 87 long-tail routes.
+- [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
+- [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
+- [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
+- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 50 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
 
 - [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 50-corridor dataset with per-platform fees and FX spreads, refreshed daily.
-- [API access & webhook contract](https://payoutdelta.com/api-access): integration reference for the static feed and derived endpoints.
-- [Full 50-corridor manifest](https://payoutdelta.com/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+- [API access & webhook contract](https://ahmadbilaldsa.github.io/payout-delta/api-access): integration reference for the static feed and derived endpoints.
+- [Full 50-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
 
 ## PayoutDelta Legal
 
-- [Terms of Service](https://payoutdelta.com/terms-of-service)
-- [Privacy Policy](https://payoutdelta.com/privacy-policy)
-- [Disclaimer](https://payoutdelta.com/disclaimer)
+- [Terms of Service](https://ahmadbilaldsa.github.io/payout-delta/terms-of-service)
+- [Privacy Policy](https://ahmadbilaldsa.github.io/payout-delta/privacy-policy)
+- [Disclaimer](https://ahmadbilaldsa.github.io/payout-delta/disclaimer)
 
 ## Contact
 
-- [Contact](https://payoutdelta.com/contact)
+- [Contact](https://ahmadbilaldsa.github.io/payout-delta/contact)

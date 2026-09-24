@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import SwiftAuditorTerminal from "@/components/compliance/SwiftAuditorTerminal";
 import { buildSwiftBankIndex } from "@/lib/swiftRoutingEngine";
 import { getCorridors } from "@/lib/db";
-
-const SITE_URL = "https://payoutdelta.com";
+import { SITE_URL } from "@/lib/seoSchemas";
 
 export const metadata: Metadata = {
   title: "SWIFT Intermediary Route Auditor",

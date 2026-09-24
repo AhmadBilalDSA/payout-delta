@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import TaxLedgerView from "@/components/ledger/TaxLedgerView";
 import { getCorridors } from "@/lib/db";
-
-const SITE_URL = "https://payoutdelta.com";
-const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
+import { BREADCRUMB_ORIGIN, SITE_URL } from "@/lib/seoSchemas";
 
 export const dynamic = "force-static";
 

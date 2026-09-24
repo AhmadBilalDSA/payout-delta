@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import fees from "../../data/fees.json";
+import { SITE_URL } from "@/lib/seoSchemas";
 
 const API_BASE = "https://api.payoutdelta.com";
-const FEED_URL = "https://ahmadbilaldsa.github.io/payout-delta/api/fees.json";
+const FEED_URL = `${SITE_URL}/api/fees.json`;
 const RATES_URL = `${API_BASE}/v1/rates?pair=USD-PKR&gross=1000&platform=upwork`;
 
 type EndpointKey = "rates" | "corridor" | "corridors" | "dataset" | "health";

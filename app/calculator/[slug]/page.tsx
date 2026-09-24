@@ -109,7 +109,7 @@ export async function generateMetadata({
     title: `${corridor.from} to ${corridor.to} — Payout Fee Audit (${corridor.country})`,
     description: `${content.overview.slice(0, 150)}`,
     alternates: {
-      canonical: `/calculator/${corridor.slug}/`,
+      canonical: `${SITE_URL}/calculator/${corridor.slug}/`,
       ...(languages ? { languages } : {}),
     },
     openGraph: {

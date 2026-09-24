@@ -31,10 +31,20 @@ export type JsonLdBlock = { "@type": string | string[] } & Record<
   unknown
 >;
 
-/** GitHub Pages origin the static export is served from. */
-export const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
-/** Production domain reserved for the custom-domain switch. */
-export const SITE_URL = "https://payoutdelta.com";
+/**
+ * Canonical origin every link (canonical, OpenGraph, JSON-LD, sitemap) is
+ * derived from. Defaults to the active GitHub Pages deployment the static
+ * export is served from (`basePath: "/payout-delta"`); override at build time
+ * through `NEXT_PUBLIC_SITE_URL` once the custom domain takes the export over.
+ * Single source of truth — route signaling must never fragment across hosts.
+ */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "https://ahmadbilaldsa.github.io/payout-delta"
+).replace(/\/+$/, "");
+
+/** Alias for call sites that read "breadcrumb / JSON-LD origin". Identical to `SITE_URL`. */
+export const BREADCRUMB_ORIGIN = SITE_URL;
 
 /**
  * BreadcrumbList — sequence from the GitHub Pages root through the corridor
@@ -325,13 +335,13 @@ export function buildDatasetSchema(opts: {
     publisher: {
       "@type": "Organization",
       name: "PayoutDelta",
-      url: "https://payoutdelta.com/",
+      url: `${SITE_URL}/`,
       sameAs: "https://github.com/AhmadBilalDSA/payout-delta",
     },
     creator: {
       "@type": "Organization",
       name: "PayoutDelta",
-      url: "https://payoutdelta.com/",
+      url: `${SITE_URL}/`,
     },
     distribution: [
       {

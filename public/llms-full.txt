@@ -6,18 +6,18 @@
 
 ## PayoutDelta Guides
 
-- [Rate Leaderboard](https://payoutdelta.com/leaderboard): ranks all 50 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
-- [Payout Calculator](https://payoutdelta.com/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 87 long-tail routes.
-- [Invoice Studio](https://payoutdelta.com/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
-- [Regulatory / Tax Ledger](https://payoutdelta.com/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
-- [SWIFT Auditor](https://payoutdelta.com/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
-- [Embeddable Payout Widget](https://payoutdelta.com/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 50 corridors live at /embed/<slug>/).
+- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 50 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 87 long-tail routes.
+- [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
+- [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
+- [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
+- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 50 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
 
 - [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 50-corridor dataset with per-platform fees and FX spreads, refreshed daily.
-- [API access & webhook contract](https://payoutdelta.com/api-access): integration reference for the static feed and derived endpoints.
-- [Full 50-corridor manifest](https://payoutdelta.com/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+- [API access & webhook contract](https://ahmadbilaldsa.github.io/payout-delta/api-access): integration reference for the static feed and derived endpoints.
+- [Full 50-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
 
 ## Corridor Database
 
@@ -25,56 +25,56 @@ Dataset snapshot: 2026-09-23T21:00:00Z — 50 corridors.
 
 | Corridor | Base → Target | Export Rate (1 USD) | Intermediary Cut (USD) | Correspondent Clearing BICs | Statutory Tax Purpose Code | Recommended Rail |
 |---|---|---|---|---|---|---|
-| [usd-to-pkr](https://payoutdelta.com/calculator/usd-to-pkr) | USD → PKR | 277.4259 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | SBP 9111 | Direct local clearing |
-| [usd-to-inr](https://payoutdelta.com/calculator/usd-to-inr) | USD → INR | 95.8734 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | RBI P0802 | Direct local clearing |
-| [usd-to-php](https://payoutdelta.com/calculator/usd-to-php) | USD → PHP | 62.8236 | $5 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | BIR 8% Freelance Gross Income Tax | Direct local clearing |
-| [usd-to-brl](https://payoutdelta.com/calculator/usd-to-brl) | USD → BRL | 5.1311 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-gbp](https://payoutdelta.com/calculator/usd-to-gbp) | USD → GBP | 0.7477 | $18 | BARCGB22, MIDLGB22 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-eur](https://payoutdelta.com/calculator/usd-to-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-ngn](https://payoutdelta.com/calculator/usd-to-ngn) | USD → NGN | 1330.691 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-bdt](https://payoutdelta.com/calculator/usd-to-bdt) | USD → BDT | 122.7592 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-egp](https://payoutdelta.com/calculator/usd-to-egp) | USD → EGP | 51.9283 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-zar](https://payoutdelta.com/calculator/usd-to-zar) | USD → ZAR | 16.2477 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-vnd](https://payoutdelta.com/calculator/usd-to-vnd) | USD → VND | 25450 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | SW / IT services | Traditional SWIFT (SHA) |
-| [usd-to-kes](https://payoutdelta.com/calculator/usd-to-kes) | USD → KES | 129.5 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | SWIFT service remittance | Direct local clearing |
-| [usd-to-idr](https://payoutdelta.com/calculator/usd-to-idr) | USD → IDR | 15800 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | IT service export | Direct local clearing |
-| [usd-to-cop](https://payoutdelta.com/calculator/usd-to-cop) | USD → COP | 4180 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | DIAN Retención — Export Services Art. 392 | Direct local clearing |
-| [usd-to-try](https://payoutdelta.com/calculator/usd-to-try) | USD → TRY | 34.2 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Software Earnings Exemption Art. 89/13 | Direct local clearing |
-| [usd-to-mxn](https://payoutdelta.com/calculator/usd-to-mxn) | USD → MXN | 19.8 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | RESICO Art. 113-E | Direct local clearing |
-| [usd-to-ars](https://payoutdelta.com/calculator/usd-to-ars) | USD → ARS | 1020 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Exportación de servicios | Traditional SWIFT (SHA) |
-| [usd-to-pln](https://payoutdelta.com/calculator/usd-to-pln) | USD → PLN | 3.95 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Ryczałt od przychodów ewidencjonowanych Art. 12 | Traditional SWIFT (SHA) |
-| [usd-to-ron](https://payoutdelta.com/calculator/usd-to-ron) | USD → RON | 4.58 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Microenterprise IT Regime Art. 47 | Traditional SWIFT (SHA) |
-| [usd-to-czk](https://payoutdelta.com/calculator/usd-to-czk) | USD → CZK | 23.2 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Paušální režim | Traditional SWIFT (SHA) |
-| [usd-to-thb](https://payoutdelta.com/calculator/usd-to-thb) | USD → THB | 33.5 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | 40(8) foreign-source income | Traditional SWIFT (SHA) |
-| [usd-to-myr](https://payoutdelta.com/calculator/usd-to-myr) | USD → MYR | 4.35 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Foreign source | Traditional SWIFT (SHA) |
-| [usd-to-ghs](https://payoutdelta.com/calculator/usd-to-ghs) | USD → GHS | 15.8 | $16 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Export services | Direct local clearing |
-| [usd-to-aed](https://payoutdelta.com/calculator/usd-to-aed) | USD → AED | 3.6725 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Freelance Visa / Individual Natural Person Art. 3 | Traditional SWIFT (SHA) |
-| [usd-to-sar](https://payoutdelta.com/calculator/usd-to-sar) | USD → SAR | 3.75 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Freelance Document Art. 68 | Traditional SWIFT (SHA) |
-| [usd-to-uah](https://payoutdelta.com/calculator/usd-to-uah) | USD → UAH | 40.2 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ФОП Group 3 (IT) | Traditional SWIFT (SHA) |
-| [usd-to-iqd](https://payoutdelta.com/calculator/usd-to-iqd) | USD → IQD | 1310 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Cross-border services | Direct local clearing |
-| [usd-to-mad](https://payoutdelta.com/calculator/usd-to-mad) | USD → MAD | 9.9 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Régime Auto-Entrepreneur Art. 82 | Direct local clearing |
-| [usd-to-clp](https://payoutdelta.com/calculator/usd-to-clp) | USD → CLP | 936 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Boleta de Honorarios — Retención 10% Art. 74 No. 6 | Traditional SWIFT (SHA) |
-| [usd-to-pen](https://payoutdelta.com/calculator/usd-to-pen) | USD → PEN | 3.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Renta 4ta Categoría — Retención 8% Art. 34-A | Traditional SWIFT (SHA) |
-| [usd-to-huf](https://payoutdelta.com/calculator/usd-to-huf) | USD → HUF | 356 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Szja declaration | Direct local clearing |
-| [usd-to-bgn](https://payoutdelta.com/calculator/usd-to-bgn) | USD → BGN | 1.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ФЛДД | Direct local clearing |
-| [usd-to-rsd](https://payoutdelta.com/calculator/usd-to-rsd) | USD → RSD | 107.5 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Freelance income | Direct local clearing |
-| [usd-to-sgd](https://payoutdelta.com/calculator/usd-to-sgd) | USD → SGD | 1.3 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Self-employment income | Traditional SWIFT (SHA) |
-| [usd-to-hkd](https://payoutdelta.com/calculator/usd-to-hkd) | USD → HKD | 7.79 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Salaries tax | Direct local clearing |
-| [usd-to-sek](https://payoutdelta.com/calculator/usd-to-sek) | USD → SEK | 10.4 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Riksbank INK1 | Direct local clearing |
-| [usd-to-nok](https://payoutdelta.com/calculator/usd-to-nok) | USD → NOK | 10.75 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Skatt M-2 | Traditional SWIFT (SHA) |
-| [usd-to-dkk](https://payoutdelta.com/calculator/usd-to-dkk) | USD → DKK | 6.85 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Ligning | Traditional SWIFT (SHA) |
-| [usd-to-bam](https://payoutdelta.com/calculator/usd-to-bam) | USD → BAM | 1.8 | $12 | DEUTDEFF, BNPAFRPA | Neto dohodak | Direct local clearing |
-| [usd-to-gel](https://payoutdelta.com/calculator/usd-to-gel) | USD → GEL | 2.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Personal Income Tax 20% Art. 96 | Direct local clearing |
-| [usd-to-uyu](https://payoutdelta.com/calculator/usd-to-uyu) | USD → UYU | 40.2 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | IRPF cuota profesional | Direct local clearing |
-| [usd-to-crc](https://payoutdelta.com/calculator/usd-to-crc) | USD → CRC | 515 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Impuesto sobre la Renta Art. 3 | Traditional SWIFT (SHA) |
-| [usd-to-hrk](https://payoutdelta.com/calculator/usd-to-hrk) | USD → EUR | 0.92 | $10 | DEUTDEFF, BNPAFRPA | Porez na dohodak Art. 15 | Direct local clearing |
-| [usd-to-tzs](https://payoutdelta.com/calculator/usd-to-tzs) | USD → TZS | 2640 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | e-services export | Traditional SWIFT (SHA) |
-| [usd-to-ugx](https://payoutdelta.com/calculator/usd-to-ugx) | USD → UGX | 3710 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | services export | Traditional SWIFT (SHA) |
-| [usd-to-rwf](https://payoutdelta.com/calculator/usd-to-rwf) | USD → RWF | 1385 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ICT export | Traditional SWIFT (SHA) |
-| [usd-to-zmw](https://payoutdelta.com/calculator/usd-to-zmw) | USD → ZMW | 26.5 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | services export | Traditional SWIFT (SHA) |
-| [usd-to-npr](https://payoutdelta.com/calculator/usd-to-npr) | USD → NPR | 134.5 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | inward IT remittance | Direct local clearing |
-| [usd-to-lkr](https://payoutdelta.com/calculator/usd-to-lkr) | USD → LKR | 298 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | foreign currency services | Traditional SWIFT (SHA) |
-| [usd-to-kzt](https://payoutdelta.com/calculator/usd-to-kzt) | USD → KZT | 480 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Astana Hub IT Exemption Art. 293 & 394 | Traditional SWIFT (SHA) |
+| [usd-to-pkr](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr) | USD → PKR | 277.4259 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | SBP 9111 | Direct local clearing |
+| [usd-to-inr](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-inr) | USD → INR | 95.8734 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | RBI P0802 | Direct local clearing |
+| [usd-to-php](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-php) | USD → PHP | 62.8236 | $5 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | BIR 8% Freelance Gross Income Tax | Direct local clearing |
+| [usd-to-brl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-brl) | USD → BRL | 5.1311 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-gbp](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-gbp) | USD → GBP | 0.7477 | $18 | BARCGB22, MIDLGB22 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-ngn](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ngn) | USD → NGN | 1330.691 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-bdt](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bdt) | USD → BDT | 122.7592 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-egp](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-egp) | USD → EGP | 51.9283 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-zar](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-zar) | USD → ZAR | 16.2477 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-vnd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-vnd) | USD → VND | 25450 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | SW / IT services | Traditional SWIFT (SHA) |
+| [usd-to-kes](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-kes) | USD → KES | 129.5 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | SWIFT service remittance | Direct local clearing |
+| [usd-to-idr](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-idr) | USD → IDR | 15800 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | IT service export | Direct local clearing |
+| [usd-to-cop](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-cop) | USD → COP | 4180 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | DIAN Retención — Export Services Art. 392 | Direct local clearing |
+| [usd-to-try](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-try) | USD → TRY | 34.2 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Software Earnings Exemption Art. 89/13 | Direct local clearing |
+| [usd-to-mxn](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-mxn) | USD → MXN | 19.8 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | RESICO Art. 113-E | Direct local clearing |
+| [usd-to-ars](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ars) | USD → ARS | 1020 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Exportación de servicios | Traditional SWIFT (SHA) |
+| [usd-to-pln](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pln) | USD → PLN | 3.95 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Ryczałt od przychodów ewidencjonowanych Art. 12 | Traditional SWIFT (SHA) |
+| [usd-to-ron](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ron) | USD → RON | 4.58 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Microenterprise IT Regime Art. 47 | Traditional SWIFT (SHA) |
+| [usd-to-czk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-czk) | USD → CZK | 23.2 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Paušální režim | Traditional SWIFT (SHA) |
+| [usd-to-thb](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-thb) | USD → THB | 33.5 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | 40(8) foreign-source income | Traditional SWIFT (SHA) |
+| [usd-to-myr](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-myr) | USD → MYR | 4.35 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Foreign source | Traditional SWIFT (SHA) |
+| [usd-to-ghs](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ghs) | USD → GHS | 15.8 | $16 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Export services | Direct local clearing |
+| [usd-to-aed](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-aed) | USD → AED | 3.6725 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Freelance Visa / Individual Natural Person Art. 3 | Traditional SWIFT (SHA) |
+| [usd-to-sar](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-sar) | USD → SAR | 3.75 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Freelance Document Art. 68 | Traditional SWIFT (SHA) |
+| [usd-to-uah](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-uah) | USD → UAH | 40.2 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ФОП Group 3 (IT) | Traditional SWIFT (SHA) |
+| [usd-to-iqd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-iqd) | USD → IQD | 1310 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Cross-border services | Direct local clearing |
+| [usd-to-mad](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-mad) | USD → MAD | 9.9 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Régime Auto-Entrepreneur Art. 82 | Direct local clearing |
+| [usd-to-clp](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-clp) | USD → CLP | 936 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Boleta de Honorarios — Retención 10% Art. 74 No. 6 | Traditional SWIFT (SHA) |
+| [usd-to-pen](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pen) | USD → PEN | 3.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Renta 4ta Categoría — Retención 8% Art. 34-A | Traditional SWIFT (SHA) |
+| [usd-to-huf](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-huf) | USD → HUF | 356 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Szja declaration | Direct local clearing |
+| [usd-to-bgn](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bgn) | USD → BGN | 1.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ФЛДД | Direct local clearing |
+| [usd-to-rsd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-rsd) | USD → RSD | 107.5 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Freelance income | Direct local clearing |
+| [usd-to-sgd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-sgd) | USD → SGD | 1.3 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Self-employment income | Traditional SWIFT (SHA) |
+| [usd-to-hkd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-hkd) | USD → HKD | 7.79 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Salaries tax | Direct local clearing |
+| [usd-to-sek](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-sek) | USD → SEK | 10.4 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Riksbank INK1 | Direct local clearing |
+| [usd-to-nok](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-nok) | USD → NOK | 10.75 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Skatt M-2 | Traditional SWIFT (SHA) |
+| [usd-to-dkk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-dkk) | USD → DKK | 6.85 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Ligning | Traditional SWIFT (SHA) |
+| [usd-to-bam](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bam) | USD → BAM | 1.8 | $12 | DEUTDEFF, BNPAFRPA | Neto dohodak | Direct local clearing |
+| [usd-to-gel](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-gel) | USD → GEL | 2.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Personal Income Tax 20% Art. 96 | Direct local clearing |
+| [usd-to-uyu](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-uyu) | USD → UYU | 40.2 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | IRPF cuota profesional | Direct local clearing |
+| [usd-to-crc](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-crc) | USD → CRC | 515 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Impuesto sobre la Renta Art. 3 | Traditional SWIFT (SHA) |
+| [usd-to-hrk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-hrk) | USD → EUR | 0.92 | $10 | DEUTDEFF, BNPAFRPA | Porez na dohodak Art. 15 | Direct local clearing |
+| [usd-to-tzs](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-tzs) | USD → TZS | 2640 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | e-services export | Traditional SWIFT (SHA) |
+| [usd-to-ugx](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ugx) | USD → UGX | 3710 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | services export | Traditional SWIFT (SHA) |
+| [usd-to-rwf](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-rwf) | USD → RWF | 1385 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ICT export | Traditional SWIFT (SHA) |
+| [usd-to-zmw](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-zmw) | USD → ZMW | 26.5 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | services export | Traditional SWIFT (SHA) |
+| [usd-to-npr](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-npr) | USD → NPR | 134.5 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | inward IT remittance | Direct local clearing |
+| [usd-to-lkr](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-lkr) | USD → LKR | 298 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | foreign currency services | Traditional SWIFT (SHA) |
+| [usd-to-kzt](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-kzt) | USD → KZT | 480 | $10 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Astana Hub IT Exemption Art. 293 & 394 | Traditional SWIFT (SHA) |
 
 ### Correspondent clearing nodes
 

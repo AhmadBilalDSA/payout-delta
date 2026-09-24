@@ -7,8 +7,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { getChannels, getCorridors, getPlatforms } from "@/lib/db";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { quoteAllChannels } from "@/utils/calculateRoute";
-
-const SITE_URL = "https://payoutdelta.com";
+import { SITE_URL } from "@/lib/seoSchemas";
 
 export const metadata: Metadata = {
   title: "The Global Cross-Border Banking Leakage Index (2026)",

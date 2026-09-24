@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { SITE_URL } from "@/lib/seoSchemas";
 
-const SHARE_BENCHMARK =
-  "Did you know traditional banks take an average of 4.2% on international wires to Asia and LatAm? My bank took $42 on $1,000. Audit your exact wire leakage on PayoutDelta: https://ahmadbilaldsa.github.io/payout-delta";
-
-const SITE_URL = "https://ahmadbilaldsa.github.io/payout-delta";
+const SHARE_BENCHMARK = `Did you know traditional banks take an average of 4.2% on international wires to Asia and LatAm? My bank took $42 on $1,000. Audit your exact wire leakage on PayoutDelta: ${SITE_URL}`;
 
 /**
  * PayoutDelta — "Leakage Leaderboard" one-click social share generator.

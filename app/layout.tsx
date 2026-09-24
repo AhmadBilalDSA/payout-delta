@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarketStatusBar from "@/components/MarketStatusBar";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { SITE_URL } from "@/lib/seoSchemas";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +17,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-const SITE_URL = "https://payoutdelta.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

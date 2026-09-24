@@ -3,9 +3,7 @@ import InvoiceEditor from "@/components/invoice/InvoiceEditor";
 import InvoiceHero from "@/components/invoice/InvoiceHero";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { getChannels, getCorridors } from "@/lib/db";
-
-const SITE_URL = "https://payoutdelta.com";
-const BREADCRUMB_ORIGIN = "https://ahmadbilaldsa.github.io/payout-delta";
+import { BREADCRUMB_ORIGIN, SITE_URL } from "@/lib/seoSchemas";
 
 export const metadata: Metadata = {
   title: "Freelance Invoice Studio",

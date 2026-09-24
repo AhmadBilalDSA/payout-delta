@@ -19,7 +19,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SITE_URL = "https://payoutdelta.com";
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "https://ahmadbilaldsa.github.io/payout-delta"
+).replace(/\/+$/, "");
 const FEED_URL = "https://ahmadbilaldsa.github.io/payout-delta/api/fees.json";
 const DEFAULT_INTERMEDIARY_CUT_USD = 18;
 

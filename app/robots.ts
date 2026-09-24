@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = "https://payoutdelta.com";
+import { SITE_URL } from "@/lib/seoSchemas";
 
 /** Required so the robots file prerenders under `output: "export"`. */
 export const dynamic = "force-static";
