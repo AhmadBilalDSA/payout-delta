@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import Dock from "@/components/dashboard/Dock";
+
 import TaxClearanceView from "@/components/tax-clearance/TaxClearanceView";
 import type {
   ClearanceBank,
@@ -794,7 +794,7 @@ export default function TaxClearancePage() {
       </div>
 
       {/* Floating module launcher — chrome above the whole page. */}
-      <Dock />
+      
     </>
   );
 }

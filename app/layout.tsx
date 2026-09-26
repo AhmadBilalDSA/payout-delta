@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarketStatusBar from "@/components/MarketStatusBar";
-import Dock from "@/components/dashboard/Dock";
+import { Dock } from "@/components/dashboard/Dock";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
 import { SITE_URL } from "@/lib/seoSchemas";
