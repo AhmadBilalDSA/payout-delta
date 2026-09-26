@@ -61,6 +61,7 @@ const STATIC_PATHS = [
   "/agencies/",
   "/api-access/",
   "/banks/",
+  "/challengers/",
   "/compare/",
   "/compare/swift-wire-vs-wise-business/",
   "/compare/sha-vs-our-swift-charges/",

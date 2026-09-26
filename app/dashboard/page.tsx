@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import DiagnosticTier from "@/components/dashboard/DiagnosticTier";
-import Dock from "@/components/dashboard/Dock";
 import SimpleTier from "@/components/dashboard/SimpleTier";
 import type {
   DashboardCorridor,
@@ -39,10 +38,9 @@ export const dynamic = "force-static";
  * route with a 60KB gzip budget.
  *
  * The two tiers are rendered in reading order — Simple open, Diagnostic
- * collapsed — and `<Dock />` is mounted as floating chrome above both. Note the
- * global `<Header />` / `<Footer />` are deliberately NOT repeated here: the
- * root layout already wraps every route in them, so importing them again would
- * duplicate the navigation on this page only.
+ * collapsed. Note the global `<Header />` / `<Footer />` / `<Dock />` are
+ * deliberately NOT repeated here: the root layout already wraps every route in
+ * them, so importing them again would duplicate the chrome on this page only.
  */
 
 /** The terminal payload is resolved ONCE and shared by the JSON-LD and the body. */
@@ -355,9 +353,6 @@ export default function DashboardPage() {
           be verified before invoicing.
         </p>
       </div>
-
-      {/* Floating module launcher — chrome above both tiers. */}
-      <Dock />
     </>
   );
 }

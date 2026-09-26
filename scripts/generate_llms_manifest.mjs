@@ -287,6 +287,25 @@ const corridors = fees.corridors.map((corridor) => {
 
 const updatedISO = fees.updatedAt ?? new Date().toISOString();
 
+/** Whole-dollar and percent formatters for the challenger-rail manifest line. */
+const usd0 = (value) => `$${Math.round(value)}`;
+const pct = (value) => `${(value * 100).toFixed(2)}%`;
+
+/** Median of a numeric series (NaN-safe on an empty input). */
+function medianOf(values) {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+/** Midpoint of the audited retail-bank spread band, same constant as the app. */
+const WIRE_SPREAD_MID = 0.031;
+const WIRE_MEDIAN_CUT = medianOf(corridors.map((c) => c.intermediaryCutUSD));
+const WIRE_MEDIAN_SHARE = medianOf(
+  corridors.map((c) => (c.intermediaryCutUSD + 1000 * WIRE_SPREAD_MID) / 1000)
+);
+
 /**
  * Compose both manifests. Both lead with the mandated llms.txt framing line so
  * the files visibly describe themselves to any agent reader.
@@ -316,6 +335,7 @@ function guidesSection() {
     `- [Institutional Clearing Terminal](${SITE_URL}/dashboard): macro clearing telemetry across ${corridors.length} corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.`,
     `- [Bank Dossier Directory](${SITE_URL}/banks): ${BANKS.length} verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.`,
     `- [Agency Treasury Leakage Engine](${SITE_URL}/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.`,
+    `- [Challenger Rails & Alternative Settlements](${SITE_URL}/challengers): institutional comparison of four non-bank settlement architectures — Airwallex local clearing, Revolut Business SEPA/ACH off-ramps, Elevate Pay US virtual accounts, and USDC/USDT on Polygon or Arbitrum — benchmarked against the median correspondent SHA deduction of ${usd0(WIRE_MEDIAN_CUT)} and a ${pct(WIRE_MEDIAN_SHARE)} all-in wire cost at the $1,000 benchmark across the ${corridors.length} corridors.`,
     `- [Embeddable Payout Widget](${SITE_URL}/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all ${corridors.length} corridors live at /embed/<slug>/).`,
   ];
 }

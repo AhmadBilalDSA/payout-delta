@@ -132,6 +132,20 @@ export function TerminalIcon({ size = 18, className, ...rest }: IconProps) {
 }
 
 /**
+ * Challenger rails — two parallel settlement rails with sleepers and a routed
+ * node, i.e. a local clearing lane bypassing the correspondent chain.
+ */
+export function RailIcon({ size = 18, className, ...rest }: IconProps) {
+  return (
+    <svg {...glyph(size, className)} {...rest}>
+      <path d="M7.5 4.5 4.5 19.5M16.5 4.5l3 15" />
+      <path d="M6.6 9.5h10.8M5.7 14.5h12.6" />
+      <circle cx="12" cy="14.5" r="1.4" />
+    </svg>
+  );
+}
+
+/**
  * Disclosure chevron. Rotates 180° off an `[open]` prop rather than shipping
  * two glyphs, so the Diagnostic Tier accordion can animate the single element
  * rather than cross-fading two.

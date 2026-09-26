@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarketStatusBar from "@/components/MarketStatusBar";
+import Dock from "@/components/dashboard/Dock";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { SITE_URL } from "@/lib/seoSchemas";
 import "./globals.css";
@@ -102,8 +103,17 @@ export default function RootLayout({
         <LanguageProvider>
           <Header />
           <MarketStatusBar />
-          <main className="flex-1">{children}</main>
+          {/* `pb-24 sm:pb-28` is the permanent clearance for the global
+              floating `<Dock />` mounted below: every route — calculator,
+              ledger tables, footer — keeps its last row scrollable and
+              clickable above the launcher. */}
+          <main className="flex-1 pb-24 sm:pb-28">{children}</main>
           <Footer />
+          {/* GLOBAL MODULE DOCK — mounted once, as the last node before
+              `</body>`, so the launcher floats above every route instead of
+              being re-declared per page. It sits inside <LanguageProvider> so
+              its seven labels resolve through the shared `t()` dictionary. */}
+          <Dock />
         </LanguageProvider>
       </body>
     </html>

@@ -19,6 +19,7 @@ const PRODUCT_LINKS: readonly FooterLink[] = [
   { label: "Rate Drops", href: "/about" },
   { label: "Comparison Guides", href: "/compare/" },
   { label: "Bank Dossiers", href: "/banks/" },
+  { label: "Challenger Rails", href: "/challengers/" },
   { label: "For Agencies", href: "/agencies/" },
 ] as const;
 
