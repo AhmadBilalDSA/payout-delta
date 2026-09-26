@@ -145,6 +145,17 @@ export function RailIcon({ size = 18, className, ...rest }: IconProps) {
   );
 }
 
+/** Tax Hub — the statutory withholding / clearance rail. */
+export function PercentIcon({ size = 18, className, ...rest }: IconProps) {
+  return (
+    <svg {...glyph(size, className)} {...rest}>
+      <path d="M18.5 5.5 5.5 18.5" />
+      <circle cx="8.25" cy="8.25" r="2.25" />
+      <circle cx="15.75" cy="15.75" r="2.25" />
+    </svg>
+  );
+}
+
 /**
  * Disclosure chevron. Rotates 180° off an `[open]` prop rather than shipping
  * two glyphs, so the Diagnostic Tier accordion can animate the single element

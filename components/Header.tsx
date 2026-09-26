@@ -18,21 +18,24 @@ const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
  * `basePath` (`/payout-delta` in production) is re-applied automatically.
  *
  * ── Anti-collision contract (laptops + tablets) ────────────────────────────
- * The bar is exactly four flex regions inside one `w-full max-w-7xl` row, and
- * only ONE of them is allowed to give ground:
+ * The bar is exactly three flex regions inside one `w-full max-w-7xl px-4` row,
+ * and only ONE of them is allowed to give ground:
  *
  *   1. BRAND        `shrink-0` — logo + corridor switcher + language capsule.
- *   2. CENTER LINKS `hidden lg:flex … shrink min-w-0 overflow-hidden` — the
- *      only elastic region. It is hidden outright below `lg`, and because it
- *      clips, the last redundant link is what degrades on a 1024px laptop
- *      instead of the currency trigger or the trust pill colliding with it.
- *   3. TRUST PILL   dot always, copy from `xl` up — icon-only below `md`, so
- *      it can never crowd the corridor capsule on a phone in portrait.
- *   4. UTILITIES    `shrink-0` — Open Data, theme toggle, API access.
+ *   2. CENTER LINKS `hidden lg:flex … shrink min-w-0 overflow-hidden` — the only
+ *      elastic region. It is hidden outright below `lg`, and because it clips,
+ *      the last redundant link is what degrades on a 1024px laptop instead of
+ *      the currency trigger or the trust pill colliding with it.
+ *   3. UTILITIES    `shrink-0` — trust indicator, Open Data, theme, API access.
+ *      The "100% Client-Side" indicator is a PULSING DOT ONLY below `xl` and
+ *      gains its full label copy from `xl` up, so the widest string in the bar
+ *      only exists at the breakpoint with room for it.
  *
- * No region wraps (`whitespace-nowrap` everywhere) and no region is allowed to
- * overlap: `shrink-0` on 1/4 plus `overflow-hidden` on 2 makes horizontal
- * overflow structurally impossible at any width.
+ * No region wraps (`whitespace-nowrap` everywhere) and no region may overlap:
+ * `shrink-0` on 1/3 plus `overflow-hidden` on 2 makes horizontal overflow
+ * structurally impossible at any width. On a 375px phone the wordmark drops to
+ * the Δ glyph alone, which is the only remaining way to fit the corridor
+ * capsule, the trust dot and the theme toggle on one line.
  */
 export default function Header() {
   const { t } = useLanguage();
@@ -41,7 +44,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 h-16 w-full border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-lg">
       <nav
         aria-label="Primary"
-        className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
+        className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4"
       >
         {/* 1 — BRAND. shrink-0 keeps the corridor capsule at its intrinsic
             width; both switchers are `relative` roots, so their absolute
@@ -50,12 +53,12 @@ export default function Header() {
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href="/"
-            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-sm font-semibold tracking-tight text-white transition-opacity duration-200 ease-out hover:opacity-80"
+            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold tracking-tight text-white transition-opacity duration-200 ease-out hover:opacity-80"
           >
             <span aria-hidden="true" className="text-base font-medium leading-none">
               Δ
             </span>
-            <span className="truncate">PayoutDelta</span>
+            <span className="hidden whitespace-nowrap sm:inline">PayoutDelta</span>
           </Link>
           <span
             aria-hidden="true"
@@ -81,61 +84,54 @@ export default function Header() {
         {/* 2 — CENTER LINKS. The only elastic region: hidden below `lg`, and
             `overflow-hidden` means a tight laptop clips the trailing
             secondary link rather than letting any two regions overlap. */}
-        <div
-          className="hidden min-w-0 shrink items-center gap-4 overflow-hidden text-xs font-mono text-slate-400 lg:flex xl:gap-5"
-        >
+        <div className="hidden items-center gap-5 overflow-hidden text-xs font-mono text-neutral-400 lg:flex shrink min-w-0">
           <Link
             href="/"
-            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-slate-100"
+            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-neutral-100"
           >
             {t("calculator")}
           </Link>
           <Link
             href="/invoice/"
-            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-slate-100"
+            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-neutral-100"
           >
             {t("invoiceStudio")}
           </Link>
           <Link
             href="/tax-ledger/"
-            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-slate-100"
+            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-neutral-100"
           >
             {t("taxLedger")}
           </Link>
           <Link
             href="/dashboard/"
-            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-slate-100"
+            className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-neutral-100"
           >
-            Terminal
+            {t("terminal")}
           </Link>
-          {/* Secondary pair: only once the `xl` breakpoint hands the row enough
-              room, and yielded again at `2xl` where the two utility pills below
-              claim the same fixed pixels inside the capped max-w-7xl container. */}
-          <span className="hidden shrink-0 items-center gap-5 xl:inline-flex 2xl:hidden">
-            <Link
-              href="/banks/"
-              className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-slate-100"
-            >
-              {t("banks")}
-            </Link>
+          {/* Challenger Rails: joins the bar once `xl` hands the row room, and
+              yields again at `2xl` where the API pill claims the same fixed
+              pixels inside the capped max-w-7xl container. It also lives on the
+              left command rail, so nothing is unreachable when it steps aside. */}
+          <span className="hidden shrink-0 xl:inline-flex 2xl:hidden">
             <Link
               href="/challengers/"
-              className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-slate-100"
+              className="whitespace-nowrap transition-colors duration-200 ease-out hover:text-neutral-100"
             >
               {t("challengers")}
             </Link>
           </span>
         </div>
 
-        {/* 3 + 4 — TRUST + UTILITIES. shrink-0, `whitespace-nowrap` on every
-            child, and the pill degrades to its status dot below `xl`. */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        {/* 3 — UTILITIES. shrink-0, `whitespace-nowrap` on every child, and the
+            trust indicator is a pulsing dot below `xl` — full label from `xl` up. */}
+        <div className="flex shrink-0 items-center gap-3">
           <span
             aria-hidden="true"
             className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-500/10 px-2 py-1 xl:px-2.5"
             title={t("clientSideBadge")}
           >
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+            <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500 xl:animate-none" />
             <span className="hidden text-xs font-medium text-emerald-400/90 xl:inline">
               {t("clientSideBadge")}
             </span>
