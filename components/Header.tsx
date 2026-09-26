@@ -4,6 +4,7 @@ import Link from "next/link";
 import CorridorSwitcher from "@/components/CorridorSwitcher";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
+import BaseCurrencySwitcher from "@/components/BaseCurrencySwitcher";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
@@ -149,6 +150,15 @@ export default function Header() {
           </Link>
           <span className="shrink-0">
             <ThemeToggle />
+          </span>
+          {/* Settlement-currency switcher — a preference control like the theme
+              toggle, so it lives in the utilities zone rather than the brand
+              zone. `hidden sm:block` keeps the 375px phone layout byte-identical
+              to the pre-existing one: on small screens the settlement currency
+              stays USD (the dataset's own accounting unit) and the re-based
+              surfaces are reached from the dashboard instead. */}
+          <span className="hidden shrink-0 sm:inline-flex">
+            <BaseCurrencySwitcher />
           </span>
           <Link
             href="/api-access/"

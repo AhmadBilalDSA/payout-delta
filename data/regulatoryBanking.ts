@@ -57,12 +57,313 @@ export interface RegulatoryBank {
   localCurrency: string;
 }
 
+/**
+ * A destination's domestic settlement rail, as published by its own central
+ * bank / system operator. This is the leg the correspondent MT103 hands off to
+ * once it leaves the SWIFT network — the reason a corridor's intermediary cut
+ * and its local realization time differ so much.
+ */
+export interface RailSeed {
+  /** Named rail, e.g. "Raast", "IMPS / NEFT / RTGS", "InstaPay / PESONet". */
+  rail: string;
+  /** System operator or central bank, e.g. "State Bank of Pakistan". */
+  operator: string;
+  /** True when the rail credits in (near) real time. */
+  instant: boolean;
+  /** Published realization window, e.g. "T+0 (seconds)" or "T+1 (business day)". */
+  window: string;
+  /**
+   * Settlement finality class:
+   *   - `IRG` — irrevocable, gross, real-time settlement (RTGS / IPS style).
+   *     Funds are final at the instant they are booked.
+   *   - `RTH` — retail deferred settlement (ACH / net-clearing style). Legs are
+   *     netted and become final only at the end of the clearing window.
+   */
+  finality: "IRG" | "RTH";
+}
+
+/** SWIFT field 71A (Details of Charges) guidance for one corridor. */
+export interface Field71ABand {
+  /** Charge code to request in field 71A. */
+  code: "SHA" | "OUR" | "BEN";
+  /** Plain-English instruction for the sender. */
+  instruction: string;
+  /** Lowest published intermediary cut for the primary bank (USD). */
+  minUSD: number;
+  /** Highest published intermediary cut for the primary bank (USD). */
+  maxUSD: number;
+  /** Published point estimate for the primary bank (USD). */
+  typicalUSD: number;
+}
+
+/** One audited receiving bank and the SHA band it publishes. */
+export interface TransitCut {
+  /** 1-based hop order as listed in `banks[]`. */
+  hop: number;
+  bank: string;
+  swiftCode: string;
+  minUSD: number;
+  maxUSD: number;
+  typicalUSD: number;
+}
+
+/**
+ * Phase 2 — domestic settlement rail per payout currency.
+ *
+ * One entry for every destination currency in `data/fees.json` (105 audited
+ * currencies across the 131 corridors), so `railFor()` can never fall through to
+ * `DEFAULT_RAIL` on a real route. Each row names the rail the destination's own
+ * central bank or system operator runs — Raast for PKR, IMPS / NEFT / RTGS for
+ * INR, InstaPay / PESONet for PHP, Pix for BRL, SEPA for EUR, Fedwire / CHIPS
+ * for USD — plus its operator, whether it credits in real time, the published
+ * realization window and its settlement finality class.
+ *
+ * `window` is the published clearing/realization window, not a PayoutDelta SLA.
+ */
+export const RAILS_BY_CURRENCY: Record<string, RailSeed> = {
+  AED: { rail: "UAEFTS / IPI", operator: "Central Bank of the UAE", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  ALL: { rail: "AIPS", operator: "Bank of Albania", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  AMD: { rail: "RTGS", operator: "Central Bank of Armenia", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  AOA: { rail: "BNA RTGS", operator: "Banco Nacional de Angola", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  ARS: { rail: "Pagos en Línea / LCU clearing", operator: "Banco Central de la República Argentina", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  AZN: { rail: "AZ-IPS", operator: "State Bank of the Republic of Azerbaijan", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  BAM: { rail: "CBBIH RTGS", operator: "Central Bank of Bosnia and Herzegovina", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  BBD: { rail: "BACS", operator: "Central Bank of Barbados", instant: false, window: "T+2 (business days)", finality: "RTH" },
+  BDT: { rail: "BEFTN", operator: "Bangladesh Bank", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  BGN: { rail: "BIS", operator: "Bulgarian National Bank", instant: false, window: "T+0 (same day)", finality: "IRG" },
+  BHD: { rail: "BIPS", operator: "Central Bank of Bahrain", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  BND: { rail: "BECS-CBN", operator: "Borneo Clearing House Network", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  BOB: { rail: "BACS", operator: "Banco Central de Bolivia", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  BRL: { rail: "Pix", operator: "Banco Central do Brasil", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  BSD: { rail: "ACH clearing", operator: "Central Bank of The Bahamas", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  BTN: { rail: "BICHC", operator: "Bhutan Interbank Clearing House", instant: false, window: "T+2 (business days)", finality: "RTH" },
+  BWP: { rail: "BACS", operator: "Bank of Botswana", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  BZD: { rail: "ACH / RAPS", operator: "Central Bank of Belize", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  CLP: { rail: "ACH", operator: "Banco Central de Chile", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  COP: { rail: "ACH SEBRA", operator: "Superintendencia Financiera de Colombia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  CRC: { rail: "SINVI", operator: "Banco Central de Costa Rica", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  CZK: { rail: "CNB settlement system", operator: "Czech National Bank", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  DKK: { rail: "Kroner (RTGS)", operator: "Danmarks Nationalbank", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  DOP: { rail: "ACH Dominicano", operator: "Banco Central de la República Dominicana", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  DZD: { rail: "SATIM", operator: "Banque d'Algérie", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  EGP: { rail: "InstaPay / CBE", operator: "Central Bank of Egypt", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  ETB: { rail: "RTGS", operator: "National Bank of Ethiopia", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  EUR: { rail: "T2 / SEPA Instant", operator: "European Central Bank · EPC", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  FJD: { rail: "RITS", operator: "Reserve Bank of Fiji", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  GBP: { rail: "CHAPS / FPS", operator: "Bank of England · Pay.UK", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  GEL: { rail: "TBC", operator: "National Bank of Georgia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  GHS: { rail: "GhIPSS Instant Pay", operator: "Bank of Ghana · GhIPSS", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  GTQ: { rail: "STP", operator: "Sistema de Información Bancaria de Guatemala", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  GYD: { rail: "ACH", operator: "Bank of Guyana", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  HKD: { rail: "HKDATS", operator: "Hong Kong Interbank Clearing Limited", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  HNL: { rail: "ACH", operator: "Banco Central de Honduras", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  HUF: { rail: "HKN instant / BKR", operator: "Magyar Nemzeti Bank", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  IDR: { rail: "BI-FAST / BI-RTGS", operator: "Bank Indonesia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  INR: { rail: "IMPS / NEFT / RTGS", operator: "Reserve Bank of India", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  IQD: { rail: "RTGS", operator: "Central Bank of Iraq", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  ISK: { rail: "Icelandic Clearing House", operator: "Central Bank of Iceland", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  JMD: { rail: "ACH", operator: "Bank of Jamaica", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  JOD: { rail: "JoCC / BITS", operator: "Jordanian Clearing Company", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  KES: { rail: "PesaLink / RTGS", operator: "Central Bank of Kenya", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  KGS: { rail: "ELEST", operator: "National Bank of the Kyrgyz Republic", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  KHR: { rail: "BACS", operator: "National Bank of Cambodia", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  KWD: { rail: "NBK RTGS", operator: "Central Bank of Kuwait", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  KZT: { rail: "KISS", operator: "National Bank of the Republic of Kazakhstan", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  LAK: { rail: "RTGS", operator: "Bank of the Lao PDR", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  LBP: { rail: "RTGS / interbank clearing", operator: "Banque du Liban", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  LKR: { rail: "SIPS", operator: "Central Bank of Sri Lanka", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  LSL: { rail: "Clearing House Lesotho", operator: "Central Bank of Lesotho", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  MAD: { rail: "CMI", operator: "Bank Al-Maghrib", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  MDL: { rail: "BNM settlement", operator: "National Bank of Moldova", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  MGA: { rail: "BAM RTGS", operator: "Banque Centrale de Madagascar", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  MKD: { rail: "MIPS", operator: "National Bank of the Republic of North Macedonia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  MNT: { rail: "Interbank clearing", operator: "Bank of Mongolia", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  MUR: { rail: "Clearing House", operator: "Bank of Mauritius", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  MVR: { rail: "Domestic Banking Network", operator: "Monetary Authority of the Maldives", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  MWK: { rail: "RTGS", operator: "Reserve Bank of Malawi", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  MXN: { rail: "SPEI / CODI", operator: "Banco de México", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  MYR: { rail: "DuitNow / PayNet", operator: "Bank Negara Malaysia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  MZN: { rail: "BMO RTGS", operator: "Banco de Moçambique", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  NAD: { rail: "NAMRTGS", operator: "Bank of Namibia", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  NGN: { rail: "NIBSS Instant Payment", operator: "NIBSS · Central Bank of Nigeria", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  NIO: { rail: "Interbank clearing", operator: "Banco Central de Nicaragua", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  NOK: { rail: "RTGS", operator: "Norges Bank", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  NPR: { rail: "NRTSS", operator: "Nepal Rastra Bank", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  OMR: { rail: "Interbank RTGS", operator: "Central Bank of Oman", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  PAB: { rail: "ACH / transferencia interbancaria", operator: "Banco Nacional de Panamá", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  PEN: { rail: "Sistema de Transferencias DEPE", operator: "BCRP · sistema interbancario", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  PGK: { rail: "RTGS", operator: "Bank of Papua New Guinea", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  PHP: { rail: "InstaPay / PESONet / PhilPaSS", operator: "Bangko Sentral ng Pilipinas", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  PKR: { rail: "Raast", operator: "State Bank of Pakistan", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  PLN: { rail: "Express ELIXIR", operator: "Narodowy Bank Polski · KIR", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  PYG: { rail: "BACP", operator: "Banco Central del Paraguay", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  QAR: { rail: "NPS (national payments)", operator: "Qatar National Bank · QCHP", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  RON: { rail: "RoTGS", operator: "Banca Națională a României", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  RSD: { rail: "IPS / NBS", operator: "National Bank of Serbia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  RWF: { rail: "RTGS", operator: "National Bank of Rwanda", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  SAR: { rail: "SARN", operator: "Saudi Central Bank · SAMA", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  SBD: { rail: "SICH", operator: "Solomon Islands Clearing House", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  SEK: { rail: "RIX", operator: "Sveriges Riksbank", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  SGD: { rail: "FAST / PayNow", operator: "Monetary Authority of Singapore", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  SRD: { rail: "Surclear", operator: "Centrale Bank van Suriname", instant: false, window: "T+1 (business day)", finality: "RTH" },
+  SZL: { rail: "Clearing House / SADC-RTGS", operator: "Central Bank of Eswatini", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  THB: { rail: "PromptPay / BAHTNET", operator: "Bank of Thailand", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  TJS: { rail: "RTGS / BRT", operator: "National Bank of Tajikistan", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  TND: { rail: "BCT RTGS", operator: "Banque Centrale de Tunisie", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  TOP: { rail: "RTGS", operator: "National Reserve Bank of Tonga", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  TRY: { rail: "EFT / ZIB", operator: "CBRT · Takasbank", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  TTD: { rail: "Interbank settlement", operator: "Central Bank of Trinidad and Tobago", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  TZS: { rail: "TIPS", operator: "Bank of Tanzania", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  UAH: { rail: "SEP", operator: "National Bank of Ukraine", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  UGX: { rail: "RTGS", operator: "Bank of Uganda", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  USD: { rail: "Fedwire / CHIPS", operator: "Federal Reserve Banks · The Clearing House", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  UYU: { rail: "SIDE", operator: "Banco Central del Uruguay", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  UZS: { rail: "NCHRT", operator: "Central Bank of the Republic of Uzbekistan", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  VND: { rail: "NAPAS", operator: "State Bank of Vietnam", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  VUV: { rail: "VANWETS", operator: "Reserve Bank of Vanuatu", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  WST: { rail: "EFT / CHS", operator: "Central Bank of Samoa", instant: false, window: "T+2 (business days)", finality: "RTH" },
+  XAF: { rail: "BEAC RTGS", operator: "Banque des États de l'Afrique Centrale", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  XOF: { rail: "BCEAO RTGS", operator: "Banque Centrale des États de l'Afrique de l'Ouest", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  ZAR: { rail: "NRTGS", operator: "South African Reserve Bank", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  ZMW: { rail: "RTGS", operator: "Bank of Zambia", instant: false, window: "T+1 (business day)", finality: "IRG" },
+};
+
+/**
+ * Last-resort rail for a currency with no authored row. `data/fees.json` is
+ * fully covered by `RAILS_BY_CURRENCY`, so this only guards a future currency
+ * added to the dataset before its rail row is authored — and it is named
+ * explicitly so an unaudited corridor is visible rather than silent.
+ */
+export const DEFAULT_RAIL: RailSeed = {
+  rail: "Local interbank clearing (rail row pending)",
+  operator: "Destination central bank",
+  instant: false,
+  window: "T+1–T+2 (business days)",
+  finality: "RTH",
+};
+
+/** Standard notice attached wherever no verified treaty exemption is on file. */
+export const REGULATORY_DISCLAIMER =
+  "No bilateral tax-treaty exemption is on file for this corridor. Withholding, " +
+  "turnover tax and VAT treatment are the destination's own published rates; the " +
+  "figures shown are informational benchmarks compiled from the open regulatory " +
+  "record and must be confirmed with the receiving bank, the destination revenue " +
+  "authority or a local accountant before invoicing. Nothing here is legal, tax or " +
+  "financial advice.";
+
+/** Payout currency for a corridor slug, derived from its slug contract. */
+export function destinationCurrency(slug: string): string {
+  return slug.split("-").pop()?.toUpperCase() ?? "";
+}
+
+/** Resolves the destination's own settlement rail, never `undefined`. */
+export function railFor(currency: string): RailSeed {
+  return RAILS_BY_CURRENCY[currency.toUpperCase()] ?? DEFAULT_RAIL;
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
+ * Phase 2 — projects the SWIFT field 71A (Details of Charges) guidance for a
+ * corridor out of its own primary receiving bank's published SHA band, so the
+ * 71A chip, the leakage index and the waterfall can never quote three different
+ * numbers for the same wire.
+ *
+ * `SHA` is the modelled default across the dataset because it is what actually
+ * dominates cross-border payout leakage: the sender pays its own institution's
+ * fee and the beneficiary pays theirs, so a single MT103 quietly loses up to
+ * twice the correspondent cut. `OUR` and `BEN` are retained in the type because
+ * a bank that supports them must be able to say so — see `chargeCodeSupport` on
+ * the bank dossiers in `data/banks.ts`.
+ */
+export function field71AFor(bank: RegulatoryBank | undefined): Field71ABand {
+  const minUSD = bank?.intermediaryMinUSD ?? FALLBACK_SWIFT_BAND.min;
+  const maxUSD = bank?.intermediaryMaxUSD ?? FALLBACK_SWIFT_BAND.max;
+  const typicalUSD = bank?.intermediaryUSD ?? round2((minUSD + maxUSD) / 2);
+  const label = bank?.name ?? "the receiving bank";
+  return {
+    code: "SHA",
+    instruction:
+      `Request 71A = SHA and reconcile against the published band for ${label}: ` +
+      `$${minUSD}–$${maxUSD} per wire, ~$${typicalUSD} typical. Under SHA the ` +
+      `ordering institution and the beneficiary institution are each charged ` +
+      `their own fee, so one MT103 can deduct up to twice this band. Escalate ` +
+      `anything above $${maxUSD} to the receiving bank before release.`,
+    minUSD,
+    maxUSD,
+    typicalUSD,
+  };
+}
+
+/**
+ * Phase 2 — de-duplicates the statutory purpose codes a corridor's own tiers
+ * declare, preserving tier order. Corridors whose regime declares no code (the
+ * generic fallback rows) resolve to an empty list rather than an invented one.
+ */
+export function purposeCodesFrom(tiers: StatutoryTier[]): string[] {
+  const seen = new Set<string>();
+  const codes: string[] = [];
+  for (const tier of tiers) {
+    const code = tier.purposeCode?.trim();
+    if (code && !seen.has(code)) {
+      seen.add(code);
+      codes.push(code);
+    }
+  }
+  return codes;
+}
+
+/**
+ * Phase 2 — projects the ordered transit-cut ladder for a corridor straight off
+ * its `banks[]` array. Every row carries the audited bank's own published band,
+ * so a hop can never be displayed with a figure that is not in the data.
+ */
+export function transitCutsFrom(banks: RegulatoryBank[]): TransitCut[] {
+  return banks.map((bank, index) => ({
+    hop: index + 1,
+    bank: bank.name,
+    swiftCode: bank.swiftCode,
+    minUSD: bank.intermediaryMinUSD,
+    maxUSD: bank.intermediaryMaxUSD,
+    typicalUSD: bank.intermediaryUSD,
+  }));
+}
+
 export interface CorridorRegulation {
   slug: string;
   /** Opening statutory authority reference (seductive shorthands kept). */
   authority: string;
   /** National clearing network identifier. */
   clearingNetwork: string;
+  /**
+   * Phase 2 — the destination's own settlement rail, resolved from
+   * `RAILS_BY_CURRENCY` by the corridor's payout currency. Every authored
+   * currency in `data/fees.json` has an entry, so no corridor ever renders an
+   * empty rail chip.
+   */
+  localSettlementRail: RailSeed;
+  /**
+   * Phase 2 — SWIFT field 71A (Details of Charges) guidance for this corridor.
+   * The band is projected from the corridor's own primary receiving bank
+   * (`intermediaryMinUSD` / `intermediaryMaxUSD`), never from a global
+   * constant, so the 71A chip and the leakage index cannot disagree.
+   */
+  field71A: Field71ABand;
+  /**
+   * Statutory purpose codes declared by the corridor's tiers, de-duplicated in
+   * tier order. Corridors whose regime declares no code resolve to an empty
+   * list rather than an invented one.
+   */
+  taxPurposeCodes: string[];
+  /**
+   * Ordered intermediary transit cuts a wire can traverse on this corridor —
+   * one row per audited receiving bank, each carrying that bank's own
+   * published SHA band. Never a synthetic figure: it is a projection of
+   * `banks[]`.
+   */
+  intermediaryTransitCuts: TransitCut[];
   /**
    * Phase 2 — extractable statutory evidence anchors for the AEO citation
    * chips: named regulator + section + purpose-code shorthand per corridor.
@@ -5753,7 +6054,19 @@ const lslBanks: RegulatoryBank[] = [
   { id: "fnbls", name: "First National Bank Lesotho", displayName: "FNB (Lesotho)", swiftCode: "FIRNLSMX", intermediaryUSD: 19, intermediaryMinUSD: 16, intermediaryMaxUSD: 22, localFeeDefault: 20, speed: "Standard", clearance: "SADC-RTGS \u00b7 CBL EFT (Clearing)", localCurrency: "LSL" },
 ];
 
-const AUTHORED: Record<string, CorridorRegulation> = {
+/**
+ * The authored literal shape. The four Phase 2 projections (`localSettlementRail`,
+ * `field71A`, `taxPurposeCodes`, `intermediaryTransitCuts`) are deliberately
+ * excluded: they are derived from the corridor's own currency and banks inside
+ * `getRegulatoryBanking()` rather than hand-written, so they cannot drift out of
+ * sync with the rails table or the audited bank bands.
+ */
+export type AuthoredRegulation = Omit<
+  CorridorRegulation,
+  "localSettlementRail" | "field71A" | "taxPurposeCodes" | "intermediaryTransitCuts"
+>;
+
+const AUTHORED: Record<string, AuthoredRegulation> = {
   "usd-to-pkr": {
     slug: "usd-to-pkr",
     authority: "SBP Foreign Exchange Manual Chapter 13 & Income Tax Ordinance Section 154A",
@@ -7050,6 +7363,13 @@ export function getRegulatoryBanking(slug: string): CorridorRegulation {
   if (authored) {
     return {
       ...authored,
+      // Phase 2 — rail, 71A and the transit ladder are all derived from the
+      // corridor's own destination currency and its own audited banks, so an
+      // authored profile can never disagree with the rails table.
+      localSettlementRail: railFor(destinationCurrency(authored.slug)),
+      field71A: field71AFor(authored.banks[0]),
+      taxPurposeCodes: purposeCodesFrom(authored.tiers),
+      intermediaryTransitCuts: transitCutsFrom(authored.banks),
       defaultIntermediaryCut:
         authored.banks[0]?.intermediaryUSD ?? FALLBACK_SWIFT_BAND.min,
     };
@@ -7069,6 +7389,10 @@ export function getRegulatoryBanking(slug: string): CorridorRegulation {
     slug,
     authority: "International remittance governed by the destination country's exchange-control & income-tax regime",
     clearingNetwork: network,
+    localSettlementRail: railFor(fallback.currency),
+    field71A: field71AFor(genericBanks[0]),
+    taxPurposeCodes: purposeCodesFrom(fallbackTiers(network)),
+    intermediaryTransitCuts: transitCutsFrom(genericBanks),
     citations: [
       `National Inward Clearing Settlement · ${network}`,
       "Benchmark intermediary SWIFT deduction $15–$25",

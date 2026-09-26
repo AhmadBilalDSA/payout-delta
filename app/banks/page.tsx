@@ -17,8 +17,7 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/banks/`,
     siteName: "PayoutDelta",
     title: "Bank Dossier Directory — PayoutDelta",
-    description:
-      "22 bank dossiers decoded: correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L) and domestic beneficiary rails with typical SHA cuts and field 71A guidance.",
+    description: `${BANK_DOSSIERS.length} bank dossiers decoded: correspondent clearing hubs (CHASUS33, DEUTDEDD, HSBCGB2L) and domestic beneficiary rails with typical SHA cuts, field 71A charge-code support and settlement rails.`,
   },
 };
 

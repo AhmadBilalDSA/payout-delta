@@ -360,6 +360,20 @@ export const enStrings = {
   dashboardHopBeneficiary: "Beneficiary bank",
   dashboardHopRail: "Domestic rail",
   dashboardHopCharge: "Field 71A",
+
+  /* --- Settlement-currency re-baselining + bank dossier expansions ------- */
+  baseCurrency: "Base currency",
+  baseCurrencyHint:
+    "Rebase every quote, waterfall and dossier figure onto your own settlement currency.",
+  baseCurrencySelect: "Settlement currency",
+  staticRateBadge: "Static rates",
+  rebasedFromUsd: "rebased from USD",
+  rebasedNotice: "Static reference rates — a fixed snapshot, not a live FX feed.",
+  bankSettlementRail: "Settlement rail",
+  bankChargeCodes: "Charge codes (71A)",
+  bankRecommended: "Recommended",
+  bankAverageCut: "Average cut",
+  bankAvgTransit: "Avg transit",
 } as const;
 
 /** Every catalog shares the exact key set derived from the English source. */
@@ -376,6 +390,7 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
   ur: {
     isRTL: true,
     strings: {
+      ...enStrings,
       calculator: "کیلکولیٹر",
       invoiceStudio: "انوائس اسٹوڈیو",
       taxLedger: "ٹیکس لیجر",
@@ -667,12 +682,27 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       dashboardHopBeneficiary: "مستحق بینک",
       dashboardHopRail: "مقامی ریل",
       dashboardHopCharge: "فیلڈ 71A",
+
+      /* --- Settlement-currency re-baselining + bank dossier expansions --- */
+      baseCurrency: "بنیادی کرنسی",
+      baseCurrencyHint:
+        "ہر تخمینے، واٹر فال اور بینک تفصیل کے اعداد و شمار اپنی کاروباری کرنسی میں دکھائیں۔",
+      baseCurrencySelect: "کاروباری کرنسی",
+      staticRateBadge: "مستحکم ریٹ",
+      rebasedFromUsd: "USD سے تبدیل شدہ",
+      rebasedNotice: "مستحکم حوالہ ریٹ — یہ لائیو فاریکس فیڈ نہیں ہے۔",
+      bankSettlementRail: "کاروباری ریل",
+      bankChargeCodes: "چارج کوڈز (71A)",
+      bankRecommended: "تجویز کردہ",
+      bankAverageCut: "اوسط کٹ",
+      bankAvgTransit: "اوسط ٹرانزٹ",
     },
   },
 
   hi: {
     isRTL: false,
     strings: {
+      ...enStrings,
       calculator: "कैलकुलेटर",
       invoiceStudio: "इनवॉइस स्टूडियो",
       taxLedger: "टैक्स लेज़र",
@@ -963,12 +993,27 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
       dashboardHopBeneficiary: "लाभार्थी बैंक",
       dashboardHopRail: "स्थानीय रेल",
       dashboardHopCharge: "फ़ील्ड 71A",
+
+      /* --- Settlement-currency re-baselining + bank dossier expansions --- */
+      baseCurrency: "आधार मुद्रा",
+      baseCurrencyHint:
+        "हर कोटेशन, वॉटरफ़ॉल और बैंक डोज़ियर के आँकड़े अपनी कारोबारी मुद्रा में देखें।",
+      baseCurrencySelect: "कारोबारी मुद्रा",
+      staticRateBadge: "स्थिर दरें",
+      rebasedFromUsd: "USD से रीबेस्ड",
+      rebasedNotice: "स्थिर संदर्भ दरें — यह लाइव FX फ़ीड नहीं है।",
+      bankSettlementRail: "कारोबारी रेल",
+      bankChargeCodes: "शुल्क कोड (71A)",
+      bankRecommended: "अनुशंसित",
+      bankAverageCut: "औसत कटौती",
+      bankAvgTransit: "औसत ट्रांज़िट",
     },
   },
 
   fil: {
     isRTL: false,
     strings: {
+      ...enStrings,
       calculator: "Calculator",
       invoiceStudio: "Invoice Studio",
       taxLedger: "Tax Ledger",
@@ -1261,12 +1306,27 @@ swiftBic: "SWIFT / BIC code",
       dashboardHopBeneficiary: "Benepisyaryong binko",
       dashboardHopRail: "Lokal na rail",
       dashboardHopCharge: "Field 71A",
+
+      /* --- Settlement-currency re-baselining + bank dossier expansions --- */
+      baseCurrency: "Base currency",
+      baseCurrencyHint:
+        "Ibalik ang lahat ng quote, waterfall at datos ng dossier sa sarili mong settlement currency.",
+      baseCurrencySelect: "Settlement currency",
+      staticRateBadge: "Fixed rates",
+      rebasedFromUsd: "rebased mula sa USD",
+      rebasedNotice: "Mga reference na rate — hindi ito live na FX feed.",
+      bankSettlementRail: "Settlement rail",
+      bankChargeCodes: "Mga charge code (71A)",
+      bankRecommended: "Mga rekomendasyon",
+      bankAverageCut: "Karaniwang cut",
+      bankAvgTransit: "Karaniwang transit",
     },
   },
 
   es: {
     isRTL: false,
     strings: {
+      ...enStrings,
       calculator: "Calculadora",
       invoiceStudio: "Estudio de facturas",
       taxLedger: "Registro tributario",
@@ -1559,12 +1619,27 @@ swiftBic: "SWIFT / BIC code",
       dashboardHopBeneficiary: "Banco beneficiario",
       dashboardHopRail: "Rail nacional",
       dashboardHopCharge: "Campo 71A",
+
+      /* --- Settlement-currency re-baselining + bank dossier expansions --- */
+      baseCurrency: "Moneda base",
+      baseCurrencyHint:
+        "Rebasa cada cotización, cascada y cifra del dosier a tu propia moneda de liquidación.",
+      baseCurrencySelect: "Moneda de liquidación",
+      staticRateBadge: "Tipos fijos",
+      rebasedFromUsd: "rebasado desde USD",
+      rebasedNotice: "Tipos de referencia fijos: no es un feed de FX en vivo.",
+      bankSettlementRail: "Red de liquidación",
+      bankChargeCodes: "Códigos de cargo (71A)",
+      bankRecommended: "Recomendado",
+      bankAverageCut: "Corte promedio",
+      bankAvgTransit: "Tránsito promedio",
     },
   },
 
   pt: {
     isRTL: false,
     strings: {
+      ...enStrings,
       calculator: "Calculadora",
       invoiceStudio: "Estúdio de faturas",
       taxLedger: "Registro tributário",
@@ -1857,12 +1932,27 @@ swiftBic: "SWIFT / BIC code",
       dashboardHopBeneficiary: "Banco favorecido",
       dashboardHopRail: "Rail doméstico",
       dashboardHopCharge: "Campo 71A",
+
+      /* --- Settlement-currency re-baselining + bank dossier expansions --- */
+      baseCurrency: "Moeda base",
+      baseCurrencyHint:
+        "Reexiba cada cotação, cascata e número do dossiê na sua própria moeda de liquidação.",
+      baseCurrencySelect: "Moeda de liquidação",
+      staticRateBadge: "Taxas fixas",
+      rebasedFromUsd: "reexibido a partir do USD",
+      rebasedNotice: "Taxas de referência fixas — não é um feed de câmbio ao vivo.",
+      bankSettlementRail: "Trilho de liquidação",
+      bankChargeCodes: "Códigos de cobrança (71A)",
+      bankRecommended: "Recomendado",
+      bankAverageCut: "Corte médio",
+      bankAvgTransit: "Trânsito médio",
     },
   },
 
   ar: {
     isRTL: true,
     strings: {
+      ...enStrings,
       calculator: "حاسبة",
       invoiceStudio: "استوديو الفواتير",
       taxLedger: "دفتر الضرائب",
@@ -2155,6 +2245,20 @@ swiftBic: "SWIFT / BIC code",
       dashboardHopBeneficiary: "البنك المستفيد",
       dashboardHopRail: "المسار المحلي",
       dashboardHopCharge: "الحقل 71A",
+
+      /* --- Settlement-currency re-baselining + bank dossier expansions --- */
+      baseCurrency: "العملة الأساس",
+      baseCurrencyHint:
+        "حوّل كل عرض سعر وشلال تكاليف وأرقام ملف البنك إلى عملة التسوية الخاصة بك.",
+      baseCurrencySelect: "عملة التسوية",
+      staticRateBadge: "أسعار ثابتة",
+      rebasedFromUsd: "مُعاد أساسه من USD",
+      rebasedNotice: "أسعار صرف مرجعية ثابتة — وليست خدمة صرف مباشر.",
+      bankSettlementRail: "مسار التسوية",
+      bankChargeCodes: "رموز الرسوم (71A)",
+      bankRecommended: "الموصى به",
+      bankAverageCut: "متوسط الخصم",
+      bankAvgTransit: "متوسط العبور",
     },
   },
 };

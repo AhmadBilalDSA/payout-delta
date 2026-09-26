@@ -91,7 +91,7 @@ export default function SwiftAuditorPage() {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/[0.6] dark:text-white/60">
           PayoutDelta maps {corridors} corridors onto their real U.S. / EU / UK
           correspondent clearing nodes (CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33,
-          DEUTDEFF, BNPAFRPA, BARCGB22, MIDLGB22) and quantifies the expected
+          DEUTDEDD, BNPAFRPA, BARCGB22, MIDLGB22) and quantifies the expected
           SHA cut, the domestic receiving rail and the settlement speed for
           every bank in the directory — deterministically, entirely in your
           browser.

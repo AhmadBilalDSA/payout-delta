@@ -14,13 +14,13 @@ import type { Corridor } from "@/lib/types";
  *  3. Beneficiary    — 2.5%–4.2% retail FX margin + local-rail delivery.
  *
  * Node data resolves from the corridor's regulatory banking directory and a
- * small currency→correspondent-BIC map (CHASUS33 / DEUTDEFF / BARCGB22) so the
+ * small currency→correspondent-BIC map (CHASUS33 / DEUTDEDD / BARCGB22) so the
  * example BIC stays truthful per source currency. Fully responsive: the three
  * nodes stack vertically with down-arrows on mobile and go horizontal on `sm`.
  */
 const CORRESPONDENT_BICS: Record<string, string> = {
   USD: "CHASUS33",
-  EUR: "DEUTDEFF",
+  EUR: "DEUTDEDD",
   GBP: "BARCGB22",
 };
 

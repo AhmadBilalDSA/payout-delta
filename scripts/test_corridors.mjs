@@ -1522,7 +1522,7 @@ const routingSource = readFileSync(
   "utf8"
 );
 
-const s2GateFailures = [0, 0, 0];
+const s2GateFailures = [0, 0, 0, 0];
 function s2fail(gateIndex, label, detail) {
   s2GateFailures[gateIndex - 1] += 1;
   fail(label, detail);
@@ -1746,6 +1746,80 @@ for (let i = 1; i < leaderboardRows.length; i += 1) {
 }
 console.log(
   `  ${(s2GateFailures[2] === 0 ? "PASS  " : "FAIL  ") + "leaderboard consistency".padEnd(34)}${leaderboardRows.length}/${corpus.corridors.length} corridors ranked, ${distinctCuts.size} distinct intermediary cuts, no ${IDENTICAL_RUN_LIMIT}-row identical cluster`
+);
+
+/** S2.4 - Phase 2 settlement rails + SWIFT field 71A coverage. */
+const railsBlock = bankingSource.match(
+  /RAILS_BY_CURRENCY: Record<string, RailSeed> = \{([\s\S]*?)\n\};/
+);
+const railEntries = new Map();
+if (!railsBlock) {
+  s2fail(4, "settlement rail table", "RAILS_BY_CURRENCY not found in data/regulatoryBanking.ts");
+} else {
+  const entryRe = /^\s{2}([A-Z]{3}):\s*\{([^\n]*)\},?\s*$/gm;
+  let entry;
+  while ((entry = entryRe.exec(railsBlock[1])) !== null) {
+    const body = entry[2];
+    const field = (name) => {
+      const m = body.match(new RegExp(`${name}:\\s*(?:"([^"]*)"|(true|false)|"T\\+[\\d-]+")`));
+      return m ? (m[1] ?? m[2]) : undefined;
+    };
+    railEntries.set(entry[1], {
+      rail: field("rail"),
+      operator: field("operator"),
+      instant: field("instant"),
+      window: field("window"),
+      finality: field("finality"),
+    });
+  }
+}
+
+const corpusCurrencies = new Set(corpus.corridors.map((c) => c.to));
+const uncoveredCurrencies = [...corpusCurrencies].filter((c) => !railEntries.has(c));
+const orphanCurrencies = [...railEntries.keys()].filter(
+  (c) => !corpusCurrencies.has(c)
+);
+if (uncoveredCurrencies.length) {
+  s2fail(
+    4,
+    "settlement rail coverage",
+    `${uncoveredCurrencies.length} corpus currencies have no rail and would silently fall back to DEFAULT_RAIL: ${uncoveredCurrencies.join(", ")}`
+  );
+}
+if (orphanCurrencies.length) {
+  s2fail(
+    4,
+    "settlement rail orphans",
+    `${orphanCurrencies.length} rail entries are unreachable from the corpus: ${orphanCurrencies.join(", ")}`
+  );
+}
+for (const [code, seed] of railEntries) {
+  if (!seed.rail || !seed.operator || !seed.window || !seed.instant) {
+    s2fail(4, "settlement rail completeness", `${code} is missing rail/operator/window/instant`);
+  }
+  if (seed.finality !== "IRG" && seed.finality !== "RTH") {
+    s2fail(4, "settlement finality", `${code} has finality "${seed.finality}" (expected IRG or RTH)`);
+  }
+}
+const resolverBody = bankingSource.match(
+  /export function getRegulatoryBanking\([\s\S]*?\n\}/
+);
+if (!resolverBody || !/railFor\(/.test(resolverBody[0]) || !/field71AFor\(/.test(resolverBody[0])) {
+  s2fail(
+    4,
+    "Phase 2 resolver wiring",
+    "getRegulatoryBanking does not attach both localSettlementRail and field71A on the authored and fallback branches"
+  );
+}
+if (!/intermediaryMinUSD/.test(bankingSource) || !/intermediaryMaxUSD/.test(bankingSource)) {
+  s2fail(
+    4,
+    "Field 71A band provenance",
+    "field71A band no longer projects from the corridor's own bank min/max"
+  );
+}
+console.log(
+  `  ${(s2GateFailures[3] === 0 ? "PASS  " : "FAIL  ") + "settlement rails + Field 71A".padEnd(34)}${railEntries.size} authored rails cover ${corpusCurrencies.size} corpus currencies, 0 DEFAULT_RAIL fallbacks, 71A band derived from primary bank`
 );
 
 console.log(`\n${"-".repeat(header.length)}`);

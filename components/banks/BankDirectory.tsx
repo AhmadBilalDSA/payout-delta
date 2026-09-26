@@ -27,9 +27,9 @@ function BankCard({ bank }: { bank: BankDossier }) {
         </div>
         <span
           className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs font-semibold tracking-wide text-slate-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-300"
-          title={`ISO 9362 BIC — ${bank.bic}`}
+          title={`ISO 9362 BIC — ${bank.swiftBic}`}
         >
-          {formatBic(bank.bic)}
+          {formatBic(bank.swiftBic)}
         </span>
       </div>
 
@@ -78,7 +78,8 @@ export default function BankDirectory({ banks }: { banks: BankDossier[] }) {
       [
         bank.name,
         bank.shortName,
-        bank.bic,
+        bank.swiftBic,
+        bank.clearingNetwork,
         bank.headquartersCity,
         bank.headquartersCountry,
         bank.role,

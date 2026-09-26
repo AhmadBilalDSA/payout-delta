@@ -645,7 +645,7 @@ function DualLaneDiagram({ medianCut }: { medianCut: number }) {
       {/* Lane A: four nodes, three hops, two deduction chips. */}
       <Node x={16} y={32} w={140} h={44} title="Origin bank" caption="your account" />
       <Node x={196} y={32} w={140} h={44} title="Correspondent A" caption="CHASUS33" tone="amber" />
-      <Node x={376} y={32} w={140} h={44} title="Correspondent B" caption="DEUTDEFF" tone="amber" />
+      <Node x={376} y={32} w={140} h={44} title="Correspondent B" caption="DEUTDEDD" tone="amber" />
       <Node x={556} y={32} w={140} h={44} title="Beneficiary bank" caption="field 71A" />
       <Arrow x1={156} y1={54} x2={192} y2={54} tone="amber" />
       <Arrow x1={336} y1={54} x2={372} y2={54} tone="amber" />

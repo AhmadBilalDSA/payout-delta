@@ -46,6 +46,7 @@ import AlternativeRailsCard from "@/components/AlternativeRailsCard";
 import AuditSheetModal from "@/components/AuditSheetModal";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useBaseCurrency } from "@/components/providers/BaseCurrencyProvider";
 
 /**
  * Interactive payout auditor (client island) — Apple-grade, iOS-feel.
@@ -96,6 +97,11 @@ export default function Calculator({
   faq?: ReactNode;
 }) {
   const { t } = useLanguage();
+  // Phase 2 — settlement currency for *display only*. The solver still runs in
+  // USD, and the Invoice-Studio sync payload below is deliberately left in USD
+  // because it declares `currency: "USD"` on the record itself; only what the
+  // reader sees is re-based.
+  const { currency } = useBaseCurrency();
   const router = useRouter();
   // Phase S2 — runtime schema guard: a malformed corridor prop from a stale
   // HTML payload is silently hydrated to safe statutory defaults before any
@@ -507,11 +513,11 @@ export default function Calculator({
             <div className="min-w-0">
               <p className="text-sm font-semibold leading-snug text-emerald-700 dark:text-emerald-300">
                 To receive exactly {formatLocal(targetNet, corridor)}, invoice
-                your client for {formatUSD(inverseRoute.verdict.best.grossRequired)}{" "}
-                USD.
+                your client for {formatUSD(inverseRoute.verdict.best.grossRequired, currency)}{" "}
+                {currency}.
               </p>
               <p className="mt-0.5 text-xs leading-relaxed text-black/[0.5] dark:text-white/[0.5]">
-                Gross-up covers {formatUSD(inverseRoute.verdict.best.totalCostUSD)}{" "}
+                Gross-up covers {formatUSD(inverseRoute.verdict.best.totalCostUSD, currency)}{" "}
                 in fees via {inverseRoute.verdict.best.channelName} · statutory
                 withholding already included.
               </p>
@@ -564,11 +570,11 @@ export default function Calculator({
                       {t("invoiceToClient")}
                     </p>
                     <p className="font-mono text-sm font-bold tabular-nums tracking-tight text-black dark:text-white">
-                      {formatUSD(quote.grossRequired)}
+                      {formatUSD(quote.grossRequired, currency)}
                     </p>
                     <p className="font-mono text-xs tabular-nums tracking-tight text-black/[0.45] dark:text-white/[0.45]">
                       {t("feesToHitTarget", {
-                        fees: formatUSD(quote.totalCostUSD),
+                        fees: formatUSD(quote.totalCostUSD, currency),
                         amount: Math.round(quote.targetNetLocal).toLocaleString(
                           "en-US"
                         ),

@@ -7,6 +7,7 @@ import type {
   DashboardPlatform,
 } from "@/components/dashboard/payload";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useBaseCurrency } from "@/components/providers/BaseCurrencyProvider";
 import { calculateGrossFromTargetNet } from "@/lib/calculatorEngine";
 
 /**
@@ -61,12 +62,19 @@ interface WaterfallStep {
   total?: boolean;
 }
 
-function formatUSD(value: number): string {
-  const safe = Number.isFinite(value) ? value : 0;
-  return `$${safe.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+/**
+ * Formats a USD-equivalent amount in the reader's settlement currency.
+ *
+ * Phase 2 — the waterfall's bar geometry is computed in USD so the proportions
+ * stay identical no matter which currency is selected; only the printed figure
+ * is re-based. That separation is deliberate: a reader who switches to AED must
+ * see the same *shape* of loss, not a re-solved one.
+ */
+function formatRebased(
+  value: number,
+  format: (usd: number, dp?: number) => string
+): string {
+  return format(Number.isFinite(value) ? value : 0);
 }
 
 /** Formats a domestic-currency amount, degrading gracefully on huge rates. */
@@ -87,6 +95,7 @@ export default function WaterfallVisualizer({
   platforms: DashboardPlatform[];
 }) {
   const { t } = useLanguage();
+  const { format, currency, isRebased: rebased } = useBaseCurrency();
   const first = corridors[0];
 
   const [slug, setSlug] = useState<string>(first?.slug ?? "");
@@ -164,7 +173,7 @@ export default function WaterfallVisualizer({
         key: "conversion",
         pct: share(conversionUsd),
         usd: conversionUsd,
-        detail: `${provider.name} · ${(provider.fxSpread * 100).toFixed(2)}% FX + ${formatUSD(provider.fixedFeeUSD)} fee`,
+        detail: `${provider.name} · ${(provider.fxSpread * 100).toFixed(2)}% FX + ${formatRebased(provider.fixedFeeUSD, format)} fee`,
       },
       {
         key: "landing",
@@ -180,7 +189,7 @@ export default function WaterfallVisualizer({
         detail: formatLocal(result.realizedTakeHomeLocal, corridor.symbol),
       },
     ];
-  }, [corridor, provider, result]);
+  }, [corridor, provider, result, format]);
 
   if (!corridor || !provider || !platform || steps.length === 0) {
     return null;
@@ -308,7 +317,7 @@ export default function WaterfallVisualizer({
                   }`}
                 >
                   {isTotal ? "+ " : "− "}
-                  {formatUSD(step.usd)}
+                  {formatRebased(step.usd, format)}
                 </span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/[0.05] dark:bg-white/[0.06]">
@@ -336,6 +345,19 @@ export default function WaterfallVisualizer({
 
       <p className="mt-4 text-[11px] leading-relaxed text-black/45 dark:text-white/45">
         {t("dashboardWaterfallNote")}
+      </p>
+
+      {/* Phase 2 — the settlement-currency badge. Present in both states on
+          purpose: a USD reader still needs to know the bars are USD, and a
+          rebased reader needs the static-rate caveat to travel with the
+          figures rather than live only in the header. */}
+      <p className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+        <span className="rounded-md border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 font-mono font-bold text-emerald-700 dark:text-emerald-400">
+          {currency}
+        </span>
+        <span className="text-black/45 dark:text-white/45">
+          {rebased ? t("rebasedNotice") : t("staticRateBadge")}
+        </span>
       </p>
 
       {/* Scoped, dependency-free motion. The `no-preference` guard is what

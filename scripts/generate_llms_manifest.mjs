@@ -43,14 +43,14 @@ const banksSource = readFileSync(join(ROOT, "data", "banks.ts"), "utf8");
 function parseBanks() {
   const banks = [];
   const re =
-    /slug:\s*"([a-z0-9-]+)",\s*\n\s*name:\s*"([^"]*)",\s*\n\s*shortName:\s*"([^"]*)",\s*\n\s*bic:\s*"([A-Z0-9]{8})",/g;
+    /slug:\s*"([a-z0-9-]+)",\s*\n\s*name:\s*"([^"]*)",\s*\n\s*shortName:\s*"([^"]*)",\s*\n\s*swiftBic:\s*"([A-Z0-9]{8})",/g;
   let match;
   while ((match = re.exec(banksSource)) !== null) {
     banks.push({
       slug: match[1],
       name: match[2],
       shortName: match[3],
-      bic: match[4],
+      swiftBic: match[4],
     });
   }
   return banks;
@@ -333,7 +333,7 @@ function guidesSection() {
     `- [Statutory Purpose Codes & Tax Clearance](${SITE_URL}/tax-clearance): the clearance paperwork behind the rail — SBP purpose code 9111 with Form 'R' and the ePRC bank certificate, RBI purpose code P0802 with the FIRC / e-FIRC download flow and the GST LUT, BSP FX Form 1 inward remittance reporting for BPO receipts, and the DIAN Formato 1060 / Declaración de Cambio and BACEN SCE declarations for LATAM exporters, with every statutory tier and receiving bank read from the same audited dataset.`,
     `- [SWIFT Auditor](${SITE_URL}/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.`,
     `- [Institutional Clearing Terminal](${SITE_URL}/dashboard): macro clearing telemetry across ${corridors.length} corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.`,
-    `- [Bank Dossier Directory](${SITE_URL}/banks): ${BANKS.length} verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.`,
+    `- [Bank Dossier Directory](${SITE_URL}/banks): ${BANKS.length} verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEDD, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.`,
     `- [Agency Treasury Leakage Engine](${SITE_URL}/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.`,
     `- [Challenger Rails & Alternative Settlements](${SITE_URL}/challengers): institutional comparison of four non-bank settlement architectures — Airwallex local clearing, Revolut Business SEPA/ACH off-ramps, Elevate Pay US virtual accounts, and USDC/USDT on Polygon or Arbitrum — benchmarked against the median correspondent SHA deduction of ${usd0(WIRE_MEDIAN_CUT)} and a ${pct(WIRE_MEDIAN_SHARE)} all-in wire cost at the $1,000 benchmark across the ${corridors.length} corridors.`,
     `- [Embeddable Payout Widget](${SITE_URL}/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all ${corridors.length} corridors live at /embed/<slug>/).`,
@@ -387,7 +387,7 @@ const correspondentLegend = [
   "Public SWIFT/BIC identifiers a traditional MT103 may clear through before the recipient bank. The pool listed per corridor matches its clearing currency (USD, EUR or GBP).",
   "",
   `- USD · JPMorgan Chase New York (CHASUS33), Citibank New York (CITIUS33), BNY Mellon New York (IRVTUS3N), Standard Chartered New York (SCBLUS33)`,
-  `- EUR · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA), Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF), BBVA Frankfurt (BBVADEFF)`,
+  `- EUR · Deutsche Bank Frankfurt (DEUTDEDD), BNP Paribas Paris (BNPAFRPA), Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF), BBVA Frankfurt (BBVADEFF)`,
   `- GBP · Barclays London (BARCGB22), HSBC UK (MIDLGB22), Standard Chartered London (SCBLGB2L), HSBC Bank London (HSBCGB2L)`,
 ];
 
@@ -400,7 +400,7 @@ const banksSection = [
   "|---|---|---|",
   ...BANKS.map(
     (bank) =>
-      `| [${bank.slug}](${SITE_URL}/banks/${bank.slug}) | ${bank.name} | ${bank.bic} |`
+      `| [${bank.slug}](${SITE_URL}/banks/${bank.slug}) | ${bank.name} | ${bank.swiftBic} |`
   ),
 ];
 

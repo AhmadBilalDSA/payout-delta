@@ -45,6 +45,7 @@ export const STORAGE_KEYS = {
   whatsappDismiss: `${NAMESPACE_PREFIX}whatsapp_consulting_dismissed`,
   theme: `${NAMESPACE_PREFIX}theme`,
   language: `${NAMESPACE_PREFIX}language`,
+  baseCurrency: `${NAMESPACE_PREFIX}base_currency`,
 } as const;
 
 /** Individual aliases so call sites read naturally. */
@@ -58,6 +59,7 @@ export const ADDENDUM_FORM_KEY = STORAGE_KEYS.addendumForm;
 export const WHATSAPP_DISMISS_KEY = STORAGE_KEYS.whatsappDismiss;
 export const THEME_KEY = STORAGE_KEYS.theme;
 export const LANGUAGE_KEY = STORAGE_KEYS.language;
+export const BASE_CURRENCY_KEY = STORAGE_KEYS.baseCurrency;
 
 /** Every key under management — handy for audits and tests. */
 export const APP_STORAGE_KEYS: readonly string[] = Object.values(STORAGE_KEYS);

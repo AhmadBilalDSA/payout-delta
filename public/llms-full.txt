@@ -13,7 +13,7 @@
 - [Statutory Purpose Codes & Tax Clearance](https://ahmadbilaldsa.github.io/payout-delta/tax-clearance): the clearance paperwork behind the rail — SBP purpose code 9111 with Form 'R' and the ePRC bank certificate, RBI purpose code P0802 with the FIRC / e-FIRC download flow and the GST LUT, BSP FX Form 1 inward remittance reporting for BPO receipts, and the DIAN Formato 1060 / Declaración de Cambio and BACEN SCE declarations for LATAM exporters, with every statutory tier and receiving bank read from the same audited dataset.
 - [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
 - [Institutional Clearing Terminal](https://ahmadbilaldsa.github.io/payout-delta/dashboard): macro clearing telemetry across 131 corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.
-- [Bank Dossier Directory](https://ahmadbilaldsa.github.io/payout-delta/banks): 22 verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.
+- [Bank Dossier Directory](https://ahmadbilaldsa.github.io/payout-delta/banks): 23 verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEDD, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.
 - [Agency Treasury Leakage Engine](https://ahmadbilaldsa.github.io/payout-delta/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.
 - [Challenger Rails & Alternative Settlements](https://ahmadbilaldsa.github.io/payout-delta/challengers): institutional comparison of four non-bank settlement architectures — Airwallex local clearing, Revolut Business SEPA/ACH off-ramps, Elevate Pay US virtual accounts, and USDC/USDT on Polygon or Arbitrum — benchmarked against the median correspondent SHA deduction of $15 and a 4.60% all-in wire cost at the $1,000 benchmark across the 131 corridors.
 - [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 131 corridors live at /embed/<slug>/).
@@ -35,7 +35,7 @@ Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
 | [usd-to-php](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-php) | USD → PHP | 62.8236 | $5 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | BIR 8% Freelance Gross Income Tax | Direct local clearing |
 | [usd-to-brl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-brl) | USD → BRL | 5.1311 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-gbp](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-gbp) | USD → GBP | 0.7477 | $18 | BARCGB22, MIDLGB22, SCBLGB2L, HSBCGB2L | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-eur) | USD → EUR | 0.8718 | $18 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-ngn](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ngn) | USD → NGN | 1330.691 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-bdt](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bdt) | USD → BDT | 122.7592 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-egp](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-egp) | USD → EGP | 51.9283 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
@@ -68,11 +68,11 @@ Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
 | [usd-to-sek](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-sek) | USD → SEK | 10.4 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Riksbank INK1 | Direct local clearing |
 | [usd-to-nok](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-nok) | USD → NOK | 10.75 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Skatt M-2 | Traditional SWIFT (SHA) |
 | [usd-to-dkk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-dkk) | USD → DKK | 6.85 | $9 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Ligning | Direct local clearing |
-| [usd-to-bam](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bam) | USD → BAM | 1.8 | $12 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Neto dohodak | Direct local clearing |
+| [usd-to-bam](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bam) | USD → BAM | 1.8 | $12 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Neto dohodak | Direct local clearing |
 | [usd-to-gel](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-gel) | USD → GEL | 2.72 | $12 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Personal Income Tax 20% Art. 96 | Direct local clearing |
 | [usd-to-uyu](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-uyu) | USD → UYU | 40.2 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | IRPF cuota profesional | Direct local clearing |
 | [usd-to-crc](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-crc) | USD → CRC | 515 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Impuesto sobre la Renta Art. 3 | Traditional SWIFT (SHA) |
-| [usd-to-hrk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-hrk) | USD → EUR | 0.92 | $10 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Porez na dohodak Art. 15 | Direct local clearing |
+| [usd-to-hrk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-hrk) | USD → EUR | 0.92 | $10 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Porez na dohodak Art. 15 | Direct local clearing |
 | [usd-to-tzs](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-tzs) | USD → TZS | 2640 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | e-services export | Traditional SWIFT (SHA) |
 | [usd-to-ugx](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-ugx) | USD → UGX | 3710 | $15 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | services export | Traditional SWIFT (SHA) |
 | [usd-to-rwf](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-rwf) | USD → RWF | 1385 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ICT export | Traditional SWIFT (SHA) |
@@ -114,26 +114,26 @@ Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
 | [usd-to-all](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-all) | USD → ALL | 86.5 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-mkd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-mkd) | USD → MKD | 55.6 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-mdl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-mdl) | USD → MDL | 17.6 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-me-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-me-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [usd-to-xk-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-xk-eur) | USD → EUR | 0.8718 | $18 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | EUR par settlement | Direct local clearing |
+| [usd-to-me-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-me-eur) | USD → EUR | 0.8718 | $18 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-xk-eur](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-xk-eur) | USD → EUR | 0.8718 | $18 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | EUR par settlement | Direct local clearing |
 | [usd-to-isk](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-isk) | USD → ISK | 131.5 | $14 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | ISK export | Direct local clearing |
 | [usd-to-gyd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-gyd) | USD → GYD | 209 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-srd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-srd) | USD → SRD | 35.2 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-bzd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-bzd) | USD → BZD | 2 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-szl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-szl) | USD → SZL | 18.4 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-lsl](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-lsl) | USD → LSL | 18.3 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
-| [eur-to-pkr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-pkr) | EUR → PKR | 300 | $16 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SBP 9111 | Direct local clearing |
-| [eur-to-inr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-inr) | EUR → INR | 91 | $14 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | RBI P0802 | Direct local clearing |
-| [eur-to-php](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-php) | EUR → PHP | 61 | $17 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BIR 8% Freelance Gross Income Tax | Direct local clearing |
-| [eur-to-bdt](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-bdt) | EUR → BDT | 131 | $15 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BB EXP | Direct local clearing |
-| [eur-to-ngn](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-ngn) | EUR → NGN | 1750 | $22 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | CBN AUT | Direct local clearing |
-| [eur-to-egp](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-egp) | EUR → EGP | 52.5 | $18 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | CBE EXP | Direct local clearing |
-| [eur-to-brl](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-brl) | EUR → BRL | 6 | $20 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BCB BACEN | Direct local clearing |
-| [eur-to-vnd](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-vnd) | EUR → VND | 27000 | $12 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SW / IT services | Direct local clearing |
-| [eur-to-idr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-idr) | EUR → IDR | 17200 | $13 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | IT service export | Direct local clearing |
-| [eur-to-mxn](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-mxn) | EUR → MXN | 21.5 | $19 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | RESICO Art. 113-E | Direct local clearing |
-| [eur-to-try](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-try) | EUR → TRY | 37.5 | $21 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Software Earnings Exemption Art. 89/13 | Direct local clearing |
-| [eur-to-kes](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-kes) | EUR → KES | 141 | $23 | DEUTDEFF, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SWIFT service remittance | Direct local clearing |
+| [eur-to-pkr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-pkr) | EUR → PKR | 300 | $16 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SBP 9111 | Direct local clearing |
+| [eur-to-inr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-inr) | EUR → INR | 91 | $14 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | RBI P0802 | Direct local clearing |
+| [eur-to-php](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-php) | EUR → PHP | 61 | $17 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BIR 8% Freelance Gross Income Tax | Direct local clearing |
+| [eur-to-bdt](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-bdt) | EUR → BDT | 131 | $15 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BB EXP | Direct local clearing |
+| [eur-to-ngn](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-ngn) | EUR → NGN | 1750 | $22 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | CBN AUT | Direct local clearing |
+| [eur-to-egp](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-egp) | EUR → EGP | 52.5 | $18 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | CBE EXP | Direct local clearing |
+| [eur-to-brl](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-brl) | EUR → BRL | 6 | $20 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | BCB BACEN | Direct local clearing |
+| [eur-to-vnd](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-vnd) | EUR → VND | 27000 | $12 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SW / IT services | Direct local clearing |
+| [eur-to-idr](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-idr) | EUR → IDR | 17200 | $13 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | IT service export | Direct local clearing |
+| [eur-to-mxn](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-mxn) | EUR → MXN | 21.5 | $19 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | RESICO Art. 113-E | Direct local clearing |
+| [eur-to-try](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-try) | EUR → TRY | 37.5 | $21 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | Software Earnings Exemption Art. 89/13 | Direct local clearing |
+| [eur-to-kes](https://ahmadbilaldsa.github.io/payout-delta/calculator/eur-to-kes) | EUR → KES | 141 | $23 | DEUTDEDD, BNPAFRPA, COMMDEFF, SANBDEFF, BBVADEFF | SWIFT service remittance | Direct local clearing |
 | [gbp-to-pkr](https://ahmadbilaldsa.github.io/payout-delta/calculator/gbp-to-pkr) | GBP → PKR | 355 | $24 | BARCGB22, MIDLGB22, SCBLGB2L, HSBCGB2L | SBP 9111 | Direct local clearing |
 | [gbp-to-inr](https://ahmadbilaldsa.github.io/payout-delta/calculator/gbp-to-inr) | GBP → INR | 108 | $11 | BARCGB22, MIDLGB22, SCBLGB2L, HSBCGB2L | RBI P0802 | Direct local clearing |
 | [gbp-to-php](https://ahmadbilaldsa.github.io/payout-delta/calculator/gbp-to-php) | GBP → PHP | 72 | $25 | BARCGB22, MIDLGB22, SCBLGB2L, HSBCGB2L | BIR 8% Freelance Gross Income Tax | Direct local clearing |
@@ -167,22 +167,23 @@ Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
 Public SWIFT/BIC identifiers a traditional MT103 may clear through before the recipient bank. The pool listed per corridor matches its clearing currency (USD, EUR or GBP).
 
 - USD · JPMorgan Chase New York (CHASUS33), Citibank New York (CITIUS33), BNY Mellon New York (IRVTUS3N), Standard Chartered New York (SCBLUS33)
-- EUR · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA), Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF), BBVA Frankfurt (BBVADEFF)
+- EUR · Deutsche Bank Frankfurt (DEUTDEDD), BNP Paribas Paris (BNPAFRPA), Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF), BBVA Frankfurt (BBVADEFF)
 - GBP · Barclays London (BARCGB22), HSBC UK (MIDLGB22), Standard Chartered London (SCBLGB2L), HSBC Bank London (HSBCGB2L)
 
 ## Bank Dossiers
 
-Verified ISO 9362 (8-character) BIC heads for the correspondent hubs and domestic beneficiary rails behind every corridor in this dataset — 22 full dossiers at /banks/<slug>. Always confirm the destination account and IBAN with the receiving bank.
+Verified ISO 9362 (8-character) BIC heads for the correspondent hubs and domestic beneficiary rails behind every corridor in this dataset — 23 full dossiers at /banks/<slug>. Always confirm the destination account and IBAN with the receiving bank.
 
 | Dossier | Bank | BIC |
 |---|---|---|
 | [jpmorgan-chase](https://ahmadbilaldsa.github.io/payout-delta/banks/jpmorgan-chase) | JPMorgan Chase Bank N.A. | CHASUS33 |
 | [citibank](https://ahmadbilaldsa.github.io/payout-delta/banks/citibank) | Citibank N.A. | CITIUS33 |
 | [bank-of-america](https://ahmadbilaldsa.github.io/payout-delta/banks/bank-of-america) | Bank of America N.A. | BOFAUS3N |
-| [deutsche-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/deutsche-bank) | Deutsche Bank AG | DEUTDEFF |
+| [deutsche-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/deutsche-bank) | Deutsche Bank AG | DEUTDEDD |
 | [commerzbank](https://ahmadbilaldsa.github.io/payout-delta/banks/commerzbank) | Commerzbank AG | COMMDEFF |
 | [barclays](https://ahmadbilaldsa.github.io/payout-delta/banks/barclays) | Barclays Bank UK PLC | BARCGB22 |
 | [standard-chartered-uk](https://ahmadbilaldsa.github.io/payout-delta/banks/standard-chartered-uk) | Standard Chartered Bank | SCBLGB2L |
+| [standard-chartered-mea](https://ahmadbilaldsa.github.io/payout-delta/banks/standard-chartered-mea) | Standard Chartered Bank Middle East, Africa & Türkiye | SCBLAEAD |
 | [hsbc-bank-uk](https://ahmadbilaldsa.github.io/payout-delta/banks/hsbc-bank-uk) | HSBC UK Bank PLC | HSBCGB2L |
 | [habib-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/habib-bank) | Habib Bank Limited (HBL) | HABBPKKA |
 | [meezan-bank](https://ahmadbilaldsa.github.io/payout-delta/banks/meezan-bank) | Meezan Bank Limited | MEZNPKKA |

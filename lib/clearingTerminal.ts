@@ -406,7 +406,7 @@ export function buildMacroTelemetry(rows: ClearingRegistryRow[]): MacroTelemetry
     record(row.correspondentBic);
     record(row.beneficiaryBic);
   }
-  for (const dossier of BANK_DOSSIERS) record(dossier.bic);
+  for (const dossier of BANK_DOSSIERS) record(dossier.swiftBic);
 
   let peak = rows[0];
   for (const row of rows) {

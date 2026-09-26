@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import MarketStatusBar from "@/components/MarketStatusBar";
 import Dock from "@/components/dashboard/Dock";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
 import { SITE_URL } from "@/lib/seoSchemas";
 import "./globals.css";
 
@@ -101,20 +102,27 @@ export default function RootLayout({
           }}
         />
         <LanguageProvider>
-          <Header />
-          <MarketStatusBar />
-          {/* `pl-16 sm:pl-20` is the permanent clearance for the global vertical
-              <Dock /> rail pinned to the left viewport edge (40px wide at
-              `left-3`), so no route can slide its content underneath the
-              launcher. The rail is a left-edge element, so the old bottom
-              padding is gone and the bottom of the page is bloat-free. */}
-          <main className="flex-1 py-4 pr-4 pl-16 sm:pl-20">{children}</main>
-          <Footer />
-          {/* GLOBAL MODULE DOCK — mounted once, as the last node before
-              `</body>`, so the launcher floats above every route instead of
-              being re-declared per page. It sits inside <LanguageProvider> so
-              its seven labels resolve through the shared `t()` dictionary. */}
-          <Dock />
+          {/* Settlement-currency state wraps the whole app so the header
+              switcher, the calculator, the waterfall and the bank dossiers all
+              quote the same rebased figure from one source of truth. Nested
+              inside <LanguageProvider> so the switcher's own labels resolve
+              through the same `t()` dictionary as the rest of the shell. */}
+          <BaseCurrencyProvider>
+            <Header />
+            <MarketStatusBar />
+            {/* `pl-16 sm:pl-20` is the permanent clearance for the global vertical
+                <Dock /> rail pinned to the left viewport edge (40px wide at
+                `left-3`), so no route can slide its content underneath the
+                launcher. The rail is a left-edge element, so the old bottom
+                padding is gone and the bottom of the page is bloat-free. */}
+            <main className="flex-1 py-4 pr-4 pl-16 sm:pl-20">{children}</main>
+            <Footer />
+            {/* GLOBAL MODULE DOCK — mounted once, as the last node before
+                `</body>`, so the launcher floats above every route instead of
+                being re-declared per page. It sits inside <LanguageProvider> so
+                its seven labels resolve through the shared `t()` dictionary. */}
+            <Dock />
+          </BaseCurrencyProvider>
         </LanguageProvider>
       </body>
     </html>

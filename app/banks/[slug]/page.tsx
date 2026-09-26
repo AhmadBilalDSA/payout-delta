@@ -8,6 +8,8 @@ import {
   getBankDossierBySlug,
   type BankDossier,
 } from "@/data/banks";
+import BankSettlementPanel from "@/components/banks/BankSettlementPanel";
+import { railFor } from "@/data/regulatoryBanking";
 import { getCorridorBySlug } from "@/lib/db";
 import {
   buildBreadcrumbLd,
@@ -42,19 +44,19 @@ export async function generateMetadata({
   }
   const url = `${SITE_URL}/banks/${bank.slug}/`;
   return {
-    title: `${bank.shortName} (${bank.bic}) — SWIFT Bank Dossier`,
-    description: `${bank.name} — ${bank.role}. Verified ${bank.bic} ISO 9362 BIC, ${bank.headquartersCity} headquarters, typical ${bank.typicalShaDeduction} and field 71A SHA guidance for ${bank.connectedCorridors.length} payout corridor${bank.connectedCorridors.length === 1 ? "" : "s"}.`,
+    title: `${bank.shortName} (${bank.swiftBic}) — SWIFT Bank Dossier`,
+    description: `${bank.name} — ${bank.role}. Verified ${bank.swiftBic} ISO 9362 BIC, ${bank.headquartersCity} headquarters, typical ${bank.typicalShaDeduction} and field 71A SHA guidance for ${bank.connectedCorridors.length} payout corridor${bank.connectedCorridors.length === 1 ? "" : "s"}.`,
     alternates: { canonical: `/banks/${bank.slug}/` },
     openGraph: {
       type: "profile",
       url,
       siteName: "PayoutDelta",
-      title: `${bank.shortName} (${bank.bic}) — PayoutDelta`,
-      description: `SWIFT dossier for ${bank.name}: BIC ${bank.bic}, ${bank.role.toLowerCase()}, ${bank.typicalShaDeduction}.`,
+      title: `${bank.shortName} (${bank.swiftBic}) — PayoutDelta`,
+      description: `SWIFT dossier for ${bank.name}: BIC ${bank.swiftBic}, ${bank.role.toLowerCase()}, ${bank.typicalShaDeduction}.`,
     },
     twitter: {
       card: "summary",
-      title: `${bank.shortName} (${bank.bic}) — PayoutDelta`,
+      title: `${bank.shortName} (${bank.swiftBic}) — PayoutDelta`,
       description: `SWIFT dossier: ${bank.role.toLowerCase()}, ${bank.typicalShaDeduction}.`,
     },
   };
@@ -81,7 +83,7 @@ function bankSchemaLd(bank: BankDossier) {
     identifier: {
       "@type": "PropertyValue",
       propertyID: "ISO 9362 BIC",
-      value: bank.bic,
+      value: bank.swiftBic,
     },
     url: `${SITE_URL}/banks/${bank.slug}/`,
     description: bank.field71aGuidance,
@@ -164,9 +166,9 @@ export default async function BankDossierPage({
             </dt>
             <dd
               className="mt-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-center font-mono text-xl font-bold tracking-widest text-slate-900 tabular-nums dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-white"
-              aria-label={`BIC ${bank.bic}`}
+              aria-label={`BIC ${bank.swiftBic}`}
             >
-              {bank.bic.slice(0, 4)} {bank.bic.slice(4, 6)} {bank.bic.slice(6)}
+              {bank.swiftBic.slice(0, 4)} {bank.swiftBic.slice(4, 6)} {bank.swiftBic.slice(6)}
             </dd>
           </dl>
         </div>
@@ -180,6 +182,20 @@ export default async function BankDossierPage({
           <p className="mt-3 text-sm leading-relaxed text-black/[0.7] dark:text-white/75">
             {bank.field71aGuidance}
           </p>
+
+          {/* Phase 2 — the rail the money lands on, the 71A codes the bank
+              honours, and the average cut. `railFor` resolves the destination's
+              own central-bank system from `RAILS_BY_CURRENCY`, so a dossier can
+              never claim a rail the rails table does not carry. */}
+          <BankSettlementPanel
+            rail={`${bank.clearingNetwork} — ${bank.clearingCurrency}`}
+            chargeCodes={bank.chargeCodeSupport.supported}
+            recommended={bank.chargeCodeSupport.recommended}
+            note={bank.chargeCodeSupport.note}
+            averageIntermediaryCutUSD={bank.averageIntermediaryCutUSD}
+            transitTimeHours={bank.transitTimeHours}
+            instantRail={railFor(bank.clearingCurrency).instant}
+          />
 
           <a
             href={`${GITHUB_REPO}/blob/master/data/banks.ts`}
@@ -202,7 +218,7 @@ export default async function BankDossierPage({
             {bank.typicalShaDeduction}
           </p>
           <p className="mt-2 text-xs leading-relaxed text-black/[0.5] dark:text-white/[0.5]">
-            Benchmark band for the intermediary tier on {bank.bic} corridors.
+            Benchmark band for the intermediary tier on {bank.swiftBic} corridors.
             Actual deduction appears on the beneficiary&apos;s CRF / MT103
             credit advice.
           </p>

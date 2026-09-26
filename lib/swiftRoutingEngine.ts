@@ -11,7 +11,7 @@
  * Correspondent registry (public SWIFT/BIC identifiers, per the brief):
  *   USD  · JPMorgan Chase NY (CHASUS33), Citibank NY (CITIUS33),
  *          BNY Mellon NY (IRVTUS3N), Standard Chartered NY (SCBLUS33)
- *   EUR  · Deutsche Bank Frankfurt (DEUTDEFF), BNP Paribas Paris (BNPAFRPA),
+ *   EUR  · Deutsche Bank Frankfurt (DEUTDEDD), BNP Paribas Paris (BNPAFRPA),
  *          Commerzbank Frankfurt (COMMDEFF), Santander Frankfurt (SANBDEFF),
  *          BBVA Frankfurt (BBVADEFF)
  *   GBP  · Barclays London (BARCGB22), Standard Chartered London (SCBLGB2L),
@@ -78,7 +78,7 @@ export const CORRESPONDENT_NODES: Record<ClearingCurrency, CorrespondentNode[]> 
       id: "db-fra",
       bankName: "Deutsche Bank",
       city: "Frankfurt, DE",
-      bic: "DEUTDEFF",
+      bic: "DEUTDEDD",
       currency: "EUR",
       note: "Primary euro clearing correspondent for EUR-denominated inbound wires.",
     },
