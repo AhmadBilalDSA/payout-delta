@@ -38,6 +38,7 @@ const OPEN_DATA_LINKS: readonly FooterLink[] = [
     external: true,
   },
   { label: "Developer Dataset & API", href: "/developers/" },
+  { label: "Institutional Clearing Terminal", href: "/dashboard/" },
   { label: "Methodology", href: "/about" },
 ] as const;
 

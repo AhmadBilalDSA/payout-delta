@@ -66,6 +66,7 @@ const STATIC_PATHS = [
   "/compare/sha-vs-our-swift-charges/",
   "/compare/direct-bank-wire-vs-payoneer/",
   "/contact/",
+  "/dashboard/",
   "/developers/",
   "/disclaimer/",
   "/invoice/",

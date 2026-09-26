@@ -75,7 +75,7 @@ function regionOf(countryCode: string): DirectoryRegion | "other" {
 }
 
 /** ISO 3166-1 alpha-2 → regional-indicator flag emoji (EU handled). */
-function flagOf(code: string): string {
+export function flagOf(code: string): string {
   if (code.toUpperCase() === "EU") return "🇪🇺";
   const base = 0x1f1e6;
   return code

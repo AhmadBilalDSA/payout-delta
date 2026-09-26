@@ -82,6 +82,12 @@ export default function Header() {
             Leaderboard
           </Link>
           <Link
+            href="/dashboard/"
+            className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
+          >
+            Terminal
+          </Link>
+          <Link
             href="/banks/"
             className="hidden text-xs text-slate-400 transition-colors duration-200 ease-out hover:text-slate-100 sm:inline"
           >

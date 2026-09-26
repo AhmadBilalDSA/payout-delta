@@ -312,6 +312,7 @@ function guidesSection() {
     `- [Invoice Studio](${SITE_URL}/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.`,
     `- [Regulatory / Tax Ledger](${SITE_URL}/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.`,
     `- [SWIFT Auditor](${SITE_URL}/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.`,
+    `- [Institutional Clearing Terminal](${SITE_URL}/dashboard): macro clearing telemetry across ${corridors.length} corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.`,
     `- [Bank Dossier Directory](${SITE_URL}/banks): ${BANKS.length} verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEFF, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.`,
     `- [Agency Treasury Leakage Engine](${SITE_URL}/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.`,
     `- [Embeddable Payout Widget](${SITE_URL}/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all ${corridors.length} corridors live at /embed/<slug>/).`,
