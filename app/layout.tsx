@@ -110,12 +110,10 @@ export default function RootLayout({
           <BaseCurrencyProvider>
             <Header />
             <MarketStatusBar />
-            {/* `pl-16 sm:pl-20` is the permanent clearance for the global vertical
-                <Dock /> rail pinned to the left viewport edge (40px wide at
-                `left-3`), so no route can slide its content underneath the
-                launcher. The rail is a left-edge element, so the old bottom
-                padding is gone and the bottom of the page is bloat-free. */}
-            <main className="flex-1 py-4 pr-4 pl-16 sm:pl-20">{children}</main>
+            {/* Responsive clearance:
+                - Mobile (<md): bottom dock at `bottom-3` → need `pb-20` (80px) clearance
+                - Desktop (md+): left rail at `left-3` → need `pl-20` (80px) clearance */}
+            <main className="flex-1 py-4 pr-4 pb-20 md:pb-6 pl-0 md:pl-20">{children}</main>
             <Footer />
             {/* GLOBAL MODULE DOCK — mounted once, as the last node before
                 `</body>`, so the launcher floats above every route instead of
