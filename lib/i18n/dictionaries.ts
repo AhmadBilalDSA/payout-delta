@@ -306,6 +306,57 @@ export const enStrings = {
   // ── Legal / footer ───────────────────────────────────────────────────
   legalLine:
     "All brand names and trademarks belong to their respective owners. Used strictly for cost comparison under Nominative Fair Use. PayoutDelta is an independent audit tool.",
+
+  // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────────
+  // Simple Tier is the open-by-default decision surface; Diagnostic Tier is
+  // the collapsed forensic surface. The seven waterfall step labels are NOT
+  // declared here: `rowGross` … `rowTakeHome` above are reused verbatim so the
+  // dashboard and the calculator can never describe the same layer two ways.
+  feeAuditor: "Fee Auditor",
+  leaderboard: "Leaderboard",
+  banks: "Banks",
+  dashboardDockLabel: "Module launcher",
+  dashboardEyebrow: "Dashboard v3",
+  dashboardTitle: "Every fee, every rail, one command deck.",
+  dashboardSubcopy:
+    "Two tiers of truth: the decision-grade totals up front, the full settlement forensics one tap away.",
+  dashboardCtaAudit: "Run an audit",
+  dashboardCtaData: "Open data",
+  dashboardTierSimple: "Simple tier",
+  dashboardTierSimpleHint: "Decision-grade totals, open by default.",
+  dashboardKpiCorridors: "Corridors audited",
+  dashboardKpiProviders: "Providers benchmarked",
+  dashboardKpiCheapest: "Cheapest corridor all-in",
+  dashboardKpiPriciest: "Priciest corridor all-in",
+  dashboardQuickQuoteTitle: "Live corridor quote",
+  dashboardQuickQuoteLead:
+    "Priced live by the same engine that powers the fee auditor — pick a corridor and an amount.",
+  dashboardQuoteLeakage: "Total leakage",
+  dashboardMatrixTitle: "Provider comparison matrix",
+  dashboardMatrixLead:
+    "Every published provider fee model on the selected corridor, ranked by what actually lands in your account.",
+  dashboardMatrixProvider: "Provider",
+  dashboardMatrixFee: "Fixed fee",
+  dashboardMatrixMarkup: "FX markup",
+  dashboardMatrixBest: "Cheapest",
+  dashboardMatrixEmpty: "No provider fee model published for this corridor.",
+  dashboardTierDiagnostic: "Diagnostic tier",
+  dashboardTierDiagnosticHint: "Full settlement forensics, collapsed by default.",
+  dashboardDiagnosticExpand: "Reveal diagnostic telemetry",
+  dashboardDiagnosticCollapse: "Hide diagnostic telemetry",
+  dashboardWaterfallLead:
+    "Seven layers between the invoice and the deposit, resolved by the live gross-up engine.",
+  dashboardWaterfallCorridor: "Corridor",
+  dashboardWaterfallNote:
+    "Bars cascade left to right. Amber marks money lost to the rail, emerald marks what actually arrives.",
+  dashboardHopTitle: "SWIFT BIC intermediary hops",
+  dashboardHopLead:
+    "The correspondent chain a wire actually walks, and the field 71A code it should carry.",
+  dashboardHopOrigin: "Origin",
+  dashboardHopCorrespondent: "Correspondent hub",
+  dashboardHopBeneficiary: "Beneficiary bank",
+  dashboardHopRail: "Domestic rail",
+  dashboardHopCharge: "Field 71A",
 } as const;
 
 /** Every catalog shares the exact key set derived from the English source. */
@@ -564,6 +615,52 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
 
       legalLine:
         "تمام برانڈ نام اور ٹریڈ مارکس اپنے مالکان کی ملکیت ہیں۔ صرف نومینیٹیو فیئر یوز کے تحت لاگت کے موازنے کے لیے استعمال۔ PayoutDelta ایک آزاد آڈٹ ٹول ہے۔",
+      // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────
+      feeAuditor: "فی آڈٹر",
+      leaderboard: "لیڈر بورڈ",
+      banks: "بینکس",
+      dashboardDockLabel: "ماڈیول لانچر",
+      dashboardEyebrow: "ڈیش بورڈ v3",
+      dashboardTitle: "ہر فیس، ہر ریل، ایک کمانڈ ڈیک۔",
+      dashboardSubcopy:
+        "سچ کے دو درجے: فیصلے کے قابل اعداد و شمار پہلے، مکمل Settlement کی تفصیل ایک ٹیپ دور۔",
+      dashboardCtaAudit: "آڈٹ چلائیں",
+      dashboardCtaData: "ڈیٹا کھولیں",
+      dashboardTierSimple: "آسان درجہ",
+      dashboardTierSimpleHint: "فیصلے کے قابل اعداد، بطورِ طے شدہ کھلا ہوا۔",
+      dashboardKpiCorridors: "آڈٹ شدہ کوریڈرز",
+      dashboardKpiProviders: "بینچ مارک شدہ فراہم کنندگان",
+      dashboardKpiCheapest: "سب سے سستا کوریڈر · مکمل لاگت",
+      dashboardKpiPriciest: "سب سے مہنگا کوریڈر · مکمل لاگت",
+      dashboardQuickQuoteTitle: "لائیو کوریڈر ریٹ",
+      dashboardQuickQuoteLead:
+        "وہی انجن جو فی آڈٹر چلاتا ہے — کوریڈر اور رقم منتخب کریں۔",
+      dashboardQuoteLeakage: "کل نشتی",
+      dashboardMatrixTitle: "فراہم کنندہ موازنہ میٹرکس",
+      dashboardMatrixLead:
+        "منتخب کردہ کوریڈر پر ہر شائع شدہ فراہم کنندہ فیس ماڈل، اس ترتیب سے جس چیز سے آپ کے اکاؤنٹ میں سب سے زیادہ پہنچے۔",
+      dashboardMatrixProvider: "فراہم کنندہ",
+      dashboardMatrixFee: "مقررہ فیس",
+      dashboardMatrixMarkup: "ایف ایکس مارجن",
+      dashboardMatrixBest: "سب سے سستا",
+      dashboardMatrixEmpty: "اس کوریڈر کے لیے کوئی فراہم کنندہ فیس ماڈل شائع نہیں۔",
+      dashboardTierDiagnostic: "تشخیصی درجہ",
+      dashboardTierDiagnosticHint: "مکمل Settlement تحقیقات، بطورِ طے شدہ بند۔",
+      dashboardDiagnosticExpand: "تشخیصی ٹیلی میٹری کھولیں",
+      dashboardDiagnosticCollapse: "تشخیصی ٹیلی میٹری چھپائیں",
+      dashboardWaterfallLead:
+        "انوائس اور جمع کے درمیان سات تہے، لائیو گراس اپ انجن سے حل شدہ۔",
+      dashboardWaterfallCorridor: "کوریڈر",
+      dashboardWaterfallNote:
+        "بار بائیں سے دائیں جاتے ہیں۔ کھڑی رنگ ریل کی وجہ سے گنجا ہوا پیسہ، زمردی رنگ وہ رقم جو واقعاً پہنچتی ہے۔",
+      dashboardHopTitle: "سوئفٹ بک رابطہ ہاپس",
+      dashboardHopLead:
+        "وہ زنجیر جس سے وائر گزرتا ہے، اور وہ فیلڈ 71A کوڈ جو اسے لے جانا چاہیے۔",
+      dashboardHopOrigin: "مقامِ آغاز",
+      dashboardHopCorrespondent: "کوریسپونڈنٹ ہب",
+      dashboardHopBeneficiary: "مستحق بینک",
+      dashboardHopRail: "مقامی ریل",
+      dashboardHopCharge: "فیلڈ 71A",
     },
   },
 
@@ -811,6 +908,52 @@ export const DICTIONARIES: Record<SupportedLang, UiCatalog> = {
 
       legalLine:
         "सभी ब्रांड नाम और ट्रेडमार्क उनके संबंधित मालिकों की संपत्ति हैं। नॉमिनेटिव फेयर यूज़ के तहत केवल लागत तुलना के लिए उपयोग। PayoutDelta एक स्वतंत्र ऑडिट टूल है।",
+      // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────
+      feeAuditor: "फी ऑडिटर",
+      leaderboard: "लीडरबोर्ड",
+      banks: "बैंक",
+      dashboardDockLabel: "मॉड्यूल लॉन्चर",
+      dashboardEyebrow: "डैशबोर्ड v3",
+      dashboardTitle: "हर फीस, हर रेल, एक कमांड डेक।",
+      dashboardSubcopy:
+        "सच के दो स्तर: फैसले लायक आंकड़े पहले, पूरी सेटलमेंट की पड़तान सिर्फ एक टैप दूर।",
+      dashboardCtaAudit: "ऑडिट चलाएँ",
+      dashboardCtaData: "डेटा खोलें",
+      dashboardTierSimple: "सरल स्तर",
+      dashboardTierSimpleHint: "फैसले लायक आंकड़े, डिफ़ॉल्ट रूप से खुले।",
+      dashboardKpiCorridors: "ऑडिट किए गए कॉरिडोर",
+      dashboardKpiProviders: "बेंचमार्क किए गए प्रदाता",
+      dashboardKpiCheapest: "सबसे सस्ता कॉरिडोर · कुल लागत",
+      dashboardKpiPriciest: "सबसे महँगा कॉरिडोर · कुल लागत",
+      dashboardQuickQuoteTitle: "लाइव कॉरिडोर कोटेशन",
+      dashboardQuickQuoteLead:
+        "वही इंजन जो फी ऑडिटर चलाता है — कॉरिडोर और राशि चुनें।",
+      dashboardQuoteLeakage: "कुल रिसाव",
+      dashboardMatrixTitle: "प्रदाता तुलना मैट्रिक्स",
+      dashboardMatrixLead:
+        "चुने गए कॉरिडोर पर हर प्रकाशित प्रदाता फीस मॉडल, इस क्रम में कि आपके खाते में सबसे ज़्यादा क्या पहुँचता है।",
+      dashboardMatrixProvider: "प्रदाता",
+      dashboardMatrixFee: "स्थिर फीस",
+      dashboardMatrixMarkup: "एफ़एक्स मार्जिन",
+      dashboardMatrixBest: "सबसे सस्ता",
+      dashboardMatrixEmpty: "इस कॉरिडोर के लिए कोई प्रदाता फीस मॉडल प्रकाशित नहीं है।",
+      dashboardTierDiagnostic: "डायग्नोस्टिक स्तर",
+      dashboardTierDiagnosticHint: "पूरी सेटलमेंट जाँच, डिफ़ॉल्ट रूप से बंद।",
+      dashboardDiagnosticExpand: "डायग्नोस्टिक टेलीमेट्री खोलें",
+      dashboardDiagnosticCollapse: "डायग्नोस्टिक टेलीमेट्री छिपाएँ",
+      dashboardWaterfallLead:
+        "इनवॉइस और जमा के बीच सात परतें, लाइव ग्रॉस-अप इंजन से हल।",
+      dashboardWaterfallCorridor: "कॉरिडोर",
+      dashboardWaterfallNote:
+        "बार बाएँ से दाएँ बढ़ते हैं। अंबर रेल की वजह से डूटा पैसा दिखाता है, हरा वह राशि जो सचमुच पहुँचती है।",
+      dashboardHopTitle: "स्विफ्ट बिक इंटरमीडियरी हॉप्स",
+      dashboardHopLead:
+        "वह श्रृंखला जिससे वायर गुज़रता है, और वह फ़ील्ड 71A कोड जो उसे ले जाना चाहिए।",
+      dashboardHopOrigin: "उद्गम",
+      dashboardHopCorrespondent: "कॉरिस्पोंडेंट हब",
+      dashboardHopBeneficiary: "लाभार्थी बैंक",
+      dashboardHopRail: "स्थानीय रेल",
+      dashboardHopCharge: "फ़ील्ड 71A",
     },
   },
 
@@ -1060,6 +1203,52 @@ swiftBic: "SWIFT / BIC code",
 
       legalLine:
         "Lahat ng brand name at trademark ay pag-aari ng kani-kanilang may-ari. Ginagamit lamang para sa cost comparison sa ilalim ng Nominative Fair Use. Ang PayoutDelta ay isang independiyenteng audit tool.",
+      // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────
+      feeAuditor: "Fee Auditor",
+      leaderboard: "Leaderboard",
+      banks: "Mga banko",
+      dashboardDockLabel: "Module launcher",
+      dashboardEyebrow: "Dashboard v3",
+      dashboardTitle: "Bawat bayad, bawat rail, isang command deck.",
+      dashboardSubcopy:
+        "Dalawang antas ng katotohanan: ang mga desisyon-grade na numero muna, at ang buong settlement forensics isang tap lang.",
+      dashboardCtaAudit: "Magpatakbo ng audit",
+      dashboardCtaData: "Buksan ang datos",
+      dashboardTierSimple: "Simple tier",
+      dashboardTierSimpleHint: "Desisyon-grade na kabuuan, bukas sa pagkakataon.",
+      dashboardKpiCorridors: "Mga na-audit na corridor",
+      dashboardKpiProviders: "Mga benchmark na provider",
+      dashboardKpiCheapest: "Pinakamurang corridor · kabuuang gastos",
+      dashboardKpiPriciest: "Pinakamahalang corridor · kabuuang gastos",
+      dashboardQuickQuoteTitle: "Live na corridor quote",
+      dashboardQuickQuoteLead:
+        "Presyado nang live ng parehong engine na nagpapatakbo ng fee auditor — pumili ng corridor at halaga.",
+      dashboardQuoteLeakage: "Kabuuang bungi",
+      dashboardMatrixTitle: "Matrix ng paghahambing ng provider",
+      dashboardMatrixLead:
+        "Bawat nakalathalang fee model ng provider sa napiling corridor, naranrank sa umano'y tuluyang dumating sa account mo.",
+      dashboardMatrixProvider: "Provider",
+      dashboardMatrixFee: "Fixed na bayad",
+      dashboardMatrixMarkup: "FX markup",
+      dashboardMatrixBest: "Pinakamamura",
+      dashboardMatrixEmpty: "Walang nakalathalang fee model ng provider para sa corridor na ito.",
+      dashboardTierDiagnostic: "Diagnostic tier",
+      dashboardTierDiagnosticHint: "Buong settlement forensics, nakatikom sa pagkakataon.",
+      dashboardDiagnosticExpand: "I-reveal ang diagnostic telemetry",
+      dashboardDiagnosticCollapse: "Itago ang diagnostic telemetry",
+      dashboardWaterfallLead:
+        "Pitong layer sa pagitan ng invoice at deposito, na-resolve ng live na gross-up engine.",
+      dashboardWaterfallCorridor: "Corridor",
+      dashboardWaterfallNote:
+        "Nag-cascade ang mga bar mula kaliwa patungo sa kanan. Amber ang perang nawala sa rail; emerald ang aktuwal na dumarating.",
+      dashboardHopTitle: "Mga SWIFT BIC intermediary hop",
+      dashboardHopLead:
+        "Ang kadenang korepondente na talagang tinat traversed ng wire, at ang field 71A code dapat nitong dalhin.",
+      dashboardHopOrigin: "Pinagmulan",
+      dashboardHopCorrespondent: "Korepondent na hub",
+      dashboardHopBeneficiary: "Benepisyaryong binko",
+      dashboardHopRail: "Lokal na rail",
+      dashboardHopCharge: "Field 71A",
     },
   },
 
@@ -1309,6 +1498,52 @@ swiftBic: "SWIFT / BIC code",
 
       legalLine:
         "Todas las marcas y nombres comerciales pertenecen a sus respectivos dueños. Se usan estrictamente para comparación de costes bajo uso justo nominativo. PayoutDelta es una herramienta de auditoría independiente.",
+      // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────
+      feeAuditor: "Auditor de comisiones",
+      leaderboard: "Clasificación",
+      banks: "Bancos",
+      dashboardDockLabel: "Lanzador de módulos",
+      dashboardEyebrow: "Panel v3",
+      dashboardTitle: "Cada comisión, cada rail, una sola mesa de control.",
+      dashboardSubcopy:
+        "Dos niveles de verdad: primero las cifras decisivas y, a un toque, la contabilidad completa de la liquidación.",
+      dashboardCtaAudit: "Ejecutar una auditoría",
+      dashboardCtaData: "Abrir datos",
+      dashboardTierSimple: "Nivel simple",
+      dashboardTierSimpleHint: "Totales decisivos, abiertos por defecto.",
+      dashboardKpiCorridors: "Corredores auditados",
+      dashboardKpiProviders: "Proveedores comparados",
+      dashboardKpiCheapest: "Corredor más barato · coste total",
+      dashboardKpiPriciest: "Corredor más caro · coste total",
+      dashboardQuickQuoteTitle: "Cotización en vivo del corredor",
+      dashboardQuickQuoteLead:
+        "Calculado en vivo por el mismo motor que alimenta el auditor de comisiones: elige corredor e importe.",
+      dashboardQuoteLeakage: "Fuga total",
+      dashboardMatrixTitle: "Matriz comparativa de proveedores",
+      dashboardMatrixLead:
+        "Todos los modelos de comisión publicados del proveedor en el corredor elegido, ordenados por lo que realmente llega a tu cuenta.",
+      dashboardMatrixProvider: "Proveedor",
+      dashboardMatrixFee: "Comisión fija",
+      dashboardMatrixMarkup: "Margen de cambio",
+      dashboardMatrixBest: "Más barato",
+      dashboardMatrixEmpty: "No hay ningún modelo de comisión publicado para este corredor.",
+      dashboardTierDiagnostic: "Nivel diagnóstico",
+      dashboardTierDiagnosticHint: "Contabilidad completa de la liquidación, contraída por defecto.",
+      dashboardDiagnosticExpand: "Mostrar telemetría de diagnóstico",
+      dashboardDiagnosticCollapse: "Ocultar telemetría de diagnóstico",
+      dashboardWaterfallLead:
+        "Siete capas entre la factura y el depósito, resueltas por el motor de gross-up en vivo.",
+      dashboardWaterfallCorridor: "Corredor",
+      dashboardWaterfallNote:
+        "Las barras fluyen de izquierda a derecha. Ámbar marca el dinero perdido por el rail; esmeralda, lo que llega de verdad.",
+      dashboardHopTitle: "Saltos de corresponsalía SWIFT BIC",
+      dashboardHopLead:
+        "La cadena de corresponsales que recorre realmente el envío, y el código de campo 71A que debería llevar.",
+      dashboardHopOrigin: "Origen",
+      dashboardHopCorrespondent: "Centro de corresponsales",
+      dashboardHopBeneficiary: "Banco beneficiario",
+      dashboardHopRail: "Rail nacional",
+      dashboardHopCharge: "Campo 71A",
     },
   },
 
@@ -1558,6 +1793,52 @@ swiftBic: "SWIFT / BIC code",
 
       legalLine:
         "Todas as marcas e nomes comerciais pertencem aos seus respectivos donos. Usados estritamente para comparação de custos sob uso justo nominativo. PayoutDelta é uma ferramenta de auditoria independente.",
+      // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────
+      feeAuditor: "Auditor de taxas",
+      leaderboard: "Ranking",
+      banks: "Bancos",
+      dashboardDockLabel: "Lançador de módulos",
+      dashboardEyebrow: "Painel v3",
+      dashboardTitle: "Cada taxa, cada rail, um só painel de comando.",
+      dashboardSubcopy:
+        "Dois níveis de verdade: primeiro os números que decidem e, a um toque, a liquidação completa.",
+      dashboardCtaAudit: "Executar uma auditoria",
+      dashboardCtaData: "Abrir dados",
+      dashboardTierSimple: "Nível simples",
+      dashboardTierSimpleHint: "Totais decisivos, abertos por padrão.",
+      dashboardKpiCorridors: "Corredores auditados",
+      dashboardKpiProviders: "Provedores comparados",
+      dashboardKpiCheapest: "Corredor mais barato · custo total",
+      dashboardKpiPriciest: "Corredor mais caro · custo total",
+      dashboardQuickQuoteTitle: "Cotação ao vivo do corredor",
+      dashboardQuickQuoteLead:
+        "Precificado ao vivo pela mesma engine que roda o auditor de taxas — escolha o corredor e o valor.",
+      dashboardQuoteLeakage: "Vazamento total",
+      dashboardMatrixTitle: "Matriz comparativa de provedores",
+      dashboardMatrixLead:
+        "Todos os modelos de taxa publicados do provedor no corredor escolhido, ordenados pelo que realmente chega à sua conta.",
+      dashboardMatrixProvider: "Provedor",
+      dashboardMatrixFee: "Taxa fixa",
+      dashboardMatrixMarkup: "Margem de câmbio",
+      dashboardMatrixBest: "Mais barato",
+      dashboardMatrixEmpty: "Nenhum modelo de taxa publicado para este corredor.",
+      dashboardTierDiagnostic: "Nível diagnóstico",
+      dashboardTierDiagnosticHint: "Liquidação completa, recolhida por padrão.",
+      dashboardDiagnosticExpand: "Revelar telemetria diagnóstica",
+      dashboardDiagnosticCollapse: "Ocultar telemetria diagnóstica",
+      dashboardWaterfallLead:
+        "Sete camadas entre a fatura e o depósito, resolvidas pelo motor de gross-up ao vivo.",
+      dashboardWaterfallCorridor: "Corredor",
+      dashboardWaterfallNote:
+        "As barras correm da esquerda para a direita. Âmbar marca o dinheiro perdido no rail; esmeralda, o que chega de verdade.",
+      dashboardHopTitle: "Saltos de correspondente SWIFT BIC",
+      dashboardHopLead:
+        "A cadeia de correspondentes que a transferência realmente percorre e o código de campo 71A que ela deve carregar.",
+      dashboardHopOrigin: "Origem",
+      dashboardHopCorrespondent: "Hub de correspondentes",
+      dashboardHopBeneficiary: "Banco favorecido",
+      dashboardHopRail: "Rail doméstico",
+      dashboardHopCharge: "Campo 71A",
     },
   },
 
@@ -1807,6 +2088,52 @@ swiftBic: "SWIFT / BIC code",
 
       legalLine:
         "جميع الأسماء والعلامات التجارية ملك لأصحابها. تستخدم حصريًا للمقارنة تحت مبدأ الاستخدام العادل الاسمي. PayoutDelta أداة تدقيق مستقلة.",
+      // ── Dashboard v3 — Two-Tier Progressive Disclosure ─────────────────
+      feeAuditor: "مدقّق الرسوم",
+      leaderboard: "لوحة الصدارة",
+      banks: "البنوك",
+      dashboardDockLabel: "مُشغّل الوحدات",
+      dashboardEyebrow: "لوحة القيادة v3",
+      dashboardTitle: "كل رسوم، كل مسار، منصة قيادة واحدة.",
+      dashboardSubcopy:
+        "مستويان من الحقيقة: الأرقام الحاسمة أولًا، ثم تدقيق التسوية الكامل على بُعد نقرة.",
+      dashboardCtaAudit: "شغّل تدقيقًا",
+      dashboardCtaData: "افتح البيانات",
+      dashboardTierSimple: "المستوى المبسّط",
+      dashboardTierSimpleHint: "المجاميع الحاسمة، مفتوحة افتراضيًا.",
+      dashboardKpiCorridors: "المسارات المُدقَّقة",
+      dashboardKpiProviders: "مزوّدون مُقارَنون",
+      dashboardKpiCheapest: "أرخص مسار · التكلفة الإجمالية",
+      dashboardKpiPriciest: "أغلى مسار · التكلفة الإجمالية",
+      dashboardQuickQuoteTitle: "سعر المسار المباشر",
+      dashboardQuickQuoteLead:
+        "يُسعَّر مباشرةً بالمحرّك نفسه الذي يشغّل مدقّق الرسوم — اختر المسار والمبلغ.",
+      dashboardQuoteLeakage: "إجمالي التسريب",
+      dashboardMatrixTitle: "مصفوفة مقارنة المزوّدين",
+      dashboardMatrixLead:
+        "كل نماذج رسوم المزوّد المنشورة على المسار المختار، مرتّبةً بحسب ما يصل فعليًا إلى حسابك.",
+      dashboardMatrixProvider: "المزوّد",
+      dashboardMatrixFee: "رسوم ثابتة",
+      dashboardMatrixMarkup: "هامش صرف العملة",
+      dashboardMatrixBest: "الأرخص",
+      dashboardMatrixEmpty: "لا توجد نماذج رسوم منشورة لهذا المسار.",
+      dashboardTierDiagnostic: "المستوى التشخيصي",
+      dashboardTierDiagnosticHint: "تدقيق التسوية الكامل، مطويّ افتراضيًا.",
+      dashboardDiagnosticExpand: "إظهار القياسات التشخيصية",
+      dashboardDiagnosticCollapse: "إخفاء القياسات التشخيصية",
+      dashboardWaterfallLead:
+        "سبع طبقات بين الفاتورة والإيداع، تحلّها محرّك الزيادة الإجمالية المباشر.",
+      dashboardWaterfallCorridor: "المسار",
+      dashboardWaterfallNote:
+        "تتسلسل الأعمدة من اليسار إلى اليمين. الكهرماني يبيّن المال الضائع في المسار، والزمردي ما يصل فعليًا.",
+      dashboardHopTitle: "قفزات المراسلين SWIFT BIC",
+      dashboardHopLead:
+        "سلسلة المراسلين التي تسلكها التحويل فعليًا، ورمز الحقل 71A الذي ينبغي أن تحمله.",
+      dashboardHopOrigin: "المصدر",
+      dashboardHopCorrespondent: "مركز المراسلين",
+      dashboardHopBeneficiary: "البنك المستفيد",
+      dashboardHopRail: "المسار المحلي",
+      dashboardHopCharge: "الحقل 71A",
     },
   },
 };
