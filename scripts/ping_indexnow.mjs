@@ -73,6 +73,7 @@ const STATIC_PATHS = [
   "/leaderboard/",
   "/privacy-policy/",
   "/swift-auditor/",
+  "/tax-clearance/",
   "/tax-ledger/",
   "/terms-of-service/",
 ];

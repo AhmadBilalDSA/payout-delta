@@ -79,6 +79,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${SITE_URL}/tax-clearance/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${SITE_URL}/swift-auditor/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "weekly",

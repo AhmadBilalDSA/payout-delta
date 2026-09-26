@@ -35,7 +35,10 @@ import type { UiKey } from "@/lib/i18n/dictionaries";
  * Localised: every label resolves through the global `t()` dictionary, so the
  * dock is one of the seven fully-translated surfaces. The label stays visible
  * beside the icon at every breakpoint — it is the accessible name for the link,
- * so it is never collapsed to an icon-only affordance.
+ * so it is never collapsed to an icon-only affordance. Labels are
+ * `whitespace-nowrap` at 11px and the rail scrolls horizontally on the rare
+ * narrow viewport where six translated labels outgrow the row, which is why no
+ * label is ever clipped to an ellipsis.
  *
  * The six targets are the modules the brief enumerates for §4j, and they reuse
  * the existing server paths so `next/link` re-applies the `/payout-delta`
@@ -80,23 +83,23 @@ export default function Dock() {
       className="no-print pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-3 sm:pb-5"
     >
       <ul
-        className="pointer-events-auto flex w-full max-w-2xl items-stretch justify-between gap-0.5 rounded-2xl border border-white/[0.08] bg-slate-900/70 p-1.5 shadow-lg shadow-black/40 backdrop-blur-lg sm:gap-1 sm:p-2"
+        className="pointer-events-auto flex w-full max-w-3xl items-stretch justify-between gap-1 overflow-x-auto rounded-2xl border border-white/[0.08] bg-slate-900/70 p-1.5 shadow-lg shadow-black/40 [scrollbar-width:none] backdrop-blur-lg [&::-webkit-scrollbar]:hidden sm:gap-1.5 sm:p-2"
       >
         {DOCK_ITEMS.map(({ href, labelKey, Icon }) => {
           const active = isActive(pathname, href);
           return (
-            <li key={href} className="min-w-0 flex-1">
+            <li key={href} className="shrink-0">
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`group flex min-w-0 flex-col items-center gap-1 rounded-xl px-1 py-1.5 text-center transition-colors duration-150 ease-out sm:flex-row sm:gap-2 sm:px-3 sm:py-2 ${
+                className={`group flex flex-col items-center gap-1 rounded-xl px-2.5 py-1.5 text-center transition-colors duration-150 ease-out sm:flex-row sm:gap-2 sm:px-3 sm:py-2 ${
                   active
                     ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30"
                     : "text-slate-400 hover:bg-white/[0.06] hover:text-slate-100"
                 } motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:scale-[1.04] md:hover:scale-[1.06]`}
               >
                 <Icon size={18} className="shrink-0" />
-                <span className="min-w-0 truncate text-[10px] font-medium leading-tight sm:text-xs">
+                <span className="whitespace-nowrap text-[11px] font-medium leading-tight">
                   {t(labelKey)}
                 </span>
               </Link>
