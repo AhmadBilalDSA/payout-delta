@@ -57,3 +57,8 @@ dist/
 # phase 6 backup archives (kept local, ignored)
 backups/
 *.zip
+
+# Repomix artifacts
+repomix-output.xml
+repomix.config.json
+

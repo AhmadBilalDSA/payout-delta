@@ -1,0 +1,8 @@
+﻿# Ignore raw data duplicates and build artifacts for token efficiency
+public/api/fees.json
+public/llms-full.txt
+docs/SYSTEM_SPEC.md
+out/
+.next/
+*.log
+repomix-output.xml
