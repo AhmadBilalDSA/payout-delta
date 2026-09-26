@@ -198,6 +198,12 @@ BIR, or a peer regulator), and describe the delta. Withholding rates, purpose
 codes (9111 / P0802), clearing networks and exemption tiers all live in
 `data/regulatoryBanking.ts`.
 
+## Issue templates
+
+- **New corridor** — `.github/ISSUE_TEMPLATE/add_new_corridor.yml`
+- **Bank tariff / fee update** — `.github/ISSUE_TEMPLATE/update_bank_tariff.yml`
+- **Statutory / regulatory update** — `.github/ISSUE_TEMPLATE/statutory_update.yml`
+
 ## Commit conventions
 
 - One logical change per commit, message in the template:

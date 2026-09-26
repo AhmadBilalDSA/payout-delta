@@ -1,24 +1,132 @@
-﻿name: Update Bank Wire Tariff
-description: Report an updated retail FX margin, intermediary cut, or domestic rail
+﻿name: "Update bank tariff / fee"
+description: "Correct or add a bank tariff, intermediary cut, local landing fee, or field 71A guidance."
+title: "[Bank tariff] {Bank} {Currency} update"
+labels: ["bank-data", "data"]
 body:
-  - type: input
-    id: bank_name
+  - type: markdown
     attributes:
-      label: Bank Name & Country
-      placeholder: e.g. Habib Bank Limited (Pakistan)
+      value: |
+        PayoutDelta stores bank-level data in two places:
+
+        1. **`data/banks.ts`** — `BANK_DOSSIERS` (global correspondent hubs & domestic beneficiary rails). Each entry is a `BankDossier` with a verified 8-character ISO 9362 BIC, typical SHA deduction band, connected corridor slugs, and field 71A guidance.
+        2. **`data/regulatoryBanking.ts`** — per-corridor `CorridorRegulation.banks[]` (`RegulatoryBank`) with exact intermediary USD cuts, min/max bands, local fees, speed, clearance, and currency.
+
+        **JSON schema reference** (see CONTRIBUTING.md for full examples):
+        - `data/banks.ts` BankDossier
+        - `data/regulatoryBanking.ts` RegulatoryBank
+
+  - type: input
+    id: bankSlug
+    attributes:
+      label: Bank slug (from `data/banks.ts`)
+      description: e.g. `jpmorgan-chase`, `meezan`, `hbl`, `scb-pk`, `alfalah` — or "new" if adding a brand-new dossier.
+      placeholder: "jpmorgan-chase"
     validations:
       required: true
+
+  - type: dropdown
+    id: changeType
+    attributes:
+      label: What are you updating?
+      options:
+        - Typical SHA deduction band (intermediary cut)
+        - Local landing fee / receiving-bank fee
+        - Clearance / PRC / FIRC turnaround
+        - Field 71A guidance text
+        - New bank dossier (add to `data/banks.ts`)
+        - New receiving-bank entry for a corridor (add to `data/regulatoryBanking.ts`)
+    validations:
+      required: true
+
+  - type: input
+    id: corridorSlug
+    attributes:
+      label: Affected corridor slug(s)
+      description: Comma-separated list of corridor slugs from `data/fees.json` (e.g. `usd-to-pkr,usd-to-inr`). Required if updating a regulatory bank entry.
+      placeholder: "usd-to-pkr"
+    validations:
+      required: false
+
   - type: input
     id: bic
     attributes:
-      label: SWIFT BIC (ISO 9362)
-      placeholder: e.g. HABBPKKA
+      label: SWIFT BIC (8-char head)
+      description: Verified ISO 9362 BIC head (e.g. `CHASUS33`, `MZNBPKKA`).
+      placeholder: "CHASUS33"
     validations:
-      required: true
-  - type: textarea
-    id: tariff_change
+      required: false
+
+  - type: input
+    id: intermediaryUSD
     attributes:
-      label: Tariff or Cut Details
-      placeholder: e.g. Intermediary deduction updated from $15 to $25 via CHASUS33
+      label: Benchmark intermediary cut (USD)
+      description: Typical correspondent SHA deduction in USD (e.g. `18`).
+      placeholder: "18"
+    validations:
+      required: false
+
+  - type: input
+    id: intermediaryMinUSD
+    attributes:
+      label: Min intermediary cut (USD)
+      description: Lower bound of the typical band.
+      placeholder: "15"
+    validations:
+      required: false
+
+  - type: input
+    id: intermediaryMaxUSD
+    attributes:
+      label: Max intermediary cut (USD)
+      description: Upper bound of the typical band.
+      placeholder: "35"
+    validations:
+      required: false
+
+  - type: input
+    id: localFeeDefault
+    attributes:
+      label: Local landing fee (destination currency)
+      description: Receiving-bank fee in the destination currency (0 = free rail). e.g. `0` or `100`.
+      placeholder: "0"
+    validations:
+      required: false
+
+  - type: input
+    id: clearance
+    attributes:
+      label: Clearance / realization timeline
+      description: e.g. `Raast Inward: 0 PKR · e-PRC 24 hrs`, `PRC turnaround 48 hrs`.
+      placeholder: "Raast Inward: 0 PKR · e-PRC 24 hrs"
+    validations:
+      required: false
+
+  - type: textarea
+    id: field71a
+    attributes:
+      label: Field 71A guidance
+      description: Human-readable guidance for field 71A (Details of Charges) — SHA vs OUR implications for this bank.
+      placeholder: "Request SHA in field 71A so USD charges are split…"
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / evidence
+      description: Link to the public bank tariff page, central bank circular, or SWIFT directory entry that supports the change.
+      placeholder: "https://www.jpmorgan.com/.../tariff"
     validations:
       required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Contribution checklist
+      options:
+        - label: I confirm all figures are public benchmarks, not private quotes.
+          required: true
+        - label: I have linked an official / verifiable source.
+          required: true
+        - label: I understand maintainers will verify before merging.
+          required: true

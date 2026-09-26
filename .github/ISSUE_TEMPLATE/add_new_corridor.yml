@@ -1,17 +1,106 @@
-﻿name: Request New Corridor
-description: Propose adding a new sovereign country corridor or clearing rail
+﻿name: "Add new corridor"
+description: "Request a new currency pair / payout corridor to be audited."
+title: "[New corridor] USD → {CCC}"
+labels: ["corridor-request", "enhancement"]
 body:
-  - type: input
-    id: corridor_pair
+  - type: markdown
     attributes:
-      label: Currency Pair
-      placeholder: e.g. USD to TND (Tunisian Dinar)
+      value: |
+        Thanks for helping expand the payout audit. The dataset lives in
+        `data/fees.json` (corridor + rail rates) and `data/regulatoryBanking.ts`
+        (the receiving-side statutory and local-bank directory). Corridor pages
+        are generated from `data/corridors.ts`.
+
+        **JSON schema reference** (see CONTRIBUTING.md for full examples):
+        - `data/fees.json` corridors[] entry
+        - `data/regulatoryBanking.ts` CorridorRegulation entry
+        - `data/banks.ts` BankDossier entry (if a dedicated bank dossier exists)
+
+  - type: input
+    id: pair
+    attributes:
+      label: Currency pair
+      description: ISO 4217 pair you want audited (e.g. USD → NGN).
+      placeholder: "USD → {CCC}"
     validations:
       required: true
-  - type: input
-    id: central_bank
+
+  - type: dropdown
+    id: country
     attributes:
-      label: Central Bank / Clearing Rail
-      placeholder: e.g. Central Bank of Tunisia / Domestic RTGS
+      label: Destination country / region
+      options:
+        - Pakistan (PKR)
+        - India (INR)
+        - Philippines (PHP)
+        - Nigeria (NGN)
+        - Bangladesh (BDT)
+        - Egypt (EGP)
+        - Brazil (BRL)
+        - South Africa (ZAR)
+        - United Kingdom (GBP)
+        - Eurozone (EUR)
+        - Other / new country
     validations:
       required: true
+
+  - type: input
+    id: baseCurrency
+    attributes:
+      label: Base (send) currency
+      description: Typically USD, EUR, or GBP.
+      placeholder: "USD"
+    validations:
+      required: true
+
+  - type: input
+    id: rate
+    attributes:
+      label: Mid-market rate (approx)
+      description: Current interbank rate for the pair (e.g. 277.42 for USD→PKR).
+      placeholder: "277.42"
+    validations:
+      required: false
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: Why it matters
+      description: Typical invoice size, freelancer volume, and which payout platforms are popular there.
+      placeholder: "e.g. ~80k freelancers, mean invoice $1,200 …"
+    validations:
+      required: false
+
+  - type: textarea
+    id: rails
+    attributes:
+      label: Local bank / SWIFT rails to add
+      description: Real receiving banks with their BIC, benchmark intermediary cut (USD), local landing fee and PRC / FIRC turnaround you can verify.
+      placeholder: |
+        - Bank name — BIC — intermediary $15 — landing fee ₹75 — 48 h PRC (source link)
+    validations:
+      required: false
+
+  - type: textarea
+    id: regulatory
+    attributes:
+      label: Regulatory / tax context
+      description: Withholding tax rates, purpose codes (9111, P0802, etc.), exemption tiers, and links to official circulars (SBP, RBI, BIR, etc.).
+      placeholder: |
+        - Withholding: 0.25% (PSEB) / 1% (filer) / 2% (non-filer)
+        - Purpose code: 9111
+        - Source: https://sbp.org.pk/...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Contribution checklist
+      options:
+        - label: I confirm fee figures are public benchmarks, not quoted rates.
+          required: true
+        - label: I have linked official sources for any regulatory claims.
+          required: true
+        - label: I am happy for the maintainers to verify before shipping.
+          required: true
