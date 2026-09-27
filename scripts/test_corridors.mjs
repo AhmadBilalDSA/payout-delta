@@ -1527,7 +1527,7 @@ const routingSource = readFileSync(
   "utf8"
 );
 
-const s2GateFailures = [0, 0, 0, 0];
+const s2GateFailures = [0, 0, 0, 0, 0, 0];
 function s2fail(gateIndex, label, detail) {
   s2GateFailures[gateIndex - 1] += 1;
   fail(label, detail);
@@ -1825,6 +1825,160 @@ if (!/intermediaryMinUSD/.test(bankingSource) || !/intermediaryMaxUSD/.test(bank
 }
 console.log(
   `  ${(s2GateFailures[3] === 0 ? "PASS  " : "FAIL  ") + "settlement rails + Field 71A".padEnd(34)}${railEntries.size} authored rails cover ${corpusCurrencies.size} corpus currencies, 0 DEFAULT_RAIL fallbacks, 71A band derived from primary bank`
+);
+
+/** S2.5 — hexagonal clearing-rail registry gate over data/rails.json. */
+const EXPECTED_RAIL_COUNT = 110;
+const RAIL_PROTOCOLS = new Set(["RTGS", "INSTANT", "BATCH", "CHAPS"]);
+const REQUIRED_RAIL_IDS = [
+  "RAAST", "PIX", "FEDWIRE", "CHIPS", "TARGET2", "SEPA_INSTANT", "CHAPS", "FPS",
+  "IMPS", "NEFT", "RTGS_IN", "PHILPASS", "INSTAPAY", "PESONET", "ZENGIN", "BOJ_NET",
+  "SIC", "BOK_WIRE", "CBC_INTERBANK", "ESAS",
+];
+let railRegistry;
+try {
+  railRegistry = JSON.parse(readFileSync(join(ROOT, "data", "rails.json"), "utf8"));
+} catch (error) {
+  s2fail(5, "clearing rail registry", `data/rails.json is not readable JSON: ${error.message}`);
+}
+const railNodes = Array.isArray(railRegistry) ? railRegistry : (railRegistry?.rails ?? []);
+const railIds = new Set();
+for (const rail of railNodes) {
+  if (railIds.has(rail.id)) {
+    s2fail(5, "clearing rail duplicates", `id ${rail.id} appears more than once`);
+  }
+  railIds.add(rail.id);
+  if (!RAIL_PROTOCOLS.has(rail.protocol)) {
+    s2fail(5, "clearing rail protocol", `${rail.id}: ${rail.protocol} (expected RTGS, INSTANT, BATCH or CHAPS)`);
+  }
+  if (typeof rail.instant !== "boolean") {
+    s2fail(5, "clearing rail instant flag", `${rail.id}: instant must be a boolean`);
+  }
+  if (typeof rail.finalityWindow !== "string" || rail.finalityWindow.length < 4) {
+    s2fail(5, "clearing rail finality window", `${rail.id}: finalityWindow is missing`);
+  }
+  if (rail.baseHopCutUSD !== 0) {
+    s2fail(5, "clearing rail local deduction", `${rail.id}: baseHopCutUSD ${rail.baseHopCutUSD} (a registered rail must be the 0 sentinel)`);
+  }
+}
+if (railNodes.length !== EXPECTED_RAIL_COUNT) {
+  s2fail(5, "clearing rail count", `${railNodes.length} rails, expected ${EXPECTED_RAIL_COUNT}`);
+}
+if (railRegistry?.meta?.railCount !== railNodes.length) {
+  s2fail(5, "clearing rail meta count", `meta.railCount ${railRegistry?.meta?.railCount} does not match ${railNodes.length} authored rails`);
+}
+for (const id of REQUIRED_RAIL_IDS) {
+  if (!railIds.has(id)) {
+    s2fail(5, "clearing rail coverage", `required rail ${id} is missing from data/rails.json`);
+  }
+}
+console.log(
+  `  ${(s2GateFailures[4] === 0 ? "PASS  " : "FAIL  ") + "clearing rail registry".padEnd(34)}${railNodes.length} rails, ${railIds.size} unique ids, ${REQUIRED_RAIL_IDS.length} required schemes present, all baseHopCutUSD = 0`
+);
+
+/** S2.6 — hexagonal sovereign-jurisdiction manifest gate over data/jurisdictions.json. */
+const EXPECTED_JURISDICTION_COUNT = 195;
+const EXPECTED_ISO2 = (
+  "AD AE AF AG AL AM AO AR AT AU AZ BA BB BD BE BF BG BH BI BJ BN BO BR BS BT BW BY BZ " +
+  "CA CD CF CG CH CI CL CM CN CO CR CU CV CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FM FR " +
+  "GA GB GD GE GH GM GN GQ GR GT GW GY HN HR HT HU ID IE IL IN IQ IR IS IT JM JP JO KE KG KH KI KM " +
+  "KN KP KR KW KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MG MH MK ML MM MN MR MT MU MV MW MX MY " +
+  "MZ NA NE NG NI NL NO NP NR NZ OM PA PE PG PH PK PL PT PW PY QA RO RS RU RW SA SB SC SD SE SG SI SK " +
+  "SL SM SN SO SR SS ST SV SY SZ TD TG TH TJ TL TM TN TO TR TT TV TZ UA UG US UY UZ VA VC VE VN VU WS " +
+  "YE ZA ZM ZW PS"
+).split(" ");
+const NON_SOVEREIGN_ISO2 = new Set(["HK", "MO", "TW", "XK", "PR", "NC", "NF", "PF"]);
+const ISO2_RE = /^[A-Z]{2}$/;
+const CURRENCY_RE = /^[A-Z]{3}$/;
+let jurisdictionManifest;
+try {
+  jurisdictionManifest = JSON.parse(
+    readFileSync(join(ROOT, "data", "jurisdictions.json"), "utf8")
+  );
+} catch (error) {
+  s2fail(6, "jurisdiction manifest", `data/jurisdictions.json is not readable JSON: ${error.message}`);
+}
+const jurisdictionNodes = Array.isArray(jurisdictionManifest)
+  ? jurisdictionManifest
+  : (jurisdictionManifest?.jurisdictions ?? []);
+const seenIso2 = new Set();
+let jurisdictionBics = 0;
+for (const node of jurisdictionNodes) {
+  const iso2 = node.iso2;
+  if (!ISO2_RE.test(iso2 ?? "")) {
+    s2fail(6, "jurisdiction ISO 3166-1 code", `${iso2}: expected two uppercase letters`);
+  }
+  if (seenIso2.has(iso2)) {
+    s2fail(6, "jurisdiction duplicates", `${iso2} appears more than once`);
+  }
+  seenIso2.add(iso2);
+  if (NON_SOVEREIGN_ISO2.has(iso2)) {
+    s2fail(6, "jurisdiction sovereignty", `${iso2} is not a sovereign state and must stay registry-only`);
+  }
+  if (!CURRENCY_RE.test(node.currency ?? "")) {
+    s2fail(6, "jurisdiction ISO 4217 code", `${iso2}: ${node.currency} is not an ISO 4217 alphabetic code`);
+  }
+  if (!railIds.has(node.primaryRailId)) {
+    s2fail(6, "jurisdiction rail foreign key", `${iso2}: primaryRailId ${node.primaryRailId} does not resolve in data/rails.json`);
+  }
+  const tax = node.tax ?? {};
+  for (const year of ["enactmentYear", "lastAmendedYear"]) {
+    if (!Number.isInteger(tax[year]) || tax[year] < 1900 || tax[year] > 2100) {
+      s2fail(6, "jurisdiction statutory year", `${iso2}: ${year} ${tax[year]} is not a plausible year`);
+    }
+  }
+  if (tax.lastAmendedYear < tax.enactmentYear) {
+    s2fail(6, "jurisdiction statutory year", `${iso2}: lastAmendedYear ${tax.lastAmendedYear} precedes enactmentYear ${tax.enactmentYear}`);
+  }
+  for (const band of ["baselineWhtPct", "treatyWhtPct"]) {
+    const value = tax[band];
+    if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 100) {
+      s2fail(6, "jurisdiction withholding band", `${iso2}: ${band} ${value} is outside [0, 100]`);
+    }
+  }
+  if (tax.treatyWhtPct > tax.baselineWhtPct) {
+    s2fail(6, "jurisdiction withholding band", `${iso2}: treaty band ${tax.treatyWhtPct}% exceeds the baseline ${tax.baselineWhtPct}%`);
+  }
+  for (const list of ["exemptionConditions", "safeHarborRules"]) {
+    if (!Array.isArray(tax[list]) || tax[list].length === 0) {
+      s2fail(6, "jurisdiction statutory evidence", `${iso2}: ${list} is empty`);
+    }
+  }
+  for (const text of ["statutoryAct", "purposeCode", "mandatoryAuditCert", "nonComplianceRisk"]) {
+    if (typeof tax[text] !== "string" || tax[text].length < 4) {
+      s2fail(6, "jurisdiction statutory evidence", `${iso2}: ${text} is missing`);
+    }
+  }
+  if (!Array.isArray(node.primaryBankBics)) {
+    s2fail(6, "jurisdiction BIC list", `${iso2}: primaryBankBics must be an array`);
+  } else {
+    for (const bic of node.primaryBankBics) {
+      jurisdictionBics += 1;
+      if (!SWIFT_BIC_RE.test(bic)) {
+        s2fail(6, "jurisdiction BIC syntax", `${iso2}: ${bic} violates ISO 9362`);
+      }
+    }
+  }
+}
+if (jurisdictionNodes.length !== EXPECTED_JURISDICTION_COUNT) {
+  s2fail(6, "jurisdiction count", `${jurisdictionNodes.length} jurisdictions, expected ${EXPECTED_JURISDICTION_COUNT} (193 UN members + VA + PS)`);
+}
+for (const iso2 of EXPECTED_ISO2) {
+  if (!seenIso2.has(iso2)) {
+    s2fail(6, "jurisdiction coverage", `sovereign jurisdiction ${iso2} is missing from data/jurisdictions.json`);
+  }
+}
+for (const iso2 of seenIso2) {
+  if (!EXPECTED_ISO2.includes(iso2)) {
+    s2fail(6, "jurisdiction coverage", `${iso2} is not part of the 193 UN members + VA + PS set`);
+  }
+}
+if (jurisdictionManifest?.meta?.jurisdictionCount !== jurisdictionNodes.length) {
+  s2fail(6, "jurisdiction meta count", `meta.jurisdictionCount ${jurisdictionManifest?.meta?.jurisdictionCount} does not match ${jurisdictionNodes.length} authored nodes`);
+}
+const referencedRails = new Set(jurisdictionNodes.map((node) => node.primaryRailId));
+console.log(
+  `  ${(s2GateFailures[5] === 0 ? "PASS  " : "FAIL  ") + "sovereign jurisdictions".padEnd(34)}${jurisdictionNodes.length} jurisdictions (193 UN + VA + PS), ${seenIso2.size} unique ISO 3166-1 codes, ${referencedRails.size}/${railNodes.length} rails referenced, ${jurisdictionBics} authorized BICs valid`
 );
 
 console.log(`\n${"-".repeat(header.length)}`);
