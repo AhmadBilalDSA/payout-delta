@@ -294,7 +294,11 @@ export default function WaterfallVisualizer({
           return (
             <li
               key={step.key}
-              className="pd-cascade"
+              className={`pd-cascade ${
+                step.key === "net"
+                  ? "rounded-xl border border-emerald-500/40 bg-emerald-50/60 px-3 py-2 dark:bg-emerald-950/20 dark:shadow-[0_0_25px_-8px_rgba(16,185,129,0.3)]"
+                  : ""
+              }`}
               style={{ animationDelay: `${index * 70}ms` }}
             >
               <div className="flex items-baseline justify-between gap-3">
@@ -308,11 +312,11 @@ export default function WaterfallVisualizer({
                   {labelFor(step.key)}
                 </span>
                 <span
-                  className={`shrink-0 font-mono text-xs tabular-nums ${
+                  className={`shrink-0 font-mono text-xs font-semibold tracking-tight tabular-nums ${
                     step.key === "net"
                       ? "font-bold text-emerald-600 dark:text-emerald-400"
                       : isTotal
-                        ? "font-semibold text-black dark:text-white"
+                        ? "text-black dark:text-white"
                         : "text-amber-600 dark:text-amber-400"
                   }`}
                 >

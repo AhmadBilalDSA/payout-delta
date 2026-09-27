@@ -1,0 +1,3769 @@
+{
+  "meta": {
+    "schema": "payoutdelta/bank-registry@1",
+    "phase": "Phase 2 — hexagonal normalization",
+    "bankCount": 266,
+    "tier1Count": 36,
+    "tier2Count": 230,
+    "jurisdictionsCovered": 115,
+    "conventions": {
+      "bic": "Real publisher-listed ISO 9362 head (8 or 11 characters). Characters 5-6 are the institution's registration country, which is also the foreign key into data/jurisdictions.json.",
+      "tier": "1 = documented correspondent clearing hub in data/banks.ts. 2 = domestic settlement bank from the per-corridor receiving-bank directory.",
+      "usdGsibCorrespondent": "The G-SIB head that carries the institution's USD leg. Tier 1 carries its own head; tier 2 publishes an empty string because no single dominant USD correspondent is evidenced per domestic bank — the monetary exposure is carried by defaultIntermediaryCutUSD instead.",
+      "supportedCharges": "Charge codes honoured on an inbound credit advice. Tier 1 uses the dossier's own published set; tier 2 carries the modelled set (SHA primary, OUR/BEN honoured), which is the charge code data/fees.json prices.",
+      "defaultIntermediaryCutUSD": "Benchmark correspondent cut in USD, lifted from the receiving-bank directory (tier 2) or the hub dossier (tier 1). A manifest-authorized head with no dossier inherits the median of the sourced hub cuts and transit figures — it is a portfolio-level benchmark, not a per-institution quote.",
+      "avgTransitHours": "Correspondent transit in hours. Tier 1 is the dossier's own figure. Tier 2 is derived from the directory's clearance class: Instant = 1h, Fast = 8h, Standard = 36h."
+    },
+    "provenance": {
+      "receivingDirectoryRecords": 290,
+      "hubDossiers": 23,
+      "manifestHeadsAlreadyMerged": 234,
+      "manifestHeadsNamedFromManifest": 13,
+      "manifestHeadsWithoutARecord": [],
+      "excludedNonSovereign": [
+        "BANBOB22 (OB)",
+        "BCEAOOLS (OO)",
+        "BEIIIJJA (IJ)",
+        "BKCHHKHH (HK)",
+        "BKKBSHTH (SH)",
+        "BLOMLEBB (LE)",
+        "BOTKTW2X (TW)",
+        "COMBCEKX (CE)",
+        "HABBPNKA (PN)",
+        "HASEHKHH (HK)",
+        "HSBCHKHH (HK)",
+        "MEGATWTP (TW)",
+        "QNBQQQHB (QQ)",
+        "RBKOXKPR (XK)",
+        "WPACPUPA (PU)"
+      ],
+      "policy": "Verified heads only. No synthetic institution is published: a market with no evidenced head stays absent rather than being padded with an invented bank code."
+    },
+    "disclaimer": "Informational benchmark derived from the project's own bank directory. A BIC identifies an institution for routing; confirm the head with the institution and its correspondent bank before invoicing, and verify the deduction that actually lands on the credit advice (CRF)."
+  },
+  "banks": [
+    {
+      "bic": "BADZADAL",
+      "name": "Banque de l'Agriculture et du Développement Rural",
+      "countryIso2": "AD",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ADCBAEAA",
+      "name": "ADCB",
+      "countryIso2": "AE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "EBILAEAD",
+      "name": "Emirates NBD (PJSC)",
+      "countryIso2": "AE",
+      "tier": 1,
+      "usdGsibCorrespondent": "EBILAEAD",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "NBADAEAD",
+      "name": "First Abu Dhabi Bank (FAB)",
+      "countryIso2": "AE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "SCBLAEAD",
+      "name": "Standard Chartered Bank Middle East, Africa & Türkiye",
+      "countryIso2": "AE",
+      "tier": 1,
+      "usdGsibCorrespondent": "SCBLAEAD",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "BKTBALTR",
+      "name": "Banka Kombëtare Tregtare (BKT)",
+      "countryIso2": "AL",
+      "tier": 1,
+      "usdGsibCorrespondent": "BKTBALTR",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15.5,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "BFAOAOAL",
+      "name": "Banco de Fomento Angola",
+      "countryIso2": "AO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BBAAARBA",
+      "name": "BBVA Argentina",
+      "countryIso2": "AR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BSARARBA",
+      "name": "Santander Argentina",
+      "countryIso2": "AR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 20,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "GABAARBA",
+      "name": "Banco Galicia",
+      "countryIso2": "AR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "CTBAAU2S",
+      "name": "Commonwealth Bank of Australia",
+      "countryIso2": "AU",
+      "tier": 1,
+      "usdGsibCorrespondent": "CTBAAU2S",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "IBAZAZ22",
+      "name": "International Bank of Azerbaijan",
+      "countryIso2": "AZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "KAPBAZ22",
+      "name": "Kapital Bank",
+      "countryIso2": "AZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ISPBBA22",
+      "name": "Intesa Sanpaolo Banka BiH",
+      "countryIso2": "BA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "RJHIBARI",
+      "name": "Al Rajhi Bank",
+      "countryIso2": "BA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "RZBABA2S",
+      "name": "Raiffeisen Bank d.d.",
+      "countryIso2": "BA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BUTTBBBS",
+      "name": "Bank of Butterfield",
+      "countryIso2": "BB",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "FCIBBBBS",
+      "name": "CIBC FirstCaribbean",
+      "countryIso2": "BB",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 11,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BRAKBDDH",
+      "name": "BRAC Bank",
+      "countryIso2": "BD",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 26,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "DBBLBDDH",
+      "name": "Dutch-Bangla Bank",
+      "countryIso2": "BD",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 27,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "IBLBBDDH",
+      "name": "Islami Bank",
+      "countryIso2": "BD",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "FINVBGSF",
+      "name": "Fibank (First Investment Bank)",
+      "countryIso2": "BG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "STSABGSF",
+      "name": "DSK Bank",
+      "countryIso2": "BG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "UNCRBGSF",
+      "name": "UniCredit Bulbank",
+      "countryIso2": "BG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BHBLBHBK",
+      "name": "Bahrain Islamic Bank",
+      "countryIso2": "BH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BUBLBHBT",
+      "name": "Bank of Bhutan",
+      "countryIso2": "BH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "DPBHBHBT",
+      "name": "Druk PNB Bank",
+      "countryIso2": "BH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BAIDBNBN",
+      "name": "Baiduri Bank",
+      "countryIso2": "BN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 11,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BIBDBNBN",
+      "name": "Bank Islam Brunei Darussalam",
+      "countryIso2": "BN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BNBOBOLV",
+      "name": "Banco Nacional de Bolivia",
+      "countryIso2": "BO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "MERZBOLV",
+      "name": "Banco Mercantil Santa Cruz",
+      "countryIso2": "BO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BRASBRRJ",
+      "name": "Banco do Brasil",
+      "countryIso2": "BR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 20,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BSSSBRSP",
+      "name": "Santander Brasil",
+      "countryIso2": "BR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 19,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ITAUBRSP",
+      "name": "Itaú Unibanco",
+      "countryIso2": "BR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 22,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "FCIBBSBS",
+      "name": "CIBC FirstCaribbean",
+      "countryIso2": "BS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NOSCBSBS",
+      "name": "Scotiabank Bahamas",
+      "countryIso2": "BS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 11,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SBICBWGZ",
+      "name": "Stanbic Bank Botswana",
+      "countryIso2": "BW",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BBLZBZBZ",
+      "name": "Belize Bank Limited",
+      "countryIso2": "BZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CRESCHZZ",
+      "name": "Credit Suisse",
+      "countryIso2": "CH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "UBSWCHZH",
+      "name": "UBS",
+      "countryIso2": "CH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BCHICLRM",
+      "name": "Banco de Chile",
+      "countryIso2": "CL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BSCHCLRM",
+      "name": "Banco Santander Chile",
+      "countryIso2": "CL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "CREDCLRM",
+      "name": "BCI",
+      "countryIso2": "CL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BICECMCM",
+      "name": "Bank of Central African States (BEAC)",
+      "countryIso2": "CM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BKCHCNBJ",
+      "name": "Bank of China",
+      "countryIso2": "CN",
+      "tier": 1,
+      "usdGsibCorrespondent": "BKCHCNBJ",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "CAVHCOBM",
+      "name": "Davivienda",
+      "countryIso2": "CO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "COLOCOBM",
+      "name": "Bancolombia S.A.",
+      "countryIso2": "CO",
+      "tier": 1,
+      "usdGsibCorrespondent": "COLOCOBM",
+      "supportedCharges": [
+        "SHA",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 35,
+      "avgTransitHours": 24
+    },
+    {
+      "bic": "BACCCRSJ",
+      "name": "BAC San José",
+      "countryIso2": "CR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BNCRCRSJ",
+      "name": "Banco Nacional",
+      "countryIso2": "CR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "CEKOCZPP",
+      "name": "ČSOB",
+      "countryIso2": "CZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "GIBACZPX",
+      "name": "Česká spořitelna",
+      "countryIso2": "CZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "KOBACZPP",
+      "name": "Komerční banka",
+      "countryIso2": "CZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "COBADEFFXXX",
+      "name": "Commerzbank",
+      "countryIso2": "DE",
+      "tier": 1,
+      "usdGsibCorrespondent": "COBADEFFXXX",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "COMMDEFF",
+      "name": "Commerzbank AG",
+      "countryIso2": "DE",
+      "tier": 1,
+      "usdGsibCorrespondent": "COMMDEFF",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "DEUTDEDD",
+      "name": "Deutsche Bank AG",
+      "countryIso2": "DE",
+      "tier": 1,
+      "usdGsibCorrespondent": "DEUTDEDD",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "DEUTDEFF",
+      "name": "Deutsche Bank",
+      "countryIso2": "DE",
+      "tier": 1,
+      "usdGsibCorrespondent": "DEUTDEFF",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "DABADKKK",
+      "name": "Danske Bank",
+      "countryIso2": "DK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "JYBADKKK",
+      "name": "Jyske Bank",
+      "countryIso2": "DK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BANRDOSD",
+      "name": "Banco de Reservas",
+      "countryIso2": "DO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BHDDDOSD",
+      "name": "Banco BHD",
+      "countryIso2": "DO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "POPDDOSD",
+      "name": "Banco Popular Dominicano",
+      "countryIso2": "DO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "PACIECUA",
+      "name": "Banco del Pacífico",
+      "countryIso2": "EC",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "PICHECUQ",
+      "name": "Banco Pichincha",
+      "countryIso2": "EC",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BMISEGCX",
+      "name": "Banque Misr",
+      "countryIso2": "EG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 27,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CIBEEGCX",
+      "name": "Commercial Int'l Bank",
+      "countryIso2": "EG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 26,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NBEGEGCX",
+      "name": "National Bank of Egypt",
+      "countryIso2": "EG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 28,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BSCHESMMXXX",
+      "name": "Banco Santander",
+      "countryIso2": "ES",
+      "tier": 1,
+      "usdGsibCorrespondent": "BSCHESMMXXX",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "CBETETAA",
+      "name": "Commercial Bank of Ethiopia",
+      "countryIso2": "ET",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "DASHETAA",
+      "name": "Dashen Bank",
+      "countryIso2": "ET",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ANZFFJSX",
+      "name": "ANZ Fiji",
+      "countryIso2": "FJ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BSPFFJFJ",
+      "name": "Bank of South Pacific Fiji",
+      "countryIso2": "FJ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BNPAFRPPXXX",
+      "name": "BNP Paribas",
+      "countryIso2": "FR",
+      "tier": 1,
+      "usdGsibCorrespondent": "BNPAFRPPXXX",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "SOGEFRPP",
+      "name": "Société Générale",
+      "countryIso2": "FR",
+      "tier": 1,
+      "usdGsibCorrespondent": "SOGEFRPP",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "GHCBGACX",
+      "name": "GCB Bank",
+      "countryIso2": "GA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BARCGB22",
+      "name": "Barclays Bank UK PLC",
+      "countryIso2": "GB",
+      "tier": 1,
+      "usdGsibCorrespondent": "BARCGB22",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "HBUKGB4B",
+      "name": "HSBC UK",
+      "countryIso2": "GB",
+      "tier": 1,
+      "usdGsibCorrespondent": "HBUKGB4B",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "HSBCGB2L",
+      "name": "HSBC UK Bank PLC",
+      "countryIso2": "GB",
+      "tier": 1,
+      "usdGsibCorrespondent": "HSBCGB2L",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "SCBLGB2L",
+      "name": "Standard Chartered Bank",
+      "countryIso2": "GB",
+      "tier": 1,
+      "usdGsibCorrespondent": "SCBLGB2L",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "BAGAGE22",
+      "name": "Bank of Georgia",
+      "countryIso2": "GE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "TBCBGE22",
+      "name": "TBC Bank",
+      "countryIso2": "GE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "ECOCGHAC",
+      "name": "Ecobank Ghana",
+      "countryIso2": "GH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 29,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "GCBHGHAC",
+      "name": "GCB Bank",
+      "countryIso2": "GH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 31,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "GTBIGHAC",
+      "name": "GTBank Ghana",
+      "countryIso2": "GH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 30,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "SBICGHAC",
+      "name": "Stanbic Bank Ghana",
+      "countryIso2": "GH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "AGROGTGC",
+      "name": "Banco Agromercantil",
+      "countryIso2": "GT",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BICTGTGC",
+      "name": "Banco Industrial",
+      "countryIso2": "GT",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "RBGLGYGG",
+      "name": "Republic Bank Guyana",
+      "countryIso2": "GY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 22,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ATLAHNAP",
+      "name": "Banco Atlántida",
+      "countryIso2": "HN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 17,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "FICOHNAP",
+      "name": "Banco Ficohsa",
+      "countryIso2": "HN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ESBCHR22",
+      "name": "Erste&Steiermärkische Bank",
+      "countryIso2": "HR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "ZABAHR2X",
+      "name": "Zagrebačka banka",
+      "countryIso2": "HR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "GIBAHUHB",
+      "name": "Erste Bank Hungary",
+      "countryIso2": "HU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "OKHBHUHB",
+      "name": "K&H Bank",
+      "countryIso2": "HU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "OTPVHUHB",
+      "name": "OTP Bank",
+      "countryIso2": "HU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BCAJIDJJ",
+      "name": "Bank Central Asia",
+      "countryIso2": "ID",
+      "tier": 1,
+      "usdGsibCorrespondent": "BCAJIDJJ",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "BMRIIDJA",
+      "name": "Bank Mandiri",
+      "countryIso2": "ID",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BRINIDJA",
+      "name": "Bank Rakyat Indonesia",
+      "countryIso2": "ID",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "CENAIDJA",
+      "name": "PT Bank Central Asia Tbk (BCA)",
+      "countryIso2": "ID",
+      "tier": 1,
+      "usdGsibCorrespondent": "CENAIDJA",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "AXISINBB",
+      "name": "Axis Bank",
+      "countryIso2": "IN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "HDFCINBB",
+      "name": "HDFC Bank",
+      "countryIso2": "IN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 11,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ICICINBB",
+      "name": "ICICI Bank Limited",
+      "countryIso2": "IN",
+      "tier": 1,
+      "usdGsibCorrespondent": "ICICINBB",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "SBININBB",
+      "name": "State Bank of India",
+      "countryIso2": "IN",
+      "tier": 1,
+      "usdGsibCorrespondent": "SBININBB",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "RAFBIQBA",
+      "name": "Rafidain Bank",
+      "countryIso2": "IQ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "RDBAIQBB",
+      "name": "Rasheed Bank",
+      "countryIso2": "IQ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "TRIQIQBA",
+      "name": "Trade Bank of Iraq",
+      "countryIso2": "IQ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "LAISISRE",
+      "name": "Landsbankinn hf.",
+      "countryIso2": "IS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "UNCRITMMXXX",
+      "name": "UniCredit",
+      "countryIso2": "IT",
+      "tier": 1,
+      "usdGsibCorrespondent": "UNCRITMMXXX",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "JNCBJMKX",
+      "name": "National Commercial Bank Jamaica",
+      "countryIso2": "JM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SAGAJMKX",
+      "name": "Sagicor Bank Jamaica",
+      "countryIso2": "JM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ARABJOAX",
+      "name": "Arab Bank Jordan",
+      "countryIso2": "JO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BOTKJPJT",
+      "name": "MUFG Bank",
+      "countryIso2": "JP",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "MZBKJPJT",
+      "name": "Mizuho Bank",
+      "countryIso2": "JP",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 11,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "SMBCJPJT",
+      "name": "Sumitomo Mitsui Banking",
+      "countryIso2": "JP",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "EQBLKENA",
+      "name": "Equity Bank",
+      "countryIso2": "KE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 29,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "KCBLKENX",
+      "name": "KCB Bank",
+      "countryIso2": "KE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 30,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "KCOOKENA",
+      "name": "Co-operative Bank",
+      "countryIso2": "KE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 28,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "AIYLKG22",
+      "name": "Aiyl Bank",
+      "countryIso2": "KG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "OPTMKG22",
+      "name": "Optima Bank",
+      "countryIso2": "KG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ABPPKHPP",
+      "name": "ABA Bank",
+      "countryIso2": "KH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "ACLEKHPH",
+      "name": "ACLEDA Bank",
+      "countryIso2": "KH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "HCCKKRSE",
+      "name": "Hana Financial Group",
+      "countryIso2": "KR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "HKBKKRSE",
+      "name": "KB Kookmin Bank",
+      "countryIso2": "KR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "SHBKKRSE",
+      "name": "Shinhan Bank",
+      "countryIso2": "KR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "NBOKKWKW",
+      "name": "National Bank of Kuwait",
+      "countryIso2": "KW",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CASPKZKA",
+      "name": "Kaspi Bank",
+      "countryIso2": "KZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "HSBKKZKX",
+      "name": "Halyk Bank",
+      "countryIso2": "KZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "IRTYKZKA",
+      "name": "ForteBank",
+      "countryIso2": "KZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BCELLAOX",
+      "name": "Banque pour le Commerce Extérieur Lao",
+      "countryIso2": "LA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "PHONLAXX",
+      "name": "Phongsavanh Bank",
+      "countryIso2": "LA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BCEYLKLX",
+      "name": "Bank of Ceylon",
+      "countryIso2": "LK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CCEYLKLX",
+      "name": "Commercial Bank of Ceylon PLC",
+      "countryIso2": "LK",
+      "tier": 1,
+      "usdGsibCorrespondent": "CCEYLKLX",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 6
+    },
+    {
+      "bic": "HNBLLKLX",
+      "name": "Hatton National Bank (HNB)",
+      "countryIso2": "LK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "FIRNLSMX",
+      "name": "First National Bank Lesotho",
+      "countryIso2": "LS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 19,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BCMAMAMC",
+      "name": "Attijariwafa Bank",
+      "countryIso2": "MA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BCPOMAMC",
+      "name": "Banque Centrale Populaire",
+      "countryIso2": "MA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BMCEMAMC",
+      "name": "Bank of Africa",
+      "countryIso2": "MA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "AGRNMD2X",
+      "name": "moldova-agroindbank (MAIB)",
+      "countryIso2": "MD",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 17,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "CKBCMEPG",
+      "name": "Crnogorska komercijalna banka ad (NLB Group)",
+      "countryIso2": "ME",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BOAMMGMA",
+      "name": "Bank of Africa Madagascar",
+      "countryIso2": "MG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "KOBSMK2X",
+      "name": "Komercijalna banka ad Skopje",
+      "countryIso2": "MK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NBSMMLNX",
+      "name": "National Bank of Malawi",
+      "countryIso2": "ML",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ABARMN22",
+      "name": "Ameriabank",
+      "countryIso2": "MN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ACBAMN22",
+      "name": "ACBA Bank",
+      "countryIso2": "MN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "KHNBMNUB",
+      "name": "Khan Bank",
+      "countryIso2": "MN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "TDBMMNUB",
+      "name": "Trade & Development Bank",
+      "countryIso2": "MN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "MCBLMUMU",
+      "name": "Mauritius Commercial Bank",
+      "countryIso2": "MU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SBMUMUMU",
+      "name": "State Bank of Mauritius",
+      "countryIso2": "MU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BMLMMVMV",
+      "name": "Bank of Maldives",
+      "countryIso2": "MV",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "MIBMMVMV",
+      "name": "Maldives Islamic Bank",
+      "countryIso2": "MV",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BCMRMXMM",
+      "name": "BBVA México",
+      "countryIso2": "MX",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 19,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BSCHMXMM",
+      "name": "Santander México",
+      "countryIso2": "MX",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 20,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BSMXMXMM",
+      "name": "Santander México",
+      "countryIso2": "MX",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "CITIMXMM",
+      "name": "Citibanamex",
+      "countryIso2": "MX",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "MENOMXMT",
+      "name": "Banorte",
+      "countryIso2": "MX",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "CIBBMYKL",
+      "name": "CIMB Bank",
+      "countryIso2": "MY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "MBBEMYKL",
+      "name": "Maybank",
+      "countryIso2": "MY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "PBBEMYKL",
+      "name": "Public Bank",
+      "countryIso2": "MY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BCIOMZMC",
+      "name": "Commercial and Investment Bank",
+      "countryIso2": "MZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "FIRNNANX",
+      "name": "First National Bank Namibia",
+      "countryIso2": "NA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ABNGNGLA",
+      "name": "Access Bank",
+      "countryIso2": "NG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 27,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "GTBINGLA",
+      "name": "GTBank",
+      "countryIso2": "NG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 28,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ZEIBNGLA",
+      "name": "Zenith Bank",
+      "countryIso2": "NG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 29,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ATLANICA",
+      "name": "Banco Atlántida",
+      "countryIso2": "NI",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BANPNICA",
+      "name": "Banco de la Producción (BANPRO)",
+      "countryIso2": "NI",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ABNANL2A",
+      "name": "ABN AMRO",
+      "countryIso2": "NL",
+      "tier": 1,
+      "usdGsibCorrespondent": "ABNANL2A",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "DNBANOKK",
+      "name": "DNB Bank",
+      "countryIso2": "NO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NDEANOKK",
+      "name": "Nordea Bank (Norway)",
+      "countryIso2": "NO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "GLBLNPKA",
+      "name": "Global IME Bank",
+      "countryIso2": "NP",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NARINPKA",
+      "name": "Nabil Bank",
+      "countryIso2": "NP",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NIBLNPKT",
+      "name": "Nepal Investment Mega Bank",
+      "countryIso2": "NP",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ANZBNZ2A",
+      "name": "ANZ New Zealand",
+      "countryIso2": "NZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BKNZNZ1A",
+      "name": "Bank of New Zealand",
+      "countryIso2": "NZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "NBOBOMRX",
+      "name": "National Bank of Oman",
+      "countryIso2": "OM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BGEPPAPX",
+      "name": "Banco General",
+      "countryIso2": "PA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BNPAPAPA",
+      "name": "Banco Nacional de Panamá",
+      "countryIso2": "PA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NOSCPAPX",
+      "name": "Scotiabank Panamá",
+      "countryIso2": "PA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BCONPEPL",
+      "name": "BBVA Perú",
+      "countryIso2": "PE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BCPLPEPL",
+      "name": "Banco de Crédito del Perú",
+      "countryIso2": "PE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BINPPEPL",
+      "name": "Interbank",
+      "countryIso2": "PE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BSPUPGPA",
+      "name": "Bank South Pacific PNG",
+      "countryIso2": "PG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BNORPHMM",
+      "name": "BDO Unibank Inc.",
+      "countryIso2": "PH",
+      "tier": 1,
+      "usdGsibCorrespondent": "BNORPHMM",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 6
+    },
+    {
+      "bic": "BOFIPHMM",
+      "name": "BPI",
+      "countryIso2": "PH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 5.5,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "MBTCPHMM",
+      "name": "Metrobank",
+      "countryIso2": "PH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 24,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "RCBCPHMM",
+      "name": "RCBC",
+      "countryIso2": "PH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 23,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "UBPHPHMM",
+      "name": "UnionBank",
+      "countryIso2": "PH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 5,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "ALFHPKKA",
+      "name": "Bank Alfalah Limited",
+      "countryIso2": "PK",
+      "tier": 1,
+      "usdGsibCorrespondent": "ALFHPKKA",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "HABBPKKA",
+      "name": "Habib Bank Limited (HBL)",
+      "countryIso2": "PK",
+      "tier": 1,
+      "usdGsibCorrespondent": "HABBPKKA",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "MEZNPKKA",
+      "name": "Meezan Bank Limited",
+      "countryIso2": "PK",
+      "tier": 1,
+      "usdGsibCorrespondent": "MEZNPKKA",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "MZNBPKKA",
+      "name": "Meezan Bank",
+      "countryIso2": "PK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 24,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SCBLPKKA",
+      "name": "Standard Chartered Bank (Pakistan) Limited",
+      "countryIso2": "PK",
+      "tier": 1,
+      "usdGsibCorrespondent": "SCBLPKKA",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 11,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "UBLBPKKA",
+      "name": "United Bank Limited",
+      "countryIso2": "PK",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 25,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BPKOPLPW",
+      "name": "PKO BP",
+      "countryIso2": "PL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BREXPLPW",
+      "name": "mBank",
+      "countryIso2": "PL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "INGBPLPW",
+      "name": "ING Bank Śląski",
+      "countryIso2": "PL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "WBKAPLPW",
+      "name": "Santander Bank Polska",
+      "countryIso2": "PL",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BACNPYPA",
+      "name": "Banco Continental",
+      "countryIso2": "PY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BBVAPYPA",
+      "name": "BBVA Paraguay",
+      "countryIso2": "PY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BTRLRO22",
+      "name": "Banca Transilvania",
+      "countryIso2": "RO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "RNCBROBU",
+      "name": "BCR",
+      "countryIso2": "RO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "RZBRROBU",
+      "name": "Raiffeisen Bank Romania",
+      "countryIso2": "RO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "AIKBRS22",
+      "name": "AIK Banka",
+      "countryIso2": "RS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "DBDBRSBG",
+      "name": "Banca Intesa Beograd",
+      "countryIso2": "RS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "RZBSRSBG",
+      "name": "Raiffeisen banka a.d.",
+      "countryIso2": "RS",
+      "tier": 1,
+      "usdGsibCorrespondent": "RZBSRSBG",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "BCRWRWRW",
+      "name": "I&M Bank Rwanda",
+      "countryIso2": "RW",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BKIGRWRW",
+      "name": "Bank of Kigali",
+      "countryIso2": "RW",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "EQBLRWRW",
+      "name": "Equity Bank Rwanda",
+      "countryIso2": "RW",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NCBKSARI",
+      "name": "Saudi National Bank (SNB)",
+      "countryIso2": "SA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "RIBLSARI",
+      "name": "Riyad Bank",
+      "countryIso2": "SA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "RJHISARI",
+      "name": "Al Rajhi Bank",
+      "countryIso2": "SA",
+      "tier": 1,
+      "usdGsibCorrespondent": "RJHISARI",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 20,
+      "avgTransitHours": 4
+    },
+    {
+      "bic": "ANZSSBBI",
+      "name": "ANZ Solomon Islands",
+      "countryIso2": "SB",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BSPSSBBI",
+      "name": "Bank South Pacific Solomon Islands",
+      "countryIso2": "SB",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ESSESESS",
+      "name": "Skandinaviska Enskilda Banken",
+      "countryIso2": "SE",
+      "tier": 1,
+      "usdGsibCorrespondent": "ESSESESS",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "SWEDSESS",
+      "name": "Skandinaviska Enskilda Banken",
+      "countryIso2": "SE",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 9,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "DBSSSGSG",
+      "name": "DBS / POSB",
+      "countryIso2": "SG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "OCBCSGSG",
+      "name": "OCBC Bank",
+      "countryIso2": "SG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "UOVBSGSG",
+      "name": "United Overseas Bank",
+      "countryIso2": "SG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "RBNKSRPA",
+      "name": "Republic Bank Suriname NV",
+      "countryIso2": "SR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 22,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "HANDSSSS",
+      "name": "Handelsbanken",
+      "countryIso2": "SS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "AGRISVCA",
+      "name": "Banco Agrícola",
+      "countryIso2": "SV",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CUSCSVCA",
+      "name": "Banco Cuscatlán",
+      "countryIso2": "SV",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "DAVISVCA",
+      "name": "Davivienda El Salvador",
+      "countryIso2": "SV",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SBICSZMX",
+      "name": "Standard Bank Eswatini",
+      "countryIso2": "SZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 19,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "KASITHBK",
+      "name": "Kasikornbank",
+      "countryIso2": "TH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SICOTHBK",
+      "name": "SCB",
+      "countryIso2": "TH",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "AMONTJ22",
+      "name": "Amonatbonk",
+      "countryIso2": "TJ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ORIETJ22",
+      "name": "Orienbank",
+      "countryIso2": "TJ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 17,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BCTNTNTT",
+      "name": "Central Bank of Tunisia",
+      "countryIso2": "TN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ANZTTOTO",
+      "name": "ANZ Tonga",
+      "countryIso2": "TO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "TDBTTOXX",
+      "name": "Tonga Development Bank",
+      "countryIso2": "TO",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "AKBKTRIS",
+      "name": "Akbank",
+      "countryIso2": "TR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 20,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ISBKTRIS",
+      "name": "İşbank",
+      "countryIso2": "TR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 21,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "TCZBTR2A",
+      "name": "Ziraat Bankası",
+      "countryIso2": "TR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 22,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "TGBATRIS",
+      "name": "Garanti BBVA",
+      "countryIso2": "TR",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "FCITTTPA",
+      "name": "First Citizens Bank",
+      "countryIso2": "TT",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "RBLTTTPA",
+      "name": "Republic Bank",
+      "countryIso2": "TT",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CORUTZTZ",
+      "name": "CRDB Bank",
+      "countryIso2": "TZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "NMBLTZTZ",
+      "name": "NMB Bank",
+      "countryIso2": "TZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SCBLTZTX",
+      "name": "Standard Chartered Tanzania",
+      "countryIso2": "TZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "PBANUA2X",
+      "name": "PrivatBank",
+      "countryIso2": "UA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "UNJSUAUK",
+      "name": "Monobank (Universal Bank)",
+      "countryIso2": "UA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 1
+    },
+    {
+      "bic": "BARCUGKX",
+      "name": "Absa Bank Uganda",
+      "countryIso2": "UG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "CERBUGKA",
+      "name": "Centenary Bank",
+      "countryIso2": "UG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SBICUGKX",
+      "name": "Stanbic Bank Uganda",
+      "countryIso2": "UG",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BOFAUS3N",
+      "name": "Bank of America N.A.",
+      "countryIso2": "US",
+      "tier": 1,
+      "usdGsibCorrespondent": "BOFAUS3N",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 22.5,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "CHASUS33",
+      "name": "JPMorgan Chase Bank N.A.",
+      "countryIso2": "US",
+      "tier": 1,
+      "usdGsibCorrespondent": "CHASUS33",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 26.5,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "CITIUS33",
+      "name": "Citibank N.A.",
+      "countryIso2": "US",
+      "tier": 1,
+      "usdGsibCorrespondent": "CITIUS33",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 26.5,
+      "avgTransitHours": 2
+    },
+    {
+      "bic": "BROUUYMM",
+      "name": "Banco República",
+      "countryIso2": "UY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ITAUUYMM",
+      "name": "Banco Itaú Uruguay",
+      "countryIso2": "UY",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 14,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "IJUBUZ22",
+      "name": "Ipak Yuli Bank",
+      "countryIso2": "UZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "IPOTUZ22",
+      "name": "Ipoteka Bank",
+      "countryIso2": "UZ",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BFTVVNVX",
+      "name": "Vietcombank",
+      "countryIso2": "VN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BIDVVNVX",
+      "name": "BIDV",
+      "countryIso2": "VN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "TCBVVNVX",
+      "name": "Techcombank",
+      "countryIso2": "VN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 10,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "VPBKVNVX",
+      "name": "VPBank",
+      "countryIso2": "VN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "VTCBVNVX",
+      "name": "Techcombank",
+      "countryIso2": "VN",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ANZVVUVU",
+      "name": "ANZ Vanuatu",
+      "countryIso2": "VU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 13,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "BOVUVUVU",
+      "name": "Bank of Vanuatu",
+      "countryIso2": "VU",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 12,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "NBSAWSWS",
+      "name": "National Bank of Samoa",
+      "countryIso2": "WS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "SCBWWSST",
+      "name": "Samoa Commercial Bank",
+      "countryIso2": "WS",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "ABSAZAJJ",
+      "name": "Absa Bank Zambia",
+      "countryIso2": "ZA",
+      "tier": 1,
+      "usdGsibCorrespondent": "ABSAZAJJ",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 18,
+      "avgTransitHours": 3
+    },
+    {
+      "bic": "CABLZAJJ",
+      "name": "Capitec Bank",
+      "countryIso2": "ZA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 29,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "FIRNZAJJ",
+      "name": "First National Bank",
+      "countryIso2": "ZA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 30,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SBZAZAJJ",
+      "name": "Standard Bank",
+      "countryIso2": "ZA",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 31,
+      "avgTransitHours": 36
+    },
+    {
+      "bic": "BARCZMLX",
+      "name": "Absa Bank Zambia",
+      "countryIso2": "ZM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "SBICZMLX",
+      "name": "Stanbic Bank Zambia",
+      "countryIso2": "ZM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 16,
+      "avgTransitHours": 8
+    },
+    {
+      "bic": "ZNCOZMLX",
+      "name": "Zanaco",
+      "countryIso2": "ZM",
+      "tier": 2,
+      "usdGsibCorrespondent": "",
+      "supportedCharges": [
+        "SHA",
+        "OUR",
+        "BEN"
+      ],
+      "defaultIntermediaryCutUSD": 15,
+      "avgTransitHours": 8
+    }
+  ]
+}

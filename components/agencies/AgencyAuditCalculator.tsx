@@ -171,18 +171,33 @@ export default function AgencyAuditCalculator({
     );
   };
 
+  /**
+   * Institutional KPI card. `crimson` marks money that leaves the treasury
+   * (SHA wire cuts, retail FX margin); `accent` marks money that stays
+   * (net saving on B2B rails). The glow is the only depth cue on the card, so
+   * the two tones stay legible side by side in a 2-up grid — the paired crimson
+   * and emerald figures are the whole argument the section makes.
+   */
   const kpiCard = (label: string, value: string, tone: "accent" | "neutral" | "crimson") => (
-    <div className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/[0.08] dark:bg-white/[0.03]">
+    <div
+      className={`flex flex-col gap-1 rounded-2xl border p-4 ${
+        tone === "crimson"
+          ? "border-red-500/40 bg-red-50/60 dark:bg-red-950/20 dark:shadow-[0_0_35px_-10px_rgba(239,68,68,0.3)]"
+          : tone === "accent"
+            ? "border-emerald-500/40 bg-emerald-50/60 dark:bg-emerald-950/20 dark:shadow-[0_0_25px_-8px_rgba(16,185,129,0.3)]"
+            : "border-slate-200 bg-white dark:border-white/[0.08] dark:bg-white/[0.03]"
+      }`}
+    >
       <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
         {label}
       </span>
       <span
         className={
           tone === "crimson"
-            ? "font-mono text-xl font-bold tracking-tight text-red-600 tabular-nums dark:text-red-400"
+            ? "font-mono text-xl font-semibold tracking-tight text-red-600 tabular-nums dark:text-red-400"
             : tone === "accent"
-              ? "font-mono text-xl font-bold tracking-tight text-emerald-700 tabular-nums dark:text-emerald-400"
-              : "font-mono text-xl font-bold tracking-tight text-slate-900 tabular-nums dark:text-white"
+              ? "font-mono text-xl font-semibold tracking-tight text-emerald-700 tabular-nums dark:text-emerald-400"
+              : "font-mono text-xl font-semibold tracking-tight text-slate-900 tabular-nums dark:text-white"
         }
       >
         {value}
@@ -285,33 +300,62 @@ export default function AgencyAuditCalculator({
         {kpiCard("Annual Retail FX Margin", formatUSD(totals.fxAnnual), "crimson")}
       </div>
 
-      <section className="mt-4 w-full min-w-0 rounded-3xl border border-red-500/25 bg-red-500/[0.05] p-6 dark:border-red-500/20 dark:bg-red-500/[0.06] sm:p-8">
-        <p className="inline-flex items-center gap-2 rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-700 dark:text-red-400">
-          <span
-            aria-hidden="true"
-            className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"
-          />
-          Annual Treasury Leakage
-        </p>
-        <p className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-          Your agency loses{" "}
-          <span className="font-mono text-red-600 tabular-nums dark:text-red-400">
-            {formatUSD(leakageAnnual)}
-          </span>{" "}
-          USD every year to silent banking friction.
-        </p>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-black/[0.6] dark:text-white/60">
-          {formatUSD(totals.shaAnnual)} leaks into correspondent SHA cuts and{" "}
-          {formatUSD(totals.fxAnnual)} evaporates in retail bank FX margins.
-          Moving the roster to flat-fee B2B rails would hold the friction at
-          roughly {formatUSD(modernAnnualMin)}–{formatUSD(modernAnnualMax)} per
-          year — a net saving of{" "}
-          <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-            {formatUSD(netSavingsMin)}–{formatUSD(netSavingsMax)}
-          </span>{" "}
-          annually.
-        </p>
-      </section>
+      {/* The two halves of the audit, side by side: what leaves the treasury in
+          crimson, what a B2B rail keeps in emerald. Both figures are annual
+          totals on the same roster, so the pairing is the comparison. */}
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <section className="w-full min-w-0 rounded-3xl border border-red-500/40 bg-red-50/60 p-6 dark:bg-red-950/20 dark:shadow-[0_0_35px_-10px_rgba(239,68,68,0.3)] sm:p-8">
+          <p className="inline-flex items-center gap-2 rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-700 dark:text-red-400">
+            <span
+              aria-hidden="true"
+              className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"
+            />
+            Annual Treasury Leakage
+          </p>
+          <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+            Your agency loses{" "}
+            <span className="font-mono font-semibold tracking-tight text-red-600 tabular-nums dark:text-red-400">
+              {formatUSD(leakageAnnual)}
+            </span>{" "}
+            USD every year to silent banking friction.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-black/[0.6] dark:text-white/60">
+            <span className="font-mono font-semibold tracking-tight text-red-600 tabular-nums dark:text-red-400">
+              {formatUSD(totals.shaAnnual)}
+            </span>{" "}
+            leaks into correspondent SHA cuts and{" "}
+            <span className="font-mono font-semibold tracking-tight text-red-600 tabular-nums dark:text-red-400">
+              {formatUSD(totals.fxAnnual)}
+            </span>{" "}
+            evaporates in retail bank FX margins.
+          </p>
+        </section>
+
+        <section className="w-full min-w-0 rounded-3xl border border-emerald-500/40 bg-emerald-50/60 p-6 dark:bg-emerald-950/20 dark:shadow-[0_0_25px_-8px_rgba(16,185,129,0.3)] sm:p-8">
+          <p className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+            <span
+              aria-hidden="true"
+              className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"
+            />
+            Net Annual Saving
+          </p>
+          <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+            Flat-fee B2B rails keep{" "}
+            <span className="font-mono font-semibold tracking-tight text-emerald-700 tabular-nums dark:text-emerald-400">
+              {formatUSD(netSavingsMin)}–{formatUSD(netSavingsMax)}
+            </span>{" "}
+            of it in your treasury.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-black/[0.6] dark:text-white/60">
+            Moving the roster off classic correspondent SWIFT holds annual
+            friction at roughly{" "}
+            <span className="font-mono font-semibold tracking-tight text-emerald-700 tabular-nums dark:text-emerald-400">
+              {formatUSD(modernAnnualMin)}–{formatUSD(modernAnnualMax)}
+            </span>{" "}
+            — the same roster, priced at mid-market.
+          </p>
+        </section>
+      </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-white/[0.02]">
         <table className="w-full min-w-[680px] text-left text-sm">
@@ -331,7 +375,7 @@ export default function AgencyAuditCalculator({
                 key={row.id}
                 className="border-b border-slate-100 last:border-b-0 dark:border-white/[0.05]"
               >
-                <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+                <td className="px-4 py-3 font-mono text-xs font-semibold tracking-tight tabular-nums text-slate-500 dark:text-slate-400">
                   #{(row.id % 100).toString().padStart(2, "0")}
                 </td>
                 <td className="max-w-[220px] truncate px-4 py-3 font-mono text-xs text-slate-900 dark:text-white">
@@ -353,10 +397,10 @@ export default function AgencyAuditCalculator({
                     className="w-28 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs text-slate-900 focus:border-emerald-500/60 focus:outline-none dark:border-white/[0.1] dark:bg-black/20 dark:text-white"
                   />
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-red-600 tabular-nums dark:text-red-400">
+                <td className="px-4 py-3 font-mono text-xs font-semibold tracking-tight tabular-nums text-red-600 dark:text-red-400">
                   {formatUSD(row.shaAnnualUSD)}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-red-600 tabular-nums dark:text-red-400">
+                <td className="px-4 py-3 font-mono text-xs font-semibold tracking-tight tabular-nums text-red-600 dark:text-red-400">
                   {formatUSD(row.fxAnnualUSD)}
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -407,19 +451,19 @@ export default function AgencyAuditCalculator({
                   <td className="px-3 py-2.5 font-mono text-xs text-slate-900 dark:text-white">
                     {group.slug}
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono text-xs text-slate-500 tabular-nums dark:text-slate-400">
+                  <td className="px-3 py-2.5 text-right font-mono text-xs font-semibold tracking-tight tabular-nums text-slate-500 dark:text-slate-400">
                     {group.contractors}
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono text-xs text-slate-900 tabular-nums dark:text-white">
+                  <td className="px-3 py-2.5 text-right font-mono text-xs font-semibold tracking-tight tabular-nums text-slate-900 dark:text-white">
                     {formatUSD(group.monthlyGross)}
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono text-xs text-red-600 tabular-nums dark:text-red-400">
+                  <td className="px-3 py-2.5 text-right font-mono text-xs font-semibold tracking-tight tabular-nums text-red-600 dark:text-red-400">
                     {formatUSD(group.classicAnnualMin)}–{formatUSD(group.classicAnnualMax)}
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono text-xs text-slate-500 tabular-nums dark:text-slate-400">
+                  <td className="px-3 py-2.5 text-right font-mono text-xs font-semibold tracking-tight tabular-nums text-slate-500 dark:text-slate-400">
                     {formatUSD(group.modernAnnualMin)}–{formatUSD(group.modernAnnualMax)}
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono text-xs font-bold text-emerald-700 tabular-nums dark:text-emerald-400">
+                  <td className="px-3 py-2.5 text-right font-mono text-xs font-semibold tracking-tight tabular-nums text-emerald-700 dark:text-emerald-400">
                     {formatUSD(group.savingsAnnual)}
                   </td>
                 </tr>
@@ -430,13 +474,13 @@ export default function AgencyAuditCalculator({
                 <td className="px-3 py-2.5 text-slate-900 dark:text-white">
                   Roster total
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums text-slate-900 dark:text-white">
+                <td className="px-3 py-2.5 text-right font-mono font-semibold tracking-tight tabular-nums text-slate-900 dark:text-white">
                   {rows.length}
                 </td>
-                <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-900 dark:text-white">
+                <td className="px-3 py-2.5 text-right font-mono font-semibold tracking-tight tabular-nums text-slate-900 dark:text-white">
                   {formatUSD(totals.monthlyGross)}
                 </td>
-                <td className="px-3 py-2.5 text-right font-mono text-red-600 tabular-nums dark:text-red-400">
+                <td className="px-3 py-2.5 text-right font-mono font-semibold tracking-tight tabular-nums text-red-600 dark:text-red-400">
                   {formatUSD(
                     rows.reduce((sum, row) => sum + row.classicAnnualMinUSD, 0)
                   )}
@@ -445,7 +489,7 @@ export default function AgencyAuditCalculator({
                     rows.reduce((sum, row) => sum + row.classicAnnualMaxUSD, 0)
                   )}
                 </td>
-                <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                <td className="px-3 py-2.5 text-right font-mono font-semibold tracking-tight tabular-nums text-slate-500 dark:text-slate-400">
                   {formatUSD(
                     rows.reduce((sum, row) => sum + row.modernAnnualMinUSD, 0)
                   )}
@@ -454,7 +498,7 @@ export default function AgencyAuditCalculator({
                     rows.reduce((sum, row) => sum + row.modernAnnualMaxUSD, 0)
                   )}
                 </td>
-                <td className="px-3 py-2.5 text-right font-mono text-emerald-700 tabular-nums dark:text-emerald-400">
+                <td className="px-3 py-2.5 text-right font-mono font-semibold tracking-tight tabular-nums text-emerald-700 dark:text-emerald-400">
                   {formatUSD(
                     rows.reduce((sum, row) => sum + row.savingsAnnualUSD, 0)
                   )}

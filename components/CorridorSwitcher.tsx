@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 
 import { useDismissable } from "@/components/useDismissable";
+import { useMenuAnchor } from "@/components/headerDropdownLayer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { localizedCorridorHref } from "@/lib/localizedCorridors";
 import rawFees from "@/data/fees.json";
@@ -31,7 +33,22 @@ import type { Corridor } from "@/lib/types";
  * the current language prefix only when that `(lang, slug)` pair is authored,
  * otherwise it opens the English corridor page (`localizedCorridorHref`).
  * `next/link` re-applies the `/payout-delta` production `basePath`.
+ *
+ * PHASE 2 — PANEL LAYER
+ * The menu is portalled to `document.body` and pinned to the trigger's live
+ * viewport rectangle (`useMenuAnchor`), so it can sit in the root stacking
+ * context at `z-[70]` — above the Header's click-scrim (`z-[60]`), which is
+ * itself above the Dock (`z-30`). Keeping it inside the header instead would
+ * trap the whole header under one `z-40` layer and put the wide panel on a
+ * collision course with the dock, and an `absolute` panel would scroll away
+ * from its trigger the moment the page moves.
  */
+
+/** Panel width on desktop, mirrored by the anchor clamp. */
+const PANEL_WIDTH_PX = 480;
+
+/** Inverse-status pill width (`w-64`), mirrored by its anchor clamp. */
+const INVERSE_PILL_WIDTH_PX = 256;
 
 /**
  * Receiving-market regions for the grouped corridor dropdown. Currencies inside
@@ -83,9 +100,19 @@ function parseRoute(pathname: string): Route {
 export default function CorridorSwitcher() {
   const pathname = usePathname();
   const { lang } = useLanguage();
-  const { open, setOpen, containerRef } = useDismissable();
-  const { open: inverseOpen, setOpen: setInverseOpen, containerRef: inverseRef } =
-    useDismissable();
+  const { open, setOpen, containerRef, panelRef } = useDismissable();
+  const {
+    open: inverseOpen,
+    setOpen: setInverseOpen,
+    containerRef: inverseRef,
+    panelRef: inversePanelRef,
+  } = useDismissable();
+  const anchor = useMenuAnchor(open, containerRef, PANEL_WIDTH_PX);
+  const inverseAnchor = useMenuAnchor(
+    inverseOpen,
+    inverseRef,
+    INVERSE_PILL_WIDTH_PX
+  );
 
   useEffect(() => {
     setOpen(false);
@@ -120,21 +147,21 @@ export default function CorridorSwitcher() {
           aria-expanded={open}
           aria-label={`Currency corridor: ${current.from} to ${current.to}`}
           onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-8 max-w-[8.5rem] items-center gap-1.5 rounded-full bg-white/[0.06] px-3 text-xs font-semibold text-white/80 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.98] sm:max-w-none"
+          className="flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 font-mono text-xs text-neutral-200 transition-all hover:border-emerald-500/50 hover:bg-neutral-900 active:scale-[0.98]"
         >
-          <span aria-hidden="true" className="text-sm leading-none text-white/50">
+          <span aria-hidden="true" className="text-neutral-500">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5">
               <circle cx="12" cy="12" r="9" />
               <ellipse cx="12" cy="12" rx="4" ry="9" />
               <path d="M3 12h18" strokeLinecap="round" />
             </svg>
           </span>
-          <span className="truncate tabular-nums">
+          <span className="truncate font-semibold tracking-tight tabular-nums">
             {current.from} <span className="opacity-50">→</span> {current.to}
           </span>
           <span
             aria-hidden="true"
-            className={`text-[9px] leading-none text-white/40 transition-transform duration-200 ease-out ${
+            className={`text-[9px] leading-none text-neutral-500 transition-transform duration-200 ease-out ${
               open ? "rotate-180" : ""
             }`}
           >
@@ -153,7 +180,7 @@ export default function CorridorSwitcher() {
               href={localizedCorridorHref(lang, inverseSlug)}
               aria-label={`Swap to ${inverseLabel}`}
               title={`${inverseLabel} — audited, open it`}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-xs font-bold text-white/70 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.95]"
+              className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900/80 text-xs font-bold text-neutral-300 transition-all hover:border-emerald-500/50 hover:bg-neutral-900 active:scale-[0.95]"
             >
               ⇄
             </Link>
@@ -166,108 +193,124 @@ export default function CorridorSwitcher() {
                 aria-label={`Swap to ${inverseLabel} — not audited yet`}
                 title={`${inverseLabel} isn't audited yet`}
                 onClick={() => setInverseOpen((value) => !value)}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-xs font-bold text-white/40 ring-1 ring-white/[0.1] transition-colors duration-200 ease-out hover:bg-white/[0.12] active:scale-[0.95]"
+                className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900/80 text-xs font-bold text-neutral-500 transition-all hover:border-emerald-500/50 hover:bg-neutral-900 active:scale-[0.95]"
               >
                 ⇄
               </button>
 
-              {/* Inverse-pair status pill (only when the swap is not available). */}
-              {inverseOpen && (
-                <div
-                  role="status"
-                  className="absolute right-0 top-full z-50 mt-2 w-64 animate-[dropdown-in_130ms_ease-out] rounded-2xl bg-white/95 p-3 shadow-[var(--apple-glass-shadow)] ring-1 ring-black/[0.06] backdrop-blur-xl dark:bg-neutral-900/95 dark:ring-white/[0.1]"
-                >
-                  <p className="text-xs font-semibold leading-relaxed text-slate-800 dark:text-white/90">
-                    {inverseLabel}
-                  </p>
-                  <p className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-white/50">
-                    This inverted pair isn’t audited yet — the dataset covers
-                    USD into {current.to} today. Request it and it ships as a
-                    full static route.
-                  </p>
-                  <a
-                    href={NEW_CORRIDOR_ISSUE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 rounded-full bg-neutral-900 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors duration-150 hover:bg-neutral-800 dark:bg-white dark:text-black"
-                  >
-                    Request {inverseLabel} on GitHub{" "}
-                    <span aria-hidden="true">↗</span>
-                  </a>
-                </div>
-              )}
+              {/* Inverse-pair status pill (only when the swap is not available).
+                  Portalled for the same reason as the corridor menu: it opens a
+                  header-layer dropdown, so the click-scrim appears, and a panel
+                  left inside the header's z-40 context would be painted under
+                  the root-level z-60 scrim. */}
+              {inverseOpen && typeof document !== "undefined"
+                ? createPortal(
+                    <div
+                      ref={inversePanelRef}
+                      role="status"
+                      style={inverseAnchor
+                        ? { left: `${inverseAnchor.left}px` }
+                        : undefined}
+                      className="fixed left-2 top-14 z-[70] mt-1 w-64 rounded-2xl border border-neutral-800 bg-neutral-950/95 p-3 shadow-2xl backdrop-blur-2xl"
+                    >
+                      <p className="text-xs font-semibold leading-relaxed text-neutral-100">
+                        {inverseLabel}
+                      </p>
+                      <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
+                        This inverted pair isn’t audited yet — the dataset covers
+                        USD into {current.to} today. Request it and it ships as a
+                        full static route.
+                      </p>
+                      <a
+                        href={NEW_CORRIDOR_ISSUE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-[11px] font-semibold text-emerald-400 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20"
+                      >
+                        Request {inverseLabel} on GitHub{" "}
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    </div>,
+                    document.body
+                  )
+                : null}
             </div>
           )
         ) : null}
       </div>
 
-      {open && (
-        <div
-          role="menu"
-          aria-label="Currency corridor"
-          className="absolute right-0 top-full z-50 mt-2 w-80 origin-top-right animate-[dropdown-in_130ms_ease-out] rounded-2xl bg-white/95 p-1.5 shadow-[var(--apple-glass-shadow)] ring-1 ring-black/[0.06] backdrop-blur-xl dark:bg-neutral-900/95 dark:ring-white/[0.1]"
-        >
-          <p
-            aria-hidden="true"
-            className="px-2.5 pb-1 pt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-white/40"
-          >
-            Audited corridors
-          </p>
-          <div className="max-h-[24rem] overflow-y-auto">
-            {corridorGroups.map((group) => (
-              <div key={group.label} role="group" aria-label={group.label}>
-                <p
-                  aria-hidden="true"
-                  className="sticky top-0 z-10 bg-white/95 px-2.5 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 backdrop-blur-md dark:bg-neutral-900/95 dark:text-white/40"
-                >
-                  {group.label}
-                </p>
-                {group.corridors.map((corridor) => {
-                  const active = isCorridorPage && corridor.slug === slug;
-                  return (
-                    <Link
-                      key={corridor.slug}
-                      href={localizedCorridorHref(lang, corridor.slug)}
-                      role="menuitem"
-                      aria-current={active ? "true" : undefined}
-                      onClick={() => setOpen(false)}
-                      className={`flex items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors duration-150 ease-out ${
-                        active
-                          ? "bg-black/[0.05] dark:bg-white/[0.08]"
-                          : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-                      }`}
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              ref={panelRef}
+              role="menu"
+              aria-label="Currency corridor"
+              style={anchor ? { left: `${anchor.left}px` } : undefined}
+              className="fixed left-2 top-14 z-[70] mt-1 max-h-[75vh] w-[92vw] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-950/98 p-3 shadow-2xl backdrop-blur-2xl sm:w-[480px]"
+            >
+              <p
+                aria-hidden="true"
+                className="px-1 pb-1.5 pt-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-500"
+              >
+                Audited corridors
+              </p>
+              <div className="space-y-3">
+                {corridorGroups.map((group) => (
+                  <div key={group.label} role="group" aria-label={group.label}>
+                    <p
+                      aria-hidden="true"
+                      className="px-1 pb-1 pt-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500"
                     >
-                      <span
-                        aria-hidden="true"
-                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-black/[0.05] text-xs font-bold text-slate-600 dark:bg-white/[0.08] dark:text-white/60"
-                      >
-                        {corridor.currencySymbol}
-                      </span>
-                      <span className="min-w-0 flex-1 leading-none">
-                        <span className="block truncate text-[13px] font-medium text-slate-800 dark:text-white/90">
-                          {corridor.country}
-                        </span>
-                        <span className="mt-0.5 block text-[11px] tabular-nums text-slate-400 dark:text-white/40">
-                          {corridor.currencyName}
-                        </span>
-                      </span>
-                      <span className="shrink-0 font-mono text-xs font-semibold tabular-nums text-slate-700 dark:text-white/70">
-                        {corridor.to}
-                      </span>
-                      {active && (
-                        <span
-                          aria-hidden="true"
-                          className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
-                        />
-                      )}
-                    </Link>
-                  );
-                })}
+                      {group.label}
+                    </p>
+                    {group.corridors.map((corridor) => {
+                      const active = isCorridorPage && corridor.slug === slug;
+                      return (
+                        <Link
+                          key={corridor.slug}
+                          href={localizedCorridorHref(lang, corridor.slug)}
+                          role="menuitem"
+                          aria-current={active ? "true" : undefined}
+                          onClick={() => setOpen(false)}
+                          className={`flex items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition-colors duration-150 ease-out ${
+                            active
+                              ? "border-emerald-500/30 bg-emerald-500/10"
+                              : "border-transparent hover:border-neutral-800 hover:bg-neutral-900/70"
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-neutral-900 text-xs font-bold text-neutral-300 ring-1 ring-neutral-800"
+                          >
+                            {corridor.currencySymbol}
+                          </span>
+                          <span className="min-w-0 flex-1 leading-none">
+                            <span className="block truncate text-[13px] font-medium text-neutral-100">
+                              {corridor.country}
+                            </span>
+                            <span className="mt-0.5 block text-[11px] tabular-nums text-neutral-500">
+                              {corridor.currencyName}
+                            </span>
+                          </span>
+                          <span className="shrink-0 font-mono text-xs font-semibold tabular-nums tracking-tight text-neutral-300">
+                            {corridor.to}
+                          </span>
+                          {active && (
+                            <span
+                              aria-hidden="true"
+                              className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400"
+                            />
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }

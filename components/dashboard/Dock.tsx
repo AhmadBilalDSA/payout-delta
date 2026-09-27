@@ -13,6 +13,18 @@ import {
   TerminalIcon,
 } from "./Icons";
 
+/**
+ * Global application launcher.
+ *
+ * PHASE 2 — LAYER OWNERSHIP
+ * The dock lives inside its own `z-30` root, and that root is what makes the
+ * layer order total: Header bar `z-40` > header click-scrim `z-[60]` > header
+ * menu `z-[70]` > dock `z-30` > page content. The wrapper is `fixed inset-0
+ * pointer-events-none` so it is a real stacking context that repaints as one
+ * unit, while only the two launcher bars themselves accept pointer events.
+ * Leaving `z-50` on the bars without this wrapper is what let a wide corridor
+ * menu and the dock fight over the same pixels in the screenshot pass.
+ */
 export function Dock() {
   const pathname = usePathname();
 
@@ -30,10 +42,10 @@ export function Dock() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <>
+    <div className="fixed inset-0 z-30 pointer-events-none">
       {/* Mobile: Bottom horizontal pill */}
       <nav
-        className="fixed bottom-3 inset-x-0 mx-auto w-fit max-w-[92vw] z-50 flex md:hidden flex-row items-center justify-center gap-1.5 p-1.5 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl overflow-x-auto"
+        className="pointer-events-auto fixed bottom-3 inset-x-0 mx-auto w-fit max-w-[92vw] flex md:hidden flex-row items-center justify-center gap-1.5 p-1.5 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl overflow-x-auto"
         role="navigation"
         aria-label="Main navigation"
       >
@@ -58,7 +70,7 @@ export function Dock() {
 
       {/* Desktop: Left vertical rail with expanding tooltips */}
       <nav
-        className="fixed left-3.5 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-2 p-2 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl hidden md:flex"
+        className="pointer-events-auto fixed left-3.5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 p-2 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl hidden md:flex"
         role="navigation"
         aria-label="Main navigation"
       >
@@ -92,6 +104,6 @@ export function Dock() {
           );
         })}
       </nav>
-    </>
+    </div>
   );
 }

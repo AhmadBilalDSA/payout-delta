@@ -18,7 +18,10 @@
       "primaryBankBics": "ISO 9362 BICs (8 or 11 characters) of the principal receiving banks. Empty arrays are intentional where no rail-local BIC is published for the market; the audit validates syntax only on entries that are present.",
       "statutoryAct": "A named act is cited only where a public, citable statute governs the remittance. Where a state has no standalone outbound service withholding act, the authority is named and the bands are 0/0 rather than a fabricated citation."
     },
-    "disclaimer": "Informational benchmark derived from public statute and central bank documentation. Not legal or tax advice: the deduction lands on the bank's credit advice and must be confirmed with the resident tax authority and the paying bank's compliance desk before invoicing."
+    "disclaimer": "Informational benchmark derived from public statute and central bank documentation. Not legal or tax advice: the deduction lands on the bank's credit advice and must be confirmed with the resident tax authority and the paying bank's compliance desk before invoicing.",
+    "authorizedBankBics": 247,
+    "jurisdictionsWithAuthorizedBics": 115,
+    "bankRegistry": "data/banksRegistry.json"
   },
   "jurisdictions": [
     {
@@ -43,7 +46,9 @@
         "mandatoryAuditCert": "None — retained copy of the remittance advice",
         "nonComplianceRisk": "No withholding liability; exposure is limited to bank reporting exceptions"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BADZADAL"
+      ]
     },
     {
       "iso2": "AE",
@@ -69,7 +74,11 @@
         "mandatoryAuditCert": "Economic Substance Certificate (ESO) plus Certificate of Residence",
         "nonComplianceRisk": "Disallowance of the free-zone 0% rate and retrospective corporate tax from the first unfiled period"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "EBILAEAD",
+        "SCBLAEAD",
+        "ADCBAEAA"
+      ]
     },
     {
       "iso2": "AF",
@@ -145,7 +154,9 @@
         "mandatoryAuditCert": "Non-resident exemption clearance from the tax administration",
         "nonComplianceRisk": "Full amount assessed as Albanian-source income plus late-payment interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BKTBALTR"
+      ]
     },
     {
       "iso2": "AM",
@@ -197,7 +208,9 @@
         "mandatoryAuditCert": "Certificate of residence sealed by the tax authority",
         "nonComplianceRisk": "Retention at the 6.5% domestic rate on the gross amount"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BFAOAOAL"
+      ]
     },
     {
       "iso2": "AR",
@@ -223,7 +236,11 @@
         "mandatoryAuditCert": "Export of services registration (form 741) and annual affidavit",
         "nonComplianceRisk": "Penal interest of 2% per month on late repatriation, plus reclassification of the payment as a dividend"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BBAAARBA",
+        "BSARARBA",
+        "GABAARBA"
+      ]
     },
     {
       "iso2": "AT",
@@ -303,7 +320,10 @@
         "mandatoryAuditCert": "Certificate of residence for DTA purposes",
         "nonComplianceRisk": "Withholding at the domestic rate assessed on the gross remittance, plus penal interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "IBAZAZ22",
+        "KAPBAZ22"
+      ]
     },
     {
       "iso2": "BA",
@@ -329,7 +349,11 @@
         "mandatoryAuditCert": "Confirmation of non-resident status from the tax administration",
         "nonComplianceRisk": "Gross amount assessed as domestic-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ISPBBA22",
+        "RJHIBARI",
+        "RZBABA2S"
+      ]
     },
     {
       "iso2": "BB",
@@ -353,7 +377,10 @@
         "mandatoryAuditCert": "None — retained copy of the credit advice",
         "nonComplianceRisk": "No withholding liability; exposure is limited to bank reporting exceptions"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BUTTBBBS",
+        "FCIBBBBS"
+      ]
     },
     {
       "iso2": "BD",
@@ -379,7 +406,11 @@
         "mandatoryAuditCert": "Tax residency certificate and BACH statement",
         "nonComplianceRisk": "Bank guarantee forfeiture and blocking of the outward remittance"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BRAKBDDH",
+        "DBBLBDDH",
+        "IBLBBDDH"
+      ]
     },
     {
       "iso2": "BE",
@@ -405,9 +436,7 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": [
-        "GEBABEBB"
-      ]
+      "primaryBankBics": []
     },
     {
       "iso2": "BF",
@@ -459,7 +488,11 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "FINVBGSF",
+        "STSABGSF",
+        "UNCRBGSF"
+      ]
     },
     {
       "iso2": "BH",
@@ -485,7 +518,11 @@
         "mandatoryAuditCert": "Covenants letter from the Bahrain tax authority",
         "nonComplianceRisk": "Assessment of the gross amount as Bahrain-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BHBLBHBK",
+        "BUBLBHBT",
+        "DPBHBHBT"
+      ]
     },
     {
       "iso2": "BI",
@@ -563,7 +600,10 @@
         "mandatoryAuditCert": "Tax clearance letter from the Inland Revenue Board",
         "nonComplianceRisk": "Gross amount assessed as Brunei-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BAIDBNBN",
+        "BIBDBNBN"
+      ]
     },
     {
       "iso2": "BO",
@@ -589,7 +629,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the tax administration",
         "nonComplianceRisk": "Gross amount assessed as Bolivia-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BNBOBOLV",
+        "MERZBOLV"
+      ]
     },
     {
       "iso2": "BR",
@@ -598,10 +641,10 @@
       "centralBank": "Banco Central do Brasil",
       "primaryRailId": "BR_STR",
       "tax": {
-        "enactmentYear": 1996,
+        "enactmentYear": 2021,
         "lastAmendedYear": 2023,
-        "statutoryAct": "Lei 9.250/1995 and Decreto-Lei 1.598/1977 with BACEN registration rules",
-        "purposeCode": "Contrato de câmbio registered in SCE-IED",
+        "statutoryAct": "Lei nº 14.286/2021 (Novo Mercado de Câmbio), as amended in 2022/2023, read with BACEN registration rules",
+        "purposeCode": "Contrato de Câmbio registered in SCE-IED",
         "baselineWhtPct": 0,
         "treatyWhtPct": 0,
         "exemptionConditions": [
@@ -609,13 +652,17 @@
           "BACEN change contract registered in SCE-IED"
         ],
         "safeHarborRules": [
-          "SCE-IED registered contract with the matching operation code",
+          "Contrato de Câmbio registered in SCE-IED with the matching operation code under Lei nº 14.286",
           "IOF at 0% under the service classification"
         ],
-        "mandatoryAuditCert": "Contrato de câmbio registered with BACEN in SCE-IED",
-        "nonComplianceRisk": "IOF charged at the higher remittance rate, plus fines under the forex regime"
+        "mandatoryAuditCert": "Contrato de Câmbio registered with BACEN in SCE-IED",
+        "nonComplianceRisk": "IOF charged at the higher remittance rate, plus fines under the Lei nº 14.286 forex regime"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BRASBRRJ",
+        "BSSSBRSP",
+        "ITAUBRSP"
+      ]
     },
     {
       "iso2": "BS",
@@ -641,7 +688,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Bahamian tax authority",
         "nonComplianceRisk": "Gross amount assessed as Bahamian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "FCIBBSBS",
+        "NOSCBSBS"
+      ]
     },
     {
       "iso2": "BT",
@@ -693,7 +743,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Botswana Unified Revenue Service",
         "nonComplianceRisk": "Gross amount assessed as Botswana-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "SBICBWGZ"
+      ]
     },
     {
       "iso2": "BY",
@@ -745,7 +797,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Belizean tax authority",
         "nonComplianceRisk": "Gross amount assessed as Belizean-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BBLZBZBZ"
+      ]
     },
     {
       "iso2": "CA",
@@ -875,7 +929,10 @@
         "mandatoryAuditCert": "Written confirmation of non-residency from the Swiss tax administration",
         "nonComplianceRisk": "Gross amount assessed as Swiss-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CRESCHZZ",
+        "UBSWCHZH"
+      ]
     },
     {
       "iso2": "CI",
@@ -927,7 +984,11 @@
         "mandatoryAuditCert": "Legalised certificate of residence for D.L. 360 remittances",
         "nonComplianceRisk": "Reclassification of the payment as a dividend with the higher penalty"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCHICLRM",
+        "BSCHCLRM",
+        "CREDCLRM"
+      ]
     },
     {
       "iso2": "CM",
@@ -953,7 +1014,9 @@
         "mandatoryAuditCert": "Attestation de non-assujettissement",
         "nonComplianceRisk": "Gross amount assessed as Cameroonian-source income plus late-payment interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BICECMCM"
+      ]
     },
     {
       "iso2": "CN",
@@ -1007,7 +1070,10 @@
         "mandatoryAuditCert": "Certificado de residencia fiscal supported by the RUT",
         "nonComplianceRisk": "Assessment of the gross amount as Colombian-source income plus interest and penalty"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "COLOCOBM",
+        "CAVHCOBM"
+      ]
     },
     {
       "iso2": "CR",
@@ -1033,7 +1099,10 @@
         "mandatoryAuditCert": "Certificado de residencia fiscal from the DGT",
         "nonComplianceRisk": "Assessment of the gross amount as Costa Rican-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BACCCRSJ",
+        "BNCRCRSJ"
+      ]
     },
     {
       "iso2": "CU",
@@ -1137,7 +1206,11 @@
         "mandatoryAuditCert": "Certificate of residence for DTA purposes",
         "nonComplianceRisk": "Gross amount assessed as Czech-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CEKOCZPP",
+        "GIBACZPX",
+        "KOBACZPP"
+      ]
     },
     {
       "iso2": "DE",
@@ -1165,7 +1238,8 @@
       },
       "primaryBankBics": [
         "DEUTDEFF",
-        "COBADEFFXXX"
+        "COBADEFFXXX",
+        "COMMDEFF"
       ]
     },
     {
@@ -1219,7 +1293,8 @@
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
       "primaryBankBics": [
-        "DABADKKK"
+        "DABADKKK",
+        "JYBADKKK"
       ]
     },
     {
@@ -1270,7 +1345,11 @@
         "mandatoryAuditCert": "Certificado de residencia para el treaty rate",
         "nonComplianceRisk": "Retention at the 10% statutory rate when the DTA claim is not evidenced"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BANRDOSD",
+        "BHDDDOSD",
+        "POPDDOSD"
+      ]
     },
     {
       "iso2": "DZ",
@@ -1322,7 +1401,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Servicio de Rentas Internas",
         "nonComplianceRisk": "Gross amount assessed as Ecuadorian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "PACIECUA",
+        "PICHECUQ"
+      ]
     },
     {
       "iso2": "EE",
@@ -1374,7 +1456,11 @@
         "mandatoryAuditCert": "Certificate of non-residency from the Egyptian tax authority",
         "nonComplianceRisk": "1% withholding on the gross remittance when the DTA claim is not evidenced"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BMISEGCX",
+        "CIBEEGCX",
+        "NBEGEGCX"
+      ]
     },
     {
       "iso2": "ER",
@@ -1454,7 +1540,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Ethiopian Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Ethiopian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CBETETAA",
+        "DASHETAA"
+      ]
     },
     {
       "iso2": "FI",
@@ -1506,7 +1595,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Fiji Revenue and Customs Service",
         "nonComplianceRisk": "Gross amount assessed as Fiji-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ANZFFJSX",
+        "BSPFFJFJ"
+      ]
     },
     {
       "iso2": "FM",
@@ -1587,7 +1679,9 @@
         "mandatoryAuditCert": "Attestation de non-assujettissement",
         "nonComplianceRisk": "Gross amount assessed as Gabonese-source income plus late-payment interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "GHCBGACX"
+      ]
     },
     {
       "iso2": "GB",
@@ -1615,7 +1709,8 @@
       },
       "primaryBankBics": [
         "BARCGB22",
-        "HBUKGB4B"
+        "HBUKGB4B",
+        "HSBCGB2L"
       ]
     },
     {
@@ -1666,7 +1761,10 @@
         "mandatoryAuditCert": "Certificate of residence certified by the Georgian Revenue Service",
         "nonComplianceRisk": "Gross amount assessed as Georgian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BAGAGE22",
+        "TBCBGE22"
+      ]
     },
     {
       "iso2": "GH",
@@ -1692,7 +1790,11 @@
         "mandatoryAuditCert": "GRA certificate of residence",
         "nonComplianceRisk": "Retention at 10% under Section 61 plus interest when the DTA claim is not evidenced"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ECOCGHAC",
+        "GCBHGHAC",
+        "GTBIGHAC"
+      ]
     },
     {
       "iso2": "GM",
@@ -1822,7 +1924,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Guatemalan SAT",
         "nonComplianceRisk": "Gross amount assessed as Guatemalan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "AGROGTGC",
+        "BICTGTGC"
+      ]
     },
     {
       "iso2": "GW",
@@ -1874,7 +1979,9 @@
         "mandatoryAuditCert": "GRA certificate of residence",
         "nonComplianceRisk": "10% withholding on the gross remittance when the certificate is not presented"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "RBGLGYGG"
+      ]
     },
     {
       "iso2": "HN",
@@ -1900,7 +2007,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Dirección de Servicios Legales",
         "nonComplianceRisk": "Gross amount assessed as Honduran-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ATLAHNAP",
+        "FICOHNAP"
+      ]
     },
     {
       "iso2": "HR",
@@ -1926,7 +2036,10 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ESBCHR22",
+        "ZABAHR2X"
+      ]
     },
     {
       "iso2": "HT",
@@ -1978,7 +2091,11 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "GIBAHUHB",
+        "OKHBHUHB",
+        "OTPVHUHB"
+      ]
     },
     {
       "iso2": "ID",
@@ -2005,7 +2122,9 @@
         "nonComplianceRisk": "Assessment of the Indonesian PPh 26 rate with penalty interest"
       },
       "primaryBankBics": [
-        "BCAJIDJJ"
+        "BCAJIDJJ",
+        "CENAIDJA",
+        "BMRIIDJA"
       ]
     },
     {
@@ -2067,10 +2186,10 @@
       "centralBank": "Reserve Bank of India",
       "primaryRailId": "IMPS",
       "tax": {
-        "enactmentYear": 2016,
-        "lastAmendedYear": 2024,
-        "statutoryAct": "Income-tax Act 1961, Sections 195 and 195A (purpose code P0802)",
-        "purposeCode": "Tax Residency Certificate and Form 15CA/15CB",
+        "enactmentYear": 1999,
+        "lastAmendedYear": 2023,
+        "statutoryAct": "FEMA 1999 read with Section 194J of the Income-tax Act 1961, as amended in 2023 (purpose code P0802)",
+        "purposeCode": "Purpose code P0802 (export of services remittance)",
         "baselineWhtPct": 10,
         "treatyWhtPct": 0,
         "exemptionConditions": [
@@ -2079,13 +2198,16 @@
         ],
         "safeHarborRules": [
           "P0802 purpose code and a statutory auditor's Form 15CB for the outward remittance",
-          "FIRC / e-FIRC advice evidencing gross-up at the customer instance"
+          "FIRC / e-FIRC advice evidencing gross-up at the customer instance",
+          "Zero-rated GST export of services with a Letter of Undertaking (LUT) filed before the outward remittance is released"
         ],
-        "mandatoryAuditCert": "Tax Residency Certificate (TRC) with the Form 15CA/15CB set",
-        "nonComplianceRisk": "Assessment under Section 195 with interest plus prosecution for a non-compliant outward remittance"
+        "mandatoryAuditCert": "FIRC / Inward Advice evidencing the inward credit of the export of services",
+        "nonComplianceRisk": "Assessment under Section 195 or 194J with interest plus prosecution for a non-compliant outward remittance"
       },
       "primaryBankBics": [
-        "SBININBB"
+        "SBININBB",
+        "ICICINBB",
+        "AXISINBB"
       ]
     },
     {
@@ -2112,7 +2234,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Iraqi tax authority",
         "nonComplianceRisk": "Gross amount assessed as Iraqi-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "RAFBIQBA",
+        "RDBAIQBB",
+        "TRIQIQBA"
+      ]
     },
     {
       "iso2": "IR",
@@ -2164,7 +2290,9 @@
         "mandatoryAuditCert": "Certificate of residence under the EEA DTA",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "LAISISRE"
+      ]
     },
     {
       "iso2": "IT",
@@ -2218,7 +2346,10 @@
         "mandatoryAuditCert": "Tax Residency Certificate issued by Tax Administration Jamaica",
         "nonComplianceRisk": "15% withholding on the gross remittance without an accepted TRC"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "JNCBJMKX",
+        "SAGAJMKX"
+      ]
     },
     {
       "iso2": "JO",
@@ -2244,7 +2375,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Jordanian tax department",
         "nonComplianceRisk": "Gross amount assessed as Jordanian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ARABJOAX"
+      ]
     },
     {
       "iso2": "JP",
@@ -2271,7 +2404,9 @@
         "nonComplianceRisk": "10% withholding on fees for technical services plus interest for late payment"
       },
       "primaryBankBics": [
-        "BOTKJPJT"
+        "BOTKJPJT",
+        "MZBKJPJT",
+        "SMBCJPJT"
       ]
     },
     {
@@ -2298,7 +2433,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Kenya Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Kenyan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "EQBLKENA",
+        "KCBLKENX",
+        "KCOOKENA"
+      ]
     },
     {
       "iso2": "KG",
@@ -2324,7 +2463,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the State Tax Inspectorate",
         "nonComplianceRisk": "Gross amount assessed as Kyrgyz-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "AIYLKG22",
+        "OPTMKG22"
+      ]
     },
     {
       "iso2": "KH",
@@ -2350,7 +2492,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the General Department of Taxation",
         "nonComplianceRisk": "Gross amount assessed as Cambodian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ABPPKHPP",
+        "ACLEKHPH"
+      ]
     },
     {
       "iso2": "KI",
@@ -2478,7 +2623,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Korean National Tax Service",
         "nonComplianceRisk": "Gross amount assessed as Korean-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "HCCKKRSE",
+        "HKBKKRSE",
+        "SHBKKRSE"
+      ]
     },
     {
       "iso2": "KW",
@@ -2504,7 +2653,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Kuwaiti tax authority",
         "nonComplianceRisk": "No withholding liability; exposure is limited to bank reporting exceptions"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "NBOKKWKW"
+      ]
     },
     {
       "iso2": "KZ",
@@ -2530,7 +2681,11 @@
         "mandatoryAuditCert": "Certificate of residence certified by the Kazakh tax authority",
         "nonComplianceRisk": "Gross amount assessed as Kazakh-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CASPKZKA",
+        "HSBKKZKX",
+        "IRTYKZKA"
+      ]
     },
     {
       "iso2": "LA",
@@ -2556,7 +2711,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Lao tax department",
         "nonComplianceRisk": "Gross amount assessed as Lao-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCELLAOX",
+        "PHONLAXX"
+      ]
     },
     {
       "iso2": "LB",
@@ -2658,7 +2816,11 @@
         "mandatoryAuditCert": "Certificate of residence plus the DTA claim approved by the IRD",
         "nonComplianceRisk": "Gross amount assessed as Sri Lankan-source income plus withholding interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CCEYLKLX",
+        "BCEYLKLX",
+        "HNBLLKLX"
+      ]
     },
     {
       "iso2": "LR",
@@ -2710,7 +2872,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Lesotho Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Lesotho-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "FIRNLSMX"
+      ]
     },
     {
       "iso2": "LT",
@@ -2840,7 +3004,11 @@
         "mandatoryAuditCert": "Attestation de résidence fiscale",
         "nonComplianceRisk": "10% withholding on the gross remittance when the DTA claim is not evidenced"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCMAMAMC",
+        "BCPOMAMC",
+        "BMCEMAMC"
+      ]
     },
     {
       "iso2": "MC",
@@ -2892,7 +3060,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Moldovan tax authority",
         "nonComplianceRisk": "Gross amount assessed as Moldovan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "AGRNMD2X"
+      ]
     },
     {
       "iso2": "ME",
@@ -2918,7 +3088,9 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Gross amount assessed as Montenegrin-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CKBCMEPG"
+      ]
     },
     {
       "iso2": "MG",
@@ -2944,7 +3116,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Malagasy tax authority",
         "nonComplianceRisk": "Gross amount assessed as Malagasy-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BOAMMGMA"
+      ]
     },
     {
       "iso2": "MH",
@@ -2996,7 +3170,9 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Gross amount assessed as domestic-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "KOBSMK2X"
+      ]
     },
     {
       "iso2": "ML",
@@ -3022,7 +3198,9 @@
         "mandatoryAuditCert": "Attestation de non-assujettissement",
         "nonComplianceRisk": "Gross amount assessed as Malian-source income plus late-payment interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "NBSMMLNX"
+      ]
     },
     {
       "iso2": "MM",
@@ -3074,7 +3252,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Mongolian tax authority",
         "nonComplianceRisk": "Gross amount assessed as Mongolian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ABARMN22",
+        "ACBAMN22",
+        "KHNBMNUB"
+      ]
     },
     {
       "iso2": "MR",
@@ -3152,7 +3334,10 @@
         "mandatoryAuditCert": "Certificate of Mauritian tax residence",
         "nonComplianceRisk": "10% withholding on the gross remittance when the certificate is not presented"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "MCBLMUMU",
+        "SBMUMUMU"
+      ]
     },
     {
       "iso2": "MV",
@@ -3178,7 +3363,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Maldives Revenue Department",
         "nonComplianceRisk": "Gross amount assessed as Maldivian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BMLMMVMV",
+        "MIBMMVMV"
+      ]
     },
     {
       "iso2": "MW",
@@ -3230,7 +3418,11 @@
         "mandatoryAuditCert": "Constancia de situación fiscal (Residencia Fiscal)",
         "nonComplianceRisk": "15% withholding on the gross remittance plus penalty interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCMRMXMM",
+        "BSCHMXMM",
+        "BSMXMXMM"
+      ]
     },
     {
       "iso2": "MY",
@@ -3256,7 +3448,11 @@
         "mandatoryAuditCert": "Malaysian tax residence certificate for DTA relief",
         "nonComplianceRisk": "Gross amount assessed as Malaysian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CIBBMYKL",
+        "MBBEMYKL",
+        "PBBEMYKL"
+      ]
     },
     {
       "iso2": "MZ",
@@ -3282,7 +3478,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Mozambique tax authority",
         "nonComplianceRisk": "Gross amount assessed as Mozambican-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCIOMZMC"
+      ]
     },
     {
       "iso2": "NA",
@@ -3308,7 +3506,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Namibia Revenue Agency",
         "nonComplianceRisk": "Gross amount assessed as Namibian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "FIRNNANX"
+      ]
     },
     {
       "iso2": "NE",
@@ -3360,7 +3560,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Nigerian Revenue Authority",
         "nonComplianceRisk": "10% withholding on the gross remittance when the certificate is not presented"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ABNGNGLA",
+        "GTBINGLA",
+        "ZEIBNGLA"
+      ]
     },
     {
       "iso2": "NI",
@@ -3386,7 +3590,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Nicaraguan DGI",
         "nonComplianceRisk": "Gross amount assessed as Nicaraguan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ATLANICA",
+        "BANPNICA"
+      ]
     },
     {
       "iso2": "NL",
@@ -3440,7 +3647,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Norwegian tax authority",
         "nonComplianceRisk": "Gross amount assessed as Norwegian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "DNBANOKK",
+        "NDEANOKK"
+      ]
     },
     {
       "iso2": "NP",
@@ -3466,7 +3676,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Inland Revenue Department",
         "nonComplianceRisk": "Gross amount assessed as Nepalese-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "GLBLNPKA",
+        "NARINPKA",
+        "NIBLNPKT"
+      ]
     },
     {
       "iso2": "NR",
@@ -3518,7 +3732,10 @@
         "mandatoryAuditCert": "IRD statement or certificate of residency",
         "nonComplianceRisk": "Gross amount assessed as New Zealand-source income plus interest and penalties"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ANZBNZ2A",
+        "BKNZNZ1A"
+      ]
     },
     {
       "iso2": "OM",
@@ -3544,7 +3761,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Omani tax authority",
         "nonComplianceRisk": "Gross amount assessed as Omani-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "NBOBOMRX"
+      ]
     },
     {
       "iso2": "PA",
@@ -3570,7 +3789,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Panamanian DGI",
         "nonComplianceRisk": "Gross amount assessed as Panamanian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BGEPPAPX",
+        "BNPAPAPA",
+        "NOSCPAPX"
+      ]
     },
     {
       "iso2": "PE",
@@ -3596,7 +3819,11 @@
         "mandatoryAuditCert": "Certificado de domicilio fiscal CD-01",
         "nonComplianceRisk": "3% retention plus penalty interest on the unrefunded amount"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCONPEPL",
+        "BCPLPEPL",
+        "BINPPEPL"
+      ]
     },
     {
       "iso2": "PG",
@@ -3622,7 +3849,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the PNG Revenue Commission",
         "nonComplianceRisk": "Gross amount assessed as PNG-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BSPUPGPA"
+      ]
     },
     {
       "iso2": "PH",
@@ -3631,14 +3860,14 @@
       "centralBank": "Bangko Sentral ng Pilipinas",
       "primaryRailId": "INSTAPAY",
       "tax": {
-        "enactmentYear": 2018,
-        "lastAmendedYear": 2024,
-        "statutoryAct": "National Internal Revenue Code Sec. 25 and Sec. 12 of the TRAIN Law (exported services are VAT zero-rated)",
+        "enactmentYear": 1987,
+        "lastAmendedYear": 2021,
+        "statutoryAct": "National Internal Revenue Code of 1987 (NIRC) Sec. 25, as amended by the CREATE Act in 2021, with NIRC Sec. 12 zero-rating for exported services",
         "purposeCode": "BIR Form 2307 with purpose code CIR-1089",
         "baselineWhtPct": 0,
         "treatyWhtPct": 0,
         "exemptionConditions": [
-          "Exported services are zero-rated for VAT under TRAIN Law Sec. 12",
+          "Exported services are zero-rated for VAT under NIRC Sec. 12 as amended by the CREATE Act",
           "BIR Form 2307 filed with the crediting bank on or before the last day of the quarter after the creditable period"
         ],
         "safeHarborRules": [
@@ -3648,7 +3877,11 @@
         "mandatoryAuditCert": "BIR Form 2307",
         "nonComplianceRisk": "Disallowance of the credit with penalty interest, plus the 25% surcharge for late or missing Form 2307"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BNORPHMM",
+        "BOFIPHMM",
+        "MBTCPHMM"
+      ]
     },
     {
       "iso2": "PK",
@@ -3657,9 +3890,9 @@
       "centralBank": "State Bank of Pakistan",
       "primaryRailId": "RAAST",
       "tax": {
-        "enactmentYear": 2024,
+        "enactmentYear": 1947,
         "lastAmendedYear": 2025,
-        "statutoryAct": "Income Tax Ordinance 2001, Section 40 and Section 236 read with the 2024 Finance Act",
+        "statutoryAct": "Foreign Exchange Regulations Act (FERA 1947, as renumbered) read with the Income Tax Ordinance 2001, Section 154A, as amended through the 2024 Finance Act and the 2025 amendment",
         "purposeCode": "Purpose code 9111 (export of services remittance)",
         "baselineWhtPct": 1,
         "treatyWhtPct": 0.25,
@@ -3668,13 +3901,19 @@
           "Certificate of residence plus the e-PRC, with the payment declared as an export of services"
         ],
         "safeHarborRules": [
-          "e-PRC (electronic profit rate certificate) filed before the outward remittance is released",
-          "PSB registration number quoted on the remittance advice"
+          "PSEB registration active, with the registration number quoted on the remittance advice",
+          "Settlement directly into a Foreign Currency Remittance Account (FCVA) under FERA",
+          "Zero local cash-over-counter settlement, so the full credited amount reaches the beneficiary account",
+          "e-PRC (electronic profit rate certificate) filed before the outward remittance is released"
         ],
-        "mandatoryAuditCert": "e-PRC plus Pakistan Software Board registration",
+        "mandatoryAuditCert": "ePRC (electronic Profit Rate Certificate) plus PSB registration",
         "nonComplianceRisk": "Assessment of the full service value as taxable income when the outward-payment proof is not filed"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ALFHPKKA",
+        "HABBPKKA",
+        "MEZNPKKA"
+      ]
     },
     {
       "iso2": "PL",
@@ -3700,7 +3939,11 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BPKOPLPW",
+        "BREXPLPW",
+        "INGBPLPW"
+      ]
     },
     {
       "iso2": "PS",
@@ -3804,7 +4047,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Paraguayan SET",
         "nonComplianceRisk": "Gross amount assessed as Paraguayan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BACNPYPA",
+        "BBVAPYPA"
+      ]
     },
     {
       "iso2": "QA",
@@ -3856,7 +4102,11 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BTRLRO22",
+        "RNCBROBU",
+        "RZBRROBU"
+      ]
     },
     {
       "iso2": "RS",
@@ -3882,7 +4132,11 @@
         "mandatoryAuditCert": "Certificate of residence under EU DTA Article 6",
         "nonComplianceRisk": "Gross amount assessed as Serbian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "RZBSRSBG",
+        "AIKBRS22",
+        "DBDBRSBG"
+      ]
     },
     {
       "iso2": "RU",
@@ -3934,7 +4188,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Rwandan Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Rwandan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCRWRWRW",
+        "BKIGRWRW",
+        "EQBLRWRW"
+      ]
     },
     {
       "iso2": "SA",
@@ -3960,7 +4218,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Saudi Arabian Monetary Authority",
         "nonComplianceRisk": "Gross amount assessed as Saudi-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "RJHISARI",
+        "NCBKSARI",
+        "RIBLSARI"
+      ]
     },
     {
       "iso2": "SB",
@@ -3986,7 +4248,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Solomon Islands Revenue Service",
         "nonComplianceRisk": "Gross amount assessed as Solomon Islands-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ANZSSBBI",
+        "BSPSSBBI"
+      ]
     },
     {
       "iso2": "SC",
@@ -4065,7 +4330,8 @@
         "nonComplianceRisk": "Withholding at the reduced domestic rate plus interest on late payment"
       },
       "primaryBankBics": [
-        "ESSESESS"
+        "ESSESESS",
+        "SWEDSESS"
       ]
     },
     {
@@ -4093,7 +4359,9 @@
         "nonComplianceRisk": "Gross amount assessed as Singapore-source income plus interest"
       },
       "primaryBankBics": [
-        "DBSSSGSG"
+        "DBSSSGSG",
+        "OCBCSGSG",
+        "UOVBSGSG"
       ]
     },
     {
@@ -4276,7 +4544,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Surinamese tax authority",
         "nonComplianceRisk": "Gross amount assessed as Surinamese-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "RBNKSRPA"
+      ]
     },
     {
       "iso2": "SS",
@@ -4302,7 +4572,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the South Sudanese revenue authority",
         "nonComplianceRisk": "Gross amount assessed as South Sudanese-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "HANDSSSS"
+      ]
     },
     {
       "iso2": "ST",
@@ -4354,7 +4626,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the El Salvadoran tax authority",
         "nonComplianceRisk": "Gross amount assessed as Salvadoran-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "AGRISVCA",
+        "CUSCSVCA",
+        "DAVISVCA"
+      ]
     },
     {
       "iso2": "SY",
@@ -4406,7 +4682,9 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Eswatini Revenue Service",
         "nonComplianceRisk": "Gross amount assessed as Eswatini-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "SBICSZMX"
+      ]
     },
     {
       "iso2": "TD",
@@ -4484,7 +4762,10 @@
         "mandatoryAuditCert": "Thai tax residence certificate for treaty relief",
         "nonComplianceRisk": "Gross amount assessed as Thai-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "KASITHBK",
+        "SICOTHBK"
+      ]
     },
     {
       "iso2": "TJ",
@@ -4510,7 +4791,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Tajik tax committee",
         "nonComplianceRisk": "Gross amount assessed as Tajik-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "AMONTJ22",
+        "ORIETJ22"
+      ]
     },
     {
       "iso2": "TL",
@@ -4588,7 +4872,9 @@
         "mandatoryAuditCert": "Attestation de non-assujettissement",
         "nonComplianceRisk": "Gross amount assessed as Tunisian-source income plus late-payment interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BCTNTNTT"
+      ]
     },
     {
       "iso2": "TO",
@@ -4614,7 +4900,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Tonga Revenue and Customs Department",
         "nonComplianceRisk": "Gross amount assessed as Tongan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ANZTTOTO",
+        "TDBTTOXX"
+      ]
     },
     {
       "iso2": "TR",
@@ -4640,7 +4929,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Turkish Revenue Administration",
         "nonComplianceRisk": "Gross amount assessed as Turkish-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "AKBKTRIS",
+        "ISBKTRIS",
+        "TCZBTR2A"
+      ]
     },
     {
       "iso2": "TT",
@@ -4666,7 +4959,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Trinidad and Tobago Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Trinidad and Tobago-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "FCITTTPA",
+        "RBLTTTPA"
+      ]
     },
     {
       "iso2": "TV",
@@ -4718,7 +5014,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Tanzania Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Tanzanian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "CORUTZTZ",
+        "NMBLTZTZ",
+        "SCBLTZTX"
+      ]
     },
     {
       "iso2": "UA",
@@ -4744,7 +5044,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Ukrainian tax authority",
         "nonComplianceRisk": "Gross amount assessed as Ukrainian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "PBANUA2X",
+        "UNJSUAUK"
+      ]
     },
     {
       "iso2": "UG",
@@ -4770,7 +5073,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Uganda Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Ugandan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BARCUGKX",
+        "CERBUGKA",
+        "SBICUGKX"
+      ]
     },
     {
       "iso2": "US",
@@ -4779,26 +5086,27 @@
       "centralBank": "Board of Governors of the Federal Reserve System",
       "primaryRailId": "FEDWIRE",
       "tax": {
-        "enactmentYear": 1913,
+        "enactmentYear": 1986,
         "lastAmendedYear": 2024,
-        "statutoryAct": "Internal Revenue Code (26 U.S.C.) Chapter 3, FIRTA, with 26 U.S.C. 1441/1442",
+        "statutoryAct": "Internal Revenue Code of 1986 (26 U.S.C.) Chapter 3, FIRTA, with 26 U.S.C. 1441/1442 on payments to non-US residents",
         "purposeCode": "Form W-8BEN or W-8BEN-E (beneficial owner) and Form 1042-S",
         "baselineWhtPct": 30,
         "treatyWhtPct": 0,
         "exemptionConditions": [
-          "Beneficial owner certification on Form W-8BEN with the treaty article claimed",
+          "Non-US residency certified on Form W-8BEN with the treaty article claimed",
           "Services performed outside the United States by a non-resident alien"
         ],
         "safeHarborRules": [
           "Treaty article rate certified on a valid Form W-8BEN",
           "Chapter 3 exemption where services are performed outside the United States"
         ],
-        "mandatoryAuditCert": "Form W-8BEN (or W-8BEN-E) with the treaty claim",
-        "nonComplianceRisk": "Backup withholding at 24% plus penalties under 26 U.S.C. 6039A and 6050W"
+        "mandatoryAuditCert": "Form W-8BEN (or W-8BEN-E) proving non-US residency, with the Form 1042-S statement of the treaty claim",
+        "nonComplianceRisk": "Statutory 30% Chapter 3 backup withholding where non-US residency is uncertified, plus 24% backup withholding and penalties under 26 U.S.C. 6039A and 6050W"
       },
       "primaryBankBics": [
         "CHASUS33",
-        "CITIUS33"
+        "CITIUS33",
+        "BOFAUS3N"
       ]
     },
     {
@@ -4825,7 +5133,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Uruguayan tax authority",
         "nonComplianceRisk": "Gross amount assessed as Uruguayan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BROUUYMM",
+        "ITAUUYMM"
+      ]
     },
     {
       "iso2": "UZ",
@@ -4851,7 +5162,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Uzbek tax authority",
         "nonComplianceRisk": "Gross amount assessed as Uzbek-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "IJUBUZ22",
+        "IPOTUZ22"
+      ]
     },
     {
       "iso2": "VA",
@@ -4953,7 +5267,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Vietnamese tax authority",
         "nonComplianceRisk": "Gross amount assessed as Vietnamese-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BFTVVNVX",
+        "BIDVVNVX",
+        "TCBVVNVX"
+      ]
     },
     {
       "iso2": "VU",
@@ -4979,7 +5297,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Vanuatu Revenue Office",
         "nonComplianceRisk": "Gross amount assessed as Vanuatu-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "ANZVVUVU",
+        "BOVUVUVU"
+      ]
     },
     {
       "iso2": "WS",
@@ -5005,7 +5326,10 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Samoa Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Samoan-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "NBSAWSWS",
+        "SCBWWSST"
+      ]
     },
     {
       "iso2": "YE",
@@ -5058,7 +5382,9 @@
         "nonComplianceRisk": "Gross amount assessed as South African-source income plus interest and penalties"
       },
       "primaryBankBics": [
-        "ABSAZAJJ"
+        "ABSAZAJJ",
+        "CABLZAJJ",
+        "FIRNZAJJ"
       ]
     },
     {
@@ -5085,7 +5411,11 @@
         "mandatoryAuditCert": "Certificate of residence issued by the Zambia Revenue Authority",
         "nonComplianceRisk": "Gross amount assessed as Zambian-source income plus interest"
       },
-      "primaryBankBics": []
+      "primaryBankBics": [
+        "BARCZMLX",
+        "SBICZMLX",
+        "ZNCOZMLX"
+      ]
     },
     {
       "iso2": "ZW",

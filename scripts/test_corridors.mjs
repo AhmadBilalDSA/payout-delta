@@ -47,6 +47,7 @@
  * Exit:  0 when every check passes, 1 otherwise.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -1503,6 +1504,12 @@ const leaderboardFailures =
  * re-derived from the same `data/fees.json` corpus + statutory bank database
  * the page is compiled from, then checked against the invariants the index
  * page itself claims (positive savings, non-zero penalty, ranked variance).
+ *
+ * Gates S2.5 - S2.7 audit the hexagonal registries themselves: the 110 clearing
+ * rails, the 195 sovereign jurisdictions (every one must resolve to a rail, and
+ * every withholding band must sit inside a plausible 0-50% statutory range) and
+ * the verified bank registry (every head must parse as ISO 9362, resolve to a
+ * sovereign jurisdiction, and match the jurisdiction that advertises it).
  */
 console.log("\nPhase S2 — static schema SRE gates:");
 
@@ -1527,7 +1534,7 @@ const routingSource = readFileSync(
   "utf8"
 );
 
-const s2GateFailures = [0, 0, 0, 0, 0, 0];
+const s2GateFailures = [0, 0, 0, 0, 0, 0, 0];
 function s2fail(gateIndex, label, detail) {
   s2GateFailures[gateIndex - 1] += 1;
   fail(label, detail);
@@ -1932,8 +1939,12 @@ for (const node of jurisdictionNodes) {
   }
   for (const band of ["baselineWhtPct", "treatyWhtPct"]) {
     const value = tax[band];
-    if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 100) {
-      s2fail(6, "jurisdiction withholding band", `${iso2}: ${band} ${value} is outside [0, 100]`);
+    // A statutory band above 50% is not a withholding rate, it is a data-entry
+    // error: the highest inbound-remittance withholding band in the corpus sits
+    // well under it, and a wider bound would let a fat-fingered percentage
+    // through into a live deduction.
+    if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 50) {
+      s2fail(6, "jurisdiction withholding band", `${iso2}: ${band} ${value} is outside [0, 50]`);
     }
   }
   if (tax.treatyWhtPct > tax.baselineWhtPct) {
@@ -1980,6 +1991,109 @@ const referencedRails = new Set(jurisdictionNodes.map((node) => node.primaryRail
 console.log(
   `  ${(s2GateFailures[5] === 0 ? "PASS  " : "FAIL  ") + "sovereign jurisdictions".padEnd(34)}${jurisdictionNodes.length} jurisdictions (193 UN + VA + PS), ${seenIso2.size} unique ISO 3166-1 codes, ${referencedRails.size}/${railNodes.length} rails referenced, ${jurisdictionBics} authorized BICs valid`
 );
+
+/** S2.7 — hexagonal bank-registry gate over data/banksRegistry.json. */
+const EXPECTED_BANK_TIERS = new Set([1, 2]);
+const CHARGE_CODES = new Set(["OUR", "SHA", "BEN"]);
+const MIN_BANK_REGISTRY_COUNT = 200;
+const INTERMEDIARY_CUT_CAP_USD = 100;
+let bankRegistry;
+try {
+  bankRegistry = JSON.parse(
+    readFileSync(join(ROOT, "data", "banksRegistry.json"), "utf8")
+  );
+} catch (error) {
+  s2fail(7, "bank registry", `data/banksRegistry.json is not readable JSON: ${error.message}`);
+}
+const bankNodes = Array.isArray(bankRegistry) ? bankRegistry : (bankRegistry?.banks ?? []);
+const registryBics = new Set();
+for (const node of bankNodes) {
+  const bic = node.bic;
+  if (!SWIFT_BIC_RE.test(bic ?? "")) {
+    s2fail(7, "bank registry BIC syntax", `${bic} violates ISO 9362 (expected 8 or 11 uppercase alphanumeric chars)`);
+    continue;
+  }
+  if (registryBics.has(bic)) {
+    s2fail(7, "bank registry duplicates", `${bic} appears more than once`);
+  }
+  registryBics.add(bic);
+  if (typeof node.name !== "string" || node.name.length < 2) {
+    s2fail(7, "bank registry name", `${bic}: name is missing`);
+  }
+  // The BIC's own country characters are the institution's registration
+  // country, so they must agree with the declared foreign key. This is what
+  // catches a head that is filed under the wrong market.
+  if (bic.slice(4, 6) !== node.countryIso2) {
+    s2fail(7, "bank registry country key", `${bic}: embedded country ${bic.slice(4, 6)} does not match countryIso2 ${node.countryIso2}`);
+  }
+  if (!seenIso2.has(node.countryIso2)) {
+    s2fail(7, "bank registry jurisdiction foreign key", `${bic}: countryIso2 ${node.countryIso2} does not resolve in data/jurisdictions.json`);
+  }
+  if (!EXPECTED_BANK_TIERS.has(node.tier)) {
+    s2fail(7, "bank registry tier", `${bic}: tier ${node.tier} (expected 1 or 2)`);
+  }
+  if (!Array.isArray(node.supportedCharges) || node.supportedCharges.length === 0) {
+    s2fail(7, "bank registry charge codes", `${bic}: supportedCharges is empty`);
+  } else {
+    for (const code of node.supportedCharges) {
+      if (!CHARGE_CODES.has(code)) {
+        s2fail(7, "bank registry charge codes", `${bic}: ${code} is not OUR, SHA or BEN`);
+      }
+    }
+  }
+  if (typeof node.defaultIntermediaryCutUSD !== "number" || node.defaultIntermediaryCutUSD < 0 || node.defaultIntermediaryCutUSD > INTERMEDIARY_CUT_CAP_USD) {
+    s2fail(7, "bank registry intermediary cut", `${bic}: defaultIntermediaryCutUSD ${node.defaultIntermediaryCutUSD} is outside [0, ${INTERMEDIARY_CUT_CAP_USD}]`);
+  }
+  if (typeof node.avgTransitHours !== "number" || !(node.avgTransitHours > 0) || node.avgTransitHours > 240) {
+    s2fail(7, "bank registry transit", `${bic}: avgTransitHours ${node.avgTransitHours} is outside (0, 240]`);
+  }
+  if (node.tier === 1 && node.usdGsibCorrespondent !== bic) {
+    s2fail(7, "bank registry USD correspondent", `${bic}: a tier-1 hub carries its own USD leg, so usdGsibCorrespondent must be the hub's own head`);
+  }
+}
+if (bankNodes.length < MIN_BANK_REGISTRY_COUNT) {
+  s2fail(7, "bank registry count", `${bankNodes.length} verified heads, expected at least ${MIN_BANK_REGISTRY_COUNT}`);
+}
+if (bankRegistry?.meta?.bankCount !== bankNodes.length) {
+  s2fail(7, "bank registry meta count", `meta.bankCount ${bankRegistry?.meta?.bankCount} does not match ${bankNodes.length} published heads`);
+}
+
+/**
+ * Manifest <-> registry referential integrity, audited here rather than in
+ * gate 6 so a jurisdiction can never advertise a receiving bank the registry
+ * does not publish.
+ */
+for (const node of jurisdictionNodes) {
+  for (const bic of node.primaryBankBics ?? []) {
+    if (!registryBics.has(bic)) {
+      s2fail(7, "jurisdiction bank foreign key", `${node.iso2}: primaryBankBics ${bic} does not resolve in data/banksRegistry.json`);
+    } else if (bic.slice(4, 6) !== node.iso2) {
+      s2fail(7, "jurisdiction bank country", `${node.iso2}: primaryBankBics ${bic} is registered in ${bic.slice(4, 6)}`);
+    }
+  }
+}
+
+/**
+ * The registry is generated. A hand-edit would silently diverge from the bank
+ * directories it is derived from, so a stale file is a hard failure.
+ */
+try {
+  execFileSync(process.execPath, [join(ROOT, "scripts", "generate_banks_registry.mjs"), "--check"], { stdio: "pipe" });
+} catch (error) {
+  s2fail(7, "bank registry freshness", error.stderr?.toString().trim() || error.message);
+}
+
+const registryCountries = new Set(bankNodes.map((node) => node.countryIso2));
+const registryTier1 = bankNodes.filter((node) => node.tier === 1).length;
+console.log(
+  `  ${(s2GateFailures[6] === 0 ? "PASS  " : "FAIL  ") + "bank registry (ISO 9362)".padEnd(34)}${bankNodes.length} verified heads (${registryTier1} tier 1, ${bankNodes.length - registryTier1} tier 2) across ${registryCountries.size} sovereign jurisdictions, all heads resolve from the manifest`
+);
+const excludedHeads = bankRegistry?.meta?.provenance?.excludedNonSovereign ?? [];
+if (excludedHeads.length) {
+  console.log(
+    `  ${"·".padEnd(38)}source heads kept out of the sovereign registry (non-ISO or non-sovereign registration): ${excludedHeads.length}`
+  );
+}
 
 console.log(`\n${"-".repeat(header.length)}`);
 console.log(`  pages exported           ${report.length} corridors + ${localizedRows.length} localized routes + 1 invoice studio + 1 tax ledger + 1 leakage index + ${embedRows.length} embed widgets + ${outCompareExists ? EXPECTED_COMPARE_SLUGS.length + 1 : "skipped (unbuilt ./out)"} compare routes`);
