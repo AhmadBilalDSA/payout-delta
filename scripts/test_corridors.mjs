@@ -186,6 +186,11 @@ const EXPECTED_SLUGS = [
   "usd-to-bzd",
   "usd-to-szl",
   "usd-to-lsl",
+  "usd-to-jpy",
+  "usd-to-chf",
+  "usd-to-krw",
+  "usd-to-twd",
+  "usd-to-nzd",
 
 ];
 

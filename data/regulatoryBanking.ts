@@ -139,6 +139,7 @@ export const RAILS_BY_CURRENCY: Record<string, RailSeed> = {
   BTN: { rail: "BICHC", operator: "Bhutan Interbank Clearing House", instant: false, window: "T+2 (business days)", finality: "RTH" },
   BWP: { rail: "BACS", operator: "Bank of Botswana", instant: false, window: "T+1 (business day)", finality: "RTH" },
   BZD: { rail: "ACH / RAPS", operator: "Central Bank of Belize", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  CHF: { rail: "SIC / euroSIC", operator: "SIX Interbank Clearing", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   CLP: { rail: "ACH", operator: "Banco Central de Chile", instant: false, window: "T+1 (business day)", finality: "RTH" },
   COP: { rail: "ACH SEBRA", operator: "Superintendencia Financiera de Colombia", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   CRC: { rail: "SINVI", operator: "Banco Central de Costa Rica", instant: false, window: "T+1 (business day)", finality: "IRG" },
@@ -164,7 +165,9 @@ export const RAILS_BY_CURRENCY: Record<string, RailSeed> = {
   ISK: { rail: "Icelandic Clearing House", operator: "Central Bank of Iceland", instant: false, window: "T+1 (business day)", finality: "RTH" },
   JMD: { rail: "ACH", operator: "Bank of Jamaica", instant: false, window: "T+1 (business day)", finality: "RTH" },
   JOD: { rail: "JoCC / BITS", operator: "Jordanian Clearing Company", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  JPY: { rail: "Zengin / BOJ-NET", operator: "Bank of Japan", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   KES: { rail: "PesaLink / RTGS", operator: "Central Bank of Kenya", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  KRW: { rail: "BOK-Wire+ / Electronic Banking Network", operator: "Bank of Korea", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   KGS: { rail: "ELEST", operator: "National Bank of the Kyrgyz Republic", instant: false, window: "T+1 (business day)", finality: "IRG" },
   KHR: { rail: "BACS", operator: "National Bank of Cambodia", instant: false, window: "T+1 (business day)", finality: "RTH" },
   KWD: { rail: "NBK RTGS", operator: "Central Bank of Kuwait", instant: false, window: "T+1 (business day)", finality: "IRG" },
@@ -189,6 +192,7 @@ export const RAILS_BY_CURRENCY: Record<string, RailSeed> = {
   NIO: { rail: "Interbank clearing", operator: "Banco Central de Nicaragua", instant: false, window: "T+1 (business day)", finality: "RTH" },
   NOK: { rail: "RTGS", operator: "Norges Bank", instant: false, window: "T+1 (business day)", finality: "IRG" },
   NPR: { rail: "NRTSS", operator: "Nepal Rastra Bank", instant: true, window: "T+0 (seconds)", finality: "IRG" },
+  NZD: { rail: "ESAS / SBI", operator: "Reserve Bank of New Zealand", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   OMR: { rail: "Interbank RTGS", operator: "Central Bank of Oman", instant: false, window: "T+1 (business day)", finality: "IRG" },
   PAB: { rail: "ACH / transferencia interbancaria", operator: "Banco Nacional de Panamá", instant: false, window: "T+1 (business day)", finality: "IRG" },
   PEN: { rail: "Sistema de Transferencias DEPE", operator: "BCRP · sistema interbancario", instant: true, window: "T+0 (seconds)", finality: "IRG" },
@@ -211,6 +215,7 @@ export const RAILS_BY_CURRENCY: Record<string, RailSeed> = {
   TJS: { rail: "RTGS / BRT", operator: "National Bank of Tajikistan", instant: false, window: "T+1 (business day)", finality: "IRG" },
   TND: { rail: "BCT RTGS", operator: "Banque Centrale de Tunisie", instant: false, window: "T+1 (business day)", finality: "IRG" },
   TOP: { rail: "RTGS", operator: "National Reserve Bank of Tonga", instant: false, window: "T+1 (business day)", finality: "IRG" },
+  TWD: { rail: "CBC Interbank / FISC", operator: "Central Bank of the Republic of China (Taiwan)", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   TRY: { rail: "EFT / ZIB", operator: "CBRT · Takasbank", instant: true, window: "T+0 (seconds)", finality: "IRG" },
   TTD: { rail: "Interbank settlement", operator: "Central Bank of Trinidad and Tobago", instant: false, window: "T+1 (business day)", finality: "IRG" },
   TZS: { rail: "TIPS", operator: "Bank of Tanzania", instant: true, window: "T+0 (seconds)", finality: "IRG" },
@@ -6054,6 +6059,60 @@ const lslBanks: RegulatoryBank[] = [
   { id: "fnbls", name: "First National Bank Lesotho", displayName: "FNB (Lesotho)", swiftCode: "FIRNLSMX", intermediaryUSD: 19, intermediaryMinUSD: 16, intermediaryMaxUSD: 22, localFeeDefault: 20, speed: "Standard", clearance: "SADC-RTGS \u00b7 CBL EFT (Clearing)", localCurrency: "LSL" },
 ];
 
+/* ---------------------------------------------------------------------------
+ * Developed-market G10 expansion — JPY / CHF / KRW / TWD / NZD.
+ * Each rail is the destination's own central-bank-operated RTGS, so the
+ * intermediary SHA band is narrow: the correspondent legs are domestic
+ * megabank hubs clearing in near-real time rather than multi-hop EM corridors.
+ * ------------------------------------------------------------------------- */
+
+const jpyTiers: StatutoryTier[] = [
+  { id: "jpy-jctax", name: "JCT Credit & Refund", authority: "Corporate Tax Act Art. 37 (JCT special deduction)", rate: 0, purposeCode: "JCT 0111", exemption: true, note: "Source-country withholding credit under the US-Japan treaty Art. 14; 100% of eligible foreign-source royalty/service income deductible under JCT Art. 37." },
+  { id: "jpy-resident", name: "Resident Progressive 5\u201345%", authority: "Income Tax Act \u00a7 21", rate: 0.05, purposeCode: "JCT 0111", note: "No withholding at source; resident individuals declare business income on the 5\u201345% progressive schedule via e-Tax." },
+];
+const jpyBanks: RegulatoryBank[] = [
+  { id: "mufg", name: "MUFG Bank", displayName: "MUFG Bank (Japan)", swiftCode: "BOTKJPJT", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 15, localFeeDefault: 0, speed: "Instant", clearance: "Zengin / BOJ-NET same-day \u00b7 JPY RTGS", localCurrency: "JPY" },
+  { id: "smbc", name: "Sumitomo Mitsui Banking", displayName: "SMBC (Japan)", swiftCode: "SMBCJPJT", intermediaryUSD: 13, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Instant", clearance: "Zengin / BOJ-NET same-day \u00b7 JPY RTGS", localCurrency: "JPY" },
+  { id: "mizuho", name: "Mizuho Bank", displayName: "Mizuho Bank (Japan)", swiftCode: "MZBKJPJT", intermediaryUSD: 11, intermediaryMinUSD: 9, intermediaryMaxUSD: 15, localFeeDefault: 0, speed: "Instant", clearance: "Zengin / BOJ-NET same-day \u00b7 JPY RTGS", localCurrency: "JPY" },
+];
+
+const chfTiers: StatutoryTier[] = [
+  { id: "chf-nfta", name: "Swiss-source Ordinary Income", authority: "Federal Act on Direct Federal Tax Art. 22 (DBG)", rate: 0, purposeCode: "DBG Art. 22", exemption: true, note: "Export-services receipts are outside Swiss-sourced income; foreign-source earnings credited against the progressive 11.5\u201339% scale." },
+  { id: "chf-vat", name: "0% Export Services (MWST)", authority: "VAT Act Art. 8(2)", rate: 0, purposeCode: "MWST Art. 8", exemption: true, note: "0% VAT on services supplied to recipients outside Switzerland under Art. 8(2) MWST." },
+];
+const chfBanks: RegulatoryBank[] = [
+  { id: "ubs", name: "UBS", displayName: "UBS (Switzerland)", swiftCode: "UBSWCHZH", intermediaryUSD: 10, intermediaryMinUSD: 8, intermediaryMaxUSD: 13, localFeeDefault: 0, speed: "Instant", clearance: "SIC / euroSIC same-day \u00b7 CHF RTGS", localCurrency: "CHF" },
+  { id: "credit-suisse", name: "Credit Suisse", displayName: "Credit Suisse (Switzerland)", swiftCode: "CRESCHZZ", intermediaryUSD: 12, intermediaryMinUSD: 9, intermediaryMaxUSD: 15, localFeeDefault: 0, speed: "Instant", clearance: "SIC / euroSIC same-day \u00b7 CHF RTGS", localCurrency: "CHF" },
+];
+
+const krwTiers: StatutoryTier[] = [
+  { id: "krw-resident", name: "Resident Earned Income", authority: "Income Tax Act Art. 46 (7.6\u201345%)", rate: 0.076, purposeCode: "KRW earned income", note: "Foreign-currency earnings credit to earned-income schedule; no source withholding on services invoiced to a Korean resident." },
+  { id: "krw-vat", name: "0% Export Services (VAT)", authority: "VAT Act Art. 21 (zero-rated supply)", rate: 0, purposeCode: "VAT zero-rated", exemption: true, note: "0% VAT on services exported outside Korea; zero-rating claimed via the resident tax invoice regime." },
+];
+const krwBanks: RegulatoryBank[] = [
+  { id: "shinhan", name: "Shinhan Bank", displayName: "Shinhan Bank (South Korea)", swiftCode: "SHBKKRSE", intermediaryUSD: 13, intermediaryMinUSD: 11, intermediaryMaxUSD: 17, localFeeDefault: 0, speed: "Instant", clearance: "BOK-Wire+ / Electronic Banking Network same-day", localCurrency: "KRW" },
+  { id: "kb-kookmin", name: "KB Kookmin Bank", displayName: "KB Kookmin (South Korea)", swiftCode: "HKBKKRSE", intermediaryUSD: 14, intermediaryMinUSD: 11, intermediaryMaxUSD: 17, localFeeDefault: 0, speed: "Instant", clearance: "BOK-Wire+ / Electronic Banking Network same-day", localCurrency: "KRW" },
+  { id: "hana", name: "Hana Financial Group", displayName: "Hana Bank (South Korea)", swiftCode: "HCCKKRSE", intermediaryUSD: 12, intermediaryMinUSD: 10, intermediaryMaxUSD: 16, localFeeDefault: 0, speed: "Instant", clearance: "BOK-Wire+ / Electronic Banking Network same-day", localCurrency: "KRW" },
+];
+
+const twdTiers: StatutoryTier[] = [
+  { id: "twd-pioneer", name: "Pioneer Enterprise", authority: "Income Tax Act Art. 9-1 (15% turnover)", rate: 0.15, purposeCode: "TWN export services", note: "15% turnover tax on certified SME service income; Software Industry Park accredited exporters can elect a reduced 10%." },
+  { id: "twd-vat", name: "0% Export Services (VAT)", authority: "VAT Act Art. 51 (export exemption)", rate: 0, purposeCode: "TWN export zero-rated", exemption: true, note: "0% VAT on services exported to overseas clients; zero-rating and refund claims run through the MOF e-invoicing gateway." },
+];
+const twdBanks: RegulatoryBank[] = [
+  { id: "bank-of-taiwan", name: "Bank of Taiwan", displayName: "Bank of Taiwan (Taiwan)", swiftCode: "BOTKTW2X", intermediaryUSD: 14, intermediaryMinUSD: 12, intermediaryMaxUSD: 18, localFeeDefault: 0, speed: "Instant", clearance: "CBC Interbank / FISC same-day \u00b7 TWD RTGS", localCurrency: "TWD" },
+  { id: "mega-icbc", name: "Mega ICBC", displayName: "Mega ICBC (Taiwan)", swiftCode: "MEGATWTP", intermediaryUSD: 13, intermediaryMinUSD: 11, intermediaryMaxUSD: 17, localFeeDefault: 0, speed: "Instant", clearance: "CBC Interbank / FISC same-day \u00b7 TWD RTGS", localCurrency: "TWD" },
+];
+
+const nzdTiers: StatutoryTier[] = [
+  { id: "nzd-resident", name: "Resident Individual Rate", authority: "Income Tax Act 2007 s. 24 (11\u201339%)", rate: 0.15, purposeCode: "IRD non-resident PIE", note: "0% withholding on service payments to a genuine non-resident; NZ-resident contractors declare on the 11\u201339% individual schedule." },
+  { id: "nzd-gst", name: "0% Zero-Rated Export", authority: "Goods and Services Tax Act 1992 s. 9(2)", rate: 0, purposeCode: "GST zero-rated export", exemption: true, note: "0% GST on services supplied to a person outside New Zealand where written confirmation of recipient status is held." },
+];
+const nzdBanks: RegulatoryBank[] = [
+  { id: "anz-nz", name: "ANZ New Zealand", displayName: "ANZ (New Zealand)", swiftCode: "ANZBNZ2A", intermediaryUSD: 9, intermediaryMinUSD: 7, intermediaryMaxUSD: 12, localFeeDefault: 0, speed: "Instant", clearance: "ESAS / SBI same-day \u00b7 NZD RTGS", localCurrency: "NZD" },
+  { id: "bnz", name: "Bank of New Zealand", displayName: "BNZ (New Zealand)", swiftCode: "BKNZNZ1A", intermediaryUSD: 9, intermediaryMinUSD: 7, intermediaryMaxUSD: 12, localFeeDefault: 0, speed: "Instant", clearance: "ESAS / SBI same-day \u00b7 NZD RTGS", localCurrency: "NZD" },
+];
+
 /**
  * The authored literal shape. The four Phase 2 projections (`localSettlementRail`,
  * `field71A`, `taxPurposeCodes`, `intermediaryTransitCuts`) are deliberately
@@ -7355,6 +7414,11 @@ const AUTHORED: Record<string, AuthoredRegulation> = {
   "usd-to-bzd": { slug: "usd-to-bzd", authority: "Central Bank of Belize · GST Act", clearingNetwork: "CBB ACH / RTGS (2:1 peg)", citations: ["GST Part III exports", "2:1 currency-board peg", "CBB ACH/RTGS"], banks: bzdBanks, tiers: bzdTiers, generic: false },
   "usd-to-szl": { slug: "usd-to-szl", authority: "Central Bank of Eswatini · VAT Act 2018", clearingNetwork: "SADC-RTGS · CBE EFT (Clearing)", citations: ["VAT § 6(3) exports", "Income Tax Order 1975", "SADC-RTGS"], banks: szlBanks, tiers: szlTiers, generic: false },
   "usd-to-lsl": { slug: "usd-to-lsl", authority: "Central Bank of Lesotho · Income Tax Act 1993", clearingNetwork: "SADC-RTGS · CBL EFT (Clearing)", citations: ["VAT Act 2009 exports", "Income Tax Act 1993", "SADC-RTGS"], banks: lslBanks, tiers: lslTiers, generic: false },
+  "usd-to-jpy": { slug: "usd-to-jpy", authority: "National Tax Agency · Corporate Tax Act", clearingNetwork: "Zengin / BOJ-NET (Bank of Japan)", citations: ["Corporate Tax Act Art. 37 JCT credit", "Income Tax Act § 21 5\u201345% residents", "Zengin 365-day intraday"], banks: jpyBanks, tiers: jpyTiers, generic: false },
+  "usd-to-chf": { slug: "usd-to-chf", authority: "Federal Tax Administration · MWST", clearingNetwork: "SIC / euroSIC (SIX Interbank Clearing)", citations: ["DBG Art. 22 foreign-source income", "MWST Art. 8(2) 0% exports", "SIC 5 instant settlement"], banks: chfBanks, tiers: chfTiers, generic: false },
+  "usd-to-krw": { slug: "usd-to-krw", authority: "National Tax Service · VAT Act", clearingNetwork: "BOK-Wire+ / Electronic Banking Network", citations: ["Income Tax Art. 46 7.6\u201345% residents", "VAT Act Art. 21 zero-rated exports", "BOK-Wire+ instant RTGS"], banks: krwBanks, tiers: krwTiers, generic: false },
+  "usd-to-twd": { slug: "usd-to-twd", authority: "Ministry of Finance · Income and Business Tax Act", clearingNetwork: "CBC Interbank / FISC (CBC Taiwan)", citations: ["Income Tax Act Art. 9-1 15% pioneer", "VAT Act Art. 51 export exemption", "CBC Interbank same-day"], banks: twdBanks, tiers: twdTiers, generic: false },
+  "usd-to-nzd": { slug: "usd-to-nzd", authority: "Inland Revenue · GST Act 1992", clearingNetwork: "ESAS / SBI (Reserve Bank of NZ)", citations: ["Income Tax Act s. 24 11\u201339% residents", "GST Act s. 9(2) zero-rated export", "ESAS instant settlement"], banks: nzdBanks, tiers: nzdTiers, generic: false },
 };
 
 /** Phase 9 — resolves the statutory regulation profile for any audited corridor slug. */

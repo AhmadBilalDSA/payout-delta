@@ -113,7 +113,7 @@ export default function RootLayout({
             {/* Responsive clearance:
                 - Mobile (<md): bottom dock at `bottom-3` → need `pb-20` (80px) clearance
                 - Desktop (md+): left rail at `left-3` → need `pl-20` (80px) clearance */}
-            <main className="flex-1 py-4 pr-4 pb-20 md:pb-6 pl-0 md:pl-20">{children}</main>
+            <main className="flex-1 py-4 pr-0 md:pr-4 pb-20 md:pb-6 pl-0 md:pl-20">{children}</main>
             <Footer />
             {/* GLOBAL MODULE DOCK — mounted once, as the last node before
                 `</body>`, so the launcher floats above every route instead of

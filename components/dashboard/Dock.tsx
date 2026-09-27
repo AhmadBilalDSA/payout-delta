@@ -17,14 +17,14 @@ export function Dock() {
   const pathname = usePathname();
 
   const items = [
-    { href: "/dashboard/calculator", icon: CalculatorIcon, label: "Calculator", ariaLabel: "Open Fee Calculator" },
-    { href: "/dashboard/invoice", icon: InvoiceIcon, label: "Invoice", ariaLabel: "Generate Invoice" },
-    { href: "/dashboard/ledger", icon: LedgerIcon, label: "Ledger", ariaLabel: "View Client Ledger" },
-    { href: "/dashboard/leaderboard", icon: LeaderboardIcon, label: "Leaderboard", ariaLabel: "View Cost Leaderboard" },
-    { href: "/dashboard/banks", icon: BankBuildingIcon, label: "Banks", ariaLabel: "Browse Bank Directory" },
-    { href: "/dashboard/compare", icon: CompareIcon, label: "Compare", ariaLabel: "Compare Corridors" },
-    { href: "/dashboard/agencies", icon: AgencyIcon, label: "Agencies", ariaLabel: "Regulatory Agencies" },
-    { href: "/dashboard/terminal", icon: TerminalIcon, label: "Terminal", ariaLabel: "Open Terminal" },
+    { href: "/", icon: CalculatorIcon, label: "Calculator", ariaLabel: "Open Fee Calculator" },
+    { href: "/invoice", icon: InvoiceIcon, label: "Invoice", ariaLabel: "Generate Invoice" },
+    { href: "/tax-ledger", icon: LedgerIcon, label: "Ledger", ariaLabel: "View Client Ledger" },
+    { href: "/leaderboard", icon: LeaderboardIcon, label: "Leaderboard", ariaLabel: "View Cost Leaderboard" },
+    { href: "/banks", icon: BankBuildingIcon, label: "Banks", ariaLabel: "Browse Bank Directory" },
+    { href: "/compare", icon: CompareIcon, label: "Compare", ariaLabel: "Compare Corridors" },
+    { href: "/agencies", icon: AgencyIcon, label: "Agencies", ariaLabel: "Regulatory Agencies" },
+    { href: "/dashboard", icon: TerminalIcon, label: "Terminal", ariaLabel: "Open Terminal" },
   ] as const;
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
@@ -33,7 +33,7 @@ export function Dock() {
     <>
       {/* Mobile: Bottom horizontal pill */}
       <nav
-        className="fixed bottom-3 inset-x-0 mx-auto w-fit max-w-[92vw] z-50 flex flex-row items-center justify-center gap-1.5 p-1.5 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl overflow-x-auto hidden md:hidden"
+        className="fixed bottom-3 inset-x-0 mx-auto w-fit max-w-[92vw] z-50 flex md:hidden flex-row items-center justify-center gap-1.5 p-1.5 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl overflow-x-auto"
         role="navigation"
         aria-label="Main navigation"
       >

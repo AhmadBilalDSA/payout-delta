@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataset": "payoutdelta-fees",
-  "updatedAt": "2026-09-25T00:00:00Z",
+  "updatedAt": "2026-09-27T00:00:00Z",
   "description": "Open dataset of freelance payout fees: platform commission, withdrawal channel fees, and foreign-exchange spreads per payout corridor (USD, EUR and GBP base rails).",
   "disclaimer": "Rates and fee schedules are indicative aggregates compiled from public merchant/commercial rate cards and are not quotes or guaranteed mid-market rates. Always confirm live rates and fees with your provider before transacting.",
   "currency": {
@@ -1894,6 +1894,81 @@
         { "id": "wise", "name": "Wise", "fixedFeeUSD": 1.0, "fxSpread": 0.007 },
         { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
         { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.027 }
+      ]
+    },
+    {
+      "slug": "usd-to-jpy",
+      "from": "USD",
+      "to": "JPY",
+      "rate": 149.23,
+      "country": "Japan",
+      "countryCode": "JP",
+      "currencyName": "Japanese Yen",
+      "currencySymbol": "¥",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.72, "fxSpread": 0.0042 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0.5, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 16, "fxSpread": 0.026 }
+      ]
+    },
+    {
+      "slug": "usd-to-chf",
+      "from": "USD",
+      "to": "CHF",
+      "rate": 0.885,
+      "country": "Switzerland",
+      "countryCode": "CH",
+      "currencyName": "Swiss Franc",
+      "currencySymbol": "CHF",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.65, "fxSpread": 0.0038 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.0185 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.021 }
+      ]
+    },
+    {
+      "slug": "usd-to-krw",
+      "from": "USD",
+      "to": "KRW",
+      "rate": 1278.5,
+      "country": "South Korea",
+      "countryCode": "KR",
+      "currencyName": "South Korean Won",
+      "currencySymbol": "₩",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.85, "fxSpread": 0.0048 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0.6, "fxSpread": 0.0215 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 18, "fxSpread": 0.028 }
+      ]
+    },
+    {
+      "slug": "usd-to-twd",
+      "from": "USD",
+      "to": "TWD",
+      "rate": 32.45,
+      "country": "Taiwan",
+      "countryCode": "TW",
+      "currencyName": "New Taiwan Dollar",
+      "currencySymbol": "NT$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.8, "fxSpread": 0.0045 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0.6, "fxSpread": 0.02 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 17, "fxSpread": 0.024 }
+      ]
+    },
+    {
+      "slug": "usd-to-nzd",
+      "from": "USD",
+      "to": "NZD",
+      "rate": 1.642,
+      "country": "New Zealand",
+      "countryCode": "NZ",
+      "currencyName": "New Zealand Dollar",
+      "currencySymbol": "NZ$",
+      "providers": [
+        { "id": "wise", "name": "Wise", "fixedFeeUSD": 0.7, "fxSpread": 0.004 },
+        { "id": "payoneer", "name": "Payoneer", "fixedFeeUSD": 0, "fxSpread": 0.019 },
+        { "id": "swift", "name": "Direct Wire", "fixedFeeUSD": 15, "fxSpread": 0.02 }
       ]
     },
     {

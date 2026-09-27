@@ -2,31 +2,31 @@
 
 > This is an llms-full.txt file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org
 
-> PayoutDelta is a cross-border remittance and intermediary-fee benchmarking engine for independent contractors: it models the settlement delta between direct local clearing (Raast, IMPS/NEFT/RTGS, SPEI, PIX, SEPA...) and a traditional SWIFT MT103 routed through JPMorgan Chase (CHASUS33), Citibank (CITIUS33), BNY Mellon (IRVTUS3N) or Standard Chartered (SCBLUS33). This full manifest enumerates every corridor in the dataset (131 corridors across USD, EUR and GBP origins as of 2026-09-25) with its benchmark intermediary deduction, correspondent BIC pool, statutory tax purpose code and recommended rail. Figures are informational benchmarks, not offers, and must be verified against the beneficiary bank's credit advice before invoicing.
+> PayoutDelta is a cross-border remittance and intermediary-fee benchmarking engine for independent contractors: it models the settlement delta between direct local clearing (Raast, IMPS/NEFT/RTGS, SPEI, PIX, SEPA...) and a traditional SWIFT MT103 routed through JPMorgan Chase (CHASUS33), Citibank (CITIUS33), BNY Mellon (IRVTUS3N) or Standard Chartered (SCBLUS33). This full manifest enumerates every corridor in the dataset (136 corridors across USD, EUR and GBP origins as of 2026-09-27) with its benchmark intermediary deduction, correspondent BIC pool, statutory tax purpose code and recommended rail. Figures are informational benchmarks, not offers, and must be verified against the beneficiary bank's credit advice before invoicing.
 
 ## PayoutDelta Guides
 
-- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 131 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 136 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
 - [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 145 long-tail routes.
 - [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
 - [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
 - [Statutory Purpose Codes & Tax Clearance](https://ahmadbilaldsa.github.io/payout-delta/tax-clearance): the clearance paperwork behind the rail — SBP purpose code 9111 with Form 'R' and the ePRC bank certificate, RBI purpose code P0802 with the FIRC / e-FIRC download flow and the GST LUT, BSP FX Form 1 inward remittance reporting for BPO receipts, and the DIAN Formato 1060 / Declaración de Cambio and BACEN SCE declarations for LATAM exporters, with every statutory tier and receiving bank read from the same audited dataset.
 - [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
-- [Institutional Clearing Terminal](https://ahmadbilaldsa.github.io/payout-delta/dashboard): macro clearing telemetry across 131 corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.
+- [Institutional Clearing Terminal](https://ahmadbilaldsa.github.io/payout-delta/dashboard): macro clearing telemetry across 136 corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.
 - [Bank Dossier Directory](https://ahmadbilaldsa.github.io/payout-delta/banks): 23 verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEDD, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.
 - [Agency Treasury Leakage Engine](https://ahmadbilaldsa.github.io/payout-delta/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.
-- [Challenger Rails & Alternative Settlements](https://ahmadbilaldsa.github.io/payout-delta/challengers): institutional comparison of four non-bank settlement architectures — Airwallex local clearing, Revolut Business SEPA/ACH off-ramps, Elevate Pay US virtual accounts, and USDC/USDT on Polygon or Arbitrum — benchmarked against the median correspondent SHA deduction of $15 and a 4.60% all-in wire cost at the $1,000 benchmark across the 131 corridors.
-- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 131 corridors live at /embed/<slug>/).
+- [Challenger Rails & Alternative Settlements](https://ahmadbilaldsa.github.io/payout-delta/challengers): institutional comparison of four non-bank settlement architectures — Airwallex local clearing, Revolut Business SEPA/ACH off-ramps, Elevate Pay US virtual accounts, and USDC/USDT on Polygon or Arbitrum — benchmarked against the median correspondent SHA deduction of $15 and a 4.60% all-in wire cost at the $1,000 benchmark across the 136 corridors.
+- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 136 corridors live at /embed/<slug>/).
 
 ## PayoutDelta References
 
-- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 131-corridor dataset with per-platform fees and FX spreads, refreshed daily.
+- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 136-corridor dataset with per-platform fees and FX spreads, refreshed daily.
 - [API access & webhook contract](https://ahmadbilaldsa.github.io/payout-delta/api-access): integration reference for the static feed and derived endpoints.
-- [Full 131-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+- [Full 136-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
 
 ## Corridor Database
 
-Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
+Dataset snapshot: 2026-09-27T00:00:00Z — 136 corridors.
 
 | Corridor | Base → Target | Export Rate (per 1 base unit) | Intermediary Cut (USD) | Correspondent Clearing BICs | Statutory Tax Purpose Code | Recommended Rail |
 |---|---|---|---|---|---|---|
@@ -160,6 +160,11 @@ Dataset snapshot: 2026-09-25T00:00:00Z — 131 corridors.
 | [usd-to-qar](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-qar) | USD → QAR | 3.64 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-tnd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-tnd) | USD → TND | 3.1 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-dzd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-dzd) | USD → DZD | 150 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-jpy](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-jpy) | USD → JPY | 149.23 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-chf](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-chf) | USD → CHF | 0.885 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-krw](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-krw) | USD → KRW | 1278.5 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-twd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-twd) | USD → TWD | 32.45 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
+| [usd-to-nzd](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-nzd) | USD → NZD | 1.642 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 | [usd-to-lbp](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-lbp) | USD → LBP | 89000 | $18 | CHASUS33, CITIUS33, IRVTUS3N, SCBLUS33 | Benchmark (not statutory) | Traditional SWIFT (fallback) |
 
 ### Correspondent clearing nodes
