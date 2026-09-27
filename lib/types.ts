@@ -28,6 +28,12 @@ export interface Corridor {
   countryCode: string;
   currencyName: string;
   currencySymbol: string;
+  /**
+   * Provenance of `rate`. Omitted on scraped rows (the default). `modelled`
+   * marks an authored indicative rate for a currency with no published
+   * wholesale feed — see the dataset `disclaimer` for the full caveat.
+   */
+  rateSource?: "scraped" | "modelled";
   /** Corridor-specific provider fee models (Wise / Payoneer / Direct Wire). */
   providers?: ProviderFee[];
 }

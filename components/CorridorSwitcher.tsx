@@ -9,7 +9,7 @@ import { useDismissable } from "@/components/useDismissable";
 import { useMenuAnchor } from "@/components/headerDropdownLayer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { localizedCorridorHref } from "@/lib/localizedCorridors";
-import rawFees from "@/data/fees.json";
+import { getCorridors } from "@/lib/db";
 import type { Corridor } from "@/lib/types";
 
 /**
@@ -67,15 +67,17 @@ const REGIONS: { label: string; currencies: string[] }[] = [
 const NEW_CORRIDOR_ISSUE_URL =
   "https://github.com/AhmadBilalDSA/payout-delta/issues/new?assignees=&labels=corridor-request%2Cenhancement&template=new_corridor.yml";
 
+const allCorridors = getCorridors();
+
 const corridorBySlug = new Map<string, Corridor>(
-  rawFees.corridors.map((corridor) => [corridor.slug, corridor])
+  allCorridors.map((corridor) => [corridor.slug, corridor])
 );
 
 /** Regions mapped to their audited corridors (empty groups are skipped). */
 const corridorGroups: { label: string; corridors: Corridor[] }[] = REGIONS.map(
   ({ label, currencies }) => ({
     label,
-    corridors: rawFees.corridors.filter((corridor) =>
+    corridors: allCorridors.filter((corridor) =>
       currencies.includes(corridor.to)
     ),
   })
@@ -127,7 +129,7 @@ export default function CorridorSwitcher() {
   const current =
     corridorBySlug.get(slug ?? "") ??
     (slug !== undefined
-      ? rawFees.corridors.find((corridor) => corridor.slug === slug)
+      ? allCorridors.find((corridor) => corridor.slug === slug)
       : undefined) ??
     corridorBySlug.get(FALLBACK_SLUG)!;
   const isCorridorPage = slug !== undefined && corridorBySlug.has(slug);

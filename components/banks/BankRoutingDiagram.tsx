@@ -174,7 +174,10 @@ export default function BankRoutingDiagram({ profile }: { profile: BankProfile }
         role: "Hop 1 · USD correspondent",
         title: profile.name,
         code: profile.bic,
-        note: "Tier 1 · carries its own USD leg",
+        // Kept under the 30-character node-note budget: the full sentence is in
+        // the caption below, so the node only has to name the self-anchored
+        // state without being cut off at an ellipsis mid-phrase.
+        note: "Tier 1 · own USD leg",
       }
     : anchorCode === ""
       ? {

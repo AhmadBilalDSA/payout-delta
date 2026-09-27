@@ -57,7 +57,14 @@ import rawFees from '../data/fees.json';
  * ---------------------------------------------------------------------------
  */
 
-const dataset: FeesDataset = rawFees;
+/**
+ * `resolveJsonModule` widens every JSON string literal to `string`, which would
+ * defeat the `rateSource: "scraped" | "modelled"` union on `Corridor`. The
+ * corpus is validated instead by `npm run test` (corpus-drift, leaderboard
+ * and rail-coverage gates all read this same file), so the assertion is applied
+ * once here at the import boundary rather than widened in `types.ts`.
+ */
+const dataset = rawFees as unknown as FeesDataset;
 
 /** Returns the raw, versioned dataset plus schema metadata. */
 export function getDataset(): FeesDataset {
