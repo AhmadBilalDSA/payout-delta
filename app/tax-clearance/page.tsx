@@ -2,18 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 
-import TaxClearanceView from "@/components/tax-clearance/TaxClearanceView";
+import StatutoryTaxWizard from "@/components/tax-clearance/StatutoryTaxWizard";
 import type {
-  ClearanceBank,
   ClearanceDocument,
-  ClearanceJurisdiction,
-  ClearanceStats,
+  ClearanceFaq,
   ClearanceStep,
-  ClearanceTier,
-  ClearanceTrack,
+  StatutoryProfile,
+  StatutePlaybook,
+  StatuteWizardStats,
 } from "@/components/tax-clearance/payload";
-import { getRegulatoryBanking } from "@/data/regulatoryBanking";
-import { getCorridorBySlug, getDataset } from "@/lib/db";
+import { getCorridors, getDataset } from "@/lib/db";
+import {
+  flagOf,
+  getBankNodesByCountry,
+  getBankProfileByBic,
+  getJurisdictions,
+  getRegistryMeta,
+  getRailById,
+} from "@/lib/registryData";
 import { SITE_URL } from "@/lib/seoSchemas";
 
 export const dynamic = "force-static";
@@ -22,24 +28,25 @@ export const dynamic = "force-static";
  * Track 4 — Statutory Purpose Code & Tax Clearance Hub.
  *
  * SERVER SHELL ONLY, for the same reason `/dashboard` is: this route must not
- * ship `data/fees.json` or the ~226KB statutory banking directory to the
- * browser. Every corridor, statutory tier, receiving bank, BIC and rate below is
- * resolved here at module scope from the two data sources, merged with the
- * authored clearance playbooks, and handed to `TaxClearanceView` as flat
+ * ship `data/fees.json`, the 195-state statutory manifest or the 266-head bank
+ * registry to the browser. Every state, statute, band, purpose code, rail and
+ * institution below is resolved here at module scope from
+ * `data/jurisdictions.json`, `data/rails.json` and `data/banksRegistry.json`,
+ * joined to the priced corridors and handed to `StatutoryTaxWizard` as flat
  * numbers and short strings.
  *
- * The playbooks are the part that cannot be derived. The dataset already knows
- * that Pakistan's clearance is `e-PRC 24 hrs` under purpose code 9111 and that
- * India zero-rates under P0802; it does not know that the FIRC is downloaded
- * from the bank's net-banking portal, that Form 'R' is the inward-receipt
- * declaration (FEM Appendix V-121) rather than the export declaration, or that
- *Formato 1060 is the goods-export exogenous format. Those are the filings a
- * contractor actually gets stuck on, so they are authored here and cited by
- * regulator and section.
+ * The playbooks are the part that cannot be derived. The registry already knows
+ * that Pakistan's clearance is an ePRC under purpose code 9111 and that India
+ * files the FIRC under P0802; it does not know that the FIRC is downloaded from
+ * the bank's net-banking portal, that Form 'R' is the inward-receipt declaration
+ * (FEM Appendix V-121) rather than the export declaration, or that Formato 1060
+ * is the goods-export exogenous format. Those are the filings a contractor
+ * actually gets stuck on, so they are authored here, attached to the markets
+ * they belong to, and cited by regulator and section.
  *
  * Everything on the page is informational. Statutory tiers, certificates and
  * deadlines change without notice — always confirm with the regulator, the
- * authorised dealer bank or a local accountant before filing.
+ * authorized dealer bank or a local accountant before filing.
  */
 
 /** Authored playbook content, keyed by the statutory track it belongs to. */
@@ -56,74 +63,49 @@ interface TrackContent {
   regulators: string[];
   steps: ClearanceStep[];
   documents: ClearanceDocument[];
-  faqs: { question: string; answer: string }[];
+  faqs: ClearanceFaq[];
+}
+
+
+/**
+ * Compact act label for the enactment badge.
+ *
+ * The registry cites statutes in full ("FEMA 1999 read with Section 194J of the
+ * Income-tax Act 1961, as amended in 2023"), which is right for the detail line
+ * and wrong for a chip. The label is therefore the citation up to its first
+ * clause break — comma, em dash or parenthetical — trimmed to a readable length.
+ */
+function shortActOf(statutoryAct: string): string {
+  const head = statutoryAct.split(/[,—(]/)[0]?.trim() ?? statutoryAct;
+  return head.length > 46 ? `${head.slice(0, 45).trimEnd()}…` : head;
 }
 
 /**
- * Regional-indicator flag from an ISO country code.
+ * The code to paste into a remittance narrative, extracted from the registry's
+ * prose purpose code.
  *
- * Local copy on purpose: `lib/directoryData.ts` also exports `flagOf`, but
- * importing that module would pull the whole in-memory directory index into this
- * route's server graph for one six-line helper. EU is the one non-derivable case.
+ * Patterns are ordered from most specific to least: an RBI-style letter+digit
+ * code, the Philippines CIR code, the US beneficial-owner forms, an 8-char
+ * agency form number, a national register, and finally a bare 4-digit band. When
+ * nothing matches, the published string is copied verbatim rather than guessed
+ * at — a wrong code on a wire is worse than a long one.
  */
-function flagOf(code: string): string {
-  if (code.toUpperCase() === "EU") return "🇪🇺";
-  const base = 0x1f1e6;
-  return code
-    .toUpperCase()
-    .replace(/[A-Z]/g, (char) =>
-      String.fromCodePoint(base + char.charCodeAt(0) - 65)
-    );
-}
-
-/**
- * Merge one corridor's dataset facts into a renderable jurisdiction record.
- *
- * `getRegulatoryBanking` resolves authored profiles and falls back to a generic
- * band, so every track is guaranteed to resolve a tier table and at least one
- * receiving bank even if a slug is later re-categorised.
- */
-function buildJurisdiction(
-  slug: string,
-  regulator: string
-): ClearanceJurisdiction {
-  const corridor = getCorridorBySlug(slug);
-  const regulation = getRegulatoryBanking(slug);
-
-  const tiers: ClearanceTier[] = regulation.tiers.map((tier) => ({
-    name: tier.name,
-    authority: tier.authority,
-    rate: tier.rate,
-    purposeCode: tier.purposeCode,
-    exemption: tier.exemption === true,
-    note: tier.note,
-  }));
-
-  const banks: ClearanceBank[] = regulation.banks.map((bank) => ({
-    name: bank.displayName,
-    swiftCode: bank.swiftCode,
-    clearance: bank.clearance,
-    localFee: bank.localFeeDefault,
-    localCurrency: bank.localCurrency,
-  }));
-
-  return {
-    id: slug,
-    country: corridor?.country ?? regulation.clearingNetwork,
-    countryCode: corridor?.countryCode ?? "",
-    flag: flagOf(corridor?.countryCode ?? ""),
-    currency: corridor?.to ?? "",
-    currencyName: corridor?.currencyName ?? "",
-    regulator,
-    authority: regulation.authority,
-    clearingNetwork: regulation.clearingNetwork,
-    citations: regulation.citations,
-    corridorSlug: slug,
-    pair: corridor ? `${corridor.from} → ${corridor.to}` : slug,
-    rate: corridor?.rate ?? 0,
-    tiers,
-    banks,
-  };
+function shortPurposeCodeOf(purposeCode: string): string {
+  const patterns: RegExp[] = [
+    /\b([A-Z]\d{4})\b/, // P0802
+    /\bCIR-\d+\b/, // CIR-1089
+    /\bW-8BEN(?:-E)?\b/, // Form W-8BEN / W-8BEN-E
+    /\b1042-S\b/, // Form 1042-S
+    /\bForm (\d{4})\b/, // BIR Form 2307
+    /\b(SCE-IED|SCE)\b/, // BACEN FX register
+    /\b(NPWP|RUT|TRC)\b/, // registry identifiers
+    /\b(\d{4})\b/, // 9111
+  ];
+  for (const pattern of patterns) {
+    const match = purposeCode.match(pattern);
+    if (match) return match[1] ?? match[0];
+  }
+  return purposeCode;
 }
 
 const TRACK_CONTENT: TrackContent[] = [
@@ -550,44 +532,125 @@ const TRACK_CONTENT: TrackContent[] = [
   },
 ];
 
-/** Every track, with its dataset-derived jurisdictions merged in at build time. */
-const TRACKS: ClearanceTrack[] = TRACK_CONTENT.map((content) => ({
+/**
+ * Authored playbooks indexed by the markets they apply to.
+ *
+ * The track list stays the source of truth for the prose; the ISO 3166-1 keys
+ * come from the priced corridors each track was authored against, so a playbook
+ * can never drift onto a market whose statute it does not describe. LATAM
+ * carries two corridors, so one playbook attaches to both Colombia and Brazil.
+ */
+const PLAYBOOKS_BY_ISO2: ReadonlyMap<string, StatutePlaybook> = (() => {
+  const byIso2 = new Map<string, StatutePlaybook>();
+  for (const content of TRACK_CONTENT) {
+    const playbook: StatutePlaybook = {
+      id: content.id,
+      region: content.region,
+      eyebrow: content.eyebrow,
+      title: content.title,
+      summary: content.summary,
+      steps: content.steps,
+      documents: content.documents,
+      faqs: content.faqs,
+    };
+    for (const slug of content.corridors) {
+      const iso2 = getCorridors().find((corridor) => corridor.slug === slug)?.countryCode;
+      if (iso2) byIso2.set(iso2, playbook);
+    }
+  }
+  return byIso2;
+})();
+
+/**
+ * Every sovereign state as one renderable statutory profile.
+ *
+ * The join is three foreign keys, all audited at build time by
+ * `scripts/test_corridors.mjs`: `jurisdiction.primaryRailId` into the rail
+ * registry, `jurisdiction.primaryBankBics` into the bank registry, and the
+ * corridor's `countryCode` back into the priced dataset. A state with no priced
+ * corridor still renders — the statutory record does not depend on a rate.
+ */
+const PROFILES: StatutoryProfile[] = getJurisdictions().map((jurisdiction) => {
+  const tax = jurisdiction.tax;
+  const corridor = getCorridors().find(
+    (candidate) => candidate.countryCode === jurisdiction.iso2
+  );
+  return {
+    iso2: jurisdiction.iso2,
+    name: jurisdiction.name,
+    flag: flagOf(jurisdiction.iso2),
+    currency: jurisdiction.currency,
+    centralBank: jurisdiction.centralBank,
+    enactmentYear: tax.enactmentYear,
+    lastAmendedYear: tax.lastAmendedYear,
+    shortAct: shortActOf(tax.statutoryAct),
+    statutoryAct: tax.statutoryAct,
+    purposeCode: tax.purposeCode,
+    shortCode: shortPurposeCodeOf(tax.purposeCode),
+    baselineWhtPct: tax.baselineWhtPct,
+    treatyWhtPct: tax.treatyWhtPct,
+    treatyDifferential: tax.treatyWhtPct < tax.baselineWhtPct,
+    exemptionConditions: [...tax.exemptionConditions],
+    safeHarborRules: [...tax.safeHarborRules],
+    mandatoryAuditCert: tax.mandatoryAuditCert,
+    nonComplianceRisk: tax.nonComplianceRisk,
+    rail: {
+      id: jurisdiction.primaryRailId,
+      operator: getRailById(jurisdiction.primaryRailId)?.operator ?? "Unspecified operator",
+      protocol: getRailById(jurisdiction.primaryRailId)?.protocol ?? "RTGS",
+      finalityWindow: getRailById(jurisdiction.primaryRailId)?.finalityWindow ?? "Not published",
+      instant: getRailById(jurisdiction.primaryRailId)?.instant === true,
+    },
+    banks: getBankNodesByCountry(jurisdiction.iso2).map((bank) => ({
+      // The dossier slug when this repository publishes one, the lowercased
+      // head otherwise — the same resolution `app/banks/[slug]/page.tsx` uses.
+      slug: getBankProfileByBic(bank.bic)?.slug ?? bank.bic.toLowerCase(),
+      bic: bank.bic,
+      name: bank.name,
+      tier: bank.tier,
+      charges: [...bank.supportedCharges],
+      cutUSD: bank.defaultIntermediaryCutUSD,
+      transitHours: bank.avgTransitHours,
+    })),
+    corridor: corridor
+      ? {
+          slug: corridor.slug,
+          pair: `${corridor.from} → ${corridor.to}`,
+          rate: corridor.rate,
+        }
+      : null,
+    playbook: PLAYBOOKS_BY_ISO2.get(jurisdiction.iso2) ?? null,
+  };
+});
+
+/** Hero totals, derived from the same payload the island renders. */
+const REGISTRY_META = getRegistryMeta();
+const STATS: StatuteWizardStats = {
+  jurisdictions: PROFILES.length,
+  rails: REGISTRY_META.railCount,
+  banks: REGISTRY_META.bankCount,
+  withholdingMarkets: PROFILES.filter((profile) => profile.baselineWhtPct > 0).length,
+  treatyReliefMarkets: PROFILES.filter((profile) => profile.treatyDifferential).length,
+  instantMarkets: PROFILES.filter((profile) => profile.rail.instant).length,
+  revisedOn: getDataset().updatedAt,
+};
+
+/** Playbooks, in authored order — the source of the FAQPage graph. */
+const PLAYBOOKS: StatutePlaybook[] = TRACK_CONTENT.map((content) => ({
   id: content.id,
   region: content.region,
   eyebrow: content.eyebrow,
   title: content.title,
-  codeLabel: content.codeLabel,
   summary: content.summary,
-  jurisdictions: content.corridors.map((slug, index) =>
-    buildJurisdiction(slug, content.regulators[index] ?? "")
-  ),
   steps: content.steps,
   documents: content.documents,
   faqs: content.faqs,
 }));
 
-/** Hero totals, derived from the same payload the island renders. */
-const STATS: ClearanceStats = {
-  corridors: new Set(
-    TRACKS.flatMap((track) => track.jurisdictions.map((j) => j.corridorSlug))
-  ).size,
-  tiers: TRACKS.reduce(
-    (total, track) =>
-      total + track.jurisdictions.reduce((sum, j) => sum + j.tiers.length, 0),
-    0
-  ),
-  banks: TRACKS.reduce(
-    (total, track) =>
-      total + track.jurisdictions.reduce((sum, j) => sum + j.banks.length, 0),
-    0
-  ),
-  revisedOn: getDataset().updatedAt,
-};
-
 const TITLE =
-  "Statutory Purpose Codes & Tax Clearance — SBP 9111, RBI P0802, BSP, DIAN & BCB";
+  "Statutory Purpose Codes & Tax Clearance — 195 countries, SBP 9111, RBI P0802, BSP, DIAN & BCB";
 const DESCRIPTION =
-  "Client-side reference for cross-border contractor tax clearance: SBP Form 'R' and the ePRC bank certificate, RBI purpose code P0802 and the FIRC download flow, BSP inward remittance reporting for BPO receipts, and the DIAN Formato 1060 and BACEN declarations for LATAM exporters. Every tier, bank and clearing rail read live from the audited corridor dataset.";
+  "Interactive statutory tax clearance reference for all 195 sovereign states: enactment year and last amendment, regulator purpose code with one-click copy (9111, P0802, CIR-1089, BIR Form 2307), safe-harbour audit defence steps, mandatory realization certificates (ePRC, FIRC, Contrato de Câmbio) and the connected domestic clearing rail — every figure read live from the statutory, rail and bank registries.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -605,7 +668,7 @@ export const metadata: Metadata = {
 };
 
 /** Every FAQ pair on the page, flattened for the FAQPage graph. */
-const FAQ_ENTRIES = TRACKS.flatMap((track) => track.faqs).map((faq) => ({
+const FAQ_ENTRIES = PLAYBOOKS.flatMap((playbook) => playbook.faqs).map((faq) => ({
   "@type": "Question" as const,
   name: faq.question,
   acceptedAnswer: {
@@ -652,14 +715,14 @@ export default function TaxClearancePage() {
       name: "PayoutDelta",
       url: `${SITE_URL}/`,
     },
-    about: TRACKS.map((track) => ({
+    about: PLAYBOOKS.map((playbook) => ({
       "@type": "Thing",
-      name: `${track.eyebrow} — ${track.title}`,
+      name: `${playbook.eyebrow} — ${playbook.title}`,
     })),
     mainEntity: {
       "@type": "Dataset",
       name: "PayoutDelta Statutory Purpose Code Registry",
-      description: `Statutory withholding tiers, purpose codes, clearing networks and receiving banks for ${STATS.corridors} audited clearance corridors, ${STATS.tiers} statutory tiers and ${STATS.banks} receiving banks.`,
+      description: `Statutory withholding bands, purpose codes, safe-harbour rules, realization certificates and connected clearing rails for ${STATS.jurisdictions} sovereign states and ${STATS.banks} verified institution heads, of which ${STATS.withholdingMarkets} markets carry a statutory withholding band and ${STATS.treatyReliefMarkets} publish a treaty or exemption relief band.`,
       dateModified: STATS.revisedOn,
       inLanguage: "en-US",
       isAccessibleForFree: true,
@@ -728,25 +791,28 @@ export default function TaxClearancePage() {
             Track 4 · Compliance
           </p>
           <h1 className="mt-4 max-w-3xl text-balance text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl">
-            Statutory Purpose Code &amp; Tax Clearance Hub
+            Statutory Purpose Code &amp; Tax Clearance Wizard
           </h1>
           <p className="mt-3 max-w-3xl text-pretty text-sm leading-relaxed text-black/[0.6] dark:text-white/60">
             A contractor&apos;s payout is not cleared because the money arrived —
-            it is cleared because the bank could file a return against it. This
-            is the paperwork layer under the rail: SBP purpose code 9111 with Form
-            &apos;R&apos; and the ePRC, RBI purpose code P0802 with the FIRC
-            download, BSP inward remittance reporting for BPO receipts, and the
-            DIAN Formato 1060 and BACEN declarations in Latin America. Every
-            statutory tier, receiving bank and clearing network below is read live
-            from the audited corridor dataset.
+            it is cleared because the bank could file a return against it. Pick
+            any of the {STATS.jurisdictions} sovereign states below and read its
+            complete statutory profile: enactment year and last amendment, the
+            purpose code you paste into the remittance, the safe-harbour steps
+            that survive an audit, the realization certificate that must be on
+            file, the baseline-versus-treaty withholding differential, and the
+            domestic rail the credit actually lands on. SBP 9111 with the ePRC,
+            RBI P0802 with the FIRC, BSP CIR-1089 with BIR Form 2307, BACEN
+            Contrato de Câmbio and the DIAN Declaraci&oacute;n de Cambio all
+            resolve from the same three registries the rest of the corpus uses.
           </p>
 
           <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: "Clearance corridors", value: String(STATS.corridors) },
-              { label: "Statutory tiers", value: String(STATS.tiers) },
-              { label: "Receiving banks", value: String(STATS.banks) },
-              { label: "Statutory tracks", value: String(TRACKS.length) },
+              { label: "Sovereign states", value: String(STATS.jurisdictions) },
+              { label: "Clearing rails", value: String(STATS.rails) },
+              { label: "Verified BICs", value: String(STATS.banks) },
+              { label: "Authored playbooks", value: String(PLAYBOOKS.length) },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -775,11 +841,17 @@ export default function TaxClearancePage() {
             >
               Reconcile against the tax ledger
             </Link>
+            <Link
+              href="/banks/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] px-4 py-2 text-sm font-semibold text-black/70 transition-colors duration-200 ease-out hover:bg-black/[0.04] dark:border-white/[0.12] dark:text-white/75 dark:hover:bg-white/[0.06]"
+            >
+              Bank registry
+            </Link>
           </div>
         </section>
 
         <div className="mt-8">
-          <TaxClearanceView tracks={TRACKS} stats={STATS} />
+          <StatutoryTaxWizard profiles={PROFILES} stats={STATS} />
         </div>
 
         <p className="no-print mt-10 text-xs leading-relaxed text-black/[0.45] dark:text-white/50">

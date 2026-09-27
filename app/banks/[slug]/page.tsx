@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  BANK_DOSSIERS,
-  GITHUB_REPO,
-  getBankDossierBySlug,
-  type BankDossier,
-} from "@/data/banks";
+import BankRoutingDiagram from "@/components/banks/BankRoutingDiagram";
 import BankSettlementPanel from "@/components/banks/BankSettlementPanel";
+import { GITHUB_REPO } from "@/data/banks";
 import { railFor } from "@/data/regulatoryBanking";
 import { getCorridorBySlug } from "@/lib/db";
+import {
+  getBankProfileBySlug,
+  getBankProfiles,
+  type BankProfile,
+} from "@/lib/registryData";
 import {
   buildBreadcrumbLd,
   serializeSchemaGraph,
@@ -23,8 +24,19 @@ interface BankDossierPageProps {
   params: Promise<{ slug: string }>;
 }
 
+/**
+ * One static route per verified head in `data/banksRegistry.json`.
+ *
+ * The 23 authored dossiers in `data/banks.ts` keep their published slugs, so
+ * `/banks/habib-bank/` never moves; the other 243 verified heads are addressed by
+ * their lowercased BIC, which is unique by construction and stable across
+ * rebuilds because it is derived from the real institution identifier. Every
+ * route renders the institutional record — validation state, USD correspondent
+ * anchor, clearing rail, charge codes — and only the 23 dossier-backed heads add
+ * the authored prose.
+ */
 export function generateStaticParams(): { slug: string }[] {
-  return BANK_DOSSIERS.map((bank) => ({ slug: bank.slug }));
+  return getBankProfiles().map((bank) => ({ slug: bank.slug }));
 }
 
 function corridorName(slug: string): string {
@@ -38,31 +50,42 @@ export async function generateMetadata({
   params,
 }: BankDossierPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const bank = getBankDossierBySlug(slug);
+  const bank = getBankProfileBySlug(slug);
   if (!bank) {
     return { title: "Bank dossier not found" };
   }
   const url = `${SITE_URL}/banks/${bank.slug}/`;
+  const role = bank.role.toLowerCase();
+  const dossier = bank.dossier;
   return {
-    title: `${bank.shortName} (${bank.swiftBic}) — SWIFT Bank Dossier`,
-    description: `${bank.name} — ${bank.role}. Verified ${bank.swiftBic} ISO 9362 BIC, ${bank.headquartersCity} headquarters, typical ${bank.typicalShaDeduction} and field 71A SHA guidance for ${bank.connectedCorridors.length} payout corridor${bank.connectedCorridors.length === 1 ? "" : "s"}.`,
+    title: `${bank.shortName} (${bank.bic}) — SWIFT Bank Dossier`,
+    description: `${bank.name} — ${role}. Verified ${bank.bic} ISO 9362 head registered in ${bank.countryName}, ${bank.railId} domestic clearing rail, field 71A charge codes ${bank.supportedCharges.join("/")}, ${formatCut(bank.defaultIntermediaryCutUSD)} benchmark intermediary cut${
+      dossier
+        ? `, typical ${dossier.typicalShaDeduction} and ${dossier.connectedCorridors.length} served payout corridor${dossier.connectedCorridors.length === 1 ? "" : "s"}`
+        : ""
+    }.`,
     alternates: { canonical: `/banks/${bank.slug}/` },
     openGraph: {
       type: "profile",
       url,
       siteName: "PayoutDelta",
-      title: `${bank.shortName} (${bank.swiftBic}) — PayoutDelta`,
-      description: `SWIFT dossier for ${bank.name}: BIC ${bank.swiftBic}, ${bank.role.toLowerCase()}, ${bank.typicalShaDeduction}.`,
+      title: `${bank.shortName} (${bank.bic}) — PayoutDelta`,
+      description: `SWIFT dossier for ${bank.name}: BIC ${bank.bic}, ${role}, ${formatCut(bank.defaultIntermediaryCutUSD)} intermediary cut.`,
     },
     twitter: {
       card: "summary",
-      title: `${bank.shortName} (${bank.swiftBic}) — PayoutDelta`,
-      description: `SWIFT dossier: ${bank.role.toLowerCase()}, ${bank.typicalShaDeduction}.`,
+      title: `${bank.shortName} (${bank.bic}) — PayoutDelta`,
+      description: `SWIFT dossier: ${role}, ${formatCut(bank.defaultIntermediaryCutUSD)} intermediary cut.`,
     },
   };
 }
 
-function bankSchemaLd(bank: BankDossier) {
+/** Shared money formatter for the metadata and the on-page cards. */
+function formatCut(value: number): string {
+  return `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+}
+
+function bankSchemaLd(bank: BankProfile) {
   return {
     "@type": "FinancialService",
     name: bank.name,
@@ -73,20 +96,28 @@ function bankSchemaLd(bank: BankDossier) {
     },
     location: {
       "@type": "Place",
-      name: `${bank.headquartersCity} headquarters`,
+      name: `${bank.countryName} registration`,
       address: {
         "@type": "PostalAddress",
-        addressLocality: bank.headquartersCity,
-        addressCountry: bank.headquartersCountry,
+        addressCountry: bank.countryIso2,
       },
     },
-    identifier: {
-      "@type": "PropertyValue",
-      propertyID: "ISO 9362 BIC",
-      value: bank.swiftBic,
-    },
+    identifier: [
+      {
+        "@type": "PropertyValue",
+        propertyID: "ISO 9362 BIC",
+        value: bank.bic,
+      },
+      {
+        "@type": "PropertyValue",
+        propertyID: "clearing rail",
+        value: bank.railId,
+      },
+    ],
     url: `${SITE_URL}/banks/${bank.slug}/`,
-    description: bank.field71aGuidance,
+    description:
+      bank.dossier?.field71aGuidance ??
+      `${bank.role} in ${bank.countryName}. ISO 9362 head ${bank.bic} validated, ${bank.railId} domestic clearing rail, field 71A charge codes ${bank.supportedCharges.join("/")}.`,
   };
 }
 
@@ -94,10 +125,11 @@ export default async function BankDossierPage({
   params,
 }: BankDossierPageProps) {
   const { slug } = await params;
-  const bank = getBankDossierBySlug(slug);
+  const bank = getBankProfileBySlug(slug);
   if (!bank) notFound();
 
-  const primaryCorridor = bank.connectedCorridors[0] ?? null;
+  const dossier = bank.dossier;
+  const primaryCorridor = dossier?.connectedCorridors[0] ?? null;
   const breadcrumbs = serializeSchemaGraph([
     buildBreadcrumbLd([
       { name: "Home", url: `${SITE_URL}/` },
@@ -131,6 +163,15 @@ export default async function BankDossierPage({
             </Link>
           </li>
           <li aria-hidden="true">/</li>
+          <li>
+            <Link
+              href="/banks/"
+              className="transition-colors hover:text-emerald-600 dark:hover:text-emerald-400"
+            >
+              {bank.countryName}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
           <li className="text-emerald-600 dark:text-emerald-400">
             {bank.shortName}
           </li>
@@ -151,11 +192,11 @@ export default async function BankDossierPage({
               {bank.name}
             </h1>
             <p className="mt-2 text-sm text-black/[0.6] dark:text-white/60">
-              {bank.headquartersCity},{" "}
-              <span className="uppercase">{bank.headquartersCountry}</span> ·{" "}
-              <span className="font-mono font-semibold">
-                {bank.clearingCurrency}
-              </span>{" "}
+              <span aria-hidden="true">{bank.flag}</span>{" "}
+              {bank.countryName},{" "}
+              <span className="uppercase">{bank.countryIso2}</span>
+              {dossier ? `, ${dossier.headquartersCity}` : ""} ·{" "}
+              <span className="font-mono font-semibold">{bank.railId}</span>{" "}
               clearing
             </p>
           </div>
@@ -166,21 +207,172 @@ export default async function BankDossierPage({
             </dt>
             <dd
               className="mt-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-center font-mono text-xl font-bold tracking-widest text-slate-900 tabular-nums dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-white"
-              aria-label={`BIC ${bank.swiftBic}`}
+              aria-label={`BIC ${bank.bic}`}
             >
-              {bank.swiftBic.slice(0, 4)} {bank.swiftBic.slice(4, 6)} {bank.swiftBic.slice(6)}
+              {bank.bic.slice(0, 4)} {bank.bic.slice(4, 6)} {bank.bic.slice(6)}
             </dd>
           </dl>
         </div>
       </section>
 
+      {/* ------------------------------------------------------------------ *
+       * Institutional record — published for every verified head, from the
+       * bank registry. The authored dossier below only deepens the 23 hubs
+       * this repository has written up.
+       * ------------------------------------------------------------------ */}
+      <section className="mt-6 w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">
+        <h2 className="text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+          Institutional record
+        </h2>
+
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
+            <dt className="text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+              ISO 9362 validation
+            </dt>
+            <dd className="mt-1.5">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                  bank.iso9362.valid
+                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                }`}
+              >
+                <span aria-hidden="true">{bank.iso9362.valid ? "✓" : "!"}</span>
+                {bank.iso9362.valid ? "Validated" : "Unvalidated"}
+              </span>
+              <p className="mt-1.5 font-mono text-[11px] text-black/55 dark:text-white/55">
+                bank {bank.iso9362.bankCode} · country {bank.iso9362.countryCode}
+                {" · "}
+                location {bank.iso9362.locationCode}
+                {bank.iso9362.branchCode
+                  ? ` · branch ${bank.iso9362.branchCode}`
+                  : ""}
+              </p>
+              <p className="mt-1 text-[11px] text-black/45 dark:text-white/45">
+                {bank.iso9362.length}-character head
+                {bank.iso9362.primaryOffice ? " · primary office" : " · branch"}
+                {bank.iso9362.length === 11 ? " (location suffix)" : ""}
+              </p>
+              {bank.iso9362.issues.map((issue) => (
+                <p
+                  key={issue}
+                  className="mt-1 text-[11px] text-amber-700 dark:text-amber-400"
+                >
+                  {issue}
+                </p>
+              ))}
+            </dd>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
+            <dt className="text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+              G-SIB USD correspondent
+            </dt>
+            <dd className="mt-1.5">
+              {bank.usdGsibCorrespondent === "" ? (
+                <>
+                  <span className="text-[11px] font-bold text-black/45 dark:text-white/45">
+                    No single anchor evidenced
+                  </span>
+                  <p className="mt-1 text-[11px] leading-relaxed text-black/50 dark:text-white/50">
+                    The registry publishes no dominant USD correspondent for this
+                    domestic bank; the monetary exposure is carried by the
+                    benchmark cut below.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <span className="font-mono text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                    {bank.usdGsibCorrespondent.slice(0, 4)}{" "}
+                    {bank.usdGsibCorrespondent.slice(4, 6)}{" "}
+                    {bank.usdGsibCorrespondent.slice(6)}
+                  </span>
+                  <p className="mt-1 text-[11px] leading-relaxed text-black/55 dark:text-white/55">
+                    {bank.usdGsibCorrespondentName ||
+                      (bank.tier === 1
+                        ? "Carries its own USD leg"
+                        : "USD leg correspondent")}
+                    {bank.usdGsibCountryIso2
+                      ? ` · ${bank.usdGsibCountryIso2}`
+                      : ""}
+                  </p>
+                </>
+              )}
+            </dd>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
+            <dt className="text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+              Domestic clearing rail
+            </dt>
+            <dd className="mt-1.5">
+              <span className="font-mono text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                {bank.railId}
+              </span>
+              <p className="mt-1 text-[11px] leading-relaxed text-black/55 dark:text-white/55">
+                {bank.rail?.operator ?? "Unspecified operator"}
+              </p>
+              <p className="mt-1 text-[11px] text-black/45 dark:text-white/45">
+                {bank.rail ? `${bank.rail.protocol} · ${bank.rail.finalityWindow}` : "Not published"}
+                {bank.rail?.instant ? " · instant" : ""}
+              </p>
+            </dd>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
+            <dt className="text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+              Field 71A charge codes
+            </dt>
+            <dd className="mt-1.5">
+              <span className="inline-flex flex-wrap gap-1">
+                {bank.supportedCharges.length > 0 ? (
+                  bank.supportedCharges.map((code) => (
+                    <span
+                      key={code}
+                      className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-700 dark:border-white/[0.12] dark:bg-white/[0.05] dark:text-slate-200"
+                    >
+                      {code}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-[11px] font-bold text-black/45 dark:text-white/45">
+                    Not published
+                  </span>
+                )}
+              </span>
+              <p className="mt-1.5 font-mono text-[11px] tabular-nums text-black/55 dark:text-white/55">
+                {formatCut(bank.defaultIntermediaryCutUSD)} benchmark cut ·{" "}
+                {bank.avgTransitHours}h transit
+              </p>
+              <p className="mt-1 text-[11px] text-black/45 dark:text-white/45">
+                {dossier?.chargeCodeSupport.recommended
+                  ? `Recommended: ${dossier.chargeCodeSupport.recommended}`
+                  : "SHA is the priced default across the corpus"}
+              </p>
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-6">
+          <h3 className="text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+            Correspondent routing path
+          </h3>
+          <div className="mt-3">
+            <BankRoutingDiagram profile={bank} />
+          </div>
+        </div>
+      </section>
+
+      {dossier ? (
+        <>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
         <section className="w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">
           <h2 className="text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
             Field 71A — Details of Charges
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-black/[0.7] dark:text-white/75">
-            {bank.field71aGuidance}
+            {dossier.field71aGuidance}
           </p>
 
           {/* Phase 2 — the rail the money lands on, the 71A codes the bank
@@ -188,13 +380,13 @@ export default async function BankDossierPage({
               own central-bank system from `RAILS_BY_CURRENCY`, so a dossier can
               never claim a rail the rails table does not carry. */}
           <BankSettlementPanel
-            rail={`${bank.clearingNetwork} — ${bank.clearingCurrency}`}
-            chargeCodes={bank.chargeCodeSupport.supported}
-            recommended={bank.chargeCodeSupport.recommended}
-            note={bank.chargeCodeSupport.note}
-            averageIntermediaryCutUSD={bank.averageIntermediaryCutUSD}
-            transitTimeHours={bank.transitTimeHours}
-            instantRail={railFor(bank.clearingCurrency).instant}
+            rail={`${dossier.clearingNetwork} — ${dossier.clearingCurrency}`}
+            chargeCodes={dossier.chargeCodeSupport.supported}
+            recommended={dossier.chargeCodeSupport.recommended}
+            note={dossier.chargeCodeSupport.note}
+            averageIntermediaryCutUSD={dossier.averageIntermediaryCutUSD}
+            transitTimeHours={dossier.transitTimeHours}
+            instantRail={railFor(dossier.clearingCurrency).instant}
           />
 
           <a
@@ -215,10 +407,10 @@ export default async function BankDossierPage({
             Typical SHA Deduction
           </h2>
           <p className="mt-3 font-mono text-2xl font-bold tracking-tight text-emerald-700 tabular-nums dark:text-emerald-400">
-            {bank.typicalShaDeduction}
+            {dossier.typicalShaDeduction}
           </p>
           <p className="mt-2 text-xs leading-relaxed text-black/[0.5] dark:text-white/[0.5]">
-            Benchmark band for the intermediary tier on {bank.swiftBic} corridors.
+            Benchmark band for the intermediary tier on {bank.bic} corridors.
             Actual deduction appears on the beneficiary&apos;s CRF / MT103
             credit advice.
           </p>
@@ -250,7 +442,7 @@ export default async function BankDossierPage({
           Served Payout Corridors
         </h2>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-          {bank.connectedCorridors.map((slug) => (
+          {dossier.connectedCorridors.map((slug) => (
             <li key={slug}>
               <Link
                 href={`/compare/${slug}/`}
@@ -265,6 +457,8 @@ export default async function BankDossierPage({
           ))}
         </ul>
       </section>
+        </>
+      ) : null}
 
       <section className="mt-6">
         <h2 className="flex items-center gap-2 text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">

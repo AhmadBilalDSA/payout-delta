@@ -1,18 +1,20 @@
 /**
  * PayoutDelta — Track 4 client payload contract (Statutory Purpose Code & Tax
- * Clearance Hub).
+ * Clearance Wizard).
  *
  * Same discipline as `components/dashboard/payload.ts`: this route is a static
- * export, so the ~226KB statutory banking directory and `data/fees.json` are
- * resolved ONCE on the server and the client island reads a flat, serializable
- * shape of numbers and short strings. Nothing here reaches back into
- * `data/regulatoryBanking.ts` from the browser.
+ * export, so the 195-state statutory manifest, the 110-rail registry, the
+ * 266-head bank registry and `data/fees.json` are resolved ONCE on the server
+ * and the client island reads a flat, serializable shape of numbers and short
+ * strings. Nothing here reaches back into `data/jurisdictions.json`,
+ * `data/rails.json`, `data/banksRegistry.json` or `lib/registryData.ts` from the
+ * browser.
  *
  * The split matters for this page in particular: the authored clearance
- * playbooks (Form 'R' + ePRC, P0802 + FIRC, BSP FX Form 1, DIAN Formato 1060 /
- * BCB SCE) are regulatory prose, while the rate, the statutory tier table, the
- * receiving banks and the BIC list are dataset facts. The server merges the two
- * here and the island only lays them out.
+ * playbooks (Form 'R' + ePRC, P0802 + FIRC, BSP FX Form 1 + BIR Form 2307, DIAN
+ * Formato 1060 / BCB Contrato de Câmbio) are regulatory prose, while the
+ * statute, purpose code, band, rail and institution list are registry facts. The
+ * server merges the two here and the island only lays them out.
  */
 
 /** One numbered step of a clearance playbook. */
@@ -37,98 +39,118 @@ export interface ClearanceFaq {
   answer: string;
 }
 
-/** A statutory withholding / exemption tier resolved from the regulatory database. */
-export interface ClearanceTier {
-  name: string;
-  authority: string;
-  /** Withholding as a decimal fraction (0.0025 = 0.25%). */
-  rate: number;
-  purposeCode?: string;
-  exemption: boolean;
-  note: string;
-}
+/* ========================================================================== *
+ * Phase 3 — the statutory tax wizard: one record per sovereign state.
+ * ========================================================================== */
 
-/** A receiving bank resolved from the statutory bank directory. */
-export interface ClearanceBank {
-  name: string;
-  swiftCode: string;
-  /** Clearance / realization timeline, straight from the directory. */
-  clearance: string;
-  /** Default landing fee in the domestic currency (0 = free local rail). */
-  localFee: number;
-  localCurrency: string;
-}
-
-/**
- * A single filing jurisdiction inside a track.
- *
- * A track maps 1:1 to a statute in South Asia (SBP, RBI) or the Philippines
- * (BSP), and 2:1 to a statute pair in Latin America — Colombia files the
- * Declaraci&oacute;n de Cambio with the Banco de la Rep&uacute;blica / DIAN while
- * Brazil registers the operation with a BCB-authorized institution and declares
- * the income to the Receita Federal. Each jurisdiction carries its own corridor,
- * rate, tiers and banks, so both halves of the LATAM track stay data-driven.
- */
-export interface ClearanceJurisdiction {
+/** The domestic clearing rail a credit into the market lands on. */
+export interface StatuteRail {
+  /** Registry id, e.g. "RAAST", "IMPS", "TARGET2". */
   id: string;
-  country: string;
-  countryCode: string;
-  /** Regional-indicator flag for the beneficiary market. */
-  flag: string;
-  /** Local currency code of the corridor (COP / BRL / …). */
-  currency: string;
-  currencyName: string;
-  /** Short regulator label, e.g. "SBP", "RBI", "BSP", "BanRep · DIAN". */
-  regulator: string;
-  /** Governing authority string as published in the regulatory database. */
-  authority: string;
-  /** National clearing network identifier. */
-  clearingNetwork: string;
-  /** Extractable statutory evidence anchors (regulator + section). */
-  citations: string[];
-  /** Audited corridor this jurisdiction is priced against. */
-  corridorSlug: string;
+  /** Operating institution or scheme. */
+  operator: string;
+  /** Settlement family: RTGS / INSTANT / BATCH / CHAPS. */
+  protocol: string;
+  /** Published finality window, e.g. "T+0 intraday". */
+  finalityWindow: string;
+  /** True when the rail credits without a value date. */
+  instant: boolean;
+}
+
+/** One verified institution receiving credits in the market. */
+export interface StatuteBank {
+  /** `/banks/<slug>/` target, so a wizard selection deep-links to the dossier. */
+  slug: string;
+  bic: string;
+  name: string;
+  /** 1 = global correspondent clearing hub, 2 = domestic settlement bank. */
+  tier: 1 | 2;
+  /** Charge codes honoured on an inbound credit advice. */
+  charges: string[];
+  /** Benchmark correspondent cut in USD. */
+  cutUSD: number;
+  /** Typical correspondent transit in hours. */
+  transitHours: number;
+}
+
+/** The live priced corridor terminating in this market, when one is published. */
+export interface StatuteCorridor {
+  slug: string;
   /** `USD → PKR` */
   pair: string;
   /** Interbank reference rate (local units per USD). */
   rate: number;
-  /** Statutory tier table for the corridor. */
-  tiers: ClearanceTier[];
-  /** Receiving banks a freelancer can actually be paid through. */
-  banks: ClearanceBank[];
 }
 
 /**
- * One statutory track — the unit the reader switches between.
- *
- * `jurisdictions` holds one entry for the single-statute tracks and two for
- * Latin America, so the island renders the same grid shape everywhere instead of
- * branching on a flag.
+ * Authored field playbook for the five markets where the documentary step is
+ * the hard part (ePRC, FIRC, BIR 2307, Contrato de Câmbio, Declaración de
+ * Cambio). Every other market is served by the statutory record alone.
  */
-export interface ClearanceTrack {
+export interface StatutePlaybook {
   id: string;
-  /** Receiving region, used for grouping and the rail label. */
   region: string;
-  /** Regulator chip shown in the tab, e.g. "SBP · 9111". */
   eyebrow: string;
   title: string;
-  /** Headline purpose-code / form label, e.g. "Purpose Code 9111 · ePRC". */
-  codeLabel: string;
   summary: string;
-  jurisdictions: ClearanceJurisdiction[];
   steps: ClearanceStep[];
   documents: ClearanceDocument[];
   faqs: ClearanceFaq[];
 }
 
-/** Build-time corpus totals shown in the page hero. */
-export interface ClearanceStats {
-  /** Corridors priced across the tracks. */
-  corridors: number;
-  /** Authored statutory tiers surfaced. */
-  tiers: number;
-  /** Receiving banks with a BIC behind the certificates. */
+/**
+ * The complete statutory profile of one sovereign state, merged at build time
+ * from `data/jurisdictions.json`, `data/rails.json` and `data/banksRegistry.json`.
+ */
+export interface StatutoryProfile {
+  /** ISO 3166-1 alpha-2. */
+  iso2: string;
+  name: string;
+  flag: string;
+  currency: string;
+  centralBank: string;
+  /** Year the governing act was first enacted. */
+  enactmentYear: number;
+  /** Year of the most recent in-force amendment. */
+  lastAmendedYear: number;
+  /** Compact act label for the badge, e.g. "FEMA 1947". */
+  shortAct: string;
+  /** Full statutory citation, shown in full. */
+  statutoryAct: string;
+  /** Regulator purpose / transaction code, verbatim from the registry. */
+  purposeCode: string;
+  /** The code to paste into a remittance narrative, e.g. "9111", "P0802". */
+  shortCode: string;
+  /** Statutory band absent relief, as a percentage (0–100). */
+  baselineWhtPct: number;
+  /** Treaty / exemption band, as a percentage (0–100). */
+  treatyWhtPct: number;
+  /** True when relief is evidenced by a materially lower band. */
+  treatyDifferential: boolean;
+  exemptionConditions: string[];
+  safeHarborRules: string[];
+  mandatoryAuditCert: string;
+  nonComplianceRisk: string;
+  rail: StatuteRail;
+  banks: StatuteBank[];
+  corridor: StatuteCorridor | null;
+  playbook: StatutePlaybook | null;
+}
+
+/** Build-time corpus totals for the wizard. */
+export interface StatuteWizardStats {
+  /** Sovereign states in the wizard. */
+  jurisdictions: number;
+  /** Clearing rails reachable from them. */
+  rails: number;
+  /** Verified institution heads behind them. */
   banks: number;
+  /** Markets with a statutory withholding band above zero. */
+  withholdingMarkets: number;
+  /** Markets where treaty relief is evidenced by a lower band. */
+  treatyReliefMarkets: number;
+  /** Markets with an instant rail. */
+  instantMarkets: number;
   /** Dataset revision date (ISO). */
   revisedOn: string;
 }

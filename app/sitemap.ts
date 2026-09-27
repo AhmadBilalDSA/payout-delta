@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { getCorridorSlugs } from "@/lib/db";
 import { LONG_TAIL_CORRIDORS } from "@/data/corridors";
 import { EDITORIAL_GUIDES } from "@/data/editorialGuides";
-import { BANK_DOSSIERS } from "@/data/banks";
 import { LOCALIZED_CORRIDORS } from "@/lib/localizedCorridors";
+import { getBankProfiles } from "@/lib/registryData";
 import { SITE_URL } from "@/lib/seoSchemas";
 
 const LAST_MODIFIED = new Date("2026-09-22");
@@ -161,11 +161,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const bankEntries: MetadataRoute.Sitemap = BANK_DOSSIERS.map((bank) => ({
+  /**
+   * One entry per verified institution head, not per authored dossier: the 23
+   * deep-dive dossiers rank a notch higher because they carry content the other
+   * 243 registry routes do not, but every `/banks/<slug>/` route is published and
+   * so every one of them belongs in the sitemap.
+   */
+  const bankEntries: MetadataRoute.Sitemap = getBankProfiles().map((bank) => ({
     url: `${SITE_URL}/banks/${bank.slug}/`,
     lastModified: LAST_MODIFIED,
     changeFrequency: "monthly" as const,
-    priority: 0.7,
+    priority: bank.hasDossier ? 0.7 : 0.5,
   }));
 
   return [
