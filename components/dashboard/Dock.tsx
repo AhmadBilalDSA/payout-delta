@@ -58,7 +58,7 @@ export function Dock() {
 
       {/* Desktop: Left vertical rail with expanding tooltips */}
       <nav
-        className="fixed left-3 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-2 p-2 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl hidden md:flex"
+        className="fixed left-3.5 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-2 p-2 rounded-2xl border border-neutral-800 bg-neutral-950/90 shadow-2xl backdrop-blur-2xl hidden md:flex"
         role="navigation"
         aria-label="Main navigation"
       >
@@ -79,11 +79,12 @@ export function Dock() {
             >
               <Icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
               <span
-                className="absolute left-full ml-3 whitespace-nowrap text-sm font-medium text-neutral-100
-                  opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible
-                  transition-opacity duration-150
-                  bg-neutral-950/95 border border-neutral-800 rounded-lg px-3 py-1.5 shadow-xl backdrop-blur-xl
-                  pointer-events-none"
+                className="absolute left-full top-1/2 -translate-y-1/2 ml-3 z-50 whitespace-nowrap
+                  rounded-lg bg-neutral-900 border border-neutral-700 px-2.5 py-1
+                  text-xs font-mono text-neutral-200 shadow-xl
+                  opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                  group-focus-within:opacity-100 group-focus-within:visible
+                  transition-opacity duration-150 pointer-events-none"
               >
                 {label}
               </span>
