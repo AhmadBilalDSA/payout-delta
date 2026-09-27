@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarketStatusBar from "@/components/MarketStatusBar";
+import ServiceWorkerBootstrap from "@/components/ServiceWorkerBootstrap";
 import { Dock } from "@/components/dashboard/Dock";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
@@ -102,6 +103,10 @@ export default function RootLayout({
           }}
         />
         <LanguageProvider>
+          {/* Phase 6 — registers `public/sw.js` in production builds only, so
+              the four registry feeds stay readable offline. Renders nothing;
+              a reader who never sees it loses nothing. */}
+          <ServiceWorkerBootstrap />
           {/* Settlement-currency state wraps the whole app so the header
               switcher, the calculator, the waterfall and the bank dossiers all
               quote the same rebased figure from one source of truth. Nested

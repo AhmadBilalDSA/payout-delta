@@ -20,7 +20,11 @@ import {
   getRegistryMeta,
   getRailById,
 } from "@/lib/registryData";
-import { SITE_URL } from "@/lib/seoSchemas";
+import {
+  buildGovernmentServiceSchema,
+  serializeSchemaGraph,
+  SITE_URL,
+} from "@/lib/seoSchemas";
 
 export const dynamic = "force-static";
 
@@ -677,6 +681,31 @@ const FAQ_ENTRIES = PLAYBOOKS.flatMap((playbook) => playbook.faqs).map((faq) => 
   },
 }));
 
+/**
+ * Phase 6 — `GovernmentService` per documented market.
+ *
+ * Scoped to the markets that carry an authored playbook, deliberately. A
+ * `GovernmentService` node asserts a service exists; publishing 195 of them
+ * would assert 195 documentary regimes this page does not actually document,
+ * which is both a spam signal and a factual overreach. The six markets below
+ * are the ones whose evidence chain the page spells out end to end, and each
+ * node is projected from the same `StatutoryProfile` the wizard renders, so the
+ * authority, purpose code and certificate in the structured data are the ones
+ * on screen.
+ */
+const GOVERNMENT_SERVICE_LD = serializeSchemaGraph(
+  PROFILES.filter((profile) => profile.playbook !== null).map((profile) =>
+    buildGovernmentServiceSchema({
+      authority: profile.centralBank,
+      market: profile.name,
+      iso2: profile.iso2,
+      purposeCode: profile.shortCode,
+      certificate: profile.mandatoryAuditCert,
+      url: `${SITE_URL}/tax-clearance/`,
+    })
+  )
+);
+
 export default function TaxClearancePage() {
   /** TechArticle — the hub as a reference work, dated to the dataset revision. */
   const techArticleLd = {
@@ -781,6 +810,14 @@ export default function TaxClearancePage() {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c"),
           }}
+        />
+        {/* Phase 6 — the sovereign clearance services themselves, so a query
+            for "which authority certifies a remittance into Pakistan" resolves
+            to a GovernmentService and a GovernmentOrganization rather than to
+            an article about one. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: GOVERNMENT_SERVICE_LD }}
         />
 
         {/* ---------------------------------------------------------------- *

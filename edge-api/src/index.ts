@@ -307,7 +307,15 @@ const routeHandlers: Record<string, (request: Request, url: URL) => Response | n
   },
 };
 
-export default {
+/**
+ * Cloudflare Workers module entry point.
+ *
+ * Bound to a named const rather than exported as an anonymous object literal:
+ * an anonymous default export cannot be named in a stack trace, and this file
+ * is the whole public API surface of the worker — a 404 here is the first
+ * thing a consumer debugs, and "at <anonymous>" is not a line number.
+ */
+const worker = {
   async fetch(request: Request): Promise<Response> {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -358,3 +366,5 @@ export default {
     return notFound();
   },
 };
+
+export default worker;

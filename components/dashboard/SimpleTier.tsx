@@ -55,6 +55,30 @@ function formatUSD(value: number): string {
   })}`;
 }
 
+/**
+ * All-in cost of one provider on one corridor, as a percent of the benchmark
+ * gross: the flat clearing fee plus the FX spread charged on $1,000. Mirrors the
+ * banking-layer methodology `lib/clearingTerminal.ts` uses for the registry, so
+ * the matrix and the clearing table can never disagree.
+ *
+ * Module scope, not component scope. It reads nothing from the component — no
+ * state, no props, no context — so declaring it inside the body re-created it on
+ * every render, which made the sorting `useMemo` depend on a fresh function
+ * identity each pass and forced an `eslint-disable exhaustive-deps` to hide the
+ * real defect. Hoisted, the memo's dependency list (`corridors`, `sortKey`,
+ * `ascending`) is genuinely exhaustive and the suppression is gone rather than
+ * merely silenced.
+ */
+function allInPercent(
+  corridor: DashboardCorridor,
+  providerId: string
+): number | null {
+  const provider = corridor.providers.find((item) => item.id === providerId);
+  if (!provider) return null;
+  const cost = provider.fixedFeeUSD + provider.fxSpread * 1000;
+  return (cost / 1000) * 100;
+}
+
 export default function SimpleTier({
   corridors,
   platforms,
@@ -121,21 +145,10 @@ export default function SimpleTier({
   const [ascending, setAscending] = useState(true);
 
   /**
-   * All-in cost of one provider on one corridor, as a percent of the benchmark
-   * gross: the flat clearing fee plus the FX spread charged on $1,000. Mirrors
-   * the banking-layer methodology `lib/clearingTerminal.ts` uses for the
-   * registry, so the matrix and the clearing table can never disagree.
+   * Sortable matrix rows. `allInPercent` is a module-scope pure function, so
+   * `[corridors, sortKey, ascending]` is the complete dependency list and no
+   * exhaustive-deps suppression is warranted.
    */
-  const allInPercent = (
-    corridor: DashboardCorridor,
-    providerId: string
-  ): number | null => {
-    const provider = corridor.providers.find((item) => item.id === providerId);
-    if (!provider) return null;
-    const cost = provider.fixedFeeUSD + provider.fxSpread * 1000;
-    return (cost / 1000) * 100;
-  };
-
   const rows = useMemo(() => {
     const sorted = [...corridors];
     sorted.sort((a, b) => {
@@ -154,7 +167,6 @@ export default function SimpleTier({
       return ascending ? delta : -delta;
     });
     return sorted;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [corridors, sortKey, ascending]);
 
   const toggleSort = (key: SortKey) => {

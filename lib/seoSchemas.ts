@@ -5,6 +5,7 @@ import type {
   Platform,
   WithdrawalChannel,
 } from "@/lib/types";
+import type { BankProfile } from "@/lib/registryData";
 import type { FaqItem } from "@/lib/corridorContent";
 
 /**
@@ -457,6 +458,169 @@ export function buildDatasetSchema(opts: {
       },
     ],
   };
+}
+
+/**
+ * Bank dossier institutional graph — `FinancialProduct` and `BankAccount`.
+ *
+ * A bank dossier already emitted `FinancialService` (the institution). That
+ * answers "who is this" but leaves the two questions a correspondent banker
+ * actually asks about a head completely unstated: *what does it charge* and
+ * *what account does the money land in*. Both are published, auditable facts
+ * in the registry, so both are published here:
+ *
+ *   - `FinancialProduct` per priced service, carrying the benchmark
+ *     intermediary cut and the field 71A charge codes the head honours. The
+ *     figures are the same `defaultIntermediaryCutUSD` the page renders, so the
+ *     structured data cannot disagree with the dossier it sits on.
+ *   - `BankAccount` for the USD correspondent leg, keyed by BIC. Emitted only
+ *     when the registry actually publishes a correspondent: a tier-2 row with
+ *     an unpublished anchor gets no invented account.
+ */
+export function buildBankAccountSchema(
+  bank: BankProfile,
+): JsonLdBlock[] {
+  const url = `${SITE_URL}/banks/${bank.slug}/`;
+  const institution: JsonLdBlock = {
+    "@type": "FinancialService",
+    name: bank.name,
+    alternateName: bank.shortName,
+  };
+
+  const correspondentProduct: JsonLdBlock = {
+    "@type": "FinancialProduct",
+    name: `${bank.shortName} Correspondent Banking (SWIFT MT103 USD leg)`,
+    category: "Cross-border correspondent banking",
+    provider: institution,
+    description:
+      `Correspondent settlement leg for ${bank.name} (${bank.role} in ` +
+      `${bank.countryName}). Benchmark intermediary deduction ` +
+      `${formatSchemaMoney(bank.defaultIntermediaryCutUSD)} USD per credit, ` +
+      `typical correspondent transit ${bank.avgTransitHours}h.`,
+    areaServed: {
+      "@type": "Country",
+      name: bank.countryName,
+      identifier: bank.countryIso2,
+    },
+    feesAndCommissionsSpecification: {
+      "@type": "MonetaryAmount",
+      name: "Benchmark intermediary deduction (SHA, USD)",
+      value: bank.defaultIntermediaryCutUSD,
+      currency: "USD",
+    },
+    identifier: bank.bic,
+    url,
+  };
+
+  const blocks: JsonLdBlock[] = [institution, correspondentProduct];
+
+  // A `BankAccount` asserts an account exists, so it is emitted only where the
+  // registry actually publishes the USD leg. That is the 36 tier-1 clearing
+  // hubs, which name a `usdGsibCorrespondent`; the 230 tier-2 beneficiary
+  // banks carry an empty string because a domestic rail is credited locally
+  // and has no upstream correspondent hop to name. Inventing one for those
+  // would assert an account that does not exist.
+  //
+  // Two further honest limits. The registry publishes a correspondent *BIC*,
+  // never an account number, so no IBAN is fabricated — a routing instruction
+  // that looks real and is not is worse than no structured data. And for the
+  // tier-1 hubs `usdGsibCorrespondent` is their own BIC: they are the
+  // correspondent, which is the whole reason they are tier 1. `anchor` is
+  // therefore null for them and the institution falls back to the bank's own
+  // resolved name rather than an empty string.
+  if (bank.usdGsibCorrespondent !== "") {
+    const correspondentName =
+      bank.usdGsibCorrespondentName !== ""
+        ? bank.usdGsibCorrespondentName
+        : bank.name;
+    const isSelfCorrespondent = bank.usdGsibCorrespondent === bank.bic;
+    blocks.push({
+      "@type": "BankAccount",
+      name: `${bank.shortName} USD correspondent account`,
+      accountType: "Correspondent settlement account (USD)",
+      currency: "USD",
+      bankInstitution: {
+        "@type": "Bank",
+        name: correspondentName,
+        identifier: bank.usdGsibCorrespondent,
+      },
+      beneficiary: {
+        "@type": "FinancialService",
+        name: bank.name,
+        url,
+      },
+      identifier: [
+        { "@type": "PropertyValue", propertyID: "beneficiary BIC", value: bank.bic },
+        {
+          "@type": "PropertyValue",
+          propertyID: "correspondent BIC",
+          value: bank.usdGsibCorrespondent,
+        },
+      ],
+      description:
+        `USD leg held at ${correspondentName} ` +
+        `(${bank.usdGsibCorrespondent})${isSelfCorrespondent ? " (self-clearing hub)" : ""} ` +
+        `on behalf of ${bank.name} (${bank.bic}); credits clear onto the ` +
+        `${bank.railId} domestic rail.`,
+    });
+  }
+
+  return blocks;
+}
+
+/**
+ * Statutory clearance graph — `GovernmentService` + `GovernmentOrganization`.
+ *
+ * `/tax-clearance/` documents what a *sovereign* requires before a cross-border
+ * service payout is creditable. That is a public-sector service with a
+ * government provider, and describing it as a `TechArticle` alone leaves the
+ * registry's most useful entity undeclared: a reader asking "which authority
+ * do I file with in Pakistan" gets a document, not a service and an agency.
+ *
+ * One service per authored market, sourced from the same payload the wizard
+ * renders, so a purpose code cannot be published here under one authority and
+ * displayed there under another.
+ */
+export function buildGovernmentServiceSchema(opts: {
+  authority: string;
+  market: string;
+  iso2: string;
+  purposeCode: string;
+  certificate: string;
+  url: string;
+}): JsonLdBlock {
+  return {
+    "@type": "GovernmentService",
+    name: `${opts.market} cross-border remittance purpose-code & tax clearance service`,
+    serviceType: "Cross-border remittance tax clearance and export realization certification",
+    description:
+      `Statutory service operated by ${opts.authority} for inward and outward ` +
+      `cross-border service remittances into ${opts.market}: purpose code ` +
+      `${opts.purposeCode}, realization certificate ${opts.certificate}.`,
+    provider: {
+      "@type": "GovernmentOrganization",
+      name: opts.authority,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: opts.market,
+      identifier: opts.iso2,
+    },
+    availableChannel: {
+      "@type": "ServiceChannel",
+      serviceUrl: opts.url,
+      availableLanguage: { "@type": "Language", name: "English" },
+    },
+    isAccessibleForFree: true,
+  };
+}
+
+/** Two-decimal money string for schema prose; never a locale-dependent value. */
+function formatSchemaMoney(value: number): string {
+  return `$${value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 /**

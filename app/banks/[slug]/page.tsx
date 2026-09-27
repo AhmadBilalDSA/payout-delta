@@ -13,6 +13,7 @@ import {
   type BankProfile,
 } from "@/lib/registryData";
 import {
+  buildBankAccountSchema,
   buildBreadcrumbLd,
   serializeSchemaGraph,
   SITE_URL,
@@ -137,6 +138,12 @@ export default async function BankDossierPage({
       { name: bank.shortName, url: `${SITE_URL}/banks/${bank.slug}/` },
     ]),
     bankSchemaLd(bank),
+    // Phase 6 — the priced correspondent product and the USD settlement
+    // account. `FinancialService` says who the head is; these two say what it
+    // charges and where the money lands, which is the rest of what an
+    // institutional consumer needs. Spread after the service node so a
+    // consumer reading the graph in order meets entity → product → account.
+    ...buildBankAccountSchema(bank),
   ]);
 
   return (

@@ -1425,24 +1425,156 @@ if (!corpusMatches) {
  * /api/fees.json (exported verbatim from public/api/fees.json) as the
  * versioned static feed; it must byte-match data/fees.json so the docs never
  * drift from the dataset the site is built from. `prebuild` keeps it in sync.
+ *
+ * The check is extended to all four registries because `public/sw.js` precaches
+ * them by URL. A mirror that drifted would not be a cosmetic bug: the worker
+ * would install a *stale* corpus into the offline cache and a reader working
+ * offline would be quoted fee and statutory figures that no longer match the
+ * live site, with no visible way to tell.
  */
-const feedPath = join(ROOT, "public", "api", "fees.json");
-let feedMirrored = false;
-if (!existsSync(feedPath)) {
-  console.log(`  ${"FAIL  " + "static feed mirror".padEnd(32)}public/api/fees.json missing`);
-  globalBad += 1;
-  fail("static feed mirror", "public/api/fees.json does not exist");
-} else {
-  const normalizeJson = (text) => JSON.stringify(JSON.parse(text));
-  feedMirrored =
-    normalizeJson(readFileSync(feedPath, "utf8")) ===
-    normalizeJson(readFileSync(join(ROOT, "data", "fees.json"), "utf8"));
-  console.log(
-    `  ${(feedMirrored ? "PASS  " : "FAIL  ") + "static feed mirror".padEnd(32)}public/api/fees.json matches data/fees.json`
-  );
-  if (!feedMirrored) {
+const MIRRORED_REGISTRIES = [
+  "fees.json",
+  "jurisdictions.json",
+  "rails.json",
+  "banksRegistry.json",
+];
+const normalizeJson = (text) => JSON.stringify(JSON.parse(text));
+for (const registry of MIRRORED_REGISTRIES) {
+  const feedPath = join(ROOT, "public", "api", registry);
+  const sourcePath = join(ROOT, "data", registry);
+  if (!existsSync(feedPath) || !existsSync(sourcePath)) {
+    console.log(
+      `  ${"FAIL  " + "static feed mirror".padEnd(32)}public/api/${registry} missing`
+    );
     globalBad += 1;
-    fail("static feed mirror", "public/api/fees.json drifted from data/fees.json");
+    fail("static feed mirror", `public/api/${registry} does not exist`);
+    continue;
+  }
+  const matched =
+    normalizeJson(readFileSync(feedPath, "utf8")) ===
+    normalizeJson(readFileSync(sourcePath, "utf8"));
+  console.log(
+    `  ${(matched ? "PASS  " : "FAIL  ") + "static feed mirror".padEnd(32)}public/api/${registry} matches data/${registry}`
+  );
+  if (!matched) {
+    globalBad += 1;
+    fail("static feed mirror", `public/api/${registry} drifted from data/${registry}`);
+  }
+}
+
+/**
+ * Phase 6 — offline shell contract. `public/sw.js` is published verbatim to
+ * `out/sw.js` and precaches the four registries by URL, so the export must
+ * actually contain both, and the worker's manifest must name the deployed
+ * prefix rather than the origin root. A worker whose precache list is all 404s
+ * still installs cleanly and still reports itself as registered, so without
+ * this gate the failure mode is a silently empty offline cache.
+ */
+const SW = join(ROOT, "public", "sw.js");
+if (!existsSync(SW)) {
+  console.log(`  ${"FAIL  " + "offline shell".padEnd(32)}public/sw.js missing`);
+  globalBad += 1;
+  fail("offline shell", "public/sw.js does not exist");
+} else {
+  const sw = readFileSync(SW, "utf8");
+  const problems = [];
+  for (const registry of MIRRORED_REGISTRIES) {
+    // Must be addressed at BASE + "/api/" — the path the export serves.
+    if (!sw.includes(`/api/${registry}`)) {
+      problems.push(`precache does not address /api/${registry}`);
+    }
+  }
+  if (!/var BASE = "\/payout-delta";/.test(sw)) {
+    problems.push("BASE is not the deployment basePath /payout-delta");
+  }
+  if (!/addEventListener\("install"/.test(sw) || !/addEventListener\("fetch"/.test(sw)) {
+    problems.push("missing install/fetch lifecycle handlers");
+  }
+  // A zero-dependency worker must not import or reference a bundler runtime.
+  // Comments are stripped first: the file documents *why* it avoids Workbox, so
+  // a naive scan would flag the explanation as the violation and report a
+  // clean worker as a dependency breach.
+  const swCode = sw.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (/\bimport\s*\(|\brequire\s*\(|importScripts\s*\(|workbox\./i.test(swCode)) {
+    problems.push("references a bundler runtime or Workbox (dependency violation)");
+  }
+  const ok = problems.length === 0;
+  if (!ok) globalBad += 1;
+  console.log(
+    `  ${(ok ? "PASS  " : "FAIL  ") + "offline shell".padEnd(32)}public/sw.js precaches ${MIRRORED_REGISTRIES.length} registries at /payout-delta/api/`
+  );
+  for (const problem of problems) fail("offline shell", problem);
+}
+
+/**
+ * Phase 6 — institutional structured data must actually be emitted.
+ *
+ * A schema builder gated behind a condition that is never true is invisible:
+ * the graph still parses, the JSON-LD integrity scan still passes, and the
+ * type simply never appears in 1509 blocks. That is a schema type the release
+ * claims to publish and no crawler can ever read. So the *rendered* export is
+ * checked for the Phase 6 node types, not just the source.
+ */
+const outDir = join(ROOT, "out");
+if (!existsSync(outDir)) {
+  console.log(
+    `  ${"SKIP  " + "institutional schema".padEnd(32)}no out/ present - run npm run build to assert`
+  );
+} else {
+  const countIn = (pattern, dir) => {
+    const re = new RegExp(pattern, "g");
+    let total = 0;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const page = join(dir, entry.name, "index.html");
+      if (!existsSync(page)) continue;
+      const matches = readFileSync(page, "utf8").match(re);
+      if (matches) total += matches.length;
+    }
+    return total;
+  };
+  const banksOut = join(outDir, "banks");
+  const expectations = [
+    ["FinancialProduct", banksOut, 1],
+    ["BankAccount", banksOut, 1],
+    ["GovernmentService", outDir, 1],
+    ["GovernmentOrganization", outDir, 1],
+  ];
+  const missing = [];
+  for (const [type, dir, min] of expectations) {
+    if (!existsSync(dir)) {
+      missing.push(`${type}: ${dir} missing`);
+      continue;
+    }
+    const n = countIn(`"${type}"`, dir);
+    const ok = n >= min;
+    if (!ok) missing.push(`${type}: emitted ${n} time(s), expected >= ${min}`);
+    console.log(
+      `  ${(ok ? "PASS  " : "FAIL  ") + "institutional schema".padEnd(32)}${type} x${n} in ${dir === outDir ? "export" : "banks"}`
+    );
+  }
+  for (const problem of missing) {
+    globalBad += 1;
+    fail("institutional schema", problem);
+  }
+
+  // The worker must also be published in the export itself, not just authored in
+  // `public/` — a file that never reaches `out/` looks complete in review and
+  // 404s in production.
+  const exportedSw = join(outDir, "sw.js");
+  if (!existsSync(exportedSw)) {
+    console.log(`  ${"FAIL  " + "offline shell export".padEnd(32)}out/sw.js missing`);
+    globalBad += 1;
+    fail("offline shell export", "out/sw.js was not published to the static export");
+  } else {
+    const ok = readFileSync(exportedSw, "utf8").includes("/api/fees.json");
+    if (!ok) globalBad += 1;
+    console.log(
+      `  ${(ok ? "PASS  " : "FAIL  ") + "offline shell export".padEnd(32)}out/sw.js published with the precache manifest`
+    );
+    if (!ok) {
+      fail("offline shell export", "out/sw.js does not carry the precache manifest");
+    }
   }
 }
 

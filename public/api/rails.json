@@ -1,0 +1,895 @@
+{
+  "meta": {
+    "schema": "payoutdelta/clearing-rails@1",
+    "phase": "Phase 1 & 2 — hexagonal normalization",
+    "railCount": 110,
+    "conventions": {
+      "id": "Globally unambiguous schemes use the operator's own acronym (RAAST, PIX, FEDWIRE, CHIPS, CHAPS, FPS, IMPS, NEFT, RTGS_IN, PHILPASS, INSTAPAY, PESONET, ZENGIN, BOJ_NET, SIC, BOK_WIRE, CBC_INTERBANK, ESAS, TARGET2, SEPA_INSTANT). Country-scoped schemes are prefixed with their ISO 3166-1 alpha-2 code (e.g. BR_STR, ID_BIFAST, ZA_RTC). Shared regional schemes use a supranational prefix (ME_RGT, WAEMU_RTGS, ECCB_RTGS).",
+      "protocol": "RTGS = real-time gross settlement, INSTANT = always-on finality with a sub-10s credit, BATCH = scheduled multilateral clearing, CHAPS = sterling high-value CHAPS settlement.",
+      "baseHopCutUSD": "Zero local-deduction sentinel. A registered clearing rail adds no correspondent hop, so every node carries 0. Any non-zero intermediary cut is modelled upstream in data/fees.json as defaultIntermediaryUSD, never here."
+    },
+    "disclaimer": "Informational benchmark derived from public scheme documentation. Finality windows, cut-off times and participation rules are set by the operator; confirm against the operating central bank before quoting a settlement time to a client."
+  },
+  "rails": [
+    {
+      "id": "SWIFT_RTGS",
+      "operator": "SWIFT Society — correspondent settlement network",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 to T+1 depending on the destination RTGS cut-off",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TARGET2",
+      "operator": "T2 CLM — Eurosystem settlement owned by the European Central Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, continuous TARGET operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TIPS",
+      "operator": "TARGET Instant Payment Settlement — European Central Bank",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SEPA_INSTANT",
+      "operator": "European Payments Council",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (10-second scheme rule, 24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SEPA_CT",
+      "operator": "European Payments Council",
+      "protocol": "BATCH",
+      "finalityWindow": "T+1 (SEPA settlement day cycle)",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ME_RGT",
+      "operator": "BEAC — Banque des États de l'Afrique Centrale",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday (CEMAC business day)",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "WAEMU_RTGS",
+      "operator": "BCEAO — Banque Centrale des États de l'Afrique de l'Ouest",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday (UEMOA business day)",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ECCB_RTGS",
+      "operator": "Eastern Caribbean Central Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday (ECCB business day)",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "RAAST",
+      "operator": "State Bank of Pakistan",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PIX",
+      "operator": "Banco Central do Brasil",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "FEDWIRE",
+      "operator": "Board of Governors of the Federal Reserve System",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Fedwire Funds Service operating hours",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CHIPS",
+      "operator": "The Clearing House",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, 24/5 CHIPS settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CHAPS",
+      "operator": "Bank of England / CHAPS Ltd",
+      "protocol": "CHAPS",
+      "finalityWindow": "T+0 sterling high-value settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "FPS",
+      "operator": "Pay.UK",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "IMPS",
+      "operator": "Reserve Bank of India / National Payments Corporation of India",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "NEFT",
+      "operator": "Reserve Bank of India",
+      "protocol": "BATCH",
+      "finalityWindow": "T+1 half-hourly NEFT settlement cycle",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "RTGS_IN",
+      "operator": "Reserve Bank of India",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, 08:00-18:30 IST settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PHILPASS",
+      "operator": "Bangko Sentral ng Pilipinas / PhilPas",
+      "protocol": "RTGS",
+      "finalityWindow": "T+1 to T+3 gross settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "INSTAPAY",
+      "operator": "Bangko Sentral ng Pilipinas",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PESONET",
+      "operator": "Bank Negara Malaysia",
+      "protocol": "BATCH",
+      "finalityWindow": "T+1 domestic retail clearing cycle",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ZENGIN",
+      "operator": "Zengin System — Bankers Association of Japan / Tokyo Clearing House",
+      "protocol": "BATCH",
+      "finalityWindow": "T+0 same-day domestic zengin settlement",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BOJ_NET",
+      "operator": "Bank of Japan (BOJ-NETS)",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, 08:30-17:00 JST settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SIC",
+      "operator": "SIX Swiss Exchange / Swiss National Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, continuous SIC settlement",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BOK_WIRE",
+      "operator": "Bank of Korea (BOK-NETS RTGS)",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BOK-NETS operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CBC_INTERBANK",
+      "operator": "Central Bank of the Republic of China (Taiwan) — CIFS",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, 08:30-18:20 local settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ESAS",
+      "operator": "Reserve Bank of New Zealand",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, continuous ESAS settlement",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CA_LVTS",
+      "operator": "Payments Canada",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, LVTS operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CA_INTERAC",
+      "operator": "Interac",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "MX_SPEI",
+      "operator": "Banco de México",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AR_SADI",
+      "operator": "Banco Central de la República Argentina",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, SADI operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CL_DAB",
+      "operator": "Banco Central de Chile",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CO_COPRA",
+      "operator": "Banco de la República de Colombia",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PE_BCRP",
+      "operator": "Banco Central de Reserva del Perú",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BCRP settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BR_STR",
+      "operator": "Banco Central do Brasil (STR via SPB)",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, STR operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BO_DAB",
+      "operator": "Banco de Bolivia / Asociación de Bancos de Bolivia",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PY_SPI",
+      "operator": "Banco Central del Paraguay",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CR_SIP",
+      "operator": "Banco Central de Costa Rica",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ID_BIFAST",
+      "operator": "Bank Indonesia",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ID_BI_RTGS",
+      "operator": "Bank Indonesia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BI-RTGS operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TH_PROMPTPAY",
+      "operator": "Bank of Thailand",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "VN_VIETQR",
+      "operator": "State Bank of Vietnam",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SG_FAST",
+      "operator": "Monetary Authority of Singapore",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CN_CIPS",
+      "operator": "People's Bank of China",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CIPS operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "HK_FPS",
+      "operator": "Hong Kong Monetary Authority",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CN_HVPS",
+      "operator": "People's Bank of China",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, High Value Payment System window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TR_EFT",
+      "operator": "Central Bank of the Republic of Türkiye",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Electronic Funds Transfer settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "UA_RTGS",
+      "operator": "National Bank of Ukraine",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBU settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "RU_RTGS",
+      "operator": "Central Bank of Russia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Bank of Russia settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "MD_RTGS",
+      "operator": "National Bank of Moldova",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBM settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AE_AANI",
+      "operator": "Central Bank of the UAE",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SA_SAPP",
+      "operator": "Saudi Central Bank (SAMA)",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SA_SIRTOP",
+      "operator": "Saudi Central Bank (SAMA)",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, SAMA high-value settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "QA_QPAY",
+      "operator": "Qatar Central Bank",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "KW_KNET",
+      "operator": "Central Bank of Kuwait",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BH_BITS",
+      "operator": "Central Bank of Bahrain",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "OM_OMANPAY",
+      "operator": "Central Bank of Oman",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "JO_JOPAY",
+      "operator": "Central Bank of Jordan",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "IL_PCH",
+      "operator": "Bank of Israel / Israeli Payment Clearing House",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Israeli clearing house settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "LB_RTGS",
+      "operator": "Banque du Liban",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BDL settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "IQ_RTGS",
+      "operator": "Central Bank of Iraq",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBI settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "IR_SATNA",
+      "operator": "Central Bank of Iran",
+      "protocol": "RTGS",
+      "finalityWindow": "T+1 same day, SATNA settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BD_BEFTN",
+      "operator": "Bangladesh Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BEFTN settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "LK_SLIPS",
+      "operator": "Central Bank of Sri Lanka",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "NP_RTGS",
+      "operator": "Nepal Rastra Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NRB settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "KZ_RTGS",
+      "operator": "National Bank of the Republic of Kazakhstan",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBK settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "UZ_RTGS",
+      "operator": "Central Bank of the Republic of Uzbekistan",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBU settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "NO_NGI",
+      "operator": "Norges Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Norwegian Interbank Settlement System window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "SE_RIX",
+      "operator": "Sveriges Riksbank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, RIX settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "DK_NRT",
+      "operator": "Danmarks Nationalbank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Danish real-time gross settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "IS_CBI",
+      "operator": "Central Bank of Iceland",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBI settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PL_EE",
+      "operator": "Narodowy Bank Polski (Express Elixir)",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "CZ_IPS",
+      "operator": "Česká národní banka",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "HU_AZAP",
+      "operator": "Magyar Nemzeti Bank",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "RO_RTGS",
+      "operator": "Banca Națională a României",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BNR settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BG_BIPS",
+      "operator": "Bulgarian National Bank / Bulgarian Association of Banks",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "GR_IRIS",
+      "operator": "Bank of Greece / Hellenic Bank Association",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "IT_BI_RTGS",
+      "operator": "Banca d'Italia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BI-RTGS operating window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "FR_SIC",
+      "operator": "Banque de France",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BA_RTGS",
+      "operator": "Centralna banka Bosne i Hercegovine",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBBH settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "MK_MIPS",
+      "operator": "National Bank of the Republic of North Macedonia",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "RS_IPS",
+      "operator": "National Bank of Serbia",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "XK_RTGS",
+      "operator": "Central Bank of the Republic of Kosovo",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBK settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AL_AIPS",
+      "operator": "Bank of Albania",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ME_RTGS",
+      "operator": "Central Bank of Montenegro",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBCG settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "NG_NIP",
+      "operator": "Central Bank of Nigeria / NIBSS",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "GH_GHIPSS",
+      "operator": "Bank of Ghana / GhIPSS",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ZA_RTC",
+      "operator": "South African Reserve Bank",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Real Time Clearing settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "EG_CIPS",
+      "operator": "Central Bank of Egypt",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "MA_CMI",
+      "operator": "Bank Al-Maghrib / Centre Monétique Interbancaire",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "DZ_SATIM",
+      "operator": "Banque d'Algérie / SATIM",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "ET_EPS",
+      "operator": "National Bank of Ethiopia",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TZ_TIPS",
+      "operator": "Bank of Tanzania",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "KE_RTGS",
+      "operator": "Central Bank of Kenya",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBK settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AU_RITS",
+      "operator": "Reserve Bank of Australia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, RITS settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AU_NPP",
+      "operator": "Reserve Bank of Australia / New Payments Platform",
+      "protocol": "INSTANT",
+      "finalityWindow": "Seconds (24/7)",
+      "instant": true,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TJ_RTGS",
+      "operator": "National Bank of Tajikistan",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBT settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AM_RTGS",
+      "operator": "Central Bank of Armenia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBA settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "AZ_RTGS",
+      "operator": "Central Bank of the Republic of Azerbaijan",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBA settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "GE_RTGS",
+      "operator": "National Bank of Georgia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBG settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "KG_RTGS",
+      "operator": "National Bank of the Kyrgyz Republic",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBKR settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "TM_RTGS",
+      "operator": "Central Bank of Turkmenistan",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, CBT settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "MN_RTGS",
+      "operator": "Bank of Mongolia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BoM settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BT_RTGS",
+      "operator": "Royal Monetary Authority of Bhutan",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, RMA settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "MV_RTGS",
+      "operator": "Monetary Authority of Maldives",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, MMA settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "LA_RTGS",
+      "operator": "Bank of the Lao PDR",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BOL settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "KH_RTGS",
+      "operator": "National Bank of Cambodia",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, NBC settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "BN_RTGS",
+      "operator": "Autoriti Monetari Brunei Darussalam",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, AMBD settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PG_RTGS",
+      "operator": "Bank of Papua New Guinea",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, BSP settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "FJ_RTGS",
+      "operator": "Reserve Bank of Fiji",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, RBF settlement window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    },
+    {
+      "id": "PA_STP",
+      "operator": "Banco Nacional de Panamá",
+      "protocol": "RTGS",
+      "finalityWindow": "T+0 intraday, Sistema de Transferencias y Pagos window",
+      "instant": false,
+      "baseHopCutUSD": 0
+    }
+  ]
+}
