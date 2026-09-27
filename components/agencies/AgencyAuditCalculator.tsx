@@ -2,6 +2,10 @@
 
 import { useMemo, useRef, useState } from "react";
 import type { Corridor } from "@/lib/types";
+import type { CorridorStatuteMap } from "@/lib/corridorStatutes";
+import ExecutiveTreasuryReport, {
+  type ExecutiveReportRow,
+} from "@/components/agencies/ExecutiveTreasuryReport";
 import {
   computeAlternativeRailsBenchmark,
   MODERN_FLAT_FEE_MIN_USD,
@@ -47,14 +51,31 @@ function corridorLabel(corridor: Corridor | undefined, slug: string): string {
 
 export default function AgencyAuditCalculator({
   corridors,
+  statutes = {},
+  issuedAt = "1970-01-01T00:00:00.000Z",
 }: {
   corridors: Corridor[];
+  /**
+   * Statutory context per corridor slug, resolved server-side in
+   * `lib/corridorStatutes.ts`. Passed in rather than imported so the
+   * jurisdiction / rail registries stay out of the client bundle.
+   */
+  statutes?: CorridorStatuteMap;
+  /**
+   * ISO 8601 issue stamp minted once in the server page. Defaulting to the
+   * epoch keeps the prop optional for any other caller without letting the
+   * clock re-enter the render: a `new Date()` here would desynchronise the
+   * prerendered HTML from the hydrated client.
+   */
+  issuedAt?: string;
 }) {
   const corridorBySlug = useMemo(
     () => new Map(corridors.map((corridor) => [corridor.slug, corridor])),
     [corridors]
   );
-  const [roundId, setRoundId] = useState(0);
+  // Phase 5 removed the screen-only "leakage round" counter: the memorandum's
+  // reference ID now digests the roster itself, so a re-issued audit is
+  // diffable without a session-scoped ordinal that no printer would record.
   const [lines, setLines] = useState<ContractorLine[]>(initialRoster);
   const [addCorridor, setAddCorridor] = useState<string>("usd-to-pkr");
   const [addInvoice, setAddInvoice] = useState<number>(DEFAULT_INVOICE_USD);
@@ -149,6 +170,33 @@ export default function AgencyAuditCalculator({
   const netSavingsMin = Math.max(0, leakageAnnual - modernAnnualMax);
   const netSavingsMax = Math.max(0, leakageAnnual - modernAnnualMin);
 
+  /**
+   * Flatten the roster for the print engine.
+   *
+   * The memorandum is a *second* rendering, not a restyle of the table below,
+   * so it gets its own projection rather than a set of conditional class names:
+   * a signed sheet is black-on-white with fixed columns, and coupling its
+   * typography to the calculator's dark theme would mean every future theme
+   * change silently altered a filed audit document. The statutory line is
+   * joined here rather than in the report so the report itself never has to
+   * know that a jurisdiction registry exists.
+   */
+  const reportRows = useMemo<ExecutiveReportRow[]>(
+    () =>
+      rows.map((row) => ({
+        id: row.id,
+        corridorSlug: row.corridor?.slug ?? "unmapped",
+        currency: row.corridor?.to ?? "—",
+        monthlyUSD: row.monthly,
+        annualGrossUSD: row.annualGrossUSD,
+        shaAnnualUSD: row.shaAnnualUSD,
+        fxAnnualUSD: row.fxAnnualUSD,
+        savingsAnnualUSD: row.savingsAnnualUSD,
+        statute: row.corridor ? statutes[row.corridor.slug] : undefined,
+      })),
+    [rows, statutes]
+  );
+
   const addLine = () => {
     nextId.current += 1;
     setLines((current) => [
@@ -207,7 +255,13 @@ export default function AgencyAuditCalculator({
 
   return (
     <div className="w-full min-w-0">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+      {/* Every interactive region below carries `print:hidden`. The global
+          print hiders in `app/globals.css` only cover header / footer / nav /
+          `.no-print`, so without these the roster's number inputs and "Remove"
+          buttons — meaningless on paper, and worse, misleading, because a
+          printed form field reads as a filled-in figure — would survive into
+          the PDF alongside the memorandum. */}
+      <div className="print:hidden flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         <div className="flex flex-1 flex-col gap-1">
           <label
             htmlFor="agency-corridor"
@@ -267,10 +321,7 @@ export default function AgencyAuditCalculator({
 
         <button
           type="button"
-          onClick={() => {
-            setLines(initialRoster);
-            setRoundId((value) => value + 1);
-          }}
+          onClick={() => setLines(initialRoster)}
           className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:border-emerald-500/40 hover:text-emerald-700 dark:border-white/[0.1] dark:text-slate-300 dark:hover:text-emerald-400"
         >
           Reset roster
@@ -293,7 +344,7 @@ export default function AgencyAuditCalculator({
         </button>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="print:hidden mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kpiCard("Monthly Gross Payroll", formatUSD(totals.monthlyGross), "neutral")}
         {kpiCard("Annual Gross Payroll", formatUSD(totals.annualGross), "neutral")}
         {kpiCard("Annual SHA Wire Cuts", formatUSD(totals.shaAnnual), "crimson")}
@@ -303,7 +354,7 @@ export default function AgencyAuditCalculator({
       {/* The two halves of the audit, side by side: what leaves the treasury in
           crimson, what a B2B rail keeps in emerald. Both figures are annual
           totals on the same roster, so the pairing is the comparison. */}
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+      <div className="print:hidden mt-4 grid gap-3 lg:grid-cols-2">
         <section className="w-full min-w-0 rounded-3xl border border-red-500/40 bg-red-50/60 p-6 dark:bg-red-950/20 dark:shadow-[0_0_35px_-10px_rgba(239,68,68,0.3)] sm:p-8">
           <p className="inline-flex items-center gap-2 rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-700 dark:text-red-400">
             <span
@@ -357,7 +408,7 @@ export default function AgencyAuditCalculator({
         </section>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-white/[0.02]">
+      <div className="print:hidden mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-white/[0.02]">
         <table className="w-full min-w-[680px] text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:border-white/[0.08] dark:text-slate-400">
@@ -418,7 +469,7 @@ export default function AgencyAuditCalculator({
         </table>
       </div>
 
-      <section className="mt-8 w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">
+      <section className="print:hidden mt-8 w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">
         <h2 className="text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
           B2B Rails vs Classic SWIFT — Annual Comparison
         </h2>
@@ -509,109 +560,28 @@ export default function AgencyAuditCalculator({
         </div>
       </section>
 
-      <div className="agency-print-area hidden">
-        <header>
-          <h1>Agency Treasury Leakage Audit — PayoutDelta</h1>
-          <p>
-            Monthly-cadence roster · {PAYOUTS_PER_YEAR} payouts per contractor
-            per year · leakage round #{roundId + 1}
-          </p>
-        </header>
-
-        <section>
-          <h2>Key figures</h2>
-          <div className="agency-print-kpis">
-            <div>
-              <span>Monthly gross payroll</span>
-              <strong>{formatUSD(totals.monthlyGross)}</strong>
-            </div>
-            <div>
-              <span>Annual gross payroll</span>
-              <strong>{formatUSD(totals.annualGross)}</strong>
-            </div>
-            <div>
-              <span>Annual SHA wire cuts</span>
-              <strong>{formatUSD(totals.shaAnnual)}</strong>
-            </div>
-            <div>
-              <span>Annual retail FX margin</span>
-              <strong>{formatUSD(totals.fxAnnual)}</strong>
-            </div>
-            <div>
-              <span>Total annual leakage</span>
-              <strong>{formatUSD(leakageAnnual)}</strong>
-            </div>
-            <div>
-              <span>Net annual saving on B2B rails</span>
-              <strong>
-                {formatUSD(netSavingsMin)}–{formatUSD(netSavingsMax)}
-              </strong>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2>Contractor roster</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Corridor</th>
-                <th>Monthly invoice (USD)</th>
-                <th>SHA cut / yr</th>
-                <th>FX leak / yr</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.corridor?.slug ?? "—"}</td>
-                  <td>{formatUSD(row.monthly)}</td>
-                  <td>{formatUSD(row.shaAnnualUSD)}</td>
-                  <td>{formatUSD(row.fxAnnualUSD)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-
-        <section>
-          <h2>B2B rails vs classic SWIFT</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Corridor</th>
-                <th>Contractors</th>
-                <th>Classic SWIFT / yr</th>
-                <th>B2B rails / yr</th>
-                <th>Net saving / yr</th>
-              </tr>
-            </thead>
-            <tbody>
-              {corridorComparison.map((group) => (
-                <tr key={group.slug}>
-                  <td>{group.slug}</td>
-                  <td>{group.contractors}</td>
-                  <td>
-                    {formatUSD(group.classicAnnualMin)}–{formatUSD(group.classicAnnualMax)}
-                  </td>
-                  <td>
-                    {formatUSD(group.modernAnnualMin)}–{formatUSD(group.modernAnnualMax)}
-                  </td>
-                  <td>{formatUSD(group.savingsAnnual)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-
-        <footer>
-          <p>
-            PayoutDelta is informational tooling. Benchmark bands compiled from
-            the public bank directory and corridor fee dataset; verify actual
-            deductions against each bank&apos;s CRF before invoicing.
-          </p>
-        </footer>
-      </div>
+      {/* Phase 5 — the print/PDF engine. `hidden print:block` keeps the
+          memorandum off screen and puts it on the sheet; `window.print()` on
+          the button above hands the whole page to the browser's own "Save as
+          PDF" renderer, which is why the export carries no third-party
+          charting, PDF or icon dependency. See
+          components/agencies/ExecutiveTreasuryReport.tsx. */}
+      <ExecutiveTreasuryReport
+        rows={reportRows}
+        issuedAt={issuedAt}
+        totals={{
+          contractors: rows.length,
+          monthlyGrossUSD: totals.monthlyGross,
+          annualGrossUSD: totals.annualGross,
+          shaAnnualUSD: totals.shaAnnual,
+          fxAnnualUSD: totals.fxAnnual,
+          leakageAnnualUSD: leakageAnnual,
+          modernAnnualMinUSD: modernAnnualMin,
+          modernAnnualMaxUSD: modernAnnualMax,
+          recoverableMinUSD: netSavingsMin,
+          recoverableMaxUSD: netSavingsMax,
+        }}
+      />
     </div>
   );
 }

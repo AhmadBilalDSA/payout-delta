@@ -30,6 +30,15 @@
   Exports: `buildDirectoryIndex(): DirectoryItem[]` (indexes corridors, rails, and BICs in memory)
 - `lib/ledgerEngine.ts`:
   Exports: localStorage-backed client ledger functions for invoice tracking
+- `lib/corridorStatutes.ts`:
+  SERVER-ONLY seam. Exports: `buildCorridorStatutes(corridors): CorridorStatuteMap`, `corridorStatute(corridor): CorridorStatute | undefined`. Projects each corridor's purpose code, mandatory realization certificate, safe-harbour rule and local rail out of the jurisdiction + regulatory registries so client islands never import `lib/registryData.ts` directly.
+
+### Print / PDF Engines (zero dependency):
+- `components/agencies/ExecutiveTreasuryReport.tsx`:
+  Default export `ExecutiveTreasuryReport({ rows, totals, issuedAt })`. Renders the print-only institutional memorandum inside `hidden print:block ... max-w-[210mm]`. Reference ID is a deterministic FNV-1a digest of the roster; no clock or random source is read at render time.
+- `app/globals.css` `@media print` blocks:
+  One block per printable surface, all last-in-cascade. Page numbering uses `position: fixed` + `counter(page)`/`counter(pages)` — no JS pagination, no PDF library.
+
 
 ### Internationalization & SEO Gates:
 - `lib/i18n/dictionaries.ts`:

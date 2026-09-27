@@ -20,6 +20,14 @@
  *   Surface 3  /banks/<slug>/    a 20-page sample, each with an inline <svg>
  *                               carrying a valid viewBox and >= 3 routing hop
  *                               <text> labels.
+ *   Surface 4  /agencies/        the Phase 5 executive treasury memorandum —
+ *                               its print container and required print classes
+ *                               are present, the seven-column roster ledger
+ *                               carries the mono/tabular numeric treatment on
+ *                               every money cell, and the statutory purpose
+ *                               codes / realization certificates it cites are
+ *                               the ones the roster's own destinations declare
+ *                               in data/jurisdictions.json.
  *
  * WHY IT PARSES HTML INSTEAD OF USING A HEADLESS BROWSER
  * The static export is fully prerendered and the pages under audit are React
@@ -43,7 +51,7 @@
  * Usage:  node scripts/audit_ui_surfaces.mjs        (run after `npm run build`)
  * Exit:   0 when every assertion passes, 1 otherwise.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -110,6 +118,44 @@ function tableBodyRows(html) {
   return body[1].split(/<tr[\s>]/i).filter((row) => row.trim().length > 0);
 }
 
+/**
+ * Collapse every whitespace run to a single space.
+ *
+ * JSX formats a long interpolation across several source lines, and the HTML it
+ * prerenders preserves the line breaks between text nodes. A statutory string
+ * such as "FIRC / Inward Advice evidencing …" is therefore emitted with a
+ * newline inside it, so a literal `includes()` on the raw text reports a false
+ * failure for a string that rendered perfectly. Both the haystack and every
+ * needle go through this before matching, which compares content rather than
+ * source formatting.
+ */
+function collapse(text) {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * What a reader actually sees: scripts, styles and *tags* removed, entities
+ * decoded, whitespace collapsed.
+ *
+ * Distinct from `renderedText` on purpose. `renderedText` keeps tags, which is
+ * right for a presence check on a single element's subtree but wrong for
+ * asserting a phrase a reader reads across a boundary — a `//` label and its
+ * value live in sibling `<dt>`/`<dd>` elements, so a text-spanning match needs
+ * the tag that separates them collapsed to a single space first. Keeping the
+ * two helpers separate means the doc-level assertions cannot accidentally start
+ * matching markup.
+ */
+function visibleText(html) {
+  return collapse(
+    decodeEntities(
+      html
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+    )
+  );
+}
+
 function readOut(relativeRoute) {
   const file = join(OUT, ...relativeRoute.split("/").filter(Boolean), "index.html");
   if (!existsSync(file)) return null;
@@ -132,6 +178,7 @@ const registry = JSON.parse(
   readFileSync(join(ROOT, "data", "banksRegistry.json"), "utf8")
 ).banks;
 const dossiers = readFileSync(join(ROOT, "data", "banks.ts"), "utf8");
+const fees = JSON.parse(readFileSync(join(ROOT, "data", "fees.json"), "utf8"));
 
 /** Authored dossier slugs, which take precedence over BIC-derived slugs. */
 const DOSSIER_SLUGS = new Set(
@@ -446,11 +493,343 @@ if (branchCoverage.unresolved > 0) {
 }
 
 /* -------------------------------------------------------------------------- *
+ * Surface 4 — /agencies/ executive treasury memorandum (print / PDF engine)
+ * -------------------------------------------------------------------------- */
+
+surface("Surface 4 · /payout-delta/agencies/ — executive treasury report print engine");
+
+/**
+ * The default roster `AgencyAuditCalculator` mounts on first render, declared
+ * here rather than scraped from the page: the assertions below are about the
+ * *default* population, and a scrape would make a regression that emptied the
+ * roster vacuously pass by having nothing left to check.
+ *
+ * `DESTINATIONS` is the distinct corridors on that roster (4 PKR + 2 INR + 1 COP
+ * contractors collapse to three jurisdictions), which is what the statutory
+ * checklist is keyed on. `CONTRACTORS` is the row count of the ledger itself —
+ * kept separate from the destination count on purpose: conflating them is how a
+ * de-duplicated compliance register gets mistaken for a seven-line payroll table.
+ */
+const DEFAULT_ROSTER_DESTINATIONS = ["usd-to-pkr", "usd-to-inr", "usd-to-cop"];
+const DEFAULT_ROSTER_CONTRACTORS = 7;
+
+/** The exact utility contract the print container is specified to carry. */
+const REQUIRED_PRINT_CLASSES = [
+  "hidden",
+  "print:block",
+  "text-black",
+  "bg-white",
+  "p-8",
+  "max-w-[210mm]",
+  "mx-auto",
+];
+
+const agenciesHtml = readOut("agencies");
+if (!agenciesHtml) {
+  fail("agencies page exported", `${BASE_PATH}/agencies/index.html missing`);
+} else {
+  pass("agencies page exported", `${BASE_PATH}/agencies/index.html`);
+
+  // The print container is located by its own class, then its *whole* class
+  // attribute is read: asserting the classes one `includes()` at a time across
+  // the file would pass even if the utilities were scattered over unrelated
+  // elements, which is precisely the regression that leaves the memorandum
+  // visible on screen or unconstrained on paper.
+  const container = /<div class="([^"]*exec-report-print-area[^"]*)"/.exec(agenciesHtml);
+  if (!container) {
+    fail(
+      "executive report print container",
+      'no <div> carrying "exec-report-print-area" in the exported markup'
+    );
+  } else {
+    pass("executive report print container", container[1].split(" ").slice(0, 2).join(" "));
+
+    const missingClasses = REQUIRED_PRINT_CLASSES.filter(
+      (token) => !container[1].split(/\s+/).includes(token)
+    );
+    if (missingClasses.length === 0) {
+      pass("print container utility contract", `${REQUIRED_PRINT_CLASSES.length}/7 classes on the container`);
+    } else {
+      fail(
+        "print container utility contract",
+        `missing ${missingClasses.join(", ")} from class="${collapse(container[1])}"`
+      );
+    }
+
+    // `hidden` (screen) and `print:block` (sheet) only behave as specified
+    // together, and only if nothing overrides the print display. The
+    // stylesheet is the other half of the contract, so it is asserted from the
+    // compiled CSS the export actually ships rather than from the source: a
+    // rule dropped from globals.css leaves the markup perfectly valid and the
+    // memorandum invisible on the sheet.
+    const printCss = readPrintCss();
+    const printRules = [
+      {
+        id: "container forced visible in print",
+        pattern: /\.agency-print-area\{[^}]*display:\s*block\s*!important/,
+        hint: "no .agency-print-area rule forces display:block !important",
+      },
+      {
+        id: "container pinned to a 210mm measure",
+        pattern: /\.exec-report-print-area\{[^}]*max-width:\s*210mm\s*!important/,
+        hint: "no .exec-report-print-area rule pins max-width to 210mm",
+      },
+      {
+        id: "page numbering resolves per page",
+        pattern: /\.exec-report-page-number::?after\{[^}]*counter\(page\)[^}]*counter\(pages\)/,
+        hint: "no .exec-report-page-number::after rule emits counter(page)/counter(pages)",
+      },
+    ];
+    for (const rule of printRules) {
+      if (rule.pattern.test(printCss)) pass(`print stylesheet — ${rule.id}`);
+      else fail(`print stylesheet — ${rule.id}`, `${rule.hint} in ${OUT}/_next/static/**/*.css`);
+    }
+  }
+
+  const text = visibleText(agenciesHtml);
+
+  // --- Masthead: the institutional identity of the document ---------------
+  for (const needle of [
+    "PAYOUTDELTA // CROSS-BORDER TREASURY LEAKAGE AUDIT",
+    "RESTRICTED FINANCIAL MEMORANDUM",
+    "Executive Treasury Memorandum",
+    "Prepared by",
+    "Approved by",
+  ]) {
+    if (text.includes(collapse(needle))) pass(`masthead "${needle}"`, "in rendered text");
+    else fail(`masthead "${needle}"`, "absent from rendered markup");
+  }
+
+  // The reference ID is a derived digest, not a hardcoded string, so it is
+  // matched by shape. A report that silently fell back to a placeholder would
+  // still print the label; only the shape proves the hash ran.
+  if (/\bPD-ETR-[0-9A-F]{4}-[0-9A-F]{8}\b/.test(text)) {
+    pass("deterministic reference ID", "PD-ETR-XXXX-XXXXXXXX digest present");
+  } else {
+    fail("deterministic reference ID", 'no PD-ETR-XXXX-XXXXXXXX token in rendered text');
+  }
+
+  // The ISO 8601 stamp is a prop minted on the server, so it must be a real
+  // instant rather than a default: this also catches a report that dropped the
+  // prop and fell back to the epoch placeholder.
+  const issued = /Issued \(ISO 8601\)\s*(\d{4}-\d{2}-\d{2}T[\d:.]+Z)/.exec(text);
+  if (issued && !issued[1].startsWith("1970-01-01")) {
+    pass("ISO 8601 issue stamp", issued[1]);
+  } else {
+    fail("ISO 8601 issue stamp", issued ? `stuck on the epoch fallback ${issued[1]}` : "no ISO 8601 stamp rendered");
+  }
+
+  // --- Section II: the granular contractor ledger -------------------------
+  const ledger = /<table class="exec-report-table">([\s\S]*?)<\/table>/.exec(agenciesHtml);
+  if (!ledger) {
+    fail("contractor roster ledger", 'no <table class="exec-report-table"> in the export');
+  } else {
+    pass("contractor roster ledger", "exec-report-table present");
+
+    const head = /<thead>([\s\S]*?)<\/thead>/.exec(ledger[1]);
+    const columns = head
+      ? [...head[1].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((m) => collapse(m[1]))
+      : [];
+    const REQUIRED_COLUMNS = [
+      "Contractor ID",
+      "Jurisdiction / Destination Rail",
+      "Monthly Gross",
+      "Correspondent SHA Loss",
+      "FX Spread Markup",
+      "Net Landing Yield",
+      "Recommended Action",
+    ];
+    const missingColumns = REQUIRED_COLUMNS.filter((column) => !columns.includes(column));
+    if (missingColumns.length === 0) {
+      pass("roster ledger column set", `${columns.length}/7 institutional columns`);
+    } else {
+      fail(
+        "roster ledger column set",
+        `missing ${missingColumns.join(", ")}; found [${columns.join(" | ")}]`
+      );
+    }
+
+    // Money is compared down the column, so the numeric treatment is
+    // load-bearing, exactly as on the bank registry: without tabular-nums the
+    // decimal points do not line up and a deduction is misread at a glance.
+    const ledgerBody = /<tbody>([\s\S]*?)<\/tbody>/.exec(ledger[1]);
+    const ledgerRows = ledgerBody
+      ? ledgerBody[1].split(/<tr[\s>]/i).filter((row) => row.trim().length > 0)
+      : [];
+    if (ledgerRows.length === DEFAULT_ROSTER_CONTRACTORS) {
+      pass("roster ledger row count", `${ledgerRows.length} rows == default roster`);
+    } else {
+      fail(
+        "roster ledger row count",
+        `${ledgerRows.length} rows, expected ${DEFAULT_ROSTER_CONTRACTORS} for the default roster`
+      );
+    }
+
+    // Money is compared down the column, so the numeric treatment is
+    // load-bearing, exactly as on the bank registry: without tabular-nums the
+    // decimal points do not line up and a deduction is misread at a glance.
+    //
+    // Checked by *column position*, not by "contains a dollar sign". The
+    // Recommended Action column is prose that quotes a retained amount, so a
+    // content sniff would demand tabular-nums of a sentence and fail a sheet
+    // that is entirely correct. Index 2..5 are Monthly Gross, Correspondent
+    // SHA Loss, FX Spread Markup and Net Landing Yield.
+    const MONEY_COLUMNS = [2, 3, 4, 5];
+    const unstyled = [];
+    for (const [index, row] of ledgerRows.entries()) {
+      const cells = [...row.matchAll(/<td([^>]*)>([\s\S]*?)<\/td>/g)].map((m) => ({
+        attrs: m[1],
+        body: collapse(m[2]),
+      }));
+      for (const column of MONEY_COLUMNS) {
+        const cell = cells[column];
+        if (!cell) {
+          unstyled.push(`#${index} has no column ${column}`);
+          continue;
+        }
+        if (!/^\$[\d,]+(\.\d{2})?$/.test(cell.body)) {
+          unstyled.push(`#${index} col ${column} is not a money value ("${cell.body.slice(0, 24)}")`);
+          continue;
+        }
+        if (!/tabular-nums/.test(cell.attrs) || !/font-mono/.test(cell.attrs)) {
+          unstyled.push(`#${index} col ${column} lacks the numeric treatment`);
+        }
+      }
+    }
+    if (unstyled.length === 0) {
+      pass(
+        "numeric treatment on every money cell",
+        `tabular-nums + font-mono × ${ledgerRows.length} rows × ${MONEY_COLUMNS.length} money columns`
+      );
+    } else {
+      fail(
+        "numeric treatment on every money cell",
+        `${unstyled.length} defect(s), first: ${unstyled.slice(0, 3).join("; ")}`
+      );
+    }
+  }
+
+  // --- Section III: statutory compliance checklist ------------------------
+  // The codes and certificates are read from the registry rather than hardcoded
+  // here. An audit that asserts "9111 is on the page" would keep passing after
+  // a destination was swapped for one whose regime says something else, which
+  // is the one change this gate exists to catch. Each slug is resolved through
+  // data/fees.json to its country, then to that market's authored statute.
+  const jurisdictionByIso2 = new Map(jurisdictions.map((entry) => [entry.iso2, entry]));
+  const corridorBySlugAudit = new Map(fees.corridors.map((corridor) => [corridor.slug, corridor]));
+
+  const missingStatutes = [];
+  const unresolvedSlugs = [];
+  for (const slug of DEFAULT_ROSTER_DESTINATIONS) {
+    const corridor = corridorBySlugAudit.get(slug);
+    if (!corridor) {
+      unresolvedSlugs.push(slug);
+      continue;
+    }
+    const market = jurisdictionByIso2.get(corridor.countryCode);
+    if (!market) {
+      unresolvedSlugs.push(`${slug}→${corridor.countryCode}`);
+      continue;
+    }
+    for (const [kind, needle] of [
+      ["purpose code", market.tax.purposeCode],
+      ["realization certificate", market.tax.mandatoryAuditCert],
+    ]) {
+      if (text.includes(collapse(needle))) {
+        pass(`${corridor.countryCode} ${kind} rendered`, collapse(needle));
+      } else {
+        missingStatutes.push(`${corridor.countryCode} ${kind}`);
+      }
+    }
+  }
+
+  for (const slug of unresolvedSlugs) {
+    fail(`roster slug "${slug}" resolves to a statute`, "not present in fees.json / jurisdictions.json");
+  }
+  if (missingStatutes.length === 0) {
+    pass(
+      "statutory checklist matches the roster",
+      `${DEFAULT_ROSTER_DESTINATIONS.length} destinations · purpose code + realization certificate each`
+    );
+  } else {
+    fail("statutory checklist matches the roster", `absent from the report: ${missingStatutes.join(", ")}`);
+  }
+
+  // --- Print isolation ----------------------------------------------------
+  // The memorandum is the only thing that may reach the sheet. Any interactive
+  // region that survives printing (a number field, a Remove button, the dark
+  // KPI tiles) would print as a filled-in form or a black box over the audit.
+  if ((agenciesHtml.match(/print:hidden/g) ?? []).length >= 6) {
+    pass("interactive UI hidden from print", `${(agenciesHtml.match(/print:hidden/g) ?? []).length} print:hidden regions`);
+  } else {
+    fail(
+      "interactive UI hidden from print",
+      `${(agenciesHtml.match(/print:hidden/g) ?? []).length} print:hidden regions, expected >= 6`
+    );
+  }
+
+  if (/window\.print\(\)/.test(agenciesHtml)) {
+    pass("print trigger wired", "window.print() inlined in the page");
+  } else {
+    // The trigger lives in the island's code, not in the document, so it can
+    // only be proven in the chunks this page actually loads — an unscoped scan
+    // of out/_next would find the call in some unrelated island and pass on a
+    // page whose button does nothing. Matching the page's own <script src>
+    // list is the only assertion that ties the trigger to *this* route.
+    const pageChunks = [...agenciesHtml.matchAll(/<script[^>]+src="([^"]+\.js)"/g)]
+      .map((m) => m[1].replace(BASE_PATH, ""))
+      .map((src) => join(OUT, ...src.split("/").filter(Boolean)))
+      .filter((file) => existsSync(file));
+    const wired = pageChunks.some((file) => /window\.print\(\)/.test(readFileSync(file, "utf8")));
+    if (wired) {
+      pass("print trigger wired", `window.print() in ${pageChunks.length} chunk(s) this page loads`);
+    } else {
+      fail(
+        "print trigger wired",
+        `window.print() not in any of the ${pageChunks.length} script chunks ${BASE_PATH}/agencies/ loads`
+      );
+    }
+  }
+}
+
+/**
+ * The compiled print rules for the memorandum, read from the stylesheets the
+ * export actually ships. `class="..."` alone proves the *markup* contract; the
+ * half of the contract that decides whether the sheet is legible on paper lives
+ * here, and reading the built CSS is what makes a dropped rule a test failure
+ * rather than a surprise in the print dialog.
+ *
+ * Next.js does not guarantee a `_next/static/css/` directory — the bundles in
+ * this build land in `_next/static/chunks/` — so the whole static tree is
+ * walked rather than one hardcoded path, which would have made this gate
+ * vacuously pass (`readPrintCss()` returning "") on a bundler change.
+ */
+function readPrintCss() {
+  return readStaticAssets(".css").join("\n");
+}
+
+/** Concatenate every file under `_next/static` with the given extension. */
+function readStaticAssets(extension) {
+  const root = join(OUT, "_next", "static");
+  const found = [];
+  const walk = (dir) => {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith(extension)) found.push(readFileSync(full, "utf8"));
+    }
+  };
+  walk(root);
+  return found;
+}
+
+/* -------------------------------------------------------------------------- *
  * Summary
  * -------------------------------------------------------------------------- */
 
 console.log(
-  `\n  surfaces audited        3 (tax-clearance, banks index, ${sampledSlugs.size} bank routes)`
+  `\n  surfaces audited        4 (tax-clearance, banks index, ${sampledSlugs.size} bank routes, agencies print engine)`
 );
 console.log(`  assertions              ${checks}`);
 console.log(`  failures                ${failures}`);

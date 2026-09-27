@@ -543,10 +543,24 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Phase 5 — Agency treasury leakage report (.agency-print-area). Mirrors the
- * .tax-ledger-print-area contract: the executive report mounted by
- * AgencyAuditCalculator flows across pages (roster + rails comparison tables)
- * under the A4 @page, re-shown against the generic print hiders.
+ * Phase 5 — Executive treasury audit report (.agency-print-area /
+ * .exec-report-print-area).
+ *
+ * This is the institutional sheet: a signed, dated, referenced memorandum that
+ * a treasury reviewer files, not a restyle of the on-screen calculator. It
+ * mirrors the .tax-ledger-print-area contract (re-shown against the generic
+ * print hiders, flows across pages under the A4 @page) with two additions:
+ *
+ *   1. A hard 210mm content column. The tax ledger is allowed to run the full
+ *      page width; the memorandum is not, because its column set is fixed at
+ *      seven and a wider measure would separate a contractor from the deduction
+ *      charged against it. The `mx-auto` + 210mm cap is what makes the sheet
+ *      print identically regardless of the browser's preview width.
+ *   2. Native page numbering. `position: fixed` makes the bar re-render on
+ *      every sheet the print engine emits and `counter(page)` / `counter(pages)`
+ *      resolve per page — the only page-numbering mechanism available in the
+ *      browser's own "Save as PDF" that needs no paginating library. Nothing in
+ *      this block measures, offsets or counts anything in JavaScript.
  * ------------------------------------------------------------------------- */
 @media print {
   .agency-print-area {
@@ -599,5 +613,125 @@ body {
   .agency-print-area table thead {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  /* --- Executive memorandum treatment ------------------------------------- */
+
+  .exec-report-print-area {
+    width: 210mm !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: Georgia, "Times New Roman", Times, serif;
+  }
+
+  /* Hairline rules top and bottom of the masthead. Drawn with borders rather
+     than a background image so no renderer can drop them for being "print
+     background graphics" — the user is never asked to tick a checkbox to keep
+     the letterhead. */
+  .exec-report-rule {
+    border-top: 1.25pt solid #0f172a;
+    height: 0;
+  }
+
+  .exec-report-heading {
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 0.5pt solid #0f172a;
+    padding-bottom: 2pt;
+  }
+
+  /* Executive summary callouts: 2×2 so the recoverable-capital tile — the one
+     figure the memorandum exists to deliver — gets a full-width row of its own
+     on a portrait A4 instead of being squeezed into a 4-up strip. */
+  .exec-report-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4pt;
+    margin-top: 6pt;
+  }
+
+  .exec-report-kpis > div {
+    border: 0.5pt solid #0f172a;
+    padding: 5pt 7pt;
+  }
+
+  .exec-report-kpis span {
+    display: block;
+    font-size: 6.5pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .exec-report-kpis strong {
+    display: block;
+    margin-top: 1pt;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12pt;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .exec-report-kpis em {
+    display: block;
+    margin-top: 1pt;
+    font-size: 6.5pt;
+    font-style: normal;
+  }
+
+  .exec-report-kpi-recoverable {
+    grid-column: 1 / -1;
+    border-width: 1.25pt !important;
+    border-color: #0f172a !important;
+  }
+
+  .exec-report-table {
+    margin-top: 4pt;
+    font-size: 7.5pt;
+  }
+
+  /* Repeat the column heads on every page the roster spills onto, and stop a
+     seven-column row from being torn in half across a page boundary. */
+  .exec-report-table thead {
+    display: table-header-group;
+    background: #e2e8f0;
+  }
+
+  .exec-report-table tfoot td {
+    border-top: 1.25pt solid #0f172a;
+  }
+
+  .exec-report-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .exec-report-checklist-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .exec-report-pagination {
+    position: fixed !important;
+    left: 16mm;
+    right: 16mm;
+    bottom: 6mm;
+    display: flex !important;
+    justify-content: space-between;
+    border-top: 0.5pt solid #0f172a;
+    padding-top: 2pt;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 6.5pt;
+    letter-spacing: 0.08em;
+    color: #000000;
+  }
+
+  .exec-report-page-number::after {
+    content: "Page " counter(page) " of " counter(pages);
   }
 }

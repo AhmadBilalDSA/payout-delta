@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import AgencyAuditCalculator from "@/components/agencies/AgencyAuditCalculator";
+import { buildCorridorStatutes } from "@/lib/corridorStatutes";
 import { getCorridors } from "@/lib/db";
 import { SITE_URL } from "@/lib/seoSchemas";
 
@@ -38,6 +39,16 @@ const webApplicationLd = {
 
 export default function AgenciesPage() {
   const corridors = getCorridors();
+  /**
+   * Phase 5 — the memorandum's issue stamp is minted here, once, at static
+   * render time, and handed to the client island as a prop. It is deliberately
+   * *not* a `new Date()` inside the island: that would desynchronise the
+   * prerendered HTML from the hydration pass, and a hydration mismatch on the
+   * one document a reviewer signs is a defect of the first order. Build-time
+   * determinism also means the export is reproducible for the same roster.
+   */
+  const issuedAt = new Date().toISOString();
+  const statutes = buildCorridorStatutes(corridors);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
@@ -61,7 +72,7 @@ export default function AgenciesPage() {
         }}
       />
 
-      <section className="w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">
+      <section className="print:hidden w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8">
         <p className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
           <span
             aria-hidden="true"
@@ -83,7 +94,11 @@ export default function AgenciesPage() {
       </section>
 
       <div className="mt-6">
-        <AgencyAuditCalculator corridors={corridors} />
+        <AgencyAuditCalculator
+          corridors={corridors}
+          statutes={statutes}
+          issuedAt={issuedAt}
+        />
       </div>
 
       <p className="no-print mt-10 text-xs leading-relaxed text-black/[0.45] dark:text-white/50">
