@@ -62,3 +62,12 @@ backups/
 repomix-output.xml
 repomix.config.json
 
+
+# Security & IDE
+*.key
+*.p12
+*.pfx
+id_rsa*
+.turbo
+.vscode/*
+!.vscode/settings.json

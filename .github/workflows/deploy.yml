@@ -4,8 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Rebuild & re-deploy whenever the nightly rate sync finishes successfully
-  # (the bot commit uses [skip ci], so the push event alone will NOT deploy).
   workflow_run:
     workflows: ["Daily Rates Sync"]
     types:
@@ -28,8 +26,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # For workflow_run events, build the branch the sync actually ran on
-          # (carries the freshly committed rates); otherwise the triggering ref.
           ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
 
       - name: Setup Node
@@ -41,11 +37,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
+      - name: Full Sequential Verification Gate
+        run: npm run prebuild && npx tsc --noEmit && npm run test && npm run build && npm run audit:ui && npm run audit:hex && npm run audit:utility && npm run audit:search && npm run audit:offline && npm run audit:security
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
