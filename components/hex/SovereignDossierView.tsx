@@ -1,4 +1,5 @@
 import { AuditSeal } from "./AuditSeal";
+import { CopyPill } from "./CopyPill";
 import type {
   PageSovereignDossier,
   SovereignRoutingNode,
@@ -68,23 +69,8 @@ function LayerHeading({ children, id }: { children: string; id?: string }) {
  * -------------------------------------------------------------------------- */
 
 /**
- * Copyable purpose-code badge.
- *
- * Implemented as text selection rather than a clipboard call: a clipboard
- * handler would force this layer to be a client island and drag the registry
- * across the boundary, which is a very large price for a convenience. A
- * `<code>` element is natively selectable and screen-reader-legible, so
- * `user-select: all` gives the same one-drag copy with none of that cost. The
- * hint text beside it is hidden in print by `.hex-copy-hint`.
- */
 function CodeBadge({ code }: { code: string }) {
-  return (
-    <code
-      className={`hex-code-badge ${FIGURE} inline-block select-all rounded-md border border-emerald-500/40 bg-emerald-500/[0.08] px-2 py-1 text-[12px] font-semibold text-emerald-700 dark:text-emerald-300`}
-    >
-      {code}
-    </code>
-  );
+  return <CopyPill code={code} />;
 }
 
 function QuickVerdict({ dossier }: { dossier: PageSovereignDossier }) {
@@ -102,7 +88,7 @@ function QuickVerdict({ dossier }: { dossier: PageSovereignDossier }) {
           Quick verdict · extraction block
         </h2>
         <span className="hex-copy-hint text-[10px] font-medium uppercase tracking-[0.12em] text-black/35 dark:text-white/35">
-          Select any code to copy
+          Click any code to copy
         </span>
       </div>
 

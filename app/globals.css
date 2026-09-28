@@ -893,3 +893,12 @@ html {
   animation-timing-function: ease-out;
 }
 
+
+@keyframes wirePulse {
+  from { stroke-dashoffset: 12; }
+  to { stroke-dashoffset: 0; }
+}
+.animate-wirePulse {
+  animation: wirePulse 1s linear infinite;
+}
+

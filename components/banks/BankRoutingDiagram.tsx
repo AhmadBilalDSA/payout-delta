@@ -74,9 +74,11 @@ interface HopNode {
 function NodeBox({
   node,
   x,
+  isIntermediary = false,
 }: {
   node: HopNode;
   x: number;
+  isIntermediary?: boolean;
 }) {
   return (
     <g transform={`translate(${x} 54)`}>
@@ -88,6 +90,16 @@ function NodeBox({
       >
         {node.role}
       </text>
+      {isIntermediary && (
+        <rect
+          x={0}
+          y={10}
+          width={216}
+          height={78}
+          rx={14}
+          className="fill-none stroke-amber-500/30 stroke-2 animate-ping"
+        />
+      )}
       <rect
         x={0}
         y={10}
@@ -97,7 +109,9 @@ function NodeBox({
         className={
           node.unresolved
             ? "fill-amber-500/[0.06] stroke-amber-500/40 stroke-[1.5] [stroke-dasharray:5_4]"
-            : "fill-white stroke-slate-200 stroke-[1.5] dark:fill-white/[0.04] dark:stroke-white/[0.12]"
+            : isIntermediary
+              ? "fill-white stroke-amber-500/80 stroke-[1.5] dark:fill-white/[0.04] dark:stroke-amber-400"
+              : "fill-white stroke-slate-200 stroke-[1.5] dark:fill-white/[0.04] dark:stroke-white/[0.12]"
         }
       />
       <text
@@ -141,15 +155,15 @@ function HopArrow({
         y1={98}
         x2={fromX + 268}
         y2={98}
-        className="stroke-emerald-500/70 stroke-[1.5]"
-        strokeDasharray={dashed ? "5 4" : undefined}
+        className="stroke-emerald-500/70 stroke-[1.5] animate-[wirePulse_1s_linear_infinite]"
+        strokeDasharray={dashed ? "5 4" : "6 6"}
         markerEnd="url(#payoutdelta-hop)"
       />
       <text
         x={fromX + 242}
         y={88}
         textAnchor="middle"
-        className="fill-slate-500 text-[9px] font-semibold dark:fill-slate-400"
+        className="fill-slate-500 text-xs font-mono tabular-nums font-semibold dark:fill-slate-400"
       >
         {label.length > 22 ? `${label.slice(0, 21)}…` : label}
       </text>
@@ -231,7 +245,7 @@ export default function BankRoutingDiagram({ profile }: { profile: BankProfile }
           label={hopLabelFor(profile)}
           dashed={!selfAnchored && anchorCode === ""}
         />
-        <NodeBox node={anchor} x={272} />
+        <NodeBox node={anchor} x={272} isIntermediary />
         <HopArrow fromX={272} label="SWIFT MT103" />
         <NodeBox node={destination} x={544} />
         </svg>

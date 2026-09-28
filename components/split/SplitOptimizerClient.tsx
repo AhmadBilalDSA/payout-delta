@@ -14,6 +14,7 @@
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRef, useEffect, useCallback } from "react";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
 
 import {
   calculateSplitYields,
@@ -328,7 +329,8 @@ export default function SplitOptimizerClient({ corridors }: Props) {
     <div className="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
 
       {/* Hero */}
-      <section className="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60 sm:p-8">
+      <SpotlightCard className="rounded-3xl p-6 sm:p-8">
+        <section>
         <p className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           Multi-Rail Split Optimizer

@@ -12,6 +12,7 @@
  * rendered through createPortal so z-index stacking context cannot clip them.
  */
 
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import {
   useCallback,
   useEffect,
@@ -380,10 +381,11 @@ export default function ReverseCalculatorClient({ corridors }: Props) {
         </section>
 
         {/* --- Receipt ledger --- */}
-        <section
-          aria-labelledby="receipt-heading"
-          className="flex flex-col rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60 sm:p-8"
-        >
+        <SpotlightCard className="flex flex-col rounded-3xl p-6 sm:p-8 h-full">
+          <section
+            aria-labelledby="receipt-heading"
+            className="flex flex-col h-full"
+          >
           <h2 id="receipt-heading" className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
             Itemized receipt
           </h2>
@@ -476,7 +478,8 @@ export default function ReverseCalculatorClient({ corridors }: Props) {
               </div>
             </>
           )}
-        </section>
+          </section>
+        </SpotlightCard>
       </div>
 
       <p className="no-print mt-8 text-xs leading-relaxed text-black/[0.45] dark:text-white/50">
