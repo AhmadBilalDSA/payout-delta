@@ -12,7 +12,8 @@
     "test": "npm run lint && node scripts/test_corridors.mjs && npm run test:simulation",
     "test:simulation": "node scripts/simulate_edge_cases.mjs",
     "audit:ui": "node scripts/audit_ui_surfaces.mjs",
-    "audit:hex": "node scripts/audit_hexagonal_mesh.mjs"
+    "audit:hex": "node scripts/audit_hexagonal_mesh.mjs",
+    "audit:utility": "node scripts/audit_utility_engines.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
