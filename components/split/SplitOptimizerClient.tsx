@@ -21,7 +21,6 @@ import {
   fmtPct,
   fmtUsd,
   PLATFORMS,
-  SPLIT_RAILS,
   type PlatformId,
   type SplitRailResult,
 } from "@/lib/reverseEngine";
@@ -245,7 +244,7 @@ function SplitBarChart({
  * Rail detail card
  * -------------------------------------------------------------------------- */
 
-function RailCard({ result, symbol, toCurrency }: { result: SplitRailResult; symbol: string; toCurrency: string }) {
+function RailCard({ result, symbol }: { result: SplitRailResult; symbol: string }) {
   const color = BAR_COLORS[result.rail.id] ?? BAR_COLORS.swift;
   const netDisplay = result.rail.retainsUsd
     ? fmtUsd(result.netUsdRetained)
@@ -451,7 +450,6 @@ export default function SplitOptimizerClient({ corridors }: Props) {
                   key={r.rail.id}
                   result={r}
                   symbol={symbol}
-                  toCurrency={toCurrency}
                 />
               ))}
             </div>

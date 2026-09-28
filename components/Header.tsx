@@ -8,6 +8,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import BaseCurrencySwitcher from "@/components/BaseCurrencySwitcher";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useHeaderDropdownActive } from "@/components/headerDropdownLayer";
+import SearchTriggerButton from "@/components/nav/SearchTriggerButton";
+import OmnibarModal from "@/components/search/OmnibarModal";
 
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
@@ -71,6 +73,9 @@ export default function Header() {
             trust indicator stays a compact pulsing pill at every width so the row
             never has to give ground. */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+          <span className="shrink-0">
+            <SearchTriggerButton />
+          </span>
           <span className="hidden shrink-0 sm:inline-flex">
             <BaseCurrencySwitcher />
           </span>
@@ -118,6 +123,7 @@ export default function Header() {
             document.body
           )
         : null}
+      <OmnibarModal />
     </>
   );
 }
