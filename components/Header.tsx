@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import Link from "next/link";
+import { TransitionLink as Link } from "@/components/nav/TransitionLink";
 import CorridorSwitcher from "@/components/CorridorSwitcher";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -50,7 +50,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="w-full border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur-xl sticky top-0 z-40 h-14 flex items-center justify-between px-4 sm:px-6">
+      <header className="w-full border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur-xl sticky top-0 z-40 h-14 flex items-center justify-between px-4 sm:px-6 [view-transition-name:site-header]">
         {/* 1 — BRAND. `shrink-0` keeps the wordmark + corridor selector at their
             intrinsic width; the selector's own `relative` root means its absolute
             dropdown resolves against itself and is never clipped by this row. */}

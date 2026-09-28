@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
 
 interface CorridorOption {
   slug: string;
@@ -25,11 +26,14 @@ export default function CorridorSelector() {
   const [activeSlug, setActiveSlug] = useState<string>(TOP_CORRIDORS[0].slug);
 
   return (
-    <div
-      role="group"
-      aria-label="Active currency corridor"
-      className="inline-flex gap-1 rounded-full bg-[#E5E5EA] p-1 dark:bg-white/[0.12]"
+    <SpotlightCard
+      className="inline-flex gap-1 rounded-full p-1"
     >
+      <div
+        role="group"
+        aria-label="Active currency corridor"
+        className="flex items-center"
+      >
       {TOP_CORRIDORS.map((corridor) => {
         const isActive = activeSlug === corridor.slug;
         return (
@@ -53,6 +57,7 @@ export default function CorridorSelector() {
           </Link>
         );
       })}
-    </div>
+      </div>
+    </SpotlightCard>
   );
 }
