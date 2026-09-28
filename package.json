@@ -14,7 +14,8 @@
     "audit:ui": "node scripts/audit_ui_surfaces.mjs",
     "audit:hex": "node scripts/audit_hexagonal_mesh.mjs",
     "audit:utility": "node scripts/audit_utility_engines.mjs",
-    "audit:search": "node scripts/audit_search_engine.mjs"
+    "audit:search": "node scripts/audit_search_engine.mjs",
+    "audit:offline": "node scripts/audit_offline_engine.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
