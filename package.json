@@ -16,7 +16,8 @@
     "audit:utility": "node scripts/audit_utility_engines.mjs",
     "audit:search": "node scripts/audit_search_engine.mjs",
     "audit:offline": "node scripts/audit_offline_engine.mjs",
-    "audit:security": "node scripts/audit_security_hygiene.mjs"
+    "audit:security": "node scripts/audit_security_hygiene.mjs",
+    "audit:advanced": "node scripts/audit_advanced_suite.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",

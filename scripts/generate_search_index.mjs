@@ -80,6 +80,24 @@ index.push({
 });
 
 index.push({
+  id: "util-matrix",
+  title: "Intermediary Deductions Sensitivity Matrix",
+  subtitle: "Evaluate cross-border wire friction",
+  badge: "Utility",
+  url: "/payout-delta/matrix/",
+  keywords: ["matrix", "sensitivity", "deductions", "friction", "wire"]
+});
+
+index.push({
+  id: "util-fx",
+  title: "Canonical FX Converter",
+  subtitle: "Compare Mid-market against Platform Rails",
+  badge: "Utility",
+  url: "/payout-delta/fx/",
+  keywords: ["fx", "converter", "exchange", "mid-market", "compare"]
+});
+
+index.push({
   id: "util-tax",
   title: "Tax Clearance Ledger",
   subtitle: "Sovereign WHT bands",

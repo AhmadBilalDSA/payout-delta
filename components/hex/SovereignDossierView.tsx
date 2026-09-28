@@ -1,3 +1,4 @@
+import { AuditSeal } from "./AuditSeal";
 import type {
   PageSovereignDossier,
   SovereignRoutingNode,
@@ -506,6 +507,14 @@ function PrintSheet({ dossier }: { dossier: PageSovereignDossier }) {
         <span>{dossier.marketIso2} · sovereign dossier</span>
         <span className="hex-pagination-page" />
       </div>
+
+      <AuditSeal 
+        bic={dossier.institution?.bic ?? "NA"} 
+        iso2={dossier.marketIso2} 
+        whtRate={dossier.statute.baselineWhtPct} 
+        minShaFee={15} 
+        maxShaFee={35} 
+      />
     </section>
   );
 }

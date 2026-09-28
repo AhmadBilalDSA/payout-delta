@@ -73,6 +73,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/matrix/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/fx/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/tax-ledger/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "weekly",
