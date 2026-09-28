@@ -4,12 +4,15 @@ import { notFound } from "next/navigation";
 
 import BankRoutingDiagram from "@/components/banks/BankRoutingDiagram";
 import BankSettlementPanel from "@/components/banks/BankSettlementPanel";
+import SovereignDossierView from "@/components/hex/SovereignDossierView";
 import { GITHUB_REPO } from "@/data/banks";
 import { railFor } from "@/data/regulatoryBanking";
 import { getCorridorBySlug } from "@/lib/db";
+import { buildSovereignDossier } from "@/lib/hexagonalDossier";
 import {
   getBankProfileBySlug,
   getBankProfiles,
+  getJurisdictionByIso2,
   type BankProfile,
 } from "@/lib/registryData";
 import {
@@ -131,6 +134,22 @@ export default async function BankDossierPage({
 
   const dossier = bank.dossier;
   const primaryCorridor = dossier?.connectedCorridors[0] ?? null;
+
+  // Phase 7 — the hexagonal sovereign dossier. Built here, on the server, from
+  // the same registry seams the rest of the page reads, and handed to the view
+  // adapter as one flat record. The jurisdiction resolves for all 266 verified
+  // heads (a head is registered in a market that has a regime), but a defensive
+  // `null` is still handled: a bank page without a statutory dossier must still
+  // render its routing, settlement and repository sections.
+  const jurisdiction = getJurisdictionByIso2(bank.countryIso2) ?? null;
+  const sovereignDossier = jurisdiction
+    ? buildSovereignDossier(
+        bank,
+        jurisdiction,
+        getCorridorBySlug(primaryCorridor ?? "") ?? null
+      )
+    : null;
+
   const breadcrumbs = serializeSchemaGraph([
     buildBreadcrumbLd([
       { name: "Home", url: `${SITE_URL}/` },
@@ -146,12 +165,29 @@ export default async function BankDossierPage({
     ...buildBankAccountSchema(bank),
   ]);
 
+  // Phase 7 — the interconnected sovereign graph (FinancialProduct +
+  // GovernmentService + FAQPage, tied by `@id`) ships as its own `@graph`
+  // document rather than being spread into the one above. The two graphs
+  // describe the same entities from different vantage points — one prices the
+  // correspondent leg, the other prices the statutory clearance — and merging
+  // them would put two `FinancialProduct` nodes for one product in a single
+  // document, which is a conflicting-entity signal rather than a richer one.
+  const sovereignLd = sovereignDossier
+    ? serializeSchemaGraph(sovereignDossier.jsonLd)
+    : "";
+
   return (
     <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: breadcrumbs }}
       />
+      {sovereignLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: sovereignLd }}
+        />
+      ) : null}
 
       <nav
         aria-label="Breadcrumb"
@@ -465,6 +501,10 @@ export default async function BankDossierPage({
         </ul>
       </section>
         </>
+      ) : null}
+
+      {sovereignDossier ? (
+        <SovereignDossierView dossier={sovereignDossier} idPrefix={`bank-${bank.slug}`} />
       ) : null}
 
       <section className="mt-6">

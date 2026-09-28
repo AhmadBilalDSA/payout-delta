@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 
+import SovereignDossierView from "@/components/hex/SovereignDossierView";
 import StatutoryTaxWizard from "@/components/tax-clearance/StatutoryTaxWizard";
 import type {
   ClearanceDocument,
@@ -12,10 +13,12 @@ import type {
   StatuteWizardStats,
 } from "@/components/tax-clearance/payload";
 import { getCorridors, getDataset } from "@/lib/db";
+import { buildSovereignDossier } from "@/lib/hexagonalDossier";
 import {
   flagOf,
   getBankNodesByCountry,
   getBankProfileByBic,
+  getJurisdictionByIso2,
   getJurisdictions,
   getRegistryMeta,
   getRailById,
@@ -706,6 +709,36 @@ const GOVERNMENT_SERVICE_LD = serializeSchemaGraph(
   )
 );
 
+/**
+ * Phase 7 — the country-scoped sovereign dossier.
+ *
+ * This route is the *statutory* facet, so the dossier is built with a `null`
+ * institution: it renders the market's regime, ledger and hop chain without
+ * pricing a specific correspondent, which is the correct shape for a page whose
+ * subject is a jurisdiction rather than a bank. It is the same kernel and the
+ * same view adapter as `/banks/<slug>/` — only the inbound adapter differs.
+ *
+ * The featured market is chosen from the data rather than hardcoded: the highest
+ * standard withholding band in the registry, ties broken by ISO code for
+ * determinism. That is the regime a reader most needs spelled out, and a fixed
+ * ISO code would be a market this page says nothing about the day the registry
+ * changes.
+ */
+const FEATURED_DOSSIER = (() => {
+  let featured = PROFILES[0];
+  for (const profile of PROFILES) {
+    if (
+      profile.baselineWhtPct > featured.baselineWhtPct ||
+      (profile.baselineWhtPct === featured.baselineWhtPct &&
+        profile.iso2 < featured.iso2)
+    ) {
+      featured = profile;
+    }
+  }
+  const jurisdiction = getJurisdictionByIso2(featured.iso2);
+  return jurisdiction ? buildSovereignDossier(null, jurisdiction) : null;
+})();
+
 export default function TaxClearancePage() {
   /** TechArticle — the hub as a reference work, dated to the dataset revision. */
   const techArticleLd = {
@@ -819,6 +852,15 @@ export default function TaxClearancePage() {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: GOVERNMENT_SERVICE_LD }}
         />
+        {/* Phase 7 — the featured market's interconnected sovereign graph. */}
+        {FEATURED_DOSSIER ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: serializeSchemaGraph(FEATURED_DOSSIER.jsonLd),
+            }}
+          />
+        ) : null}
 
         {/* ---------------------------------------------------------------- *
          * Hero — value proposition and the two ways in.
@@ -890,6 +932,13 @@ export default function TaxClearancePage() {
         <div className="mt-8">
           <StatutoryTaxWizard profiles={PROFILES} stats={STATS} />
         </div>
+
+        {FEATURED_DOSSIER ? (
+          <SovereignDossierView
+            dossier={FEATURED_DOSSIER}
+            idPrefix="tax-featured"
+          />
+        ) : null}
 
         <p className="no-print mt-10 text-xs leading-relaxed text-black/[0.45] dark:text-white/50">
           PayoutDelta is informational tooling, not financial, tax or legal

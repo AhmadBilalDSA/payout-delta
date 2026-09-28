@@ -735,3 +735,149 @@ body {
     content: "Page " counter(page) " of " counter(pages);
   }
 }
+
+/* ------------------------------------------------------------------------- *
+ * PHASE 7 — HEXAGONAL SOVEREIGN DOSSIER (components/hex/SovereignDossierView)
+ *
+ * Last-in-cascade, per the one-block-per-printable-surface contract. This is
+ * the fourth institutional sheet and it is the only one that prints from a route
+ * which is otherwise a normal product page: `/banks/<slug>/` is a searchable
+ * dossier a reader scrolls, and `/tax-clearance/` is a wizard. Neither should
+ * look like a memorandum when printed, but the statutory content inside them is
+ * exactly the thing a compliance reviewer needs to file, so the dossier prints
+ * as a standalone A4 sheet and the surrounding page chrome does not.
+ *
+ *   1. `hidden print:block` on the sheet itself. The same contract as
+ *      `.agency-print-area`, which keeps the screen surface and the printed
+ *      surface from being two different hand-maintained stylesheets.
+ *   2. A 210mm content column. Same reasoning as the executive memorandum — a
+ *      ledger whose figure column must line up under its own header cannot
+ *      afford to reflow with the browser's preview width.
+ *   3. Repeating table heads. The ledger is long (up to twelve rows plus the
+ *      safe-harbour block) and will spill; `display: table-header-group` is the
+ *      only way to repeat column heads across the spill without JavaScript.
+ *   4. Row integrity. A statutory row and its basis are one unit of evidence;
+ *      `break-inside: avoid` keeps them on one page.
+ *   5. Native page numbering, same `position: fixed` + `counter()` mechanism as
+ *      the memorandum. Nothing here measures, offsets or counts in JavaScript.
+ *   6. The vector layer prints. An SVG routing chain is the clearest statement
+ *      of the hop structure on paper, so it is explicitly restored rather than
+ *      left to the generic "hide the diagram" instinct most print sheets apply.
+ * ------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .hex-dossier-sheet {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 12mm 16mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+  }
+
+  .hex-dossier-sheet * {
+    visibility: visible !important;
+  }
+
+  /* Screen-only affordances: the copy hint, the router's own breadcrumb, and
+     the interactive anchor targets have no meaning on paper. */
+  .hex-copy-hint {
+    display: none !important;
+  }
+
+  .hex-dossier-sheet h2,
+  .hex-dossier-sheet h3 {
+    color: #0f172a !important;
+  }
+
+  .hex-ledger {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+
+  .hex-ledger th,
+  .hex-ledger td {
+    border: 0.5pt solid #cbd5e1;
+    padding: 4pt 6pt;
+    text-align: left;
+  }
+
+  .hex-ledger thead {
+    display: table-header-group;
+    background: #e2e8f0;
+  }
+
+  .hex-ledger tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .hex-ledger td {
+    color: #0f172a !important;
+  }
+
+  /* The safe-harbour block is quoted statute: keep each rule whole rather than
+     splitting a quoted sentence across a page boundary. */
+  .hex-safeharbor-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .hex-routing-map {
+    display: block !important;
+    max-height: 62mm !important;
+  }
+
+  .hex-verdict {
+    border: 1pt solid #0f172a !important;
+    background: #f8fafc !important;
+  }
+
+  .hex-stamp {
+    border: 0.75pt solid #0f172a !important;
+    color: #0f172a !important;
+  }
+
+  .hex-signoff {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8mm;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .hex-signoff-cell {
+    border-top: 0.5pt solid #0f172a;
+    padding-top: 3pt;
+  }
+
+  .hex-pagination {
+    position: fixed !important;
+    left: 16mm;
+    right: 16mm;
+    bottom: 6mm;
+    display: flex !important;
+    justify-content: space-between;
+    border-top: 0.5pt solid #0f172a;
+    padding-top: 2pt;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 6.5pt;
+    letter-spacing: 0.08em;
+    color: #000000;
+  }
+
+  .hex-pagination-page::after {
+    content: "Page " counter(page) " of " counter(pages);
+  }
+}
