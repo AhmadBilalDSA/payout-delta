@@ -63,7 +63,7 @@ for (const file of allFiles) {
         failures++;
       }
     }
-  } catch(e) {
+  } catch {
     // skip unreadable
   }
 }

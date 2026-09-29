@@ -89,6 +89,15 @@ index.push({
 });
 
 index.push({
+  id: "util-export",
+  title: "Institutional Reconciliation Ledger Export",
+  subtitle: "Generate and export an institutional payment audit sheet",
+  badge: "Utility",
+  url: "/payout-delta/export/",
+  keywords: ["export", "reconciliation", "ledger", "audit", "sheet", "print"]
+});
+
+index.push({
   id: "util-matrix",
   title: "Intermediary Deductions Sensitivity Matrix",
   subtitle: "Evaluate cross-border wire friction",
