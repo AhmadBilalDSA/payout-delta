@@ -344,6 +344,7 @@ export default function SplitOptimizerClient({ corridors }: Props) {
           volume, corridor, and platform to see fee leakage in real time.
         </p>
       </section>
+      </SpotlightCard>
 
       {/* Controls */}
       <section

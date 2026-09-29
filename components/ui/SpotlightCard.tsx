@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef } from "react";
-import { cn } from "@/lib/utils";
 
 export function SpotlightCard({
   children,
@@ -27,10 +26,7 @@ export function SpotlightCard({
     <div
       ref={cardRef}
       onPointerMove={handlePointerMove}
-      className={cn(
-        "spotlight-hover relative overflow-hidden rounded-xl border border-neutral-800/80 bg-neutral-950/80",
-        className
-      )}
+      className={`spotlight-hover relative overflow-hidden rounded-xl border border-neutral-800/80 bg-neutral-950/80 ${className || ""}`}
     >
       <style dangerouslySetInnerHTML={{ __html: `
         @media (hover: hover) {

@@ -64,11 +64,7 @@ function LayerHeading({ children, id }: { children: string; id?: string }) {
   );
 }
 
-/* -------------------------------------------------------------------------- *
- * LAYER 1 — AEO extraction
- * -------------------------------------------------------------------------- */
 
-/**
 function CodeBadge({ code }: { code: string }) {
   return <CopyPill code={code} />;
 }
