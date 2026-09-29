@@ -26,6 +26,7 @@ export function ExportClient({ corridors }: ExportClientProps) {
   const [grossAmount, setGrossAmount] = useState<number>(10000);
   const [originatorEntity, setOriginatorEntity] = useState<string>("Acme Corp International");
   const [debtorBic, setDebtorBic] = useState<string>("CHASUS33");
+  const [intermediaryChain, setIntermediaryChain] = useState<string>("CITIUS33");
   const [creditorBic, setCreditorBic] = useState<string>("SCBLINBBA");
 
   const corridor = corridors.find((c) => c.slug === selectedSlug) || corridors[0];
@@ -50,7 +51,7 @@ export function ExportClient({ corridors }: ExportClientProps) {
     }
   };
 
-  const payload = `${originatorEntity}|${debtorBic}|${creditorBic}|${selectedSlug}|${grossAmount}|${rate}|${shaUsd}|${finalLocal}`;
+  const payload = `${originatorEntity}|${debtorBic}|${intermediaryChain}|${creditorBic}|${selectedSlug}|${grossAmount}|${rate}|${shaUsd}|${finalLocal}`;
 
   const formatUsd = (val: number) => `$${val.toFixed(2)}`;
   const formatLocal = (val: number) => `${symbol}${val.toFixed(2)}`;
@@ -69,7 +70,7 @@ export function ExportClient({ corridors }: ExportClientProps) {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 mb-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Corridor</label>
             <select
@@ -108,6 +109,15 @@ export function ExportClient({ corridors }: ExportClientProps) {
               type="text"
               value={debtorBic}
               onChange={(e) => setDebtorBic(e.target.value)}
+              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Intermediary Routing Chain</label>
+            <input
+              type="text"
+              value={intermediaryChain}
+              onChange={(e) => setIntermediaryChain(e.target.value)}
               className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
             />
           </div>
@@ -165,6 +175,10 @@ export function ExportClient({ corridors }: ExportClientProps) {
               <div>
                 <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 print:text-slate-600 dark:text-slate-400">Debtor BIC</dt>
                 <dd className={`${FIGURE} mt-1 text-lg font-semibold uppercase`}>{debtorBic}</dd>
+              </div>
+              <div>
+                <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 print:text-slate-600 dark:text-slate-400">Intermediary Routing Chain</dt>
+                <dd className={`${FIGURE} mt-1 text-lg font-semibold uppercase`}>{intermediaryChain}</dd>
               </div>
               <div>
                 <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 print:text-slate-600 dark:text-slate-400">Creditor BIC</dt>
