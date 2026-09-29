@@ -902,3 +902,40 @@ html {
   animation: wirePulse 1s linear infinite;
 }
 
+
+/* HUD Ambient Layer */
+body {
+  background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 70%),
+              radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+              #080808 !important;
+  color: #e4e4e7;
+}
+
+.terminal-grid {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+.hairline-border {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hairline-border-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hairline-border-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hairline-border-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hairline-border-l {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.95); }
+}
+.animate-pulse-subtle {
+  animation: pulse-subtle 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

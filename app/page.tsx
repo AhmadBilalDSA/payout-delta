@@ -1,9 +1,10 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { getDataset } from "@/lib/db";
 import { buildDirectoryIndex } from "@/lib/directoryData";
 import DirectoryExplorer from "@/components/DirectoryExplorer";
 import Hero from "@/components/Hero";
 import AnnualLeakageCalculator from "@/components/AnnualLeakageCalculator";
+import { HeroSettlementCard } from "@/components/hud/HeroSettlementCard";
 
 export default function Home() {
   const entries = buildDirectoryIndex();
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
       <Hero />
+      <HeroSettlementCard />
 
       <DirectoryExplorer entries={entries} />
 

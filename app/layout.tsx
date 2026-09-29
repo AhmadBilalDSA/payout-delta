@@ -8,6 +8,8 @@ import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import { Dock } from "@/components/dashboard/Dock";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
+import { SovereignHeader } from "@/components/hud/SovereignHeader";
+import { KeyboardDock } from "@/components/hud/KeyboardDock";
 import { SITE_URL } from "@/lib/seoSchemas";
 import "./globals.css";
 
@@ -113,6 +115,7 @@ export default function RootLayout({
               inside <LanguageProvider> so the switcher's own labels resolve
               through the same `t()` dictionary as the rest of the shell. */}
           <BaseCurrencyProvider>
+            <SovereignHeader />
             <Header />
             <MarketStatusBar />
             {/* Responsive clearance:
@@ -126,6 +129,7 @@ export default function RootLayout({
                 being re-declared per page. It sits inside <LanguageProvider> so
                 its seven labels resolve through the shared `t()` dictionary. */}
             <Dock />
+            <KeyboardDock />
           </BaseCurrencyProvider>
         </LanguageProvider>
       </body>
