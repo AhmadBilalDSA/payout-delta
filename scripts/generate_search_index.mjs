@@ -80,6 +80,15 @@ index.push({
 });
 
 index.push({
+  id: "util-compare",
+  title: "Multi-Rail Corridor Comparator",
+  subtitle: "Compare SWIFT SHA vs OUR vs Local Clearing",
+  badge: "Utility",
+  url: "/payout-delta/compare/",
+  keywords: ["compare", "comparator", "swift", "sha", "our", "local clearing"]
+});
+
+index.push({
   id: "util-matrix",
   title: "Intermediary Deductions Sensitivity Matrix",
   subtitle: "Evaluate cross-border wire friction",

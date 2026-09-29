@@ -69,6 +69,8 @@ function CodeBadge({ code }: { code: string }) {
   return <CopyPill code={code} />;
 }
 
+import { SettlementWindow } from "./SettlementWindow";
+
 function QuickVerdict({ dossier }: { dossier: PageSovereignDossier }) {
   return (
     <section
@@ -76,16 +78,14 @@ function QuickVerdict({ dossier }: { dossier: PageSovereignDossier }) {
       aria-labelledby="quick-verdict-heading"
       className="hex-verdict w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 transition-colors duration-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:shadow-md dark:backdrop-blur-md sm:p-8"
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
         <h2
           id="quick-verdict-heading"
           className="text-[11px] font-bold uppercase tracking-[0.16em] text-black/45 dark:text-white/45"
         >
           Quick verdict · extraction block
         </h2>
-        <span className="hex-copy-hint text-[10px] font-medium uppercase tracking-[0.12em] text-black/35 dark:text-white/35">
-          Click any code to copy
-        </span>
+        <SettlementWindow countryCode={dossier.statute.countryCode || dossier.slug} />
       </div>
 
       {/* High contrast on purpose: this paragraph is the block an answer engine

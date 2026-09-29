@@ -79,6 +79,7 @@ export interface SovereignStatute {
   safeHarborRules: readonly string[];
   /** Published consequence of getting the evidence wrong. */
   nonComplianceRisk: string;
+  countryCode: string;
 }
 
 /**
@@ -302,6 +303,7 @@ function adaptStatute(jurisdiction: SovereignJurisdictionNode): SovereignStatute
     treatyDifferential: tax.treatyWhtPct < tax.baselineWhtPct,
     safeHarborRules: tax.safeHarborRules,
     nonComplianceRisk: tax.nonComplianceRisk,
+      countryCode: jurisdiction.iso2,
   };
 }
 
@@ -733,3 +735,4 @@ export function buildJurisdictionDossiers(
   }
   return map;
 }
+
