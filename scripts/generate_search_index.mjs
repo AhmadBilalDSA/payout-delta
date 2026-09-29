@@ -94,7 +94,7 @@ index.push({
   subtitle: "Generate and export an institutional payment audit sheet",
   badge: "Utility",
   url: "/payout-delta/export/",
-  keywords: ["export", "reconciliation", "ledger", "audit", "sheet", "print"]
+  keywords: ["reconciliation", "audit ledger", "tax export", "disbursement sheet", "export", "print"]
 });
 
 index.push({
@@ -128,3 +128,4 @@ const outPath = join(ROOT, "public", "api", "search-index.json");
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(index));
 console.log(`static search index built -> public/api/search-index.json (${index.length} entries)`);
+
