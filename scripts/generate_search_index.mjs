@@ -151,6 +151,15 @@ index.push({
   keywords: ["batch", "payout", "split", "engine", "enterprise", "bulk", "reconciliation"]
 });
 
+index.push({
+  id: "util-router",
+  title: "Sovereign Settlement Hop Resolver",
+  subtitle: "Pathfinding engine computing deterministic settlement routes",
+  badge: "Utility",
+  url: "/payout-delta/router/",
+  keywords: ["hop resolver", "swift pathfinding", "wire route", "correspondent tracer", "router"]
+});
+
 const outPath = join(ROOT, "public", "api", "search-index.json");
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(index));
