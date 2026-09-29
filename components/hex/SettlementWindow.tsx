@@ -31,7 +31,7 @@ export function SettlementWindow({ countryCode }: { countryCode: string }) {
   const rule = CLEARING_RULES[countryCode] || DEFAULT_RULE;
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     
     const tick = () => {

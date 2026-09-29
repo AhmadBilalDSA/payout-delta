@@ -124,6 +124,33 @@ index.push({
   keywords: ["tax", "clearance", "withholding", "wht", "ledger", "jurisdictions"]
 });
 
+index.push({
+  id: "util-w8ben",
+  title: "Statutory W-8BEN & Tax Treaty Clearance",
+  subtitle: "Interactive withholding tax resolver",
+  badge: "Utility",
+  url: "/payout-delta/w8ben/",
+  keywords: ["w8ben", "w-8ben", "tax", "treaty", "clearance", "withholding", "irs"]
+});
+
+index.push({
+  id: "util-tracer",
+  title: "Intermediary SWIFT Wire Hop Tracer",
+  subtitle: "Deterministic correspondent hop simulator",
+  badge: "Utility",
+  url: "/payout-delta/tracer/",
+  keywords: ["tracer", "swift", "wire", "hop", "intermediary", "sha", "correspondent"]
+});
+
+index.push({
+  id: "util-batch",
+  title: "Enterprise Batch Payout Split Engine",
+  subtitle: "Institutional multi-invoice reconciliation calculator",
+  badge: "Utility",
+  url: "/payout-delta/batch/",
+  keywords: ["batch", "payout", "split", "engine", "enterprise", "bulk", "reconciliation"]
+});
+
 const outPath = join(ROOT, "public", "api", "search-index.json");
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(index));
