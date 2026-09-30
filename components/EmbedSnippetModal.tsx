@@ -44,7 +44,7 @@ function EmbedSnippetDialog({
   onClose: () => void;
 }) {
   const embedUrl = `${EMBED_ORIGIN}/embed/${corridor.slug}/`;
-  const snippet = `<iframe src="${embedUrl}" width="380" height="220" frameborder="0" scrolling="no" style="border-radius:12px;overflow:hidden;"></iframe>`;
+  const snippet = `<iframe src="${embedUrl}" width="100%" height="220" frameborder="0" scrolling="no" sandbox="allow-scripts allow-same-origin" style="border-radius:12px;overflow:hidden;max-width:380px;border:none;" title="PayoutDelta Widget"></iframe>`;
   const [copied, setCopied] = useState(false);
   const copiedTimer = useRef<number | null>(null);
 

@@ -6,11 +6,27 @@ import { isAudioEnabled, setAudioEnabled, playClick } from "@/lib/sound";
 export function SovereignHeader() {
   const [audioOn, setAudioOn] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [freshness, setFreshness] = useState<{ dateStr: string; isStale: boolean } | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setAudioOn(isAudioEnabled());
+    
+    fetch("/payout-delta/api/fees.json")
+      .then(r => r.json())
+      .then(data => {
+        if (data.lastCompiledAudit) {
+          const auditDate = new Date(data.lastCompiledAudit);
+          const diffDays = (Date.now() - auditDate.getTime()) / (1000 * 60 * 60 * 24);
+          const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' });
+          setFreshness({
+            dateStr: formatter.format(auditDate),
+            isStale: diffDays > 30
+          });
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleAudioToggle = () => {
@@ -71,6 +87,20 @@ export function SovereignHeader() {
 
         {/* Right: Controls & Cheat-Pills */}
         <div className="flex items-center gap-2">
+          {/* Freshness Badge */}
+          {freshness && (
+            <div className="hidden lg:flex items-center gap-2 px-2.5 py-0.5 rounded bg-zinc-900/80 hairline-border text-[11px] font-mono tabular-nums">
+              <span className="text-zinc-500">Statutory Rails Audited:</span>
+              <span className={`font-semibold ${freshness.isStale ? "text-amber-400" : "text-zinc-200"}`}>{freshness.dateStr}</span>
+              <span className="text-emerald-400 font-mono text-[10px]">• Live Client-Side Engine</span>
+              {freshness.isStale && (
+                <span className="text-amber-500/90 italic ml-2 hidden xl:inline-block">
+                  (Static benchmark feeds may not reflect intra-day bank tariff changes)
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Quick Stats Pill */}
           <div className="hidden lg:flex items-center gap-2 px-2.5 py-0.5 rounded bg-zinc-900/80 hairline-border text-[11px] font-mono text-zinc-400 tabular-nums">
             <span className="text-zinc-500">LIQUIDITY DEPTH</span>

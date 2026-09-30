@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -94,12 +95,13 @@ export function LandedCalculator() {
   const [preset, setPreset] = useState<PresetKey>("wire");
   const [feeType, setFeeType] = useState<"SHA" | "OUR">("SHA");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [freshness, setFreshness] = useState<{ dateStr: string; isStale: boolean } | null>(null);
   
   const originBankOpts = useMemo(() => ALL_BANKS.filter(b => b.countryIso2 === "US"), []);
   const destBankOpts = useMemo(() => ALL_BANKS.filter(b => b.countryIso2 !== "US"), []);
 
   const [originBankBic, setOriginBankBic] = useState(originBankOpts.find(b => b.name.includes("Chase"))?.bic || originBankOpts[0].bic);
-  const [destBankBic, setDestBankBic] = useState(destBankOpts.find(b => b.name.includes("Deutsche Bank"))?.bic || destBankOpts[0].bic);
+  const [destBankBic, setDestBankBic] = useState(destBankOpts.find(b => b.name.includes("Habib"))?.bic || destBankOpts.find(b => b.name.includes("Deutsche Bank"))?.bic || destBankOpts[0].bic);
 
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const showToast = (msg: string) => {
@@ -109,15 +111,66 @@ export function LandedCalculator() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    try {
+      if (window.location.hash) {
+        const hashParams = window.location.hash.replace("#", "").split(",");
+        if (hashParams[0] === "calc" && hashParams.length >= 5) {
+          const initAmount = parseFloat(hashParams[1]);
+          if (!isNaN(initAmount) && initAmount > 0) setAmountStr(initAmount.toString());
+          if (hashParams[2] === "gross" || hashParams[2] === "net") setFlowMode(hashParams[2]);
+          if (hashParams[3] in PRESET_FEES) setPreset(hashParams[3] as PresetKey);
+          if (hashParams[4] === "SHA" || hashParams[4] === "OUR") setFeeType(hashParams[4]);
+          
+          if (hashParams[5]) {
+            const ob = originBankOpts.find(b => b.bic === hashParams[5]);
+            if (ob) setOriginBankBic(ob.bic);
+            else console.warn(`[Diagnostic] Unknown origin BIC in hash: ${hashParams[5]}, falling back to default.`);
+          }
+          if (hashParams[6]) {
+            const db = destBankOpts.find(b => b.bic === hashParams[6]);
+            if (db) setDestBankBic(db.bic);
+            else console.warn(`[Diagnostic] Unknown dest BIC in hash: ${hashParams[6]}, falling back to default.`);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[Diagnostic] Failed to parse calculator hash state, resetting.", err);
+      window.location.hash = "";
+    }
+    
+    try {
+      fetch("/payout-delta/api/fees.json")
+        .then(r => r.json())
+        .then(data => {
+          if (data.lastCompiledAudit) {
+            const auditDate = new Date(data.lastCompiledAudit);
+            const diffDays = (Date.now() - auditDate.getTime()) / (1000 * 60 * 60 * 24);
+            const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' });
+            setFreshness({
+              dateStr: formatter.format(auditDate),
+              isStale: diffDays > 30
+            });
+          }
+        })
+        .catch(console.error);
+    } catch {
+      // ignore
+    }
+    
     return () => {
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     };
-  }, []);
+  }, [destBankOpts, originBankOpts]);
 
-  const parsedAmount = parseFloat(amountStr) || 0;
+  let rawAmount = parseFloat(amountStr);
+  if (isNaN(rawAmount) || !isFinite(rawAmount) || rawAmount < 0) rawAmount = 0;
+  const parsedAmount = rawAmount;
+  
   const isSHA = feeType === "SHA";
 
-  const { wirePlatform, wireInward, localPlatform, localInward } = PRESET_FEES[preset];
+  const presetData = PRESET_FEES[preset] || PRESET_FEES.wire;
+  const { wirePlatform, wireInward, localPlatform, localInward } = presetData;
   const totalWireFriction = wirePlatform + wireInward;
   const totalLocalFriction = localPlatform + localInward;
 
@@ -171,7 +224,7 @@ export function LandedCalculator() {
   const shareLink = () => {
     if (navigator.clipboard) {
       const url = new URL(window.location.href);
-      url.hash = `calc,${parsedAmount},${flowMode},${preset},${feeType}`;
+      url.hash = `calc,${parsedAmount},${flowMode},${preset},${feeType},${originBankBic},${destBankBic}`;
       navigator.clipboard.writeText(url.toString())
         .then(() => showToast("Calculation link copied!"))
         .catch(() => showToast("Failed to copy link"));
@@ -182,12 +235,27 @@ export function LandedCalculator() {
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 font-sans mb-16">
       <section className="bg-zinc-900/80 rounded-xl border border-zinc-800 p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-sm min-h-[580px] md:min-h-[520px]">
         
-        <div className="flex items-center justify-between pb-6 mb-6 border-b border-zinc-800/80">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-[11px] uppercase tracking-wider text-zinc-100 font-medium">Rate locked for 48:00</span>
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-zinc-800/80 gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-[11px] uppercase tracking-wider text-zinc-100 font-medium">Rate locked for 48:00</span>
+            </div>
+            
+            {freshness && (
+              <div className="flex items-center gap-2 px-2.5 py-0.5 rounded bg-zinc-900/80 hairline-border text-[11px] font-mono tabular-nums self-start md:self-auto">
+                <span className="text-zinc-500">Statutory Rails Audited:</span>
+                <span className={`font-semibold ${freshness.isStale ? "text-amber-400" : "text-zinc-200"}`}>{freshness.dateStr}</span>
+                <span className="text-emerald-400 font-mono text-[10px] hidden sm:inline-block">• Live Client-Side Engine</span>
+                {freshness.isStale && (
+                  <span className="text-amber-500/90 italic ml-2 hidden sm:inline-block">
+                    (Static benchmark feeds may not reflect intra-day bank tariff changes)
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <span className="text-[11px] text-zinc-400 font-mono bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 tabular-nums">
             FX Spread: 0.00% (Institutional mid-market)

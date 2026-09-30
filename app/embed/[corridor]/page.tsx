@@ -62,6 +62,8 @@ export async function generateMetadata({
  * and the real net local take-home a $1,000 direct payout lands with. Forced
  * explicit dark hexes so the card reads identically in any embedding context.
  */
+import { EmbedResizer } from "@/components/calculator/EmbedResizer";
+
 export default async function EmbedCorridorPage({
   params,
 }: EmbedCorridorPageProps) {
@@ -93,6 +95,7 @@ export default async function EmbedCorridorPage({
 
   return (
     <div className="flex w-full flex-col bg-[#080D1A] p-3 font-mono">
+      <EmbedResizer />
       <div className="flex flex-col gap-2.5 rounded-xl border border-[#1E293B] bg-[#0F172A] p-3.5 text-white">
         <div className="flex items-center justify-between gap-2">
           <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-400">

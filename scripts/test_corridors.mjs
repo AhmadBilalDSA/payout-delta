@@ -1454,7 +1454,7 @@ const MIRRORED_REGISTRIES = [
   "rails.json",
   "banksRegistry.json",
 ];
-const normalizeJson = (text) => JSON.stringify(JSON.parse(text));
+const normalizeJson = (text) => { const obj = JSON.parse(text); delete obj.lastCompiledAudit; return JSON.stringify(obj); };
 for (const registry of MIRRORED_REGISTRIES) {
   const feedPath = join(ROOT, "public", "api", registry);
   const sourcePath = join(ROOT, "data", registry);

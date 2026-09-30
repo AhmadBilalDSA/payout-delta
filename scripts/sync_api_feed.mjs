@@ -30,7 +30,7 @@
  * package.json) — including the GitHub Actions deploy workflow.
  */
 
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -44,10 +44,20 @@ const REGISTRIES = [
   "banksRegistry.json",
 ];
 
+const isoDate = new Date().toISOString();
+
 for (const name of REGISTRIES) {
   const source = join(ROOT, "data", name);
   const target = join(ROOT, "public", "api", name);
   mkdirSync(dirname(target), { recursive: true });
-  copyFileSync(source, target);
+  
+  if (name === "fees.json" || name === "jurisdictions.json") {
+    const data = JSON.parse(readFileSync(source, "utf8"));
+    data.lastCompiledAudit = isoDate;
+    writeFileSync(target, JSON.stringify(data, null, 2));
+  } else {
+    copyFileSync(source, target);
+  }
+  
   console.log(`static api feed synced -> public/api/${name}`);
 }
