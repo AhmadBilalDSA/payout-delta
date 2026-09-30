@@ -1,0 +1,317 @@
+PAYOUTDELTA — UI COMPONENTS SPECIFICATION
+Generated: 2026-09-30 | Framework: Next.js 16 App Router, React 19, Tailwind CSS v4
+Zero-dependency rule: no runtime chart/icon/animation packages. All SVGs hand-rolled inline.
+
+================================================================================
+SHELL / LAYOUT COMPONENTS
+================================================================================
+
+Header.tsx
+  Path: components/Header.tsx
+  Role: Global navigation bar
+  Features: Open Data pill, theme toggle (light/dark), language switcher pill,
+            LanguageSwitcher dropdown, link to /calculator/, /invoice/, /dashboard/,
+            /leaderboard/, /banks/, /compare/, /tracer/
+  Constraints: Uses root-relative hrefs (basePath /payout-delta implicit via next/link)
+
+Footer.tsx
+  Path: components/Footer.tsx
+  Role: 4-column canonical link hub
+  Columns: Tools | Data | Legal | Community
+
+ThemeToggle.tsx
+  Path: components/ThemeToggle.tsx
+  Role: Light/dark mode toggle button (inline SVG sun/moon icons)
+
+LanguageSwitcher.tsx
+  Path: components/LanguageSwitcher.tsx
+  Role: 7-locale dropdown; drives document dir="rtl" for Urdu and Arabic
+
+================================================================================
+DASHBOARD SHELL
+================================================================================
+
+DashboardV3.tsx
+  Path: components/DashboardV3.tsx
+  Role: Full dashboard layout with tier selector
+
+Dock.tsx
+  Path: components/dashboard/Dock.tsx
+  Role: Frosted macOS-style bottom application launcher
+  Apps launched: Calculator, Invoice, Ledger, Leaderboard, Banks, Compare, Agency, Terminal
+
+Icons.tsx
+  Path: components/dashboard/Icons.tsx
+  Exports (inline SVG): CalculatorIcon, InvoiceIcon, LedgerIcon, LeaderboardIcon,
+                         BankBuildingIcon, CompareIcon, AgencyIcon, TerminalIcon
+
+SimpleTier.tsx / DiagnosticTier.tsx / WaterfallVisualizer.tsx
+  Path: components/dashboard/
+  Role: Dashboard tiers showing simplified vs. diagnostic fee waterfall
+
+================================================================================
+CALCULATOR SURFACE
+================================================================================
+
+Calculator.tsx
+  Path: components/Calculator.tsx
+  Role: Main interactive calculator; consumes calculateGrossFromTargetNet()
+  Inputs: targetNetLocal, platformFeePercent, channelSpread, baseRate,
+          fixedFeeUSD, intermediaryCutUSD, landingFeeLocal, taxWithholdingRate
+  Outputs: GrossUpResult fields rendered in FeeBreakdownList and VerdictCard
+
+FeeBreakdownList.tsx
+  Path: components/FeeBreakdownList.tsx
+  Role: Itemized deduction list (platform cut, bank/wire cut, FX spread, tax)
+
+VerdictCard.tsx
+  Path: components/VerdictCard.tsx
+  Role: Summary card showing requiredGrossBill and realizedTakeHomeLocal
+
+SliderControls.tsx
+  Path: components/SliderControls.tsx
+  Role: Range slider UI for fee inputs
+
+CorridorSelector.tsx / CorridorSwitcher.tsx
+  Path: components/Corridor*.tsx
+  Role: Picker UI for selecting from 131 corridor slugs
+
+BaseCurrencySwitcher.tsx
+  Path: components/BaseCurrencySwitcher.tsx
+  Role: Toggle between USD and local-currency display mode
+
+AnnualLeakageCalculator.tsx
+  Path: components/AnnualLeakageCalculator.tsx
+  Role: Projects monthly send × 12 × leakage percent
+
+TaxImpactCard.tsx
+  Path: components/TaxImpactCard.tsx
+  Role: Displays taxWithholdingLocal and effectiveTaxRate
+
+================================================================================
+REVERSE / GROSS-UP CALCULATOR
+================================================================================
+
+ReverseCalculatorClient.tsx
+  Path: components/reverse-calculator/ReverseCalculatorClient.tsx
+  Role: "What gross must I invoice?" UX; calls calculateGrossFromTargetNet()
+
+================================================================================
+INVOICE STUDIO
+================================================================================
+
+InvoiceEditor.tsx
+  Path: components/invoice/InvoiceEditor.tsx
+  Role: Rich invoice form (line items, purpose code, corridor, currency)
+
+InvoicePreview.tsx
+  Path: components/invoice/InvoicePreview.tsx
+  Role: Print-ready A4 invoice preview
+
+InvoiceHero.tsx
+  Path: components/invoice/InvoiceHero.tsx
+  Role: Landing hero for /invoice/ route
+
+TransparencyClause.tsx
+  Path: components/invoice/TransparencyClause.tsx
+  Role: Appends statutory fee-disclosure clause to invoice
+
+ContractAddendumModal.tsx
+  Path: components/invoice/ContractAddendumModal.tsx
+  Role: Modal for attaching contract addendum to invoice PDF
+
+================================================================================
+PRINT / PDF ENGINE (ZERO DEPENDENCY)
+================================================================================
+
+ExecutiveTreasuryReport.tsx
+  Path: components/agencies/ExecutiveTreasuryReport.tsx
+  Props: { rows, totals, issuedAt }
+  Role: Institutional-grade print memorandum; hidden on screen, visible in print
+  Layout: max-w-[210mm] (A4), hidden print:block
+  Reference ID: deterministic FNV-1a digest of roster (no clock / random)
+
+AuditReceipt.tsx / TransactionAuditSeal.tsx / AuditSeal.tsx
+  Path: components/ and components/export/ and components/hex/
+  Role: Print-sealed audit receipts and compliance seals
+
+Print CSS: app/globals.css @media print blocks
+  One block per printable surface, last-in-cascade.
+  Page numbering: position:fixed + counter(page)/counter(pages) — no JS pagination.
+
+================================================================================
+DIRECTORY & SEARCH
+================================================================================
+
+DirectoryExplorer.tsx
+  Path: components/DirectoryExplorer.tsx
+  Role: Instant in-memory full-text search + sticky category nav
+  Data source: buildDirectoryIndex() from lib/directoryData.ts
+
+CorridorDirectory.tsx
+  Path: components/CorridorDirectory.tsx
+  Role: Grid/list of all 131 corridors
+
+OmnibarModal.tsx
+  Path: components/search/OmnibarModal.tsx
+  Role: Global keyboard-triggered omnibar (Cmd+K / Ctrl+K)
+
+CorridorSearch.tsx
+  Path: components/search/CorridorSearch.tsx
+  Role: Inline search input filtering corridors
+
+================================================================================
+LEADERBOARD & COMPARE
+================================================================================
+
+LeaderboardShareCard.tsx
+  Path: components/LeaderboardShareCard.tsx
+  Role: Shareable card for leaderboard standings
+
+CompareClient.tsx
+  Path: components/compare/CompareClient.tsx
+  Role: Side-by-side corridor fee comparison
+
+================================================================================
+BANKS DIRECTORY
+================================================================================
+
+BankDirectory.tsx / BankRegistryTable.tsx
+  Path: components/banks/
+  Role: Display 22 bank dossiers from BANK_DOSSIERS[]
+
+BankRoutingDiagram.tsx / BankSettlementPanel.tsx
+  Path: components/banks/
+  Role: Inline SVG routing diagram and settlement window display
+
+================================================================================
+AGENCY TOOLS
+================================================================================
+
+AgencyAuditCalculator.tsx
+  Path: components/agencies/AgencyAuditCalculator.tsx
+  Role: Batch audit calculator for agency-level treasury ops
+
+================================================================================
+COMPLIANCE / SWIFT TOOLS
+================================================================================
+
+SwiftAuditorTerminal.tsx
+  Path: components/compliance/SwiftAuditorTerminal.tsx
+  Role: CLI-style SWIFT message auditor terminal
+
+SwiftRouteInspector.tsx
+  Path: components/compliance/SwiftRouteInspector.tsx
+  Role: Visual SWIFT route inspection diagram
+
+PrcLetterModal.tsx
+  Path: components/compliance/PrcLetterModal.tsx
+  Role: Modal for generating PRC (Purpose of Remittance Certificate) letters
+
+StatutoryTaxWizard.tsx
+  Path: components/tax-clearance/StatutoryTaxWizard.tsx
+  Role: Step-by-step wizard for tax clearance certificate generation
+
+W8BenClient.tsx
+  Path: components/tax/W8BenClient.tsx
+  Role: IRS W-8BEN form generator / validator
+
+================================================================================
+TRACER / ROUTER / SPLIT
+================================================================================
+
+TracerClient.tsx
+  Path: components/tracer/TracerClient.tsx
+  Role: SWIFT GPI-style payment tracer UI
+
+RouterClient.tsx
+  Path: components/router/RouterClient.tsx
+  Role: Optimal payment routing recommendation engine UI
+
+SplitOptimizerClient.tsx
+  Path: components/split/SplitOptimizerClient.tsx
+  Role: Multi-corridor split optimizer for large transfers
+
+BatchClient.tsx
+  Path: components/batch/BatchClient.tsx
+  Role: Bulk corridor fee calculator (CSV/paste input)
+
+================================================================================
+FX / RATE TOOLS
+================================================================================
+
+FxConverterClient.tsx
+  Path: components/fx/FxConverterClient.tsx
+  Role: Live FX conversion widget
+
+RateSparkline.tsx / CurrencyTrendSparkline.tsx
+  Path: components/
+  Role: Inline SVG mini-charts for rate trends (no chart library)
+
+MarketStatusBar.tsx
+  Path: components/MarketStatusBar.tsx
+  Role: Top-of-page market hours and status indicator
+
+RateWatchlistWidget.tsx
+  Path: components/RateWatchlistWidget.tsx
+  Role: User-pinned corridor rate watchlist (localStorage-backed)
+
+================================================================================
+LEDGER
+================================================================================
+
+TaxLedgerView.tsx
+  Path: components/ledger/TaxLedgerView.tsx
+  Role: Full ledger view of invoices with tax line items
+  Data: lib/ledgerEngine.ts (localStorage-backed)
+
+================================================================================
+SEO / SCHEMA
+================================================================================
+
+HomeJsonLd.tsx
+  Path: components/seo/HomeJsonLd.tsx
+  Role: Injects JSON-LD structured data for homepage
+
+AeoFaqSection.tsx / aeoTemplate.tsx
+  Path: components/
+  Role: AEO-optimized FAQ section with FAQ schema markup
+
+================================================================================
+PROVIDERS
+================================================================================
+
+BaseCurrencyProvider.tsx
+  Path: components/providers/BaseCurrencyProvider.tsx
+  Role: React context for base currency (USD/local) preference
+
+LanguageProvider.tsx
+  Path: components/providers/LanguageProvider.tsx
+  Role: React context for active locale; reads DICTIONARIES from lib/i18n/dictionaries.ts
+
+================================================================================
+MISC UI PRIMITIVES
+================================================================================
+
+SpotlightCard.tsx     — Spotlight hover effect card (components/ui/)
+ErrorBoundary.tsx     — React error boundary (components/ and components/common/)
+TransitionLink.tsx    — Animated page transition wrapper (components/nav/)
+SearchTriggerButton.tsx — Opens OmnibarModal (components/nav/)
+EmbedResizer.tsx      — PostMessage-based iframe auto-resizer (components/calculator/)
+EmbedSnippetModal.tsx — Copy-paste embed code modal
+ServiceWorkerRegister.tsx — PWA SW registration (components/pwa/)
+ClearLocalCacheButton.tsx — Dev utility: clears localStorage state
+KeyboardDock.tsx      — Keyboard shortcut overlay (components/hud/)
+HeroSettlementCard.tsx — Hero section settlement summary card (components/hud/)
+SovereignHeader.tsx   — Sovereign/institutional header variant (components/hud/)
+SovereignDossierView.tsx — Full dossier view (components/hex/)
+SettlementWindow.tsx  — Settlement timing window display (components/hex/)
+CopyPill.tsx          — One-click copy button pill (components/hex/)
+WhatsAppConsultingCard.tsx — WhatsApp CTA card (components/leads/)
+CodeSnippetTabs.tsx   — Tabbed code snippet display (components/developers/)
+BlufSummary.tsx       — Bottom-line-up-front summary (components/)
+AlternativeRailsCard.tsx — Shows alternative payment rails (components/)
+ComplianceGuide.tsx   — Corridor compliance guide block (components/)
+TransactionCostingWidget.tsx — Quick costing widget (components/)
+WirePipelineMap.tsx   — Inline SVG wire pipeline visualization (components/)
+AuditSheetModal.tsx   — Modal for audit sheet export (components/)

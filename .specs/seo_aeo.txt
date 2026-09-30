@@ -1,0 +1,166 @@
+PAYOUTDELTA — SEO & AEO SPECIFICATION
+Generated: 2026-09-30 | Static Export | GitHub Pages | basePath: /payout-delta
+
+================================================================================
+SEO ARCHITECTURE OVERVIEW
+================================================================================
+
+Strategy: Static-first SEO; all metadata, structured data, and sitemaps are
+          generated at build time. No server-side rendering for SEO signals.
+
+Site URL: Defined in lib/seoSchemas.ts as SITE_URL constant.
+Canonical form: {SITE_URL}/{route}/ (trailing slash enforced)
+IndexNow: scripts/ping_indexnow.mjs pings Bing/Yandex on every build.
+
+================================================================================
+INTERNATIONALIZATION (i18n) GATES
+================================================================================
+
+File: lib/i18n/dictionaries.ts
+Rule: ANY new UI string MUST be registered in this file before use.
+
+Supported locales (7):
+  en  — English          (LTR) [canonical]
+  ur  — Urdu / اردو       (RTL)
+  hi  — Hindi / हिन्दी    (LTR)
+  fil — Filipino          (LTR)
+  es  — Español           (LTR)
+  pt  — Português         (LTR)
+  ar  — Arabic / العربية  (RTL)
+
+LANG_META export: { englishName, nativeName, shortLabel, isRTL } per locale
+RTL enforcement: LanguageProvider.tsx sets document dir="rtl" for ur and ar
+
+Dictionary structure:
+  enStrings — canonical key set; all other catalogs must match keyof enStrings
+  DICTIONARIES — Record<SupportedLang, UiCatalog>
+  Vars type — interpolation variables ({curly} placeholders, replaced verbatim)
+
+Preserved in all languages (not translated):
+  Product names, provider identities, legal acronyms:
+  PSEB, PRC, FEMA, FIRC, LUT, VAT, GST, P2P, corridor codes
+
+================================================================================
+METADATA & STRUCTURED DATA
+================================================================================
+
+lib/seoSchemas.ts
+  Exports: SITE_URL, plus schema builder functions for:
+    - Organization schema
+    - WebSite schema with SearchAction
+    - BreadcrumbList schema
+    - FAQPage schema
+    - FinancialProduct schema (per corridor)
+
+HomeJsonLd.tsx (components/seo/HomeJsonLd.tsx)
+  Injects: Organization + WebSite JSON-LD into <head> on homepage
+
+Per-corridor calculator pages:
+  Include: BreadcrumbList + FAQPage + FinancialProduct JSON-LD
+
+Per-guide compare pages:
+  Include: Article + BreadcrumbList + FAQPage JSON-LD
+
+================================================================================
+AEO (ANSWER ENGINE OPTIMIZATION) COMPONENTS
+================================================================================
+
+AeoFaqSection.tsx (components/AeoFaqSection.tsx)
+  Role: Renders FAQ content with FAQPage schema markup
+  Purpose: Targets featured snippets, People Also Ask, and AI overviews
+
+aeoTemplate.tsx (components/aeoTemplate.tsx)
+  Role: Template wrapper for AEO-optimized corridor answer pages
+  Structure: Question → Direct answer → Supporting data → Schema
+
+FaqAccordion.tsx (components/FaqAccordion.tsx)
+  Role: Accessible accordion FAQ display (keyboard navigable)
+
+BlufSummary.tsx (components/BlufSummary.tsx)
+  Role: Bottom-Line-Up-Front summary block
+  Purpose: Delivers the direct answer in the first 40-60 words for AI extraction
+
+ComplianceGuide.tsx (components/ComplianceGuide.tsx)
+  Role: Corridor-specific compliance guide (regulatory context)
+
+================================================================================
+SITEMAP
+================================================================================
+
+File: app/sitemap.ts (force-static export)
+Sources:
+  - getCorridorSlugs() + LONG_TAIL_CORRIDORS → /calculator/[slug]/
+  - LOCALIZED_CORRIDORS → /[lang]/calculator/[slug]/
+  - EDITORIAL_GUIDES → /compare/[slug]/
+  - Static entries: /, /tracer/, /w8ben/, /export/, /docs/, /compare/,
+                    /invoice/, /tax-ledger/, /leaderboard/, /dashboard/, /banks/
+
+Priority map:
+  1.0   Homepage
+  0.9   /tracer/, /w8ben/, /invoice/
+  0.85  /calculator/[slug]/
+  0.8   /export/, /compare/, /tax-ledger/, /leaderboard/, /banks/
+  0.7   /dashboard/, /[lang]/calculator/[slug]/
+  0.6   /compare/[slug]/
+  0.5   /embed/[slug]/
+
+================================================================================
+ROBOTS & CRAWL DIRECTIVES
+================================================================================
+
+File: public/robots.txt
+  Allows all crawlers on all routes.
+  Sitemap directive points to /payout-delta/sitemap.xml
+
+IndexNow key: public/indexnow-key.txt (Bing + Yandex)
+Google verification: public/googleb8e9bec69a131a8e.html
+
+================================================================================
+LLM-READABLE MANIFEST
+================================================================================
+
+/llms.txt        — Compact machine-readable site index for AI crawlers
+/llms-full.txt   — Extended version with corridor and bank summaries
+/index.txt       — Flat route index
+
+Generated by: scripts/generate_llms_manifest.mjs (run at build time)
+
+================================================================================
+EDITORIAL CONTENT (COMPARE GUIDES)
+================================================================================
+
+Source: data/editorialGuides.ts → EDITORIAL_GUIDES array
+URL pattern: /compare/[slug]/
+Content: Provider vs. provider comparisons per corridor (e.g. Wise vs Payoneer PK)
+Sitemap priority: 0.6
+
+================================================================================
+LONG-TAIL CORRIDOR STRATEGY
+================================================================================
+
+Source: data/corridors.ts → LONG_TAIL_CORRIDORS
+Purpose: Extends slug coverage beyond the 131 primary corridors for
+         low-competition, high-intent keyword capture.
+Included in: sitemap calculator entries (same priority 0.85 as primary)
+
+================================================================================
+CORE SEO RULES
+================================================================================
+
+1. Every page must have a unique <title> and <meta name="description">.
+2. Canonical URLs always include trailing slash.
+3. All images use next/image with unoptimized: true (static export).
+4. No client-side navigation breaks crawlability — all routes are pre-rendered.
+5. Structured data must be valid JSON-LD (validate with Google's Rich Results Test).
+6. Any new route added to app/ must also be added to app/sitemap.ts.
+7. Any new locale-specific content must add entries to LOCALIZED_CORRIDORS.
+8. i18n strings must be registered in lib/i18n/dictionaries.ts before use.
+
+================================================================================
+SEARCH INDEX
+================================================================================
+
+Generated by: scripts/generate_search_index.mjs
+Used by: DirectoryExplorer.tsx and OmnibarModal.tsx
+Index covers: corridor slugs, corridor labels, bank names, BIC codes, rail names
+Engine: buildDirectoryIndex() in lib/directoryData.ts (in-memory, client-side)
