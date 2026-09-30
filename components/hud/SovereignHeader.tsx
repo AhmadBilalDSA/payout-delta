@@ -69,7 +69,7 @@ export function SovereignHeader() {
               </svg>
             </div>
             <span className="text-xs font-semibold tracking-wider text-zinc-100 uppercase">
-              PAYOUT-DELTA <span className="text-zinc-500 font-normal">{"//"}</span> <span className="text-zinc-300">SETTLEMENT LEDGER</span>
+              PAYOUT-DELTA <span className="text-zinc-500 font-normal">{"//"}</span> <span className="text-zinc-300">MAINTAINED BY AHMAD BILAL • OPEN SOURCE SETTLEMENT LEDGER</span>
             </span>
           </div>
 

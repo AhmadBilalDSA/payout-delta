@@ -97,7 +97,7 @@ export const BANK_DOSSIERS: BankDossier[] = [
     clearingCurrency: "USD",
     clearingNetwork: "Fedwire / CHIPS (USD) · SWIFT gpi",
     typicalShaDeduction: "$18.00 – $35.00 SHA Cut",
-    averageIntermediaryCutUSD: 26.5,
+    averageIntermediaryCutUSD: 20,
     chargeCodeSupport: {
       supported: ["SHA", "OUR", "BEN"],
       recommended: "SHA",

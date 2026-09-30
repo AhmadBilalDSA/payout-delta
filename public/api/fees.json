@@ -32,14 +32,14 @@
     {
       "id": "swift",
       "name": "Direct SWIFT Wire",
-      "fixedFeeUSD": 45,
+      "fixedFeeUSD": 30,
       "fxSpread": 0.035
     },
     {
       "id": "local-bank",
       "name": "Local Bank Transfer",
       "fixedFeeUSD": 0.99,
-      "fxSpread": 0.035
+      "fxSpread": 0.032
     },
     {
       "id": "wise",
@@ -50,8 +50,8 @@
     {
       "id": "payoneer",
       "name": "Payoneer",
-      "fixedFeeUSD": 2,
-      "fxSpread": 0.02
+      "fixedFeeUSD": 3.15,
+      "fxSpread": 0.05
     },
     {
       "id": "remitly",
@@ -4474,5 +4474,5 @@
       "rateSource": "modelled"
     }
   ],
-  "lastCompiledAudit": "2026-09-30T11:01:55.878Z"
+  "lastCompiledAudit": "2026-09-30T11:22:43.417Z"
 }

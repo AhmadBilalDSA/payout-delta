@@ -432,8 +432,11 @@ export function LandedCalculator() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
+          </div>
+          <div className="mt-4 text-[10px] text-zinc-500 text-center leading-relaxed">
+            Audited from State Bank of Pakistan (SBP) & Institutional Schedule of Charges (Updated Q3 2026). <a href="/payout-delta/api/fees.json" className="text-emerald-500 hover:underline" target="_blank">Open data</a>.
+          </div>
+        </section>
 
       <div className="[content-visibility:auto] [contain-intrinsic-size:100%_460px]">
         <h2 className="text-xl font-bold text-zinc-100 mb-4">Compare Execution Rails</h2>
