@@ -1,12 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { CorridorSearch, GlobalSearchTrigger } from "@/components/search/CorridorSearch";
 import { isAudioEnabled, setAudioEnabled, playClick } from "@/lib/sound";
 
 export function SovereignHeader() {
   const [audioOn, setAudioOn] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [freshness, setFreshness] = useState<{ dateStr: string; isStale: boolean } | null>(null);
+
+  useEffect(() => {
+    const onOpen = () => setIsSearchOpen(true);
+    window.addEventListener('open-global-search', onOpen);
+    return () => window.removeEventListener('open-global-search', onOpen);
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -101,6 +109,7 @@ export function SovereignHeader() {
             </div>
           )}
 
+          <GlobalSearchTrigger onClick={() => setIsSearchOpen(true)} className="hidden md:flex" />
           {/* Quick Stats Pill */}
           <div className="hidden lg:flex items-center gap-2 px-2.5 py-0.5 rounded bg-zinc-900/80 hairline-border text-[11px] font-mono text-zinc-400 tabular-nums">
             <span className="text-zinc-500">LIQUIDITY DEPTH</span>
@@ -137,6 +146,7 @@ export function SovereignHeader() {
           </div>
         </div>
       </header>
+      <CorridorSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

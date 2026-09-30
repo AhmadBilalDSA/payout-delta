@@ -1,8 +1,17 @@
-# PayoutDelta - Cross-Border Remittance & Intermediary Fee Benchmark
+# Project name: PayoutDelta // Institutional Settlement & Net Payout Ledger
 
 > This is an llms.txt file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org
 
-> PayoutDelta benchmarks exactly what a contractor payout loses inside the banking rail before it lands in the recipient's local account: correspondent SWIFT intermediary deductions (SHA), FX spreads, platform cuts and statutory withholding. The dataset covers 208 currency corridors across USD, EUR and GBP origins — USD, EUR and GBP to Pakistan, India, the Philippines, Brazil, Mexico, Nigeria, the EU and beyond — and is restated every time `data/fees.json` refreshes (dataset 2026-09-27, 208 corridors, 145 platform routes).
+> Direct summary: Static zero-dependency auditor benchmarking correspondent bank SHA deductions (CHASUS33, CITIUS33), foreign exchange markups, and cross-border landing amounts for international contractors and financial institutions.
+
+## Core endpoints
+- Data Feed: https://ahmadbilaldsa.github.io/payout-delta/api/fees.json
+- Bank Directory: https://ahmadbilaldsa.github.io/payout-delta/api/banksRegistry.json
+- Documentation: https://ahmadbilaldsa.github.io/payout-delta/docs/
+- Sitemap: https://ahmadbilaldsa.github.io/payout-delta/sitemap.xml
+
+## Calculation Invariants
+Standard SWIFT SHA deducts $15 to $35 intermediary clearing cut. Local RTGS / instant clearing saves up to 96% on principal transfers.
 
 ## PayoutDelta Guides
 

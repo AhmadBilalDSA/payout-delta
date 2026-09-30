@@ -3,56 +3,68 @@ import { getCorridorSlugs } from "@/lib/db";
 import { LONG_TAIL_CORRIDORS } from "@/data/corridors";
 import { EDITORIAL_GUIDES } from "@/data/editorialGuides";
 import { LOCALIZED_CORRIDORS } from "@/lib/localizedCorridors";
-import { getBankProfiles } from "@/lib/registryData";
 import { SITE_URL } from "@/lib/seoSchemas";
 
-const LAST_MODIFIED = new Date("2026-09-22");
+const LAST_MODIFIED = new Date();
 
 /** Required so the sitemap prerenders under `output: "export"`. */
 export const dynamic = "force-static";
 
 /** Paths use trailing slashes to mirror `trailingSlash: true` canonicals. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const corridorEntries = [
+  const corridorSlugs = [
     ...getCorridorSlugs(),
     ...LONG_TAIL_CORRIDORS.map((spec) => spec.slug),
-  ].map((slug) => ({
+  ];
+
+  const calculatorEntries: MetadataRoute.Sitemap = corridorSlugs.map((slug) => ({
     url: `${SITE_URL}/calculator/${slug}/`,
     lastModified: LAST_MODIFIED,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
+    changeFrequency: "weekly",
+    priority: 0.85,
   }));
 
-  const embedEntries: MetadataRoute.Sitemap = getCorridorSlugs().map(
-    (slug) => ({
-      url: `${SITE_URL}/embed/${slug}/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly" as const,
-      priority: 0.4,
-    }),
-  );
+  const embedEntries: MetadataRoute.Sitemap = corridorSlugs.map((slug) => ({
+    url: `${SITE_URL}/embed/${slug}/`,
+    lastModified: LAST_MODIFIED,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
 
   const localizedEntries: MetadataRoute.Sitemap = LOCALIZED_CORRIDORS.map(
     ({ lang, slug }) => ({
       url: `${SITE_URL}/${lang}/calculator/${slug}/`,
       lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly" as const,
+      changeFrequency: "weekly",
       priority: 0.7,
     }),
   );
+
+  const guideEntries: MetadataRoute.Sitemap = EDITORIAL_GUIDES.map((guide) => ({
+    url: `${SITE_URL}/compare/${guide.slug}/`,
+    lastModified: LAST_MODIFIED,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
 
   const staticEntries: MetadataRoute.Sitemap = [
     {
       url: `${SITE_URL}/`,
       lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 1,
+      changeFrequency: "daily",
+      priority: 1.0,
     },
     {
-      url: `${SITE_URL}/compare/`,
+      url: `${SITE_URL}/tracer/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/w8ben/`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.9,
     },
     {
       url: `${SITE_URL}/export/`,
@@ -61,16 +73,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${SITE_URL}/about/`,
+      url: `${SITE_URL}/docs/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "monthly",
-      priority: 0.5,
+      priority: 0.8,
     },
     {
-      url: `${SITE_URL}/contact/`,
+      url: `${SITE_URL}/compare/`,
       lastModified: LAST_MODIFIED,
-      changeFrequency: "monthly",
-      priority: 0.3,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${SITE_URL}/invoice/`,
@@ -79,34 +91,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${SITE_URL}/matrix/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/fx/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
       url: `${SITE_URL}/tax-ledger/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/tax-clearance/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "monthly",
       priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/swift-auditor/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.7,
     },
     {
       url: `${SITE_URL}/leaderboard/`,
@@ -117,123 +105,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${SITE_URL}/dashboard/`,
       lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/api-access/`,
-      lastModified: LAST_MODIFIED,
       changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/developers/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "monthly",
-      priority: 0.6,
+      priority: 0.7,
     },
     {
       url: `${SITE_URL}/banks/`,
       lastModified: LAST_MODIFIED,
       changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/agencies/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/challengers/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/privacy-policy/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${SITE_URL}/terms-of-service/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${SITE_URL}/disclaimer/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${SITE_URL}/reverse-calculator/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/split/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/w8ben/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/tracer/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/batch/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/router/`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
       priority: 0.8,
     },
   ];
 
-  const compareGuideEntries: MetadataRoute.Sitemap = EDITORIAL_GUIDES.map(
-    (guide) => ({
-      url: `${SITE_URL}/compare/${guide.slug}/`,
-      lastModified: new Date(guide.updatedAt),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    }),
-  );
-
-  /**
-   * One entry per verified institution head, not per authored dossier: the 23
-   * deep-dive dossiers rank a notch higher because they carry content the other
-   * 243 registry routes do not, but every `/banks/<slug>/` route is published and
-   * so every one of them belongs in the sitemap.
-   */
-  const bankEntries: MetadataRoute.Sitemap = getBankProfiles().map((bank) => ({
-    url: `${SITE_URL}/banks/${bank.slug}/`,
-    lastModified: LAST_MODIFIED,
-    changeFrequency: "monthly" as const,
-    priority: bank.hasDossier ? 0.7 : 0.5,
-  }));
-
   return [
     ...staticEntries,
-    ...compareGuideEntries,
-    ...corridorEntries,
-    ...bankEntries,
+    ...calculatorEntries,
     ...embedEntries,
     ...localizedEntries,
+    ...guideEntries,
   ];
 }

@@ -111,7 +111,6 @@ export function LandedCalculator() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     try {
       if (window.location.hash) {
         const hashParams = window.location.hash.replace("#", "").split(",");

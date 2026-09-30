@@ -1,3 +1,4 @@
+import { GlobalSearchTrigger } from "@/components/search/CorridorSearch";
 import CorridorSelector from "@/components/CorridorSelector";
 
 /**
@@ -24,8 +25,14 @@ export default function Hero() {
           Independent fee and spread auditor benchmarked against real-time
           interbank foreign exchange rates.
         </p>
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex flex-col items-center gap-6">
+          {/* Hero Search Trigger */}
+          <div className="w-full max-w-md">
+            <GlobalSearchTrigger standalone className="w-full justify-between py-3 px-4 text-sm bg-zinc-900/50 hover:bg-zinc-800/80 shadow-inner" />
+          </div>
+          <div className="flex justify-center">
           <CorridorSelector />
+        </div>
         </div>
       </div>
     </section>

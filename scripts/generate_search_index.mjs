@@ -50,13 +50,24 @@ for (const j of jurisData.jurisdictions) {
 
 // 4. Corridors (from fees.json)
 for (const c of feesData.corridors) {
+  const juris = jurisData.jurisdictions.find(j => j.iso2 === c.countryCode);
+  const primaryBics = juris ? juris.primaryBankBics : [];
+  const primaryRail = juris ? juris.primaryRailId : "";
+  const bankDetails = primaryBics.map(bic => banksData.banks.find(b => b.bic === bic)).filter(Boolean);
+  const shaDeduction = bankDetails.length > 0 ? bankDetails[0].defaultIntermediaryCutUSD : 18;
+
   index.push({
     id: `corridor-${c.slug}`,
     title: `${c.from} to ${c.to}`,
     subtitle: c.country,
     badge: "Corridor",
     url: `/payout-delta/calculator/${c.slug}/`,
-    keywords: [c.slug, c.from, c.to, c.country, c.countryCode, c.currencyName, c.currencySymbol].filter(Boolean)
+    keywords: [c.slug, c.from, c.to, c.country, c.countryCode, c.currencyName, c.currencySymbol, primaryRail, ...primaryBics].filter(Boolean),
+    meta: {
+      flag: c.countryCode,
+      shaDeduction: shaDeduction,
+      rail: primaryRail
+    }
   });
 }
 
@@ -94,74 +105,11 @@ index.push({
   subtitle: "Generate and export an institutional payment audit sheet",
   badge: "Utility",
   url: "/payout-delta/export/",
-  keywords: ["reconciliation", "audit ledger", "tax export", "disbursement sheet", "export", "print"]
+  keywords: ["export", "ledger", "audit", "sheet", "pdf", "csv"]
 });
 
-index.push({
-  id: "util-matrix",
-  title: "Intermediary Deductions Sensitivity Matrix",
-  subtitle: "Evaluate cross-border wire friction",
-  badge: "Utility",
-  url: "/payout-delta/matrix/",
-  keywords: ["matrix", "sensitivity", "deductions", "friction", "wire"]
-});
+const outDir = join(ROOT, "public", "api");
+mkdirSync(outDir, { recursive: true });
+writeFileSync(join(outDir, "search-index.json"), JSON.stringify(index, null, 2));
 
-index.push({
-  id: "util-fx",
-  title: "Canonical FX Converter",
-  subtitle: "Compare Mid-market against Platform Rails",
-  badge: "Utility",
-  url: "/payout-delta/fx/",
-  keywords: ["fx", "converter", "exchange", "mid-market", "compare"]
-});
-
-index.push({
-  id: "util-tax",
-  title: "Tax Clearance Ledger",
-  subtitle: "Sovereign WHT bands",
-  badge: "Utility",
-  url: "/payout-delta/tax-clearance/",
-  keywords: ["tax", "clearance", "withholding", "wht", "ledger", "jurisdictions"]
-});
-
-index.push({
-  id: "util-w8ben",
-  title: "Statutory W-8BEN & Tax Treaty Clearance",
-  subtitle: "Interactive withholding tax resolver",
-  badge: "Utility",
-  url: "/payout-delta/w8ben/",
-  keywords: ["w8ben", "w-8ben", "tax", "treaty", "clearance", "withholding", "irs"]
-});
-
-index.push({
-  id: "util-tracer",
-  title: "Intermediary SWIFT Wire Hop Tracer",
-  subtitle: "Deterministic correspondent hop simulator",
-  badge: "Utility",
-  url: "/payout-delta/tracer/",
-  keywords: ["tracer", "swift", "wire", "hop", "intermediary", "sha", "correspondent"]
-});
-
-index.push({
-  id: "util-batch",
-  title: "Enterprise Batch Payout Split Engine",
-  subtitle: "Institutional multi-invoice reconciliation calculator",
-  badge: "Utility",
-  url: "/payout-delta/batch/",
-  keywords: ["batch", "payout", "split", "engine", "enterprise", "bulk", "reconciliation"]
-});
-
-index.push({
-  id: "util-router",
-  title: "Sovereign Settlement Hop Resolver",
-  subtitle: "Pathfinding engine computing deterministic settlement routes",
-  badge: "Utility",
-  url: "/payout-delta/router/",
-  keywords: ["hop resolver", "swift pathfinding", "wire route", "correspondent tracer", "router"]
-});
-
-const outPath = join(ROOT, "public", "api", "search-index.json");
-mkdirSync(dirname(outPath), { recursive: true });
-writeFileSync(outPath, JSON.stringify(index));
 console.log(`static search index built -> public/api/search-index.json (${index.length} entries)`);
-
