@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
+import { TransitionLink as Link } from "@/components/nav/TransitionLink";
 import banksRegistryData from "@/data/banksRegistry.json";
 import jurisdictionsData from "@/data/jurisdictions.json";
 import feesData from "@/data/fees.json";
@@ -468,9 +469,9 @@ export function LandedCalculator() {
                 <span className="text-[11px] font-medium text-zinc-400">{flowMode === 'gross' ? 'Net Landed:' : 'Required Gross:'}</span>
                 <span className="text-xl text-zinc-100 font-mono font-bold tabular-nums">${(flowMode === 'gross' ? wireNetLanded : wireRequiredGross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
-              <button className="w-full py-2.5 rounded-lg border border-zinc-700 hover:bg-zinc-800 text-zinc-200 text-sm font-medium transition-colors">
+              <Link href="/tracer/" className="w-full py-2.5 rounded-lg border border-zinc-700 hover:bg-zinc-800 text-zinc-200 text-sm font-medium transition-colors flex items-center justify-center">
                 Select Wire {feeType}
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -509,9 +510,9 @@ export function LandedCalculator() {
                 <span className="text-[11px] font-medium text-zinc-400">{flowMode === 'gross' ? 'Net Landed:' : 'Required Gross:'}</span>
                 <span className="text-xl text-emerald-400 font-mono font-bold tabular-nums">${(flowMode === 'gross' ? localNetLanded : localRequiredGross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
-              <button className="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold transition-all shadow-sm active:scale-95">
+              <Link href="/" className="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold transition-all shadow-sm active:scale-95 flex items-center justify-center">
                 Route via Instant Rail
-              </button>
+              </Link>
             </div>
           </div>
         </div>

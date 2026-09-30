@@ -30,13 +30,13 @@ export function Dock() {
 
   const items = [
     { href: "/", icon: CalculatorIcon, label: "Calculator", ariaLabel: "Open Fee Calculator" },
-    { href: "/invoice", icon: InvoiceIcon, label: "Invoice", ariaLabel: "Generate Invoice" },
-    { href: "/tax-ledger", icon: LedgerIcon, label: "Ledger", ariaLabel: "View Client Ledger" },
-    { href: "/leaderboard", icon: LeaderboardIcon, label: "Leaderboard", ariaLabel: "View Cost Leaderboard" },
-    { href: "/banks", icon: BankBuildingIcon, label: "Banks", ariaLabel: "Browse Bank Directory" },
-    { href: "/compare", icon: CompareIcon, label: "Compare", ariaLabel: "Compare Corridors" },
-    { href: "/agencies", icon: AgencyIcon, label: "Agencies", ariaLabel: "Regulatory Agencies" },
-    { href: "/dashboard", icon: TerminalIcon, label: "Terminal", ariaLabel: "Open Terminal" },
+    { href: "/invoice/", icon: InvoiceIcon, label: "Invoice", ariaLabel: "Generate Invoice" },
+    { href: "/tracer/", icon: LedgerIcon, label: "Tracer", ariaLabel: "SWIFT Wire Hop Tracer" },
+    { href: "/w8ben/", icon: AgencyIcon, label: "W-8BEN", ariaLabel: "W-8BEN Treaty Resolver" },
+    { href: "/leaderboard/", icon: LeaderboardIcon, label: "Leaderboard", ariaLabel: "View Cost Leaderboard" },
+    { href: "/banks/", icon: BankBuildingIcon, label: "Banks", ariaLabel: "Browse Bank Directory" },
+    { href: "/compare/", icon: CompareIcon, label: "Compare", ariaLabel: "Compare Corridors" },
+    { href: "/dashboard/", icon: TerminalIcon, label: "Terminal", ariaLabel: "Open Terminal" },
   ] as const;
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");

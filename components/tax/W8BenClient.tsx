@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TransactionAuditSeal } from "@/components/export/TransactionAuditSeal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { TransitionLink as Link } from "@/components/nav/TransitionLink";
 
 const FIGURE = "font-mono tabular-nums";
 
@@ -199,6 +200,15 @@ export function W8BenClient({ jurisdictions }: W8BenClientProps) {
           </div>
         </div>
       </SpotlightCard>
+
+      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 print:hidden">
+        <Link href="/tracer/" className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800">
+          Trace SWIFT Route &rarr;
+        </Link>
+        <Link href="/invoice/" className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-emerald-400">
+          Open Invoice Studio &rarr;
+        </Link>
+      </div>
     </div>
   );
 }
