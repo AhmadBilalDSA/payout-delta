@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { TransactionAuditSeal } from "@/components/export/TransactionAuditSeal";
-import { calculateRoutes, type HopRoute } from "@/lib/hopEngine";
+import { calculateRoutes } from "@/lib/hopEngine";
 
 const FIGURE = "font-mono tabular-nums";
 

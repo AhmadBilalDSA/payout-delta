@@ -38,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Full Sequential Verification Gate
-        run: npm run prebuild && npx tsc --noEmit && npm run test && npm run build && npm run audit:ui && npm run audit:hex && npm run audit:utility && npm run audit:search && npm run audit:offline && npm run audit:security
+        run: npm run prebuild && npx tsc --noEmit && npm run build && npm run test && npm run audit:ui && npm run audit:hex && npm run audit:utility && npm run audit:search && npm run audit:offline && npm run audit:security
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

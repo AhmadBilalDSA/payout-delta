@@ -10,7 +10,6 @@ export function SovereignHeader() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAudioOn(isAudioEnabled());
   }, []);
 
