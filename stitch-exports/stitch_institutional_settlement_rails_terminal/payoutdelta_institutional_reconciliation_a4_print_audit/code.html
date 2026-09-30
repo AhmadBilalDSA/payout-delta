@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PayoutDelta // Reconciliation Audit #PD-2025-9941</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary": "#003825",
+            "inverse-on-surface": "#2c303a",
+            "on-primary-fixed-variant": "#005137",
+            "tertiary": "#ffd16d",
+            "primary-fixed-dim": "#45dfa4",
+            "on-secondary-fixed-variant": "#004c69",
+            "on-error": "#690005",
+            "outline-variant": "#3c4a42",
+            "on-tertiary": "#402d00",
+            "on-tertiary-fixed": "#261a00",
+            "surface-container-high": "#262a34",
+            "surface-dim": "#0f131c",
+            "on-secondary": "#00354a",
+            "primary-fixed": "#68fcbf",
+            "surface-container-low": "#181b25",
+            "error": "#ffb4ab",
+            "secondary-fixed-dim": "#7bd0ff",
+            "on-primary-container": "#00563b",
+            "on-tertiary-fixed-variant": "#5c4300",
+            "secondary-fixed": "#c4e7ff",
+            "on-secondary-container": "#00374d",
+            "tertiary-fixed": "#ffdf9f",
+            "on-tertiary-container": "#614700",
+            "secondary": "#7bd0ff",
+            "error-container": "#93000a",
+            "on-secondary-fixed": "#001e2c",
+            "surface-container-highest": "#31353f",
+            "primary-container": "#34d399",
+            "on-primary-fixed": "#002114",
+            "surface-tint": "#45dfa4",
+            "on-surface": "#dfe2ef",
+            "inverse-primary": "#006c4b",
+            "surface-container": "#1c1f29",
+            "on-surface-variant": "#bbcac0",
+            "inverse-surface": "#dfe2ef",
+            "surface-variant": "#31353f",
+            "outline": "#85948b",
+            "on-background": "#dfe2ef",
+            "tertiary-fixed-dim": "#f9bd22",
+            "secondary-container": "#00a6e0",
+            "surface": "#0f131c",
+            "surface-bright": "#353943",
+            "primary": "#5af0b3",
+            "tertiary-container": "#ecb210",
+            "background": "#0f131c",
+            "surface-container-lowest": "#0a0e17",
+            "on-error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-md": "0.75rem",
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-2xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1rem",
+            "space-xl": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Geist"],
+            "body-lg": ["Geist"],
+            "label-caps": ["JetBrains Mono"],
+            "headline-xl": ["Geist"],
+            "mono-num-sm": ["JetBrains Mono"],
+            "body-sm": ["Geist"],
+            "mono-num-md": ["JetBrains Mono"],
+            "headline-xl-mobile": ["Geist"],
+            "headline-md": ["Geist"],
+            "body-md": ["Geist"],
+            "mono-num-xl": ["JetBrains Mono"],
+            "mono-num-lg": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "label-caps": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "mono-num-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "body-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "mono-num-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "500" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "mono-num-xl": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "mono-num-lg": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "500" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-sheet {
+        border: 1px solid #d1d5db !important;
+        background-color: #ffffff !important;
+        color: #111827 !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-sheet * {
+        color: #111827 !important;
+        border-color: #e5e7eb !important;
+      }
+    }
+    .hairline-border {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .hairline-b {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .hairline-t {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-primary-container selection:text-on-primary">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-6 py-2 border-b border-outline-variant/30 bg-surface-container-lowest sticky top-0 z-50">
+<div class="flex items-center space-x-6">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight flex items-center gap-2">
+<span class="inline-block w-2.5 h-2.5 bg-primary-container rounded-none"></span>
+        PayoutDelta // Treasury Terminal
+      </span>
+<nav class="hidden md:flex items-center space-x-6">
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#">Calculator</a>
+<a class="text-primary border-b-2 border-primary font-mono-num-md text-mono-num-md pb-1" href="#">Reconciliation Audit</a>
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#">Hop Tracer</a>
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#">W-8BEN Resolver</a>
+</nav>
+</div>
+<div class="flex items-center space-x-4">
+<div class="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface-variant font-mono-num-sm text-mono-num-sm">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+        Live MID: 1.0842 EUR/USD
+      </div>
+<div class="flex items-center space-x-1 text-on-surface-variant">
+<button class="p-1.5 rounded hover:text-primary hover:bg-surface-container-high/40 transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</button>
+<button class="p-1.5 rounded hover:text-primary hover:bg-surface-container-high/40 transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">shield_with_heart</span>
+</button>
+<button class="p-1.5 rounded hover:text-primary hover:bg-surface-container-high/40 transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant/30 hidden sm:block"></div>
+<button class="px-3 py-1 bg-surface-container border border-outline-variant/40 rounded text-on-surface hover:border-outline transition-colors duration-150 font-mono-num-sm text-mono-num-sm active:scale-[0.98]">
+        Export Ledger
+      </button>
+<div class="flex items-center space-x-2 pl-1">
+<div class="w-7 h-7 rounded bg-surface-container-high border border-outline-variant/40 flex items-center justify-center text-primary font-mono-num-sm font-semibold">
+          TO
+        </div>
+</div>
+</div>
+</header>
+<!-- Context / Action Bar -->
+<div class="no-print w-full bg-surface-container-low/60 border-b border-outline-variant/30 px-6 py-3">
+<div class="max-w-[1240px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div class="flex items-center space-x-2 font-mono-num-sm text-mono-num-sm">
+<span class="text-on-surface-variant">Treasury Desk</span>
+<span class="text-outline">/</span>
+<span class="text-on-surface-variant">Export</span>
+<span class="text-outline">/</span>
+<span class="text-primary font-medium">Reconciliation Audit #PD-2025-9941</span>
+<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-label-caps bg-emerald-950/40 border border-emerald-500/30 text-emerald-400">
+          SETTLED &amp; LOCKED
+        </span>
+</div>
+<!-- Action Controls -->
+<div class="flex items-center flex-wrap gap-2">
+<button class="px-3 py-1.5 bg-primary-container hover:bg-emerald-500 text-on-primary font-headline-md font-semibold text-[0.8125rem] rounded inline-flex items-center gap-1.5 transition-all duration-150 active:scale-[0.98]" onclick="window.print()">
+<span class="material-symbols-outlined text-[16px]">print</span>
+          Print Document (A4)
+        </button>
+<button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 text-on-surface font-headline-md font-medium text-[0.8125rem] rounded inline-flex items-center gap-1.5 transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-[16px]">table_chart</span>
+          Download CSV Ledger
+        </button>
+<button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 text-on-surface-variant hover:text-on-surface font-mono-num-sm text-mono-num-sm rounded inline-flex items-center gap-1.5 transition-colors duration-150 active:scale-[0.98]" id="copyHashBtn" onclick="navigator.clipboard.writeText('7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069'); this.innerText='Hash Copied';">
+<span class="material-symbols-outlined text-[15px]">content_copy</span>
+          Copy SHA-256
+        </button>
+<button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 text-on-surface-variant hover:text-on-surface font-headline-md font-medium text-[0.8125rem] rounded inline-flex items-center gap-1.5 transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+          Export PDF
+        </button>
+</div>
+</div>
+</div>
+<!-- Primary Document Canvas (Simulated A4 Architectural Container) -->
+<main class="flex-1 py-8 px-4 sm:px-6">
+<div class="print-sheet max-w-[1040px] mx-auto bg-[#121826] hairline-border rounded shadow-2xl relative p-6 sm:p-10 space-y-8">
+<!-- Subtle Document Security Grid Ribbon -->
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-4 text-outline-variant font-mono-num-sm text-[10px]">
+<div class="flex items-center gap-3">
+<span class="text-primary font-label-caps uppercase tracking-wider font-semibold">TREASURY CLEARING RECORD</span>
+<span>//</span>
+<span>ISO 20022 CAMT.053 / PACS.008 VERIFIED</span>
+<span class="hidden sm:inline">//</span>
+<span class="hidden sm:inline">ORIGIN: FEDWIRE-TARGET2 CORRIDOR</span>
+</div>
+<div class="flex items-center gap-2">
+<span>DOCUMENT LEVEL: TIER-1 INSTITUTIONAL</span>
+<span class="w-2 h-2 rounded-full bg-primary/70"></span>
+</div>
+</div>
+<!-- 1. Document Header & Seal -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-outline-variant/20 pb-6">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="px-1.5 py-0.5 bg-primary-container/10 border border-primary-container/30 text-primary font-label-caps text-label-caps">
+              CONFIDENTIAL // INSTITUTIONAL AUDIT VOUCHER
+            </span>
+<span class="px-1.5 py-0.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-mono-num-sm text-[10px]">
+              VOUCHER #PD-2025-9941
+            </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">
+            PAYOUTDELTA TREASURY CLEARING HOUSE
+          </h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            Standard Operating Procedure § 404-B Final Settlement &amp; Net Landing Execution Statement
+          </p>
+</div>
+<!-- Meta Stamp Panel -->
+<div class="bg-[#0c121e] border border-white/[0.04] p-3 rounded font-mono-num-sm text-mono-num-sm min-w-[280px]">
+<div class="flex justify-between items-center py-0.5 border-b border-white/[0.04]">
+<span class="text-on-surface-variant font-label-caps text-label-caps">TIMESTAMP (UTC):</span>
+<span class="text-on-surface">2025-05-18 14:32:09</span>
+</div>
+<div class="flex justify-between items-center py-0.5 border-b border-white/[0.04]">
+<span class="text-on-surface-variant font-label-caps text-label-caps">BATCH ID:</span>
+<span class="text-primary font-medium">BTH-8841-EURUSD</span>
+</div>
+<div class="flex justify-between items-center py-0.5">
+<span class="text-on-surface-variant font-label-caps text-label-caps">STATUS:</span>
+<span class="px-1.5 py-0.2 bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-label-caps text-[10px]">
+              RECONCILED &amp; LOCKED
+            </span>
+</div>
+</div>
+</section>
+<!-- 2. Route & Clearing Corridor Matrix (4-Column Structured Grid) -->
+<section class="space-y-2.5">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">account_tree</span>
+            Corridor Route &amp; Clearing Architecture
+          </h2>
+<span class="font-label-caps text-label-caps text-on-surface-variant">MULTI-HOP MT103/PACS008 SEQUENCE</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+<!-- Step 1: Debtor / Originator -->
+<div class="bg-[#0c121e] border border-white/[0.04] rounded p-3.5 flex flex-col justify-between relative group hover:border-white/[0.1] transition-colors">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-primary">01 / DEBTOR (ORIGIN)</span>
+<span class="px-1 py-0.2 bg-surface-container-high text-[9px] font-mono-num-sm text-on-surface-variant rounded">US NY</span>
+</div>
+<h3 class="font-headline-md text-[0.9375rem] font-medium text-on-surface">Chase Bank N.A.</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">New York, United States</p>
+</div>
+<div class="mt-4 pt-3 border-t border-white/[0.04] space-y-1 font-mono-num-sm text-mono-num-sm">
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>SWIFT BIC:</span>
+<span class="text-on-surface font-semibold">CHASUS33XXX</span>
+</div>
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>ACCOUNT:</span>
+<span class="text-on-surface">****4910</span>
+</div>
+</div>
+</div>
+<!-- Step 2: Intermediary Clearing Agent -->
+<div class="bg-[#0c121e] border border-white/[0.04] rounded p-3.5 flex flex-col justify-between relative group hover:border-white/[0.1] transition-colors">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-tertiary">02 / INTERMEDIARY NODE</span>
+<span class="px-1 py-0.2 bg-amber-950/40 border border-amber-500/30 text-amber-400 text-[9px] font-label-caps">SHA CUT</span>
+</div>
+<h3 class="font-headline-md text-[0.9375rem] font-medium text-on-surface">JPMorgan Chase Clearing</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Fedwire Funds Routing Node</p>
+</div>
+<div class="mt-4 pt-3 border-t border-white/[0.04] space-y-1 font-mono-num-sm text-mono-num-sm">
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>FEDWIRE ABA:</span>
+<span class="text-on-surface font-semibold">#021000021</span>
+</div>
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>INSTRUCTION:</span>
+<span class="text-amber-400">Transiting SHA Fee</span>
+</div>
+</div>
+</div>
+<!-- Step 3: Receiving Clearing Network -->
+<div class="bg-[#0c121e] border border-white/[0.04] rounded p-3.5 flex flex-col justify-between relative group hover:border-white/[0.1] transition-colors">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-secondary">03 / INWARD CLEARING</span>
+<span class="px-1 py-0.2 bg-sky-950/40 border border-sky-500/30 text-sky-400 text-[9px] font-label-caps">TARGET2</span>
+</div>
+<h3 class="font-headline-md text-[0.9375rem] font-medium text-on-surface">TARGET2 / STEP2</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bundesbank / EBA Core Node</p>
+</div>
+<div class="mt-4 pt-3 border-t border-white/[0.04] space-y-1 font-mono-num-sm text-mono-num-sm">
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>NETWORK REF:</span>
+<span class="text-on-surface font-semibold">EUR-T2-9844</span>
+</div>
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>CYCLE:</span>
+<span class="text-on-surface">Same-Day RTGS</span>
+</div>
+</div>
+</div>
+<!-- Step 4: Creditor / Beneficiary -->
+<div class="bg-[#0c121e] border border-white/[0.04] rounded p-3.5 flex flex-col justify-between relative group hover:border-white/[0.1] transition-colors">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-primary">04 / BENEFICIARY (DEST)</span>
+<span class="px-1 py-0.2 bg-surface-container-high text-[9px] font-mono-num-sm text-on-surface-variant rounded">EU DE</span>
+</div>
+<h3 class="font-headline-md text-[0.9375rem] font-medium text-on-surface">Deutsche Bank AG</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Frankfurt am Main, Germany</p>
+</div>
+<div class="mt-4 pt-3 border-t border-white/[0.04] space-y-1 font-mono-num-sm text-mono-num-sm">
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>SWIFT BIC:</span>
+<span class="text-on-surface font-semibold">DEUTDEDDXXX</span>
+</div>
+<div class="flex justify-between text-on-surface-variant text-[11px]">
+<span>IBAN:</span>
+<span class="text-on-surface">DE89 3704 **** 9912</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Itemized Settlement & Friction Reconciliation Ledger -->
+<section class="space-y-2.5">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">receipt_long</span>
+            Settlement &amp; Friction Waterfall Reconciliation
+          </h2>
+<span class="font-mono-num-sm text-mono-num-sm text-on-surface-variant">BASE CURRENCY: USD / SETTLED: EUR</span>
+</div>
+<div class="overflow-x-auto border border-outline-variant/30 rounded bg-[#0c121e]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/30 bg-[#121826] font-label-caps text-label-caps text-on-surface-variant">
+<th class="py-2.5 px-4 font-semibold">STAGE // LEDGER CODE</th>
+<th class="py-2.5 px-4 font-semibold">AUDIT DESCRIPTION &amp; VERIFICATION REFERENCE</th>
+<th class="py-2.5 px-4 font-semibold text-right">BASIS POINTS</th>
+<th class="py-2.5 px-4 font-semibold text-right">REALIZED AMOUNT</th>
+<th class="py-2.5 px-4 font-semibold text-right">BALANCE WATERFALL</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/[0.04] font-mono-num-sm text-mono-num-sm">
+<!-- Row 1: Gross Invoiced -->
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-4 font-medium text-on-surface">
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 text-on-surface mr-2 text-[10px]">01-GRS</span>
+                  Gross Invoiced Principal
+                </td>
+<td class="py-3 px-4 text-on-surface-variant">
+                  Debtor instruction dispatched via Fedwire ISO 20022 message core.
+                </td>
+<td class="py-3 px-4 text-right text-on-surface-variant">0.0 bps</td>
+<td class="py-3 px-4 text-right font-medium text-on-surface tabular-nums">+$5,000.00 USD</td>
+<td class="py-3 px-4 text-right font-semibold text-primary tabular-nums">$5,000.00 USD</td>
+</tr>
+<!-- Row 2: Upstream Fee -->
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-4 text-on-surface">
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 text-on-surface-variant mr-2 text-[10px]">02-FED</span>
+                  Upstream Wire Initiation Fee
+                </td>
+<td class="py-3 px-4 text-on-surface-variant">
+                  Billed directly to Originator account via Fedwire Direct Corporate Agreement.
+                </td>
+<td class="py-3 px-4 text-right text-on-surface-variant">0.0 bps</td>
+<td class="py-3 px-4 text-right text-on-surface-variant tabular-nums">$0.00 USD</td>
+<td class="py-3 px-4 text-right text-on-surface tabular-nums">$5,000.00 USD</td>
+</tr>
+<!-- Row 3: Transiting Correspondent -->
+<tr class="hover:bg-white/[0.02] transition-colors bg-amber-950/10">
+<td class="py-3 px-4 text-amber-400 font-medium">
+<span class="px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-500/30 text-amber-400 mr-2 text-[10px]">03-SHA</span>
+                  Correspondent Deduction (SHA Cut)
+                </td>
+<td class="py-3 px-4 text-on-surface-variant">
+                  Transiting clearing toll deducted from principal. <span class="text-amber-400 font-medium">Verified MT103 Field 71F</span>.
+                </td>
+<td class="py-3 px-4 text-right text-amber-400 tabular-nums">50.0 bps</td>
+<td class="py-3 px-4 text-right text-amber-400 font-medium tabular-nums">-$25.00 USD</td>
+<td class="py-3 px-4 text-right text-on-surface tabular-nums">$4,975.00 USD</td>
+</tr>
+<!-- Row 4: Beneficiary Tariff -->
+<tr class="hover:bg-white/[0.02] transition-colors bg-rose-950/10">
+<td class="py-3 px-4 text-rose-400 font-medium">
+<span class="px-1.5 py-0.5 rounded bg-rose-950/40 border border-rose-500/30 text-rose-400 mr-2 text-[10px]">04-BNF</span>
+                  Beneficiary Inward Settlement Tariff
+                </td>
+<td class="py-3 px-4 text-on-surface-variant">
+                  Receiving network lifting deduction. <span class="text-rose-400 font-medium">Verified pacs.008 inward ledger fee</span>.
+                </td>
+<td class="py-3 px-4 text-right text-rose-400 tabular-nums">20.0 bps</td>
+<td class="py-3 px-4 text-right text-rose-400 font-medium tabular-nums">-$10.00 USD</td>
+<td class="py-3 px-4 text-right text-on-surface tabular-nums">$4,965.00 USD</td>
+</tr>
+<!-- Row 5: Foreign Exchange Conversion -->
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-4 text-on-surface font-medium">
+<span class="px-1.5 py-0.5 rounded bg-sky-950/40 border border-sky-500/30 text-sky-400 mr-2 text-[10px]">05-FXP</span>
+                  Foreign Exchange Execution
+                </td>
+<td class="py-3 px-4 text-on-surface-variant">
+                  Institutional Zero-Spread Interbank Conversion @ <span class="text-secondary font-semibold">1.087 EUR/USD (Live Mid: 1.0842)</span>
+</td>
+<td class="py-3 px-4 text-right text-on-surface-variant">0.0 bps</td>
+<td class="py-3 px-4 text-right text-secondary tabular-nums">FX 0.00%</td>
+<td class="py-3 px-4 text-right font-medium text-secondary tabular-nums">€4,567.80 EUR</td>
+</tr>
+</tbody>
+<!-- Summary Footing -->
+<tfoot>
+<tr class="border-t-2 border-outline-variant/40 bg-[#121826]/90 font-mono-num-md text-mono-num-md">
+<td class="py-3.5 px-4 font-headline-md font-semibold text-on-surface" colspan="2">
+                  TOTAL FRICTION REALIZED &amp; NET CREDIT RECOVERY
+                </td>
+<td class="py-3.5 px-4 text-right text-rose-400 font-semibold tabular-nums">
+                  70.0 bps drag
+                </td>
+<td class="py-3.5 px-4 text-right text-rose-400 font-semibold tabular-nums">
+                  -$35.00 USD
+                </td>
+<td class="py-3.5 px-4 text-right tabular-nums">
+<div class="text-primary font-bold text-[1.0625rem]">$4,965.00 USD</div>
+<div class="text-secondary text-mono-num-sm font-medium">€4,567.80 EUR (99.30% Net)</div>
+</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</section>
+<!-- Key Performance Metrics Strip -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="p-3 bg-[#0c121e] border border-white/[0.04] rounded">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-1">INVOICED GROSS</span>
+<span class="font-mono-num-lg text-mono-num-lg font-bold text-on-surface tabular-nums">$5,000.00</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant block">100.00% Principal</span>
+</div>
+<div class="p-3 bg-[#0c121e] border border-white/[0.04] rounded">
+<span class="font-label-caps text-label-caps text-amber-400 block mb-1">TOTAL CORRIDOR SLIPPAGE</span>
+<span class="font-mono-num-lg text-mono-num-lg font-bold text-amber-400 tabular-nums">-$35.00</span>
+<span class="font-body-sm text-[10px] text-amber-400/80 block">70.0 Basis Points Drag</span>
+</div>
+<div class="p-3 bg-[#0c121e] border border-white/[0.04] rounded">
+<span class="font-label-caps text-label-caps text-primary block mb-1">LANDED NET CREDIT</span>
+<span class="font-mono-num-lg text-mono-num-lg font-bold text-primary tabular-nums">€4,567.80</span>
+<span class="font-body-sm text-[10px] text-primary/80 block">99.30% Settlement Efficiency</span>
+</div>
+<div class="p-3 bg-[#0c121e] border border-white/[0.04] rounded">
+<span class="font-label-caps text-label-caps text-secondary block mb-1">CONVERSION BENCHMARK</span>
+<span class="font-mono-num-lg text-mono-num-lg font-bold text-secondary tabular-nums">1.0842</span>
+<span class="font-body-sm text-[10px] text-secondary/80 block">True Mid-Market Exact</span>
+</div>
+</section>
+<!-- 4. Formal Sign-Off & Corporate Accounting Authorization Block -->
+<section class="space-y-2.5">
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
+          Corporate Treasury Authorization &amp; Attestation
+        </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Sign-Off 1: Prepared By -->
+<div class="bg-[#0c121e] border border-white/[0.06] rounded p-4 flex flex-col justify-between space-y-4">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">DISPATCHED &amp; PREPARED BY</span>
+<span class="px-1.5 py-0.2 bg-surface-container-high text-on-surface font-mono-num-sm text-[10px] rounded">OPERATOR #TR-8819</span>
+</div>
+<p class="font-headline-md text-[0.9375rem] font-semibold text-on-surface">A. Vance — Senior Liquidity Desk Officer</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cross-Border Settlement &amp; Netting Desk (Americas)</p>
+</div>
+<!-- Signature Visualization Block -->
+<div class="border-b border-dashed border-outline-variant/50 pb-2 flex items-end justify-between font-mono-num-sm text-[11px]">
+<div class="italic font-serif text-on-surface-variant tracking-wider text-base">
+                A. Vance (Electronic PKI Sig)
+              </div>
+<div class="text-right text-on-surface-variant">
+<span>SIGNED: </span>
+<span class="text-on-surface font-medium">2025-05-18 14:35:12 UTC</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono-num-sm text-on-surface-variant">
+<span>PKI CERT: #US-NY-77124-FD</span>
+<span class="text-emerald-400">DISPATCH CERTIFIED</span>
+</div>
+</div>
+<!-- Sign-Off 2: Reconciled & Closed By -->
+<div class="bg-[#0c121e] border border-white/[0.06] rounded p-4 flex flex-col justify-between space-y-4 relative overflow-hidden">
+<!-- Institutional Closed Stamp Background Watermark -->
+<div class="absolute right-3 -bottom-2 pointer-events-none select-none border-2 border-emerald-500/20 text-emerald-500/10 font-label-caps text-3xl font-extrabold px-3 py-1 rotate-[-12deg] tracking-widest uppercase">
+              CLOSED &amp; RECONCILED
+            </div>
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">VERIFIED &amp; RECONCILED BY</span>
+<span class="px-1.5 py-0.2 bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-label-caps text-[10px]">LEDGER: CLOSED</span>
+</div>
+<p class="font-headline-md text-[0.9375rem] font-semibold text-on-surface">M. E. Sterling, CPA — Chief Accounting Officer</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Institutional Controllership &amp; Sarbanes-Oxley Compliance</p>
+</div>
+<div class="border-b border-dashed border-outline-variant/50 pb-2 flex items-end justify-between font-mono-num-sm text-[11px]">
+<div class="italic font-serif text-on-surface-variant tracking-wider text-base">
+                M. E. Sterling, CAO
+              </div>
+<div class="text-right text-on-surface-variant">
+<span>AUDITED: </span>
+<span class="text-on-surface font-medium">2025-05-18 14:41:00 UTC</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono-num-sm text-on-surface-variant">
+<span>CONTROLLER REF: #CTL-4910-FIN</span>
+<span class="text-emerald-400 font-semibold">ATTESATION SECURED</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Deterministic SHA-256 Audit Seal Block -->
+<section class="bg-[#0c121e] border border-white/[0.06] rounded p-4 space-y-3">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">fingerprint</span>
+<div>
+<span class="font-headline-md text-[0.875rem] font-semibold text-on-surface">Deterministic Cryptographic Audit Seal</span>
+<span class="text-on-surface-variant font-mono-num-sm text-[11px] ml-2">Block Anchor #4,819,104</span>
+</div>
+</div>
+<span class="px-2 py-0.5 bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-label-caps text-label-caps inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            IMMUTABLE LEDGER RECORD
+          </span>
+</div>
+<div class="bg-[#121826] border border-white/[0.04] p-2.5 rounded flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+<div class="font-mono-num-sm text-[11px] text-on-surface-variant break-all">
+<span class="text-primary font-semibold font-label-caps">SHA-256:</span>
+<span class="text-on-surface ml-1 select-all">7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069</span>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<!-- Simulated QR Indicator Code Block -->
+<div class="w-7 h-7 bg-white text-black p-0.5 rounded flex items-center justify-center font-mono-num-sm text-[8px] font-bold tracking-tighter">
+              QR-99
+            </div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">ISO 20022 COMPLIANT VERIFIED</span>
+</div>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+          This document certifies that the principal settlement of $5,000.00 USD in batch #BTH-8841-EURUSD has cleared all transit correspondent intermediary stages with $35.00 USD (70.0 bps) in total verified friction, landing €4,567.80 EUR into Deutsche Bank AG. The record is permanently anchored in accordance with Federal Reserve and EBA statutory clearing benchmarks.
+        </p>
+</section>
+<!-- Document Sign-Off Disclaimer Footer -->
+<div class="border-t border-outline-variant/20 pt-4 flex flex-col sm:flex-row justify-between items-center text-on-surface-variant font-mono-num-sm text-[10px] gap-2">
+<span>SECURITY LEVEL: CONFIDENTIAL TIER-1 TREASURY DESK</span>
+<span>RECONCILIATION SHEET CODE: DS-8841-V3.8</span>
+<span>PAGE 1 OF 1 (LEGAL AUDIT RECORD)</span>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full px-6 py-4 border-t border-outline-variant/30 bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center gap-4 mt-auto">
+<div class="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+        © 2025 PayoutDelta Treasury Terminal Inc. Real-time FedNow, SEPA, and SWIFT settlement verification guaranteed under Tier-1 Institutional SLA.
+      </span>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-4">
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-primary" href="#">
+        SHA-256 Audit: #9e82a4
+      </a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-primary" href="#">
+        SLA Commitments
+      </a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-primary" href="#">
+        SOC-2 Type II Verified
+      </a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-primary" href="#">
+        Form W-8BEN Protocol
+      </a>
+<span class="text-primary font-label-caps text-label-caps flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+        System Health: Operational
+      </span>
+</div>
+</footer>
+</body></html>

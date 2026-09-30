@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PayoutDelta // Statutory W-8BEN Resolver</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Inter & JetBrains Mono Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary": "#003825",
+            "inverse-on-surface": "#2c303a",
+            "on-primary-fixed-variant": "#005137",
+            "tertiary": "#ffd16d",
+            "primary-fixed-dim": "#45dfa4",
+            "on-secondary-fixed-variant": "#004c69",
+            "on-error": "#690005",
+            "outline-variant": "#3c4a42",
+            "on-tertiary": "#402d00",
+            "on-tertiary-fixed": "#261a00",
+            "surface-container-high": "#262a34",
+            "surface-dim": "#0f131c",
+            "on-secondary": "#00354a",
+            "primary-fixed": "#68fcbf",
+            "surface-container-low": "#181b25",
+            "error": "#ffb4ab",
+            "secondary-fixed-dim": "#7bd0ff",
+            "on-primary-container": "#00563b",
+            "on-tertiary-fixed-variant": "#5c4300",
+            "secondary-fixed": "#c4e7ff",
+            "on-secondary-container": "#00374d",
+            "tertiary-fixed": "#ffdf9f",
+            "on-tertiary-container": "#614700",
+            "secondary": "#7bd0ff",
+            "error-container": "#93000a",
+            "on-secondary-fixed": "#001e2c",
+            "surface-container-highest": "#31353f",
+            "primary-container": "#34d399",
+            "on-primary-fixed": "#002114",
+            "surface-tint": "#45dfa4",
+            "on-surface": "#dfe2ef",
+            "inverse-primary": "#006c4b",
+            "surface-container": "#1c1f29",
+            "on-surface-variant": "#bbcac0",
+            "inverse-surface": "#dfe2ef",
+            "surface-variant": "#31353f",
+            "outline": "#85948b",
+            "on-background": "#dfe2ef",
+            "tertiary-fixed-dim": "#f9bd22",
+            "secondary-container": "#00a6e0",
+            "surface": "#0f131c",
+            "surface-bright": "#353943",
+            "primary": "#5af0b3",
+            "tertiary-container": "#ecb210",
+            "background": "#0f131c",
+            "surface-container-lowest": "#0a0e17",
+            "on-error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-md": "0.75rem",
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-2xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1rem",
+            "space-xl": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Geist"],
+            "body-lg": ["Geist"],
+            "label-caps": ["JetBrains Mono"],
+            "headline-xl": ["Geist"],
+            "mono-num-sm": ["JetBrains Mono"],
+            "body-sm": ["Geist"],
+            "mono-num-md": ["JetBrains Mono"],
+            "headline-xl-mobile": ["Geist"],
+            "headline-md": ["Geist"],
+            "body-md": ["Geist"],
+            "mono-num-xl": ["JetBrains Mono"],
+            "mono-num-lg": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "label-caps": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "mono-num-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "body-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "mono-num-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "500" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "mono-num-xl": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "mono-num-lg": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 1.125rem;
+      line-height: 1;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0c121e;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md select-none selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Shared Component -->
+<header class="flex justify-between items-center w-full px-6 py-2 border-b border-outline-variant/30 bg-surface-container-lowest sticky top-0 z-50">
+<!-- Brand Anchor -->
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-3">
+<div class="w-6 h-6 bg-primary-container flex items-center justify-center rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">currency_exchange</span>
+</div>
+<span class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">PayoutDelta // Treasury Terminal</span>
+</div>
+<!-- Primary Global Nav Links -->
+<nav class="hidden lg:flex items-center space-x-6 pt-1">
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#calculator">Calculator</a>
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#reconciliation">Reconciliation Audit</a>
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#tracer">Hop Tracer</a>
+<a class="text-primary border-b-2 border-primary font-mono-num-md text-mono-num-md pb-1 font-semibold" href="#w8ben">W-8BEN Resolver</a>
+</nav>
+</div>
+<!-- Trailing Action Controls & Telemetry -->
+<div class="flex items-center space-x-4">
+<!-- Live Mid Indicator Badge -->
+<div class="hidden sm:flex items-center space-x-2 px-2.5 py-1 bg-surface-container-low rounded border border-outline-variant/30">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-mono-num-sm text-mono-num-sm text-on-surface-variant">Live MID: 1.0842 EUR/USD</span>
+</div>
+<!-- Icon Actions -->
+<div class="flex items-center space-x-1 border-l border-outline-variant/30 pl-3">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container-high/40 rounded transition-colors duration-150 active:scale-[0.98]" title="Terminal console">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container-high/40 rounded transition-colors duration-150 active:scale-[0.98]" title="Security status">
+<span class="material-symbols-outlined" data-icon="shield_with_heart">shield_with_heart</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container-high/40 rounded transition-colors duration-150 active:scale-[0.98] relative" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full"></span>
+</button>
+</div>
+<!-- Export Primary Action -->
+<button class="hidden md:inline-flex items-center px-3 py-1.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 rounded text-on-surface font-label-caps text-label-caps tracking-wider transition-colors duration-150 active:scale-[0.98]">
+        Export Ledger
+      </button>
+<!-- User Avatar / Operator Badge -->
+<div class="flex items-center pl-2">
+<div class="w-7 h-7 rounded border border-outline-variant/50 bg-surface-container-high flex items-center justify-center font-mono-num-sm text-mono-num-sm text-primary font-medium">
+          TX
+        </div>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-[1536px] mx-auto px-4 md:px-6 py-6 space-y-6">
+<!-- Page Header & Statutory Intent Banner -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-outline-variant/20">
+<div class="space-y-1">
+<div class="flex items-center space-x-2">
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-primary font-label-caps text-label-caps border border-primary/20">US-CODE TITLE 26 § 1441</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-caps text-label-caps border border-outline-variant/30">TREASURY CIRCULAR 230 COMPLIANT</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl font-semibold text-on-surface tracking-tight">Statutory Form W-8BEN &amp; Treaty Withholding Resolver</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-4xl">
+          Calculate statutory US cross-border withholding tax obligations, map bilateral double taxation treaty rates, and generate certified treaty statements.
+        </p>
+</div>
+<div class="flex items-center space-x-2 self-start md:self-end">
+<div class="px-3 py-1.5 bg-surface-container-low rounded border border-outline-variant/30 text-right">
+<div class="font-label-caps text-label-caps text-on-surface-variant">STATUTORY DEFAULT RATE</div>
+<div class="font-mono-num-md text-mono-num-md text-error font-medium">30.00% FDAP</div>
+</div>
+<div class="px-3 py-1.5 bg-primary-container/10 rounded border border-primary-container/30 text-right">
+<div class="font-label-caps text-label-caps text-primary">TREATY PRESERVED RATE</div>
+<div class="font-mono-num-md text-mono-num-md text-primary font-semibold">0.00% BENEFIT</div>
+</div>
+</div>
+</div>
+<!-- Section 1: Configuration & Contractor Profile Card -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant/30 p-5 space-y-5">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/20 pb-3">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary">person_search</span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold">Contractor Statutory Configuration</h2>
+</div>
+<div class="flex items-center space-x-1.5 text-on-surface-variant font-mono-num-sm text-mono-num-sm">
+<span>Simulation Ledger Base:</span>
+<span class="text-on-surface font-semibold font-mono-num-md">$5,000.00 USD</span>
+</div>
+</div>
+<!-- 4 Streamlined Form Selectors Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Field 1: Contractor Tax Residence -->
+<div class="space-y-1.5">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">
+            CONTRACTOR TAX RESIDENCE
+          </label>
+<div class="relative">
+<select class="w-full bg-[#0c121e] border border-outline-variant/30 focus:border-secondary rounded px-3 py-2 text-on-surface font-body-sm text-body-sm appearance-none outline-none focus:ring-0">
+<option selected="">Germany (DE) - US Treaty in Force</option>
+<option>United Kingdom (GB) - US Treaty in Force</option>
+<option>Canada (CA) - US Treaty in Force</option>
+<option>India (IN) - US Treaty in Force</option>
+<option>Brazil (BR) - Non-Treaty Territory</option>
+<option>Australia (AU) - US Treaty in Force</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 pointer-events-none text-on-surface-variant text-base">expand_more</span>
+</div>
+<!-- Quick Toggles -->
+<div class="flex flex-wrap gap-1 pt-1">
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest/60 hover:bg-surface-container-highest text-on-surface font-label-caps text-[0.625rem] border border-outline-variant/20">UK</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest/60 hover:bg-surface-container-highest text-on-surface font-label-caps text-[0.625rem] border border-outline-variant/20">CA</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest/60 hover:bg-surface-container-highest text-on-surface font-label-caps text-[0.625rem] border border-outline-variant/20">IN</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest/60 hover:bg-surface-container-highest text-on-surface font-label-caps text-[0.625rem] border border-outline-variant/20">BR</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest/60 hover:bg-surface-container-highest text-on-surface font-label-caps text-[0.625rem] border border-outline-variant/20">AU</button>
+</div>
+</div>
+<!-- Field 2: Income Classification -->
+<div class="space-y-1.5">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">
+            INCOME CLASSIFICATION / TYPE
+          </label>
+<div class="relative">
+<select class="w-full bg-[#0c121e] border border-outline-variant/30 focus:border-secondary rounded px-3 py-2 text-on-surface font-body-sm text-body-sm appearance-none outline-none focus:ring-0">
+<option selected="">Independent Personal Services / Advisory</option>
+<option>Software Development / SaaS Engineering</option>
+<option>Industrial Royalties / Copyright Licensing</option>
+<option>Fixed &amp; Determinable Annual (FDAP) General</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 pointer-events-none text-on-surface-variant text-base">expand_more</span>
+</div>
+<div class="flex items-center space-x-1 text-primary pt-1">
+<span class="material-symbols-outlined text-xs">verified</span>
+<span class="font-label-caps text-[0.625rem]">DE-US CONVENTION ART. 14 APPLIES</span>
+</div>
+</div>
+<!-- Field 3: Foreign TIN Status -->
+<div class="space-y-1.5">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">
+            FOREIGN / US TIN IDENTIFIER
+          </label>
+<div class="relative">
+<input class="w-full bg-[#0c121e] border border-outline-variant/30 focus:border-secondary rounded px-3 py-2 text-on-surface font-mono-num-sm text-mono-num-sm outline-none focus:ring-0" type="text" value="DE812948102 (Steuer-ID)"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-primary text-base">check_circle</span>
+</div>
+<div class="flex items-center space-x-1 text-on-surface-variant pt-1">
+<span class="font-label-caps text-[0.625rem] text-primary">VALIDATED VIA BZST VAT PORTAL</span>
+</div>
+</div>
+<!-- Field 4: Real-time Statutory Delta Card -->
+<div class="bg-[#0c121e] p-3 rounded border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant">NET PRESERVED CAPITAL</span>
+<span class="px-1.5 py-0.2 bg-primary-container/20 text-primary border border-primary/30 rounded font-label-caps text-[0.625rem]">+3000 BPS</span>
+</div>
+<div class="my-1">
+<div class="font-mono-num-lg text-mono-num-lg text-primary font-semibold">+$1,500.00 USD</div>
+<div class="font-label-caps text-[0.6875rem] text-on-surface-variant flex items-center gap-1">
+<span>30.00% Statutory</span>
+<span>→</span>
+<span class="text-primary font-bold">0.00% Treaty</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1 overflow-hidden">
+<div class="bg-primary h-full w-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Interactive Treaty Matrix & Statutory Comparison Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Card 1: Default Non-Resident Withholding (Without W-8BEN) -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 p-5 flex flex-col justify-between relative overflow-hidden">
+<!-- Visual Accent Line -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-error-container"></div>
+<div>
+<!-- Header Area -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-error">gavel</span>
+<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Default Non-Resident Withholding</h3>
+</div>
+<span class="px-2 py-0.5 rounded bg-error/10 border border-error/30 text-error font-label-caps text-label-caps">
+              WITHOUT W-8BEN
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2.5">
+            Pursuant to IRC Sections 1441 and 1442, foreign payees with uncertified tax status are subject to flat gross-basis withholding deducted at source.
+          </p>
+<!-- Metric Row Breakdown -->
+<div class="mt-5 space-y-3">
+<div class="flex justify-between items-center py-2 px-3 bg-[#0c121e] rounded border border-outline-variant/20">
+<span class="font-body-md text-body-md text-on-surface-variant">Statutory Withholding Rate</span>
+<span class="font-mono-num-md text-mono-num-md text-error font-semibold">30.00%</span>
+</div>
+<div class="flex justify-between items-center py-2 px-3 bg-[#0c121e] rounded border border-outline-variant/20">
+<span class="font-body-md text-body-md text-on-surface-variant">Deducted at Source (IRS Remittance)</span>
+<span class="font-mono-num-md text-mono-num-md text-error font-semibold">-$1,500.00 USD</span>
+</div>
+<div class="flex justify-between items-center py-2 px-3 bg-[#0c121e] rounded border border-outline-variant/20">
+<div>
+<div class="font-body-md text-body-md text-on-surface">Contractor Net Settlement</div>
+<div class="font-label-caps text-[0.625rem] text-on-surface-variant">Landed funds on $5,000.00 gross invoice</div>
+</div>
+<span class="font-mono-num-lg text-mono-num-lg text-on-surface font-semibold">$3,500.00 USD</span>
+</div>
+</div>
+</div>
+<!-- Recovery Burden Alert Box -->
+<div class="mt-6 p-3.5 bg-surface-container rounded border border-error/20 flex items-start space-x-3">
+<span class="material-symbols-outlined text-error shrink-0 mt-0.5">hourglass_bottom</span>
+<div class="space-y-1">
+<div class="font-label-caps text-label-caps text-error">RECOVERY BURDEN: FORM 1040-NR DELAY</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              The contractor must file an annual US non-resident tax return (Form 1040-NR / Form 8833) to claim excess withheld taxes. Typical IRS refund cycle takes <strong>12 to 18 months</strong> with significant tax accounting overhead.
+            </p>
+</div>
+</div>
+</div>
+<!-- Card 2: Validated Treaty Benefit (With Certified Form W-8BEN) -->
+<div class="bg-surface-container-low rounded-xl border-2 border-primary-container/70 p-5 flex flex-col justify-between relative overflow-hidden shadow-lg shadow-primary/5">
+<!-- Visual Accent Line -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-primary-container"></div>
+<div>
+<!-- Header Area -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Validated Treaty Benefit</h3>
+</div>
+<span class="px-2 py-0.5 rounded bg-primary-container/20 border border-primary-container/40 text-primary font-label-caps text-label-caps flex items-center gap-1 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+              TREATY OPTIMIZED
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2.5">
+            Statutory withholding eliminated under bilateral double tax convention between the United States and the Federal Republic of Germany.
+          </p>
+<!-- Metric Row Breakdown -->
+<div class="mt-5 space-y-3">
+<div class="flex justify-between items-center py-2 px-3 bg-[#0c121e] rounded border border-primary/20">
+<span class="font-body-md text-body-md text-on-surface-variant">Statutory Treaty Withholding Rate</span>
+<span class="font-mono-num-md text-mono-num-md text-primary font-semibold">0.00%</span>
+</div>
+<div class="flex justify-between items-center py-2 px-3 bg-[#0c121e] rounded border border-outline-variant/20">
+<span class="font-body-md text-body-md text-on-surface-variant">Withholding at Source (Retained)</span>
+<span class="font-mono-num-md text-mono-num-md text-primary font-semibold">$0.00 USD</span>
+</div>
+<div class="flex justify-between items-center py-2 px-3 bg-[#0c121e] rounded border border-primary/30">
+<div>
+<div class="font-body-md text-body-md text-on-surface font-medium">Contractor Net Settlement</div>
+<div class="font-label-caps text-[0.625rem] text-primary">Full principal settlement (100% landed)</div>
+</div>
+<span class="font-mono-num-lg text-mono-num-lg text-primary font-semibold">$5,000.00 USD</span>
+</div>
+</div>
+</div>
+<!-- Citation Verification Box -->
+<div class="mt-6 p-3.5 bg-[#0c121e] rounded border border-primary/25 space-y-2">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-sm">menu_book</span>
+<span class="font-label-caps text-label-caps text-primary">STATUTORY TREATY LEGAL CITATION</span>
+</div>
+<div class="font-mono-num-sm text-mono-num-sm text-on-surface leading-relaxed">
+            United States - Federal Republic of Germany Income Tax Convention, Article 14 (Independent Personal Services) / Article 7 (Business Profits).
+          </div>
+<div class="flex items-center justify-between pt-1 border-t border-outline-variant/20 text-[0.6875rem] text-on-surface-variant">
+<span>Treasury Reg. § 1.1441-6(b)</span>
+<span class="text-primary font-mono-num-sm">Zero Source Drag</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Ready-to-Paste Form W-8BEN Part II Line 10 Certification Generator Card -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant/30 p-5 space-y-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline-variant/20 pb-3">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary">assignment_turned_in</span>
+<div>
+<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Generated Part II Line 10 Treaty Statement</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standardized statutory certification ready for payroll attachment and IRS compliance vault</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center space-x-2">
+<button class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-primary-container text-on-primary-container font-semibold rounded text-body-sm hover:bg-[#22c55e] transition-colors duration-150 active:scale-[0.98]" id="copyBtn" onclick="copyClause()">
+<span class="material-symbols-outlined text-base">content_copy</span>
+<span>Copy Certification Clause</span>
+</button>
+<button class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 rounded text-on-surface text-body-sm transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-base">picture_as_pdf</span>
+<span>Download Form W-8BEN PDF</span>
+</button>
+</div>
+</div>
+<!-- Verbatim Legal Monospace Box -->
+<div class="relative bg-[#0c121e] rounded-lg border border-outline-variant/30 p-4 font-mono-num-sm text-mono-num-sm text-on-surface leading-relaxed overflow-x-auto custom-scrollbar">
+<div class="text-on-surface-variant text-[0.6875rem] mb-2 font-label-caps flex items-center justify-between">
+<span>// FORM W-8BEN (REV. OCTOBER 2021) - PART II CLAIM OF TAX TREATY BENEFITS - LINE 10</span>
+<span class="text-primary font-semibold">TREATY ARTICLE 14 CLAUSE</span>
+</div>
+<p class="text-on-surface selection:bg-primary-container selection:text-on-primary-container" id="clauseText">
+          "The beneficial owner is claiming the provisions of Article 14 of the tax treaty between the United States and Germany to claim a 0% rate of withholding on income earned from independent cross-border software development, advisory, and technical consulting services. The beneficial owner meets all terms of the treaty article, does not maintain a fixed base or permanent establishment in the United States, and is a statutory tax resident of Germany."
+        </p>
+</div>
+<!-- Validation Checklist Footer -->
+<div class="pt-2 border-t border-outline-variant/20">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-2">IRS AUDIT READINESS CHECKLIST</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+<div class="flex items-center space-x-2 bg-[#0c121e] p-2.5 rounded border border-primary/20">
+<span class="material-symbols-outlined text-primary text-base">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface">FOREIGN TIN VALIDATED</span>
+<span class="font-mono-num-sm text-[0.625rem] text-on-surface-variant">DE812948102 (Steuer-ID)</span>
+</div>
+</div>
+<div class="flex items-center space-x-2 bg-[#0c121e] p-2.5 rounded border border-primary/20">
+<span class="material-symbols-outlined text-primary text-base">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface">PERMANENT RESIDENCE</span>
+<span class="font-mono-num-sm text-[0.625rem] text-on-surface-variant">Berlin, Federal Republic of Germany</span>
+</div>
+</div>
+<div class="flex items-center space-x-2 bg-[#0c121e] p-2.5 rounded border border-primary/20">
+<span class="material-symbols-outlined text-primary text-base">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface">NO US PE ESTABLISHMENT</span>
+<span class="font-mono-num-sm text-[0.625rem] text-on-surface-variant">Absence of US trade or office</span>
+</div>
+</div>
+<div class="flex items-center space-x-2 bg-[#0c121e] p-2.5 rounded border border-primary/20">
+<span class="material-symbols-outlined text-primary text-base">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface">DIGITAL SIGNATURE SECURED</span>
+<span class="font-mono-num-sm text-[0.625rem] text-on-surface-variant">X.509 SHA-256 e-Sign Compliant</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Institutional Compliance Footer Shared Component -->
+<footer class="w-full px-6 py-4 border-t border-outline-variant/30 bg-surface-container-lowest mt-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<!-- Copyright & Disclaimer -->
+<div class="space-y-1 text-center md:text-left">
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+        © 2025 PayoutDelta Treasury Terminal Inc. Real-time FedNow, SEPA, and SWIFT settlement verification guaranteed under Tier-1 Institutional SLA.
+      </div>
+<div class="font-mono-num-sm text-[0.6875rem] text-outline">
+        DISCLAIMER: Not legal or tax advice. PayoutDelta provides deterministic calculation of statutory treaty articles under US Internal Revenue Code § 1441.
+      </div>
+</div>
+<!-- Audit & Compliance Links -->
+<div class="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-1 font-label-caps text-label-caps text-on-surface-variant">
+<a class="hover:text-primary transition-colors duration-150" href="#audit">SHA-256 Audit: #9e82a4</a>
+<span class="text-outline-variant/40">•</span>
+<a class="hover:text-primary transition-colors duration-150" href="#sla">SLA Commitments</a>
+<span class="text-outline-variant/40">•</span>
+<a class="hover:text-primary transition-colors duration-150" href="#soc2">SOC-2 Type II Verified</a>
+<span class="text-outline-variant/40">•</span>
+<a class="text-primary hover:underline" href="#w8ben-protocol">Form W-8BEN Protocol</a>
+<span class="text-outline-variant/40">•</span>
+<span class="inline-flex items-center text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary inline-block mr-1"></span>
+        System Health: Operational
+      </span>
+</div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+    function copyClause() {
+      const clauseText = document.getElementById('clauseText').innerText;
+      navigator.clipboard.writeText(clauseText).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined text-base">done</span><span>Clause Copied!</span>`;
+        btn.classList.add('bg-primary');
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.classList.remove('bg-primary');
+        }, 2000);
+      });
+    }
+  </script>
+</body></html>

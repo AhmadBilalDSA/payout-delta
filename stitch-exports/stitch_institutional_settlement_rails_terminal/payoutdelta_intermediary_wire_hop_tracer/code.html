@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PayoutDelta // Treasury Terminal - Hop Tracer</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary": "#003825",
+            "inverse-on-surface": "#2c303a",
+            "on-primary-fixed-variant": "#005137",
+            "tertiary": "#ffd16d",
+            "primary-fixed-dim": "#45dfa4",
+            "on-secondary-fixed-variant": "#004c69",
+            "on-error": "#690005",
+            "outline-variant": "#3c4a42",
+            "on-tertiary": "#402d00",
+            "on-tertiary-fixed": "#261a00",
+            "surface-container-high": "#262a34",
+            "surface-dim": "#0f131c",
+            "on-secondary": "#00354a",
+            "primary-fixed": "#68fcbf",
+            "surface-container-low": "#181b25",
+            "error": "#ffb4ab",
+            "secondary-fixed-dim": "#7bd0ff",
+            "on-primary-container": "#00563b",
+            "on-tertiary-fixed-variant": "#5c4300",
+            "secondary-fixed": "#c4e7ff",
+            "on-secondary-container": "#00374d",
+            "tertiary-fixed": "#ffdf9f",
+            "on-tertiary-container": "#614700",
+            "secondary": "#7bd0ff",
+            "error-container": "#93000a",
+            "on-secondary-fixed": "#001e2c",
+            "surface-container-highest": "#31353f",
+            "primary-container": "#34d399",
+            "on-primary-fixed": "#002114",
+            "surface-tint": "#45dfa4",
+            "on-surface": "#dfe2ef",
+            "inverse-primary": "#006c4b",
+            "surface-container": "#1c1f29",
+            "on-surface-variant": "#bbcac0",
+            "inverse-surface": "#dfe2ef",
+            "surface-variant": "#31353f",
+            "outline": "#85948b",
+            "on-background": "#dfe2ef",
+            "tertiary-fixed-dim": "#f9bd22",
+            "secondary-container": "#00a6e0",
+            "surface": "#0f131c",
+            "surface-bright": "#353943",
+            "primary": "#5af0b3",
+            "tertiary-container": "#ecb210",
+            "background": "#0f131c",
+            "surface-container-lowest": "#0a0e17",
+            "on-error-container": "#ffdad6"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "gutter": "1rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-md": "0.75rem",
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-2xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1rem",
+            "space-xl": "1.5rem"
+          },
+          fontFamily: {
+            "headline-lg": ["Geist", "sans-serif"],
+            "body-lg": ["Geist", "sans-serif"],
+            "label-caps": ["JetBrains Mono", "monospace"],
+            "headline-xl": ["Geist", "sans-serif"],
+            "mono-num-sm": ["JetBrains Mono", "monospace"],
+            "body-sm": ["Geist", "sans-serif"],
+            "mono-num-md": ["JetBrains Mono", "monospace"],
+            "headline-xl-mobile": ["Geist", "sans-serif"],
+            "headline-md": ["Geist", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "mono-num-xl": ["JetBrains Mono", "monospace"],
+            "mono-num-lg": ["JetBrains Mono", "monospace"]
+          },
+          fontSize: {
+            "headline-lg": ["1.5rem", { lineHeight: "2rem", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "body-lg": ["1rem", { lineHeight: "1.5rem", letterSpacing: "-0.01em", fontWeight: "400" }],
+            "label-caps": ["0.6875rem", { lineHeight: "0.875rem", letterSpacing: "0.06em", fontWeight: "600" }],
+            "headline-xl": ["2.25rem", { lineHeight: "2.75rem", letterSpacing: "-0.025em", fontWeight: "600" }],
+            "mono-num-sm": ["0.75rem", { lineHeight: "1rem", letterSpacing: "0.02em", fontWeight: "400" }],
+            "body-sm": ["0.75rem", { lineHeight: "1rem", letterSpacing: "0.01em", fontWeight: "400" }],
+            "mono-num-md": ["0.875rem", { lineHeight: "1.25rem", letterSpacing: "0em", fontWeight: "500" }],
+            "headline-xl-mobile": ["1.75rem", { lineHeight: "2.25rem", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "headline-md": ["1.25rem", { lineHeight: "1.75rem", letterSpacing: "-0.015em", fontWeight: "500" }],
+            "body-md": ["0.875rem", { lineHeight: "1.25rem", letterSpacing: "0em", fontWeight: "400" }],
+            "mono-num-xl": ["1.75rem", { lineHeight: "2.25rem", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "mono-num-lg": ["1.25rem", { lineHeight: "1.75rem", letterSpacing: "-0.01em", fontWeight: "500" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-primary-container selection:text-on-primary">
+<!-- TOP NAV BAR (Institutional Terminal Anchor) -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-6 py-2 border-b border-outline-variant/30 bg-surface-container-lowest">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<span class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">PayoutDelta // Treasury Terminal</span>
+</div>
+<!-- Desktop Navigation Links -->
+<nav aria-label="Terminal Global Navigation" class="hidden md:flex items-center gap-5 pt-0.5">
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#calculator">Calculator</a>
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#reconciliation">Reconciliation Audit</a>
+<!-- ACTIVE: Hop Tracer -->
+<a class="text-primary border-b-2 border-primary font-mono-num-md text-mono-num-md pb-1" href="#tracer">Hop Tracer</a>
+<a class="text-on-surface-variant font-mono-num-md text-mono-num-md pb-1 hover:text-on-surface transition-colors duration-150" href="#w8ben">W-8BEN Resolver</a>
+</nav>
+</div>
+<!-- Trailing Actions & Institutional Telemetry -->
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant/30 font-mono-num-sm text-mono-num-sm">
+<span class="text-secondary font-medium">Live MID: 1.0842 EUR/USD</span>
+<span class="text-primary font-label-caps text-label-caps bg-primary/10 px-1 py-0.5 rounded">REALTIME</span>
+</div>
+<button class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded bg-surface-container-low border border-outline-variant/40 hover:border-outline text-on-surface font-mono-num-sm text-mono-num-sm active:scale-[0.98] transition-transform duration-100 ease-out" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="file_download">file_download</span>
+        Export Ledger
+      </button>
+<div class="flex items-center gap-2 pl-2 border-l border-outline-variant/30 text-on-surface-variant">
+<button aria-label="Terminal Console" class="p-1 hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="terminal">terminal</span>
+</button>
+<button aria-label="Compliance Status" class="p-1 hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="shield_with_heart">shield_with_heart</span>
+</button>
+<button aria-label="Notifications" class="p-1 hover:text-primary transition-colors relative" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full"></span>
+</button>
+</div>
+<!-- Avatar -->
+<div class="w-7 h-7 rounded border border-outline-variant/50 bg-surface-container-high flex items-center justify-center font-mono-num-sm text-mono-num-sm text-primary font-semibold" title="Treasury Operator Profile Avatar">
+        TO
+      </div>
+</div>
+</header>
+<!-- MAIN OPERATIONAL CANVAS -->
+<main class="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-6 py-5 space-y-5">
+<!-- PAGE HEADER & BREADCRUMB -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-3 border-b border-outline-variant/30">
+<div>
+<div class="flex items-center gap-2 font-mono-num-sm text-mono-num-sm text-secondary mb-1">
+<span>TX_REF: #TRC-89240-US-DE</span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">UETR: c8b024ee-6db1-4c12-87ad-e0d8fa0992c1</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-semibold text-on-surface tracking-tight">Cross-Border Intermediary Hop Tracer</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Real-time multi-node hop telemetry revealing correspondent bank deductions and foreign exchange conversion points.</p>
+</div>
+<!-- Execution Quick Badges -->
+<div class="flex items-center gap-2 font-mono-num-sm text-mono-num-sm">
+<span class="px-2 py-1 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface-variant">
+          AUDIT ID: <span class="text-on-surface font-medium">0x8F94...B19A</span>
+</span>
+<span class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-primary font-medium flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          FINALITY CONFIRMED
+        </span>
+</div>
+</div>
+<!-- CORRIDOR OVERVIEW METRICS BAR -->
+<section aria-label="Corridor Telemetry Overview" class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-surface-container-low rounded border border-outline-variant/30 p-3.5">
+<div class="space-y-0.5">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SETTLEMENT CORRIDOR</span>
+<div class="flex items-center gap-2 font-mono-num-md text-mono-num-md text-on-surface font-semibold">
+<span>USD</span>
+<span class="material-symbols-outlined text-[14px] text-secondary" data-icon="arrow_forward">arrow_forward</span>
+<span>EUR</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-normal">(Chase NY → Deutsche Bank)</span>
+</div>
+</div>
+<div class="space-y-0.5 border-l border-outline-variant/20 pl-3">
+<span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL ROUTE LATENCY</span>
+<div class="flex items-center gap-1.5 font-mono-num-md text-mono-num-md text-on-surface font-semibold">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="schedule">schedule</span>
+<span>14h 22m</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant font-normal">transit</span>
+</div>
+</div>
+<div class="space-y-0.5 border-l border-outline-variant/20 pl-3">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SETTLEMENT PROTOCOL</span>
+<div class="flex items-center gap-1.5 font-mono-num-md text-mono-num-md text-secondary font-semibold">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="hub">hub</span>
+<span>SWIFT MT103 / pacs.008</span>
+</div>
+</div>
+<div class="space-y-0.5 border-l border-outline-variant/20 pl-3">
+<span class="font-label-caps text-label-caps text-on-surface-variant">CORRESPONDENT FRICTION</span>
+<div class="flex items-center gap-2 font-mono-num-md text-mono-num-md text-error font-semibold">
+<span>-$35.00 USD</span>
+<span class="px-1.5 py-0.5 rounded bg-error-container/40 text-error font-mono-num-sm text-mono-num-sm font-normal">-70.0 bps</span>
+</div>
+</div>
+</section>
+<!-- MULTI-NODE HOP JOURNEY (PIPELINE WATERFALL) -->
+<section aria-label="Sequential Hop Cascade" class="space-y-3">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface font-medium flex items-center gap-2">
+<span>Intermediary Clearing Chain</span>
+<span class="font-mono-num-sm text-mono-num-sm text-on-surface-variant font-normal">4 Nodes Traversed</span>
+</h2>
+<span class="font-label-caps text-label-caps text-on-surface-variant">CHRONOLOGICAL DISPATCH FLOW</span>
+</div>
+<!-- PIPELINE GRID (4 NODES) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 relative">
+<!-- HOP 01: Debtor Origin -->
+<article class="bg-surface-container-low rounded border border-outline-variant/30 flex flex-col justify-between p-3.5 space-y-3">
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20">
+                HOP 01 // ORIGIN
+              </span>
+<span class="font-mono-num-sm text-mono-num-sm text-primary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                0ms
+              </span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md font-semibold text-on-surface">Chase Bank N.A.</div>
+<div class="font-mono-num-sm text-mono-num-sm text-on-surface-variant">New York, US • BIC: CHASUS33XXX</div>
+</div>
+<div class="p-2.5 rounded bg-surface-container-lowest border border-outline-variant/20 space-y-1 font-mono-num-sm text-mono-num-sm">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Gross Principal:</span>
+<span class="text-on-surface font-semibold">$5,000.00 USD</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Protocol:</span>
+<span class="text-secondary font-medium">Fedwire Outbound</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Hop Deduction:</span>
+<span class="text-primary font-medium">$0.00 (Upstream billed)</span>
+</div>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant/20 flex items-center justify-between text-on-surface-variant font-mono-num-sm text-mono-num-sm">
+<span>Status:</span>
+<span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded">DISPATCHED</span>
+</div>
+</article>
+<!-- HOP 02: Intermediary Clearing Agent (FRICTION CALLOUT) -->
+<article class="bg-surface-container-low rounded border border-tertiary-container/60 flex flex-col justify-between p-3.5 space-y-3 relative ring-1 ring-tertiary-container/30">
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-tertiary px-1.5 py-0.5 rounded bg-tertiary/10 border border-tertiary/30">
+                HOP 02 // INTERMEDIARY
+              </span>
+<span class="font-mono-num-sm text-mono-num-sm text-tertiary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="timer">timer</span>
+                +04h 15m
+              </span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md font-semibold text-on-surface">JPMorgan Clearing</div>
+<div class="font-mono-num-sm text-mono-num-sm text-on-surface-variant">Fedwire Node #021000021 (Correspondent)</div>
+</div>
+<!-- Friction Callout -->
+<div class="p-2.5 rounded bg-surface-container-lowest border border-tertiary-container/40 space-y-1.5 font-mono-num-sm text-mono-num-sm">
+<div class="flex items-center gap-1 text-tertiary font-label-caps text-label-caps font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="warning">warning</span>
+                CRITICAL FRICTION POINT
+              </div>
+<div class="flex justify-between items-center text-on-surface">
+<span class="text-on-surface-variant">SHA Cut Deducted:</span>
+<span class="text-tertiary font-bold text-mono-num-md">-$25.00 USD</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>SWIFT Field:</span>
+<span class="text-secondary font-medium">MT103 Field 71F</span>
+</div>
+<div class="flex justify-between border-t border-outline-variant/20 pt-1">
+<span class="text-on-surface-variant">Forwarded Principal:</span>
+<span class="text-on-surface font-semibold">$4,975.00 USD</span>
+</div>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant/20 flex items-center justify-between text-on-surface-variant font-mono-num-sm text-mono-num-sm">
+<span>Clearing Queue:</span>
+<span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded">FEE ASSESSED</span>
+</div>
+</article>
+<!-- HOP 03: Inward FX & Clearing Gateway (CONVERSION CALLOUT) -->
+<article class="bg-surface-container-low rounded border border-secondary/40 flex flex-col justify-between p-3.5 space-y-3">
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-secondary px-1.5 py-0.5 rounded bg-secondary/10 border border-secondary/30">
+                HOP 03 // FX GATEWAY
+              </span>
+<span class="font-mono-num-sm text-mono-num-sm text-secondary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="currency_exchange">currency_exchange</span>
+                +08h 40m
+              </span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md font-semibold text-on-surface">Bundesbank / EBA STEP2</div>
+<div class="font-mono-num-sm text-mono-num-sm text-on-surface-variant">Frankfurt, DE • TARGET2 Cross-Inward</div>
+</div>
+<!-- FX Conversion Callout -->
+<div class="p-2.5 rounded bg-surface-container-lowest border border-secondary/30 space-y-1.5 font-mono-num-sm text-mono-num-sm">
+<div class="flex items-center gap-1 text-secondary font-label-caps text-label-caps font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="sync_alt">sync_alt</span>
+                CURRENCY CONVERSION POINT
+              </div>
+<div class="flex justify-between items-center text-on-surface">
+<span class="text-on-surface-variant">Exec Mid-Market:</span>
+<span class="text-on-surface font-semibold">1.0842 (0.0% spread)</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>Inward / Converted:</span>
+<span class="text-primary font-bold text-mono-num-md">€4,577.01 EUR</span>
+</div>
+<div class="flex justify-between border-t border-outline-variant/20 pt-1">
+<span class="text-on-surface-variant">Validation:</span>
+<span class="text-secondary font-medium">Verified pacs.009</span>
+</div>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant/20 flex items-center justify-between text-on-surface-variant font-mono-num-sm text-mono-num-sm">
+<span>FX Execution:</span>
+<span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded">INSTITUTIONAL MID</span>
+</div>
+</article>
+<!-- HOP 04: Creditor Beneficiary (DESTINATION / TARIFF CALLOUT) -->
+<article class="bg-surface-container-low rounded border border-outline-variant/30 flex flex-col justify-between p-3.5 space-y-3">
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant px-1.5 py-0.5 rounded bg-surface-container-high border border-outline-variant/40">
+                HOP 04 // CREDITOR
+              </span>
+<span class="font-mono-num-sm text-mono-num-sm text-primary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="task_alt">task_alt</span>
+                +14h 22m
+              </span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md font-semibold text-on-surface">Deutsche Bank AG</div>
+<div class="font-mono-num-sm text-mono-num-sm text-on-surface-variant">Frankfurt, DE • BIC: DEUTDEDDXXX</div>
+</div>
+<!-- Inward Tariff & Final Landed -->
+<div class="p-2.5 rounded bg-surface-container-lowest border border-error/30 space-y-1.5 font-mono-num-sm text-mono-num-sm">
+<div class="flex items-center gap-1 text-error font-label-caps text-label-caps font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="remove_circle_outline">remove_circle_outline</span>
+                INWARD RECEIVING TARIFF
+              </div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant">Receiving Deduction:</span>
+<span class="text-error font-medium">-€9.21 EUR (-$10 USD)</span>
+</div>
+<div class="flex justify-between border-t border-outline-variant/20 pt-1 items-baseline">
+<span class="text-on-surface font-medium">Final Landed:</span>
+<span class="text-primary font-bold text-mono-num-lg">€4,567.80 EUR</span>
+</div>
+<div class="text-right text-on-surface-variant font-mono-num-sm text-[11px]">
+                ≈ $4,965.00 USD eq.
+              </div>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant/20 flex items-center justify-between text-on-surface-variant font-mono-num-sm text-mono-num-sm">
+<span>Beneficiary:</span>
+<span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded">SETTLED IN ACCOUNT</span>
+</div>
+</article>
+</div>
+</section>
+<!-- DETAIL INSPECTION DRAWER / BENTO SECTION -->
+<section aria-label="Inspection and Route Optimization" class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1">
+<!-- LEFT CARD: SWIFT MT103 Telemetry Inspector (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-low rounded border border-outline-variant/30 p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20 mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="data_object">data_object</span>
+<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">SWIFT Message Telemetry Inspector</h3>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
+              RAW ISO 15022 / FIN MT103
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
+            Parsed field audit confirming correspondent fee deductions and intermediary bank settlement tags across transit node 2.
+          </p>
+<!-- Raw Code Container -->
+<div class="bg-surface-container-lowest rounded border border-outline-variant/30 p-3 font-mono-num-sm text-mono-num-sm space-y-1.5 text-on-surface-variant overflow-x-auto">
+<div class="text-outline font-label-caps text-[11px] pb-1 border-b border-outline-variant/20">{1:F01CHASUS33AXXX0000000000}{2:I103DEUTDEDDXXXXN}{3:{108:TRC89240USDE}}{4:</div>
+<div><span class="text-secondary font-semibold">:20:</span> <span class="text-on-surface">TRC-89240-US-DE</span></div>
+<div><span class="text-secondary font-semibold">:23B:</span> <span class="text-on-surface">CRED</span></div>
+<div><span class="text-secondary font-semibold">:32A:</span> <span class="text-primary font-medium">250224USD5000,00</span> <span class="text-outline-variant">// Value Date 2025-02-24, Gross USD 5,000.00</span></div>
+<div><span class="text-secondary font-semibold">:50K:</span> <span class="text-on-surface">/021000021-ACC-9821 / ACME CORP GLOBAL LIQUIDITY NY</span></div>
+<div><span class="text-secondary font-semibold">:57A:</span> <span class="text-on-surface">DEUTDEDDXXX (Deutsche Bank AG Frankfurt)</span></div>
+<div><span class="text-secondary font-semibold">:59:</span> <span class="text-on-surface">/DE89370400440532013000 / CONTINENTAL LOGISTICS GMBH</span></div>
+<div class="bg-tertiary-container/10 -mx-3 px-3 py-1 border-l-2 border-tertiary">
+<span class="text-tertiary font-semibold">:71A:</span> <span class="text-tertiary font-medium">SHA</span> <span class="text-on-surface-variant">// Charges shared between ordering and receiving party</span>
+</div>
+<div class="bg-tertiary-container/10 -mx-3 px-3 py-1 border-l-2 border-tertiary">
+<span class="text-tertiary font-semibold">:71F:</span> <span class="text-tertiary font-bold">USD25,00</span> <span class="text-on-surface-variant">// Intermediary Sender's Charges deducted at JPMorgan Clearing</span>
+</div>
+<div><span class="text-secondary font-semibold">:72:</span> <span class="text-on-surface">/REC/PAYOUTDELTA-ROUTE-VERIFIED</span></div>
+<div class="text-outline font-label-caps text-[11px] pt-1 border-t border-outline-variant/20">-}{5:{CHK:9E82A4B1D048}}</div>
+</div>
+</div>
+<div class="mt-3 pt-3 border-t border-outline-variant/20 flex flex-wrap items-center justify-between gap-2 font-mono-num-sm text-mono-num-sm">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="verified">verified</span>
+<span>Cryptographic Checksum Verified</span>
+</div>
+<span class="text-on-surface-variant">ISO 20022 MX Equivalent: <strong class="text-on-surface">pacs.008.001.09</strong></span>
+</div>
+</div>
+<!-- RIGHT CARD: Predictive Route Optimizer (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container-low rounded border border-outline-variant/30 p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20 mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="alt_route">alt_route</span>
+<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Predictive Route Optimizer</h3>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+              OPTIMAL PATH
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">
+            Comparison between the executed 4-hop legacy correspondent path and PayoutDelta's synthetic local clearing protocol.
+          </p>
+<!-- Route Comparison Matrix -->
+<div class="space-y-3 font-mono-num-sm text-mono-num-sm">
+<!-- Current Route Row -->
+<div class="p-3 rounded bg-surface-container-lowest border border-outline-variant/30 space-y-1.5">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">Executed Legacy Route (Current)</span>
+<span class="text-error font-semibold">-$35.00 USD Friction</span>
+</div>
+<div class="text-on-surface-variant flex items-center justify-between">
+<span>Hops: 4 Nodes</span>
+<span>Latency: 14h 22m</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded overflow-hidden">
+<div class="bg-error w-3/4 h-full"></div>
+</div>
+</div>
+<!-- Optimized Direct Rail -->
+<div class="p-3 rounded bg-surface-container-lowest border border-primary/40 space-y-1.5 relative ring-1 ring-primary/20">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="bolt">bolt</span>
+<span class="text-primary font-semibold">Local Instant Rail (Recommended)</span>
+</div>
+<span class="text-primary font-bold">-$1.20 USD Friction</span>
+</div>
+<div class="text-on-surface-variant flex items-center justify-between">
+<span>FedNow ↔ SEPA Instant Gateway</span>
+<span class="text-primary font-medium">Latency: &lt; 8 seconds</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded overflow-hidden">
+<div class="bg-primary w-1/12 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Savings Summary Banner -->
+<div class="mt-4 p-3 rounded bg-primary/10 border border-primary/30 flex items-center justify-between font-mono-num-sm text-mono-num-sm">
+<div>
+<div class="text-on-surface font-semibold">Net Reclaimed Capital</div>
+<div class="text-on-surface-variant">Eliminates $25.00 SHA Cut &amp; $8.80 Inward Tariff</div>
+</div>
+<div class="text-right">
+<div class="text-primary font-mono-num-lg text-mono-num-lg font-bold">+$33.80 USD</div>
+<div class="text-primary font-label-caps text-label-caps">+67.6 bps Yield</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex gap-2">
+<button class="w-full py-2 px-3 rounded bg-primary text-on-primary font-body-md text-body-md font-semibold hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="auto_mode">auto_mode</span>
+            Re-route Similar Corridors
+          </button>
+</div>
+</div>
+</section>
+</main>
+<!-- FOOTER (Institutional Compliance Anchor) -->
+<footer class="w-full px-6 py-4 border-t border-outline-variant/30 bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center gap-4 mt-8">
+<div class="flex items-center gap-3">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface">PayoutDelta</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">
+        © 2025 PayoutDelta Treasury Terminal Inc. Real-time FedNow, SEPA, and SWIFT settlement verification guaranteed under Tier-1 Institutional SLA.
+      </p>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<a class="text-primary font-label-caps text-label-caps hover:underline" href="#audit">SHA-256 Audit: #9e82a4</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150" href="#sla">SLA Commitments</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150" href="#soc2">SOC-2 Type II Verified</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-150" href="#w8ben">Form W-8BEN Protocol</a>
+<span class="text-primary font-label-caps text-label-caps flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary/10 border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+        System Health: Operational
+      </span>
+</div>
+</footer>
+</body></html>
