@@ -180,7 +180,7 @@ export function LandedCalculator() {
 
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 font-sans mb-16">
-      <section className="bg-zinc-900/80 rounded-xl border border-zinc-800 p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-sm min-h-[500px]">
+      <section className="bg-zinc-900/80 rounded-xl border border-zinc-800 p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-sm min-h-[580px] md:min-h-[520px]">
         
         <div className="flex items-center justify-between pb-6 mb-6 border-b border-zinc-800/80">
           <div className="flex items-center gap-2">
@@ -368,7 +368,7 @@ export function LandedCalculator() {
         </div>
       </section>
 
-      <div>
+      <div className="[content-visibility:auto] [contain-intrinsic-size:100%_460px]">
         <h2 className="text-xl font-bold text-zinc-100 mb-4">Compare Execution Rails</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           

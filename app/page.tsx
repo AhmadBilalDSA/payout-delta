@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import AnnualLeakageCalculator from "@/components/AnnualLeakageCalculator";
 import { HeroSettlementCard } from "@/components/hud/HeroSettlementCard";
 import { LandedCalculator } from "@/components/home/LandedCalculator";
+import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 
 export default function Home() {
   const entries = buildDirectoryIndex();
@@ -13,6 +14,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
+      <HomeJsonLd />
       <Hero />
       <LandedCalculator />
       <HeroSettlementCard />
