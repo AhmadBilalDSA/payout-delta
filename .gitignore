@@ -72,6 +72,35 @@ id_rsa*
 .vscode/*
 !.vscode/settings.json
 
+# --- Hardened security surface (least-privilege tracking lock) ---
+# Local/editor-override payloads that must never enter the object store
+*.local
+
+# Edge / hosting provider state (may embed deployment tokens)
+.wrangler/
+.netlify/
+.firebase/
+
+# AI design export artifacts (scratch output, not part of the shipped app)
+stitch-exports/
+
+# One-shot migration / patch scripts (throwaway, per ANTIGRAVITY.md 1.2)
+temp_*.mjs
+patch_*.mjs
+
+# Private specs and private notes
+.specs/private/
+
+# Local certificate / keystore material
+*.crt
+*.csr
+*.jks
+*.keystore
+
+# OS / tooling noise
+Thumbs.db
+.DS_Store
+
 *.log
 temp_*.mjs
 patch_*.mjs
