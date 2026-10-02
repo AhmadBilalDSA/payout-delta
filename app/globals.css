@@ -947,3 +947,18 @@ body {
     background-color: rgb(24, 24, 27) !important;
   }
 }
+/* Zero-runtime GPU micro-interactions */
+.interactive-tap {
+  transition: transform 100ms ease-out;
+  will-change: transform;
+}
+.interactive-tap:active {
+  transform: scale(0.98);
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  100% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+}
+.animate-calc-pulse {
+  animation: pulse-ring 220ms ease-out forwards;
+}
