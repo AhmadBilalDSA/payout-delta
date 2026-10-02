@@ -71,3 +71,10 @@ id_rsa*
 .turbo
 .vscode/*
 !.vscode/settings.json
+
+*.log
+temp_*.mjs
+patch_*.mjs
+.specs/private/
+.vercel
+.wrangler/
