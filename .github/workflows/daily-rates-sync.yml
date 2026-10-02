@@ -6,17 +6,29 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+# Serialize syncs: two overlapping runs would race on data/fees.json and
+# data/history.json, so one push would clobber the other.
+concurrency:
+  group: "daily-rates-sync"
+  cancel-in-progress: false
 
 jobs:
   sync-rates:
     runs-on: ubuntu-latest
+    # Sole write capability in the file, scoped to this job alone.
+    permissions:
+      contents: write
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
+          # Required: this job pushes with the job token.
+          persist-credentials: true
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -34,6 +46,9 @@ jobs:
         run: python scripts/playwright_scraper.py --mode auto
 
       - name: Commit and push changes
+        # Hard gate: only ever push when HEAD is main. A workflow_dispatch run
+        # started from any other branch must not be able to write to main.
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

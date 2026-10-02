@@ -1,8 +1,44 @@
-# PayoutDelta // Institutional Settlement Ledger
-> Real-time foreign exchange spread benchmarks, SWIFT intermediary cut deductions, and statutory export tax treaties.
+# Project name: PayoutDelta // Institutional Settlement & Net Payout Ledger
 
-- Base URL: https://ahmadbilaldsa.github.io/payout-delta
-- Canonical Repository: https://github.com/AhmadBilalDSA/payout-delta
-- Architecture: 100% Client-Side Static Export (Next.js 15, zero tracking, zero runtime backend)
-- Core API Feeds: /api/fees.json, /api/banksRegistry.json, /api/jurisdictions.json
-- Supported Corridors: USD to PKR, BDT, INR, NGN, PHP, EUR, GBP
+> This is an llms.txt file. It is a standardized way to present information about a website to LLMs. Read more at https://llmstxt.org
+
+> Direct summary: Static zero-dependency auditor benchmarking correspondent bank SHA deductions (CHASUS33, CITIUS33), foreign exchange markups, and cross-border landing amounts for international contractors and financial institutions.
+
+## Core endpoints
+- Data Feed: https://ahmadbilaldsa.github.io/payout-delta/api/fees.json
+- Bank Directory: https://ahmadbilaldsa.github.io/payout-delta/api/banksRegistry.json
+- Documentation: https://ahmadbilaldsa.github.io/payout-delta/docs/
+- Sitemap: https://ahmadbilaldsa.github.io/payout-delta/sitemap.xml
+
+## Calculation Invariants
+Standard SWIFT SHA deducts $15 to $35 intermediary clearing cut. Local RTGS / instant clearing saves up to 96% on principal transfers.
+
+## PayoutDelta Guides
+
+- [Rate Leaderboard](https://ahmadbilaldsa.github.io/payout-delta/leaderboard): ranks all 208 corridors by the local-currency shortfall a USD 1,000 payout incurs across intermediary, invoice and direct rails.
+- [Payout Calculator](https://ahmadbilaldsa.github.io/payout-delta/calculator/usd-to-pkr): models intermediary cuts, FX spreads and statutory withholding per corridor, with platform presets (Upwork, Fiverr, Deel) across 145 long-tail routes.
+- [Invoice Studio](https://ahmadbilaldsa.github.io/payout-delta/invoice): contract-grade compliant invoices carrying the statutory purpose code and withholding for the selected corridor.
+- [Regulatory / Tax Ledger](https://ahmadbilaldsa.github.io/payout-delta/tax-ledger): per-corridor statutory purpose codes, tolerances and withholding rationale.
+- [Statutory Purpose Codes & Tax Clearance](https://ahmadbilaldsa.github.io/payout-delta/tax-clearance): the clearance paperwork behind the rail — SBP purpose code 9111 with Form 'R' and the ePRC bank certificate, RBI purpose code P0802 with the FIRC / e-FIRC download flow and the GST LUT, BSP FX Form 1 inward remittance reporting for BPO receipts, and the DIAN Formato 1060 / Declaración de Cambio and BACEN SCE declarations for LATAM exporters, with every statutory tier and receiving bank read from the same audited dataset.
+- [SWIFT Auditor](https://ahmadbilaldsa.github.io/payout-delta/swift-auditor): reverse-engineers the correspondent route (direct vs SHA) for any destination BIC.
+- [Institutional Clearing Terminal](https://ahmadbilaldsa.github.io/payout-delta/dashboard): macro clearing telemetry across 208 corridors — intermediary SHA cut histogram, retail bank spread heatmap, and a filterable clearing registry with field 71A charge recommendations, domestic settlement rails and 1-click CSV export.
+- [Bank Dossier Directory](https://ahmadbilaldsa.github.io/payout-delta/banks): 23 verified profiles of the correspondent clearing hubs (CHASUS33, DEUTDEDD, HSBCGB2L…) and domestic beneficiary rails behind every corridor, with ISO 9362 BICs, SHA deduction bands and field 71A guidance.
+- [Agency Treasury Leakage Engine](https://ahmadbilaldsa.github.io/payout-delta/agencies): roster-level annual audit of SHA wire cuts and retail FX margins for agencies paying cross-border contractors, with a B2B rails comparison and 1-click executive PDF.
+- [Challenger Rails & Alternative Settlements](https://ahmadbilaldsa.github.io/payout-delta/challengers): institutional comparison of four non-bank settlement architectures — Airwallex local clearing, Revolut Business SEPA/ACH off-ramps, Elevate Pay US virtual accounts, and USDC/USDT on Polygon or Arbitrum — benchmarked against the median correspondent SHA deduction of $18 and a 4.90% all-in wire cost at the $1,000 benchmark across the 208 corridors.
+- [Embeddable Payout Widget](https://ahmadbilaldsa.github.io/payout-delta/embed/usd-to-pkr): a static backlink card for any publisher — active mid-market rate, SWIFT intermediary cut and the real net take-home on a $1,000 invoice in a single iframe (all 208 corridors live at /embed/<slug>/).
+
+## PayoutDelta References
+
+- [Machine-readable corridor + rate feed (JSON)](https://ahmadbilaldsa.github.io/payout-delta/api/fees.json): the full 208-corridor dataset with per-platform fees and FX spreads, refreshed daily.
+- [API access & webhook contract](https://ahmadbilaldsa.github.io/payout-delta/api-access): integration reference for the static feed and derived endpoints.
+- [Full 208-corridor manifest](https://ahmadbilaldsa.github.io/payout-delta/llms-full.txt): the complete table of intermediary cuts, correspondent BICs, purpose codes and recommended rails below.
+
+## PayoutDelta Legal
+
+- [Terms of Service](https://ahmadbilaldsa.github.io/payout-delta/terms-of-service)
+- [Privacy Policy](https://ahmadbilaldsa.github.io/payout-delta/privacy-policy)
+- [Disclaimer](https://ahmadbilaldsa.github.io/payout-delta/disclaimer)
+
+## Contact
+
+- [Contact](https://ahmadbilaldsa.github.io/payout-delta/contact)

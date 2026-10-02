@@ -1,0 +1,48 @@
+# Normalize line endings to LF repo-wide to keep diffs deterministic.
+* text=auto eol=lf
+
+# Lockfile: generated, never hand-edited, no line-ending translation.
+package-lock.json linguist-generated -diff
+
+# Never apply CRLF/eol conversion or text diffing to secret-bearing material.
+# These are gitignored as defense-in-depth, but if ever force-added, Git must
+# treat them as opaque bytes so no normalization or diff ever leaks a token.
+*.env
+*.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.csr
+*.jks
+*.keystore
+id_rsa*
+**/.specs/private/** binary
+
+# Build output and generated artifacts: never enter diffs or language stats.
+/out/** linguist-generated
+/.next/** linguist-generated
+/coverage/** linguist-generated
+stitch-exports/** linguist-generated -diff
+repomix-output.xml linguist-generated -diff
+
+# One-shot scripts are intentionally untracked; keep Git out of their diffs.
+temp_*.mjs linguist-generated
+patch_*.mjs linguist-generated
+
+# Vendored / binary assets — no text conversion, no diff attempts.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+
+# Shell + CI scripts must stay LF or they break on POSIX runners.
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
