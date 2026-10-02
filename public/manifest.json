@@ -1,0 +1,9 @@
+{
+  "name": "PayoutDelta - Cross-Border Settlement Ledger",
+  "short_name": "PayoutDelta",
+  "start_url": "/payout-delta/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#10b981",
+  "description": "Calculate exact landed remittance after SWIFT SHA intermediary cuts and platform fees."
+}
