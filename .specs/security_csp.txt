@@ -1,0 +1,5 @@
+# EMBED SECURITY & ISOLATION SPEC
+FRAME DIRECTIVES:
+- X-Frame-Options: SAMEORIGIN (allowlist for verified partner embeds)
+- Sandbox Attributes: allow-scripts (no forms, no top-navigation, no popups)
+- Runtime: Zero JavaScript execution required for static friction readout
