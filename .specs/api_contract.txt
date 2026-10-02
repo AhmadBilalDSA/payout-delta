@@ -1,0 +1,9 @@
+# PAYOUTDELTA PUBLIC FEED CONTRACT (Q4 2026)
+Endpoints:
+1. GET /api/fees.json
+   - Returns full corridor tree, deduction models, and platform presets (Upwork, Deel, Payoneer).
+2. GET /api/banksRegistry.json
+   - Returns 260+ SWIFT BICs, clearing rails (Fedwire, CHIPS, SEPA, Raast), and transit delays.
+3. GET /api/jurisdictions.json
+   - Returns statutory W-8BEN withholding treaty matrices.
+All feeds are byte-mirrored, statically compiled, and CDN-cached.
