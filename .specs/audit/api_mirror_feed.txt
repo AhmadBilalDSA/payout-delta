@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: api_mirror_feed.txt
+Scope: audit(api): define static hash verification for public JSON feeds
+Timestamp: 2026-10-04 23:05:49
