@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: w8ben_services.txt
+Scope: audit(tax): verify Article 7 permanent establishment boundaries
+Timestamp: 2026-10-04 23:05:41
