@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: corridor_bdt.txt
+Scope: audit(corridor): verify statutory BDT clearing and bKash limits
+Timestamp: 2026-10-04 23:05:36
