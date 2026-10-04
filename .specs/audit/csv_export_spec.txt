@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: csv_export_spec.txt
+Scope: audit(export): define RFC-4180 compliance for settlement ledger CSVs
+Timestamp: 2026-10-04 23:05:45
