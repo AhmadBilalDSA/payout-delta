@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: print_css_bounds.txt
+Scope: audit(print): verify A4 print media styling breakpoints
+Timestamp: 2026-10-04 23:05:46
