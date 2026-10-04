@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: security_headers.txt
+Scope: audit(sec): verify Strict-Transport-Security preload requirements
+Timestamp: 2026-10-04 23:05:42
