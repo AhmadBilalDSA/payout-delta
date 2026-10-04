@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: w8ben_article12.txt
+Scope: audit(tax): document US-PK Treaty Article 12 royalties withholding
+Timestamp: 2026-10-04 23:05:40
