@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: pwa_service_worker.txt
+Scope: audit(pwa): specify CacheFirst strategy for immutable bank tables
+Timestamp: 2026-10-04 23:05:42
