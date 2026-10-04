@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: hotkeys_schema.txt
+Scope: audit(ui): map terminal navigation shortcuts [G][H] through [G][E]
+Timestamp: 2026-10-04 23:05:44
