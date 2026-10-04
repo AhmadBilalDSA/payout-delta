@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: swift_intermediary.txt
+Scope: audit(swift): codify JPMorgan CHASUS33 correspondent fee matrix
+Timestamp: 2026-10-04 23:05:39
