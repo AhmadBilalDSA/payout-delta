@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: corridor_ngn.txt
+Scope: audit(corridor): benchmark NGN parallel FX spread vs official NAFEM
+Timestamp: 2026-10-04 23:05:36
