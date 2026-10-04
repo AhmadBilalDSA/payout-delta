@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: freeze_manifest.txt
+Scope: chore(release): lock 20-point production audit manifest prior to departure
+Timestamp: 2026-10-04 23:05:50
