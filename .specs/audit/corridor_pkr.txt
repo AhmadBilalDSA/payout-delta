@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: corridor_pkr.txt
+Scope: audit(corridor): benchmark 1500 USD Raast settlement fee exemptions
+Timestamp: 2026-10-04 23:05:38
