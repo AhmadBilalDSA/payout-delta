@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: corridor_php.txt
+Scope: audit(corridor): validate PHP InstaPay and PESONet clearing rails
+Timestamp: 2026-10-04 23:05:37
