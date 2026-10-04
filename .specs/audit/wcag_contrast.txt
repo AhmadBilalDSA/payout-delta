@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: wcag_contrast.txt
+Scope: audit(a11y): verify WCAG 2.1 AAA monospace monetary contrast ratio
+Timestamp: 2026-10-04 23:05:46
