@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: zero_dependency.txt
+Scope: audit(arch): reaffirm zero runtime dependency constraint
+Timestamp: 2026-10-04 23:05:43
