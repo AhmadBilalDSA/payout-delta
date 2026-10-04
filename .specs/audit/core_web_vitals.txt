@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: core_web_vitals.txt
+Scope: audit(perf): document zero Cumulative Layout Shift baseline
+Timestamp: 2026-10-04 23:05:47
