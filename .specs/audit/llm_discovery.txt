@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: llm_discovery.txt
+Scope: audit(aeo): specify machine-readable llms.txt discovery boundaries
+Timestamp: 2026-10-04 23:05:48
