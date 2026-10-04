@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: swift_citi.txt
+Scope: audit(swift): verify Citibank CITICAAX intermediary handling rates
+Timestamp: 2026-10-04 23:05:40
