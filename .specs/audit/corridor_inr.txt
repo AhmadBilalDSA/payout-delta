@@ -1,0 +1,4 @@
+# PAYOUTDELTA SPECIFICATION ENTRY
+Key: corridor_inr.txt
+Scope: audit(corridor): verify Purpose Code P0802 export remittances to INR
+Timestamp: 2026-10-04 23:05:38
