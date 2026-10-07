@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layout/Footer";
 import MarketStatusBar from "@/components/MarketStatusBar";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
-import { Dock } from "@/components/dashboard/Dock";
+import { FloatingDock } from "@/components/layout/FloatingDock";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
 import { SovereignHeader } from "@/components/hud/SovereignHeader";
@@ -132,8 +132,7 @@ export default function RootLayout({
                 `</body>`, so the launcher floats above every route instead of
                 being re-declared per page. It sits inside <LanguageProvider> so
                 its seven labels resolve through the shared `t()` dictionary. */}
-            <Dock />
-            <KeyboardDock />
+            <FloatingDock />
           </BaseCurrencyProvider>
         </LanguageProvider>
       </body>

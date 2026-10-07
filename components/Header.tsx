@@ -94,15 +94,10 @@ export default function Header() {
             <ThemeToggle />
           </span>
           <Link
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden shrink-0 items-center whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20 dark:text-emerald-400 lg:inline-flex"
+            href="/advisory"
+            className="hidden shrink-0 items-center whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20 dark:text-emerald-400 lg:inline-flex gap-1.5"
           >
-            Open Data
-            <span aria-hidden="true" className="ml-0.5 opacity-60">
-              ↗
-            </span>
+            Lead Systems Architect • Advisory & Custom Deployment ↗
           </Link>
         </div>
       </header>

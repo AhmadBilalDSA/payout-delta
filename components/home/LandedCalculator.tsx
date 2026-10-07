@@ -6,6 +6,7 @@ import { TransitionLink as Link } from "@/components/nav/TransitionLink";
 import banksRegistryData from "@/data/banksRegistry.json";
 import jurisdictionsData from "@/data/jurisdictions.json";
 import feesData from "@/data/fees.json";
+import BankFrictionInspector from "@/components/corridors/BankFrictionInspector";
 
 const PRESET_FEES = {
   wire: { wirePlatform: 25.0, wireInward: 10.0, localPlatform: 1.5, localInward: 0.0, name: "Direct Wire" },
@@ -95,6 +96,7 @@ export function LandedCalculator() {
   const [flowMode, setFlowMode] = useState<"gross" | "net">("gross");
   const [preset, setPreset] = useState<PresetKey>("wire");
   const [feeType, setFeeType] = useState<"SHA" | "OUR">("SHA");
+  const [showAuditDrawer, setShowAuditDrawer] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [freshness, setFreshness] = useState<{ dateStr: string; isStale: boolean } | null>(null);
   
@@ -294,229 +296,105 @@ export function LandedCalculator() {
           </div>
         </div>
 
-        <div className="space-y-2 mb-6">
-          <label className="text-sm font-medium text-zinc-400 block">{flowMode === 'gross' ? 'You send exactly' : 'Recipient needs exactly'}</label>
-          <div className="flex items-center justify-between bg-zinc-950 rounded-xl border border-zinc-800/80 px-4 py-3 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/50 transition-all duration-150">
-            <div className="flex items-baseline gap-1 flex-1">
-              <span className="text-xl font-medium text-zinc-500 font-mono">$</span>
-              <input 
-                className="w-full bg-transparent border-0 p-0 text-3xl font-semibold font-mono tabular-nums text-zinc-100 focus:outline-none focus:ring-0 tracking-tight" 
-                placeholder="0.00" 
-                type="number" 
-                value={amountStr}
-                onChange={e => setAmountStr(e.target.value)}
+        {/* Gross Send Card */}
+        <div className="bg-zinc-950 rounded-t-2xl border border-zinc-800/80 p-5 md:p-6 z-10 relative">
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Gross Send (USD)</label>
+              <div className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 font-mono">
+                {feeType} PRESET
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-medium text-zinc-500 font-mono">$</span>
+                <input 
+                  className="w-full bg-transparent border-0 p-0 text-4xl md:text-5xl font-semibold font-mono tabular-nums text-zinc-100 focus:outline-none focus:ring-0 tracking-tight" 
+                  placeholder="0.00" 
+                  type="number" 
+                  value={amountStr}
+                  onChange={e => setAmountStr(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2 pl-3 bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800/50">
+                <span className="text-xl leading-none">🇺🇸</span>
+                <span className="text-sm text-zinc-100 font-semibold tracking-wide">USD</span>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <BankSelector 
+                label="Origin Institution" 
+                value={originBankBic} 
+                options={originBankOpts} 
+                onChange={setOriginBankBic} 
+                railLabel="FEDWIRE / CHIPS"
               />
             </div>
-            <div className="flex items-center gap-2 pl-3 border-l border-zinc-800 py-1 px-2.5 rounded-lg bg-zinc-900/50">
-              <span className="text-xl leading-none">🇺🇸</span>
-              <span className="text-sm text-zinc-100 font-semibold tracking-wide">USD</span>
-            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-11 gap-3 items-center mb-6 z-20 relative">
-          <BankSelector 
-            label="Origin Institution" 
-            value={originBankBic} 
-            options={originBankOpts} 
-            onChange={setOriginBankBic} 
-            railLabel="FEDWIRE / CHIPS"
-          />
-          
-          <div className="md:col-span-1 flex justify-center py-1 md:py-0 pointer-events-none">
-            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shadow-sm">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
-          </div>
-
-          <BankSelector 
-            label="Destination Institution" 
-            value={destBankBic} 
-            options={destBankOpts} 
-            onChange={setDestBankBic} 
-          />
-        </div>
-
-        <div className="rounded-xl border border-emerald-500/30 p-6 bg-gradient-to-b from-emerald-500/10 to-emerald-500/[0.02] mb-6 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">{flowMode === 'gross' ? 'RECIPIENT RECEIVES' : 'YOU NEED TO INVOICE'}</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500 text-black font-mono">
-                  {flowMode === 'gross' ? 'Net Landed Amount' : 'Required Gross Invoice'}
-                </span>
-              </div>
-              <div className="text-4xl md:text-5xl text-emerald-400 font-mono font-bold tracking-tight tabular-nums">
-                ${(flowMode === 'gross' ? wireNetLanded : wireRequiredGross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-2xl text-zinc-100 font-sans font-medium">USD</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-900/50 border border-emerald-500/20 text-zinc-300 font-mono text-[11px] mt-2">
-                <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                <span>≈ {destBank.currency === 'USD' ? '$' : ''}{localCurrencyEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {destBank.currency} at mid-market rate</span>
-              </div>
-            </div>
-            <div className="text-left sm:text-right">
-              <span className="text-xs text-zinc-400 block font-medium">Settlement Target</span>
-              <span className="text-sm text-zinc-100 font-medium flex items-center sm:justify-end gap-1.5 mt-0.5">
-                <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                1 - 2 business days
-              </span>
-            </div>
+        {/* Centered Overlapping Circular Swap */}
+        <div className="relative h-2 flex items-center justify-center -my-3 z-20 pointer-events-none">
+          <div className="w-10 h-10 rounded-full bg-zinc-900 border-4 border-zinc-950 flex items-center justify-center text-emerald-400 shadow-sm shadow-black/50 z-20">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+            </svg>
           </div>
         </div>
 
-        <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-5 z-10 relative">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <span className="text-sm text-zinc-100 font-semibold flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Transparent Friction Breakdown
-            </span>
-            <div className="inline-flex p-0.5 rounded-lg bg-zinc-900 border border-zinc-800">
-              <button 
-                onClick={() => setFeeType("SHA")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold font-mono transition-colors shadow-sm ${feeType === 'SHA' ? 'bg-emerald-500 text-black' : 'text-zinc-400 hover:text-zinc-200'}`}
-              >
-                SHA (Shared Deductions)
-              </button>
-              <button 
-                onClick={() => setFeeType("OUR")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold font-mono transition-colors shadow-sm ${feeType === 'OUR' ? 'bg-emerald-500 text-black' : 'text-zinc-400 hover:text-zinc-200'}`}
-              >
-                OUR (Client Covers Fees)
-              </button>
-            </div>
-          </div>
-          
-          {feeType === "OUR" && (
-            <div className="mb-3 px-3 py-2 rounded-lg bg-zinc-900/50 border border-emerald-500/20 flex items-start gap-2 text-zinc-300 text-[11px]">
-              <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>You have selected <strong>OUR</strong> instruction. The sender will be billed an extra <strong>${totalWireFriction.toFixed(2)}</strong> so you receive exactly <strong>${parsedAmount.toFixed(2)}</strong>.</span>
-            </div>
-          )}
-
-          <div className="space-y-3 text-sm">
-            <div className="flex items-start justify-between py-1">
-              <div>
-                <div className="text-zinc-200 font-medium flex items-center gap-1.5">
-                  Intermediary / Platform Cut
-                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <div className="text-xs text-zinc-500">Deducted by intermediate clearing banks or platform</div>
-              </div>
-              <span className="font-mono text-rose-400 font-medium tabular-nums">-${wirePlatform.toFixed(2)}</span>
-            </div>
+        {/* True Landed Cash Card & Destination Bank */}
+        <div className="bg-zinc-950 rounded-b-2xl border border-zinc-800/80 p-5 md:p-6 z-10 relative mb-6">
+          <div className="flex flex-col gap-4">
             
-            <div className="flex items-start justify-between py-1 border-t border-zinc-800/80 pt-2">
-              <div>
-                <div className="text-zinc-200 font-medium flex items-center gap-1.5">
-                  Receiving Bank Inward Fee
-                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <div className="text-xs text-zinc-500">Standard incoming wire inward processing tariff</div>
-              </div>
-              <span className="font-mono text-rose-400 font-medium tabular-nums">-${wireInward.toFixed(2)}</span>
+            <div className="pb-2">
+              <BankSelector 
+                label="Destination Institution" 
+                value={destBankBic} 
+                options={destBankOpts} 
+                onChange={setDestBankBic} 
+              />
             </div>
-            
-            <div className="flex items-center justify-between pt-3 border-t border-zinc-700 font-medium">
-              <span className="text-zinc-200">Subtotal deductions</span>
-              <div className="text-right">
-                <span className="font-mono text-zinc-200 font-semibold tabular-nums">-${totalWireFriction.toFixed(2)} total friction</span>
-              </div>
-            </div>
-          </div>
-          </div>
-          <div className="mt-4 text-[10px] text-zinc-500 text-center leading-relaxed">
-            Audited from State Bank of Pakistan (SBP) & Institutional Schedule of Charges (Updated Q3 2026). <a href="/payout-delta/api/fees.json" className="text-emerald-500 hover:underline" target="_blank">Open data</a>.
-          </div>
-        </section>
 
-      <div className="[content-visibility:auto] [contain-intrinsic-size:100%_460px]">
-        <h2 className="text-xl font-bold text-zinc-100 mb-4">Compare Execution Rails</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 flex flex-col justify-between hover:border-zinc-700 transition-all duration-150 min-h-[220px]">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-medium px-2.5 py-1 rounded bg-zinc-800 text-zinc-400">{PRESET_FEES[preset].name} (Standard)</span>
-                <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-zinc-100 mb-1">Direct SWIFT SHA</h3>
-              
-              <div className="space-y-3 py-3 border-y border-zinc-800 mb-4 text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-400">Total Deductions</span>
-                  <span className="font-mono text-zinc-200 font-medium tabular-nums">-${totalWireFriction.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-400">Est. Delivery</span>
-                  <span className="text-zinc-200 font-medium">1 - 2 business days</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-baseline mb-4">
-                <span className="text-[11px] font-medium text-zinc-400">{flowMode === 'gross' ? 'Net Landed:' : 'Required Gross:'}</span>
-                <span className="text-xl text-zinc-100 font-mono font-bold tabular-nums">${(flowMode === 'gross' ? wireNetLanded : wireRequiredGross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-              <Link href="/tracer/" className="w-full py-2.5 rounded-lg border border-zinc-700 hover:bg-zinc-800 text-zinc-200 text-sm font-medium transition-colors flex items-center justify-center">
-                Select Wire {feeType}
-              </Link>
-            </div>
-          </div>
-
-          <div className="bg-zinc-900 rounded-xl border-2 border-emerald-500/50 p-6 flex flex-col justify-between relative shadow-lg shadow-emerald-500/5 hover:border-emerald-500 transition-all duration-150 min-h-[220px]">
-            <div className="absolute -top-3 right-6 bg-emerald-500 text-black text-[10px] font-bold px-3 py-0.5 rounded-full flex items-center gap-1 shadow-md">
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              Recommended • Faster
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-semibold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400">Local Rail Routing</span>
-                <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-zinc-100 mb-1">Local Clearing / Instant Rail</h3>
-              
-              <div className="space-y-3 py-3 border-y border-zinc-800 mb-4 text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-400">Total Deductions</span>
-                  <div className="text-right">
-                    <span className="font-mono text-emerald-400 font-medium tabular-nums">-${totalLocalFriction.toFixed(2)} flat fee</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-400">Est. Delivery</span>
-                  <span className="text-emerald-400 font-medium flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                    Under 60 seconds
+            <div className="flex items-center justify-between border-t border-zinc-800/80 pt-4 mt-2">
+              <div className="flex flex-col">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1">True Landed Cash</span>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-zinc-900 text-zinc-400 font-mono text-[10px] border border-zinc-800">
+                    Baseline: {fxRate.toFixed(4)}
                   </span>
                 </div>
               </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-baseline mb-4">
-                <span className="text-[11px] font-medium text-zinc-400">{flowMode === 'gross' ? 'Net Landed:' : 'Required Gross:'}</span>
-                <span className="text-xl text-emerald-400 font-mono font-bold tabular-nums">${(flowMode === 'gross' ? localNetLanded : localRequiredGross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <div className="text-right">
+                <div className="text-3xl md:text-4xl text-emerald-400 font-mono font-bold tracking-tight tabular-nums">
+                  {(flowMode === 'gross' ? wireNetLanded : wireRequiredGross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <div className="text-xs text-zinc-400 mt-1 font-mono">
+                  ≈ {destBank.currency === 'USD' ? '$' : ''}{localCurrencyEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {destBank.currency}
+                </div>
               </div>
-              <Link href="/" className="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold transition-all shadow-sm active:scale-95 flex items-center justify-center">
-                Route via Instant Rail
-              </Link>
             </div>
+
           </div>
         </div>
-      </div>
+
+        <div className="mt-4">
+          <button 
+            onClick={() => setShowAuditDrawer(!showAuditDrawer)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/50 border border-zinc-800/80 hover:bg-zinc-800 transition-colors rounded-xl text-zinc-300 font-medium text-sm"
+          >
+            <span>Audit Bank Friction & Intermediary Deductions</span>
+            <svg className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${showAuditDrawer ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showAuditDrawer ? 'max-h-[2000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+            <BankFrictionInspector />
+          </div>
+        </div>
+      </section>
 
       <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">

@@ -8,6 +8,7 @@ import { HeroSettlementCard } from "@/components/hud/HeroSettlementCard";
 import { LandedCalculator } from "@/components/home/LandedCalculator";
 import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import BankFrictionInspector from "@/components/corridors/BankFrictionInspector";
 
 export default function Home() {
   const entries = buildDirectoryIndex();
