@@ -132,23 +132,25 @@ export default async function BankDossierPage({
   const bank = getBankProfileBySlug(slug);
   if (!bank) notFound();
 
+  // Early exit: skip expensive sovereign dossier for banks without jurisdiction
+  const jurisdiction = getJurisdictionByIso2(bank.countryIso2) ?? null;
   const dossier = bank.dossier;
   const primaryCorridor = dossier?.connectedCorridors[0] ?? null;
 
-  // Phase 7 — the hexagonal sovereign dossier. Built here, on the server, from
-  // the same registry seams the rest of the page reads, and handed to the view
-  // adapter as one flat record. The jurisdiction resolves for all 266 verified
-  // heads (a head is registered in a market that has a regime), but a defensive
-  // `null` is still handled: a bank page without a statutory dossier must still
-  // render its routing, settlement and repository sections.
-  const jurisdiction = getJurisdictionByIso2(bank.countryIso2) ?? null;
-  const sovereignDossier = jurisdiction
-    ? buildSovereignDossier(
+  // Build sovereign dossier only when we have all required data
+  let sovereignDossier = null;
+  if (jurisdiction && dossier) {
+    try {
+      sovereignDossier = buildSovereignDossier(
         bank,
         jurisdiction,
         getCorridorBySlug(primaryCorridor ?? "") ?? null
-      )
-    : null;
+      );
+    } catch {
+      // Degrade gracefully if dossier building fails
+      sovereignDossier = null;
+    }
+  }
 
   const breadcrumbs = serializeSchemaGraph([
     buildBreadcrumbLd([

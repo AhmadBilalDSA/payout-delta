@@ -23,6 +23,15 @@ import {
   type SettlementOverrides,
 } from "@/utils/inverseMath";
 import { formatLocal, formatUSD } from "@/utils/format";
+import {
+  calculateForwardPayout,
+  calculateReverseTarget,
+  formatCurrency,
+} from "@/src/lib/engine/math";
+import type {
+  Corridor as EngineCorridor,
+  IntermediaryRoute,
+} from "@/src/lib/engine/types";
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { validateCorridorRuntime } from "@/lib/schemaValidator";
 import {
@@ -177,14 +186,92 @@ export default function Calculator({
   // stack. The same first-bank / first-tier bench the TransactionCostingWidget
   // defaults to becomes the solver's overrides, so the verdict invoice and the
   // 7-step waterfall agree out of the box (PKR: Meezan wire $15 + PSEB tier).
-  const settlementOverrides = useMemo<SettlementOverrides>(() => {
-    const regulation = getRegulatoryBanking(corridor.slug);
-    return {
+  // Phase 2 — the corridor's own statutory bench, resolved once and shared by
+  // the solver defaults and the engine audit seam below.
+  const regulation = useMemo(
+    () => getRegulatoryBanking(corridor.slug),
+    [corridor.slug]
+  );
+
+  const settlementOverrides = useMemo<SettlementOverrides>(
+    () => ({
       wireUSD: regulation.banks[0]?.intermediaryUSD ?? 0,
       localFee: regulation.banks[0]?.localFeeDefault ?? 0,
       tierRate: regulation.tiers[0]?.rate ?? 0,
+    }),
+    [regulation]
+  );
+
+  // The receiving bank the waterfall currently has selected (streamed up by
+  // TransactionCostingWidget), falling back to the corridor's primary bench.
+  const settlementBank = useMemo(
+    () =>
+      regulation.banks.find((item) => item.id === selectedBankId) ??
+      regulation.banks[0] ??
+      null,
+    [regulation, selectedBankId]
+  );
+
+  // Engine seam — the correspondent/banking layer is recomputed through the
+  // pure `src/lib/engine/math.ts` waterfall so the settlement figures obey the
+  // R1–R4 invariants (bounded amount, clamped non-negative landing, guarded
+  // division, `Intl` fixed-point output). Its base is the post-platform USD
+  // balance of the live ranked quote. NOTE the deliberate difference: the
+  // ranked verdict quotes the *channel* only, while this layer also subtracts
+  // the receiving bank's correspondent cut and the statutory tier — so it is a
+  // conservative restatement (always ≤ the channel landing), never a second
+  // optimisic number for the same money.
+  const engineAudit = useMemo(() => {
+    const anchor = route.verdict.best ?? route.quotes[0];
+    if (!anchor) {
+      return null;
+    }
+    const channel = channels.find((item) => item.id === anchor.channelId);
+    const engineCorridor: EngineCorridor = {
+      id: corridor.slug,
+      source: corridor.from,
+      target: corridor.to,
+      baseSpreadPercent: channel?.fxSpread ?? 0,
+      fixedDeductUsd: anchor.feeDeductedUSD,
     };
-  }, [corridor.slug]);
+    const intermediaryRoute: IntermediaryRoute = {
+      // A local-clearing corridor publishes no BIC; the sentinel is carried
+      // verbatim as a label, exactly as the S2.1 ISO 9362 gate exempts it.
+      bic: settlementBank?.swiftCode ?? "—",
+      bankName: settlementBank?.name ?? corridor.country,
+      chargeCode: regulation.field71A.code,
+      deductUsd: settlementBank?.intermediaryUSD ?? settlementOverrides.wireUSD,
+    };
+    // `SettlementOverrides` fields are optional by design (the solver accepts
+    // a partial bench); the engine signature is strict, so the tier rate is
+    // resolved to a concrete 0 here rather than widening the engine.
+    const tierRate = settlementOverrides.tierRate ?? 0;
+    const forward = calculateForwardPayout(
+      anchor.netAfterPlatformUSD,
+      engineCorridor,
+      intermediaryRoute,
+      tierRate
+    );
+    const reverse = calculateReverseTarget(
+      anchor.netAfterPlatformUSD,
+      engineCorridor,
+      intermediaryRoute,
+      tierRate
+    );
+    return { forward, reverse, intermediaryRoute };
+  }, [
+    route,
+    channels,
+    corridor,
+    settlementBank,
+    settlementOverrides,
+    regulation.field71A.code,
+  ]);
+
+  // R2 — the absorption warning only fires when the correspondent + spread +
+  // withholding stack consumes the whole post-platform balance. The engine
+  // owns the boolean; the UI never renders a negative landing.
+  const feeAbsorbed = engineAudit !== null && engineAudit.forward.isFeeAbsorbed;
 
   const inverseRoute = useMemo(
     () =>
@@ -501,6 +588,63 @@ export default function Calculator({
           platforms={platforms}
           corridor={corridor}
         />
+
+        {/* Engine audit (src/lib/engine/math.ts) — the correspondent layer is
+            recomputed through the pure, invariant-checked waterfall on every
+            slider move. R2 renders the explicit absorption warning when the
+            stack consumes the whole post-platform balance; every figure is
+            emitted through the engine's `formatCurrency` (Intl fixed-point). */}
+        {engineAudit !== null && (
+          <div className="flex w-full min-w-0 flex-col gap-3">
+            {feeAbsorbed && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className="flex w-full min-w-0 items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3.5 py-2.5 text-xs font-medium leading-relaxed text-amber-700 dark:text-amber-300"
+              >
+                <span aria-hidden="true" className="mt-px shrink-0">
+                  ⚠️
+                </span>
+                <span>
+                  Intermediary deductions exceed transfer amount; net landing
+                  clamped to zero.
+                </span>
+              </div>
+            )}
+
+            {!feeAbsorbed && engineAudit.reverse.feasible && (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-slate-200/90 bg-white px-3.5 py-2.5 font-mono text-[11px] tabular-nums tracking-tight text-black/55 shadow-sm shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900/60 dark:text-white/55 dark:backdrop-blur-md">
+                <span>
+                  Engine net landing{" "}
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                    {formatCurrency(
+                      engineAudit.forward.netLanding,
+                      corridor.from
+                    )}
+                  </span>
+                </span>
+                <span className="text-black/25 dark:text-white/25" aria-hidden="true">
+                  ·
+                </span>
+                <span>
+                  Correspondent {engineAudit.intermediaryRoute.chargeCode}{" "}
+                  {formatCurrency(engineAudit.forward.intermediaryDeduct, corridor.from)}
+                </span>
+                <span className="text-black/25 dark:text-white/25" aria-hidden="true">
+                  ·
+                </span>
+                <span>
+                  Effective loss {formatCurrency(
+                    engineAudit.forward.grossAmount *
+                      engineAudit.forward.effectiveLossPercent,
+                    corridor.from
+                  )}{" "}
+                  ({(engineAudit.forward.effectiveLossPercent * 100).toFixed(2)}%)
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Reverse target-gross invoice solver callout — Mode B only. Shows the
             exact USD invoice the solver grossed up for the current target and

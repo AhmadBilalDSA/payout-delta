@@ -10,8 +10,13 @@ import {
 import { getRegulatoryBanking } from "@/data/regulatoryBanking";
 import { getCorridorHistory } from "@/lib/history";
 import { computeRoute, DEFAULT_GROSS_USD } from "@/utils/calculateRoute";
-import { formatLocal, formatUSD } from "@/utils/format";
+import { formatLocal } from "@/utils/format";
 import { BREADCRUMB_ORIGIN, SITE_URL } from "@/lib/seoSchemas";
+import { calculateForwardPayout, formatCurrency } from "@/src/lib/engine/math";
+import type {
+  Corridor as EngineCorridor,
+  IntermediaryRoute,
+} from "@/src/lib/engine/types";
 
 interface EmbedCorridorPageProps {
   params: Promise<{ corridor: string }>;
@@ -93,6 +98,40 @@ export default async function EmbedCorridorPage({
   const bic = bank && bank.swiftCode !== "—" ? bank.swiftCode : "Local clearing";
   const calculatorUrl = `${BREADCRUMB_ORIGIN}/calculator/${corridor.slug}/`;
 
+  // Engine seam — the card's take-home is computed by the same pure, R1–R4
+  // checked waterfall the interactive calculator runs, so both surfaces call
+  // one audited function instead of a second hand-inlined formula. The engine
+  // returns a source-currency balance, converted to local at the reference
+  // rate for display. It is deliberately CONSERVATIVE against the ranked
+  // channel quote: it also charges the spread on the fee-bearing balance and
+  // the statutory tier, so on a $1,000 USD→PKR direct wire it lands ~Rs 1k
+  // below the channel-only figure. The card therefore understates rather than
+  // overstates what a beneficiary receives.
+  const engineCorridor: EngineCorridor = {
+    id: corridor.slug,
+    source: corridor.from,
+    target: corridor.to,
+    // The spread the ranked winner actually charges, read off the channel the
+    // route selected — never a hardcoded global.
+    baseSpreadPercent:
+      channels.find((channel) => channel.id === best?.channelId)?.fxSpread ??
+      0.035,
+    fixedDeductUsd: best?.feeDeductedUSD ?? 30,
+  };
+  const intermediaryRoute: IntermediaryRoute = {
+    bic: bank?.swiftCode ?? "—",
+    bankName: bank?.name ?? corridor.country,
+    chargeCode: regulation.field71A.code,
+    deductUsd: wireFee,
+  };
+  const engineResult = calculateForwardPayout(
+    best?.netAfterPlatformUSD ?? DEFAULT_GROSS_USD,
+    engineCorridor,
+    intermediaryRoute,
+    regulation.tiers[0]?.rate ?? 0
+  );
+  const engineLandingLocal = engineResult.netLanding * activeRate;
+
   return (
     <div className="flex w-full flex-col bg-[#080D1A] p-3 font-mono">
       <EmbedResizer />
@@ -124,7 +163,7 @@ export default async function EmbedCorridorPage({
               Intermediary Fee (SWIFT BIC)
             </p>
             <p className="mt-1 text-sm font-bold tabular-nums">
-              ≈ {formatUSD(wireFee)}
+              ≈ {formatCurrency(engineResult.intermediaryDeduct, corridor.from)}
             </p>
             <p className="mt-0.5 truncate text-[9px] text-slate-500">{bic}</p>
           </div>
@@ -132,8 +171,16 @@ export default async function EmbedCorridorPage({
             <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-slate-500">
               Real Net Take-Home on $1,000
             </p>
-            <p className="mt-1 text-sm font-bold tabular-nums text-emerald-400">
-              {best ? formatLocal(best.localAmount, corridor) : "—"}
+            <p
+              className={`mt-1 text-sm font-bold tabular-nums ${
+                engineResult.isFeeAbsorbed ? "text-amber-400" : "text-emerald-400"
+              }`}
+            >
+              {/* R2 — the engine clamped the landing to zero, so the card says
+                  so instead of printing a plausible but unspendable number. */}
+              {engineResult.isFeeAbsorbed
+                ? "Fees exceed transfer"
+                : formatLocal(engineLandingLocal, corridor)}
             </p>
             <p className="mt-0.5 truncate text-[9px] text-slate-500">
               {best ? `via ${best.channelName}` : "no feasible rail"}

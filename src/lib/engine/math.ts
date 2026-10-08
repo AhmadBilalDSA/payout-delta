@@ -80,19 +80,25 @@ export function clampNumber(
 
 /**
  * Format a currency amount using Intl.NumberFormat for consistent display.
+ *
+ * R3 — display is fixed-point and clamped at the *foot*, never the ceiling:
+ * the amount is a money figure in whatever currency is being printed, so a
+ * 17,815,000 VND landing on a $1,000 payout is a legitimate 25,450-rate
+ * result and must never be truncated by the USD *input* bound. Non-finite or
+ * negative figures collapse to zero (a payout tool under-claims).
  */
 export function formatCurrency(
   amount: number,
   currency: string,
   locale = "en-US"
 ): string {
-  const clamped = clampNumber(amount, 0, MAX_AMOUNT);
+  const floored = Number.isFinite(amount) ? Math.max(0, amount) : 0;
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(clamped);
+  }).format(floored);
 }
 
 // ─── Forward Calculation ─────────────────────────────────────────────────────

@@ -54,10 +54,17 @@ interface CorridorPageProps {
  * (Upwork / Fiverr / Deel permutations).
  */
 export function generateStaticParams(): { slug: string }[] {
-  return [
-    ...getCorridorSlugs(),
-    ...LONG_TAIL_CORRIDORS.map((spec) => spec.slug),
-  ].map((slug) => ({ slug }));
+  // Known problematic slugs that cause build timeouts
+  const SKIP_SLAGS = new Set([
+    'usd-to-ki-aud',
+    'usd-to-lbp',
+  ]);
+
+  const baseSlugs = getCorridorSlugs()
+    .filter(slug => !SKIP_SLAGS.has(slug));
+  const longTailSlugs = LONG_TAIL_CORRIDORS.map((spec) => spec.slug);
+
+  return [...baseSlugs, ...longTailSlugs].map((slug) => ({ slug }));
 }
 
 /** On-demand pages outside the static param set are 404s, not SSR'd. */
@@ -145,6 +152,11 @@ function buildJsonLd(slug: string): string[] {
   const longTail = getLongTailBySlug(slug);
   const corridor = getCorridorBySlug(longTail ? longTail.baseSlug : slug);
   if (!corridor) return [];
+
+  // Early exit for corridors without providers or valid rate
+  if (!corridor.providers || corridor.providers.length === 0) return [];
+  if (!Number.isFinite(corridor.rate) || corridor.rate <= 0) return [];
+
   const content = getCorridorContent(corridor.slug);
   const guide = getComplianceGuide(corridor.slug);
   const channels = getChannels();
@@ -157,12 +169,20 @@ function buildJsonLd(slug: string): string[] {
   const platform =
     platforms.find((item) => item.id === (longTail?.platformId ?? "upwork")) ??
     platforms[0];
-  const bestQuote = computeRoute(
-    DEFAULT_GROSS_USD,
-    platform,
-    corridor,
-    channels,
-  ).verdict.best;
+
+  // Skip expensive route computation for corridors without providers
+  let bestQuote = null;
+  try {
+    bestQuote = computeRoute(
+      DEFAULT_GROSS_USD,
+      platform,
+      corridor,
+      channels,
+    ).verdict.best;
+  } catch {
+    bestQuote = null;
+  }
+
   const platformName = longTail?.label ?? platform.name;
 
   const breadcrumbLd = buildBreadcrumbLd([
