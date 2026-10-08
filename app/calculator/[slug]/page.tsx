@@ -38,6 +38,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import FaqAccordion from "@/components/FaqAccordion";
 import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
+import { FinancialSchema } from "@/src/components/seo/FinancialSchema";
+import { CorridorFaqSchema } from "@/src/components/seo/CorridorFaqSchema";
 import AeoFaqSection from "@/components/AeoFaqSection";
 import ComplianceGuide from "@/components/ComplianceGuide";
 import CurrencyTrendSparkline from "@/components/CurrencyTrendSparkline";
@@ -54,17 +56,11 @@ interface CorridorPageProps {
  * (Upwork / Fiverr / Deel permutations).
  */
 export function generateStaticParams(): { slug: string }[] {
-  // Known problematic slugs that cause build timeouts
-  const SKIP_SLAGS = new Set([
-    'usd-to-ki-aud',
-    'usd-to-lbp',
-  ]);
+  // Directly retrieve slugs without async/FS operations.
+  const slugs = getCorridorSlugs();
+  const longTail = LONG_TAIL_CORRIDORS.map((spec) => spec.slug);
 
-  const baseSlugs = getCorridorSlugs()
-    .filter(slug => !SKIP_SLAGS.has(slug));
-  const longTailSlugs = LONG_TAIL_CORRIDORS.map((spec) => spec.slug);
-
-  return [...baseSlugs, ...longTailSlugs].map((slug) => ({ slug }));
+  return [...slugs, ...longTail].map((slug) => ({ slug }));
 }
 
 /** On-demand pages outside the static param set are 404s, not SSR'd. */
@@ -381,7 +377,42 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         <AnnualLeakageCalculator corridor={corridor} />
       </div>
 
-      {/* Phase 5 — regional banking & tax compliance drawer under the fee cards. */}
+      {/* Schema.org — FinancialService + Dataset (static, build-time). */}
+      <FinancialSchema
+        slug={corridor.slug}
+        sourceCurrency={corridor.from}
+        targetCurrency={corridor.to}
+        displayName={`${corridor.from} to ${corridor.to}`}
+        baseRate={corridor.rate}
+        intermediaryFeeUsd={25}
+        regulatoryCitation={
+          corridor.slug === "usd-to-pkr"
+            ? "Section 154A of the Income Tax Ordinance, 2001"
+            : corridor.slug === "usd-to-inr"
+            ? "Section 195 of the Income Tax Act, 1961"
+            : "Local statutory withholding"
+        }
+        purposeCode={
+          corridor.slug === "usd-to-pkr" ? "1201" : undefined
+        }
+      />
+
+      {/* AEO FAQPage schema — three programmatic, citation-rich entries per corridor. */}
+      <CorridorFaqSchema
+        source={corridor.from}
+        target={corridor.to}
+        country={corridor.country}
+        regulatoryCitation={
+          corridor.slug === "usd-to-pkr"
+            ? "Section 154A of the Income Tax Ordinance, 2001"
+            : corridor.slug === "usd-to-inr"
+            ? "Section 195 of the Income Tax Act, 1961"
+            : "Local statutory withholding"
+        }
+        purposeCode={
+          corridor.slug === "usd-to-pkr" ? "1201" : undefined
+        }
+      />
       <div className="mt-8">
         <ComplianceGuide guide={guide} />
       </div>
