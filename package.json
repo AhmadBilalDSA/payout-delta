@@ -11,6 +11,8 @@
     "lint": "eslint",
     "test": "npm run lint && node scripts/test_corridors.mjs && npm run test:simulation",
     "test:simulation": "node scripts/simulate_edge_cases.mjs",
+    "test:engine": "vitest run src/lib/engine/__tests__/engine.test.ts",
+    "test:all": "npm run test && npm run test:engine",
     "audit:ui": "node scripts/audit_ui_surfaces.mjs",
     "audit:hex": "node scripts/audit_hexagonal_mesh.mjs",
     "audit:utility": "node scripts/audit_utility_engines.mjs",
@@ -36,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.1"
   }
 }
