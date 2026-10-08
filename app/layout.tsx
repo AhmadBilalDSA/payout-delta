@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
@@ -10,7 +10,7 @@ import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
 import { SovereignHeader } from "@/components/hud/SovereignHeader";
 import { KeyboardDock } from "@/components/hud/KeyboardDock";
-import CommandPalette from "@/components/navigation/CommandPalette";
+import CommandPalette from "@/src/components/navigation/CommandPalette";
 import { SITE_URL } from "@/lib/seoSchemas";
 import "./globals.css";
 
@@ -31,11 +31,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "PayoutDelta — Freelance Payout Fee Auditor",
+    default: "PayoutDelta â€” Freelance Payout Fee Auditor",
     template: "%s | PayoutDelta",
   },
   description:
-    "Audit freelance payout fees across Upwork, Fiverr and direct invoices. Compare SWIFT, Wise, Payoneer, local bank and remittance channels in 10 currencies — no signup, no cost.",
+    "Audit freelance payout fees across Upwork, Fiverr and direct invoices. Compare SWIFT, Wise, Payoneer, local bank and remittance channels in 10 currencies â€” no signup, no cost.",
   keywords: [
     "freelance payout fees",
     "upwork withdrawal fees",
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: "PayoutDelta",
-    title: "PayoutDelta — Freelance Payout Fee Auditor",
+    title: "PayoutDelta â€” Freelance Payout Fee Auditor",
     description:
       "Fee-by-fee breakdown of freelance payout channels across 10 currency corridors. Find the route that keeps the most of what you earn.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PayoutDelta — Freelance Payout Fee Auditor",
+    title: "PayoutDelta â€” Freelance Payout Fee Auditor",
     description:
       "Fee-by-fee breakdown of freelance payout channels across 10 currency corridors.",
   },
@@ -110,7 +110,7 @@ export default function RootLayout({
           }}
         />
         <LanguageProvider>
-          {/* Phase 6 — registers `public/sw.js` in production builds only, so
+          {/* Phase 6 â€” registers `public/sw.js` in production builds only, so
               the four registry feeds stay readable offline. Renders nothing;
               a reader who never sees it loses nothing. */}
           <ServiceWorkerRegister />
@@ -124,18 +124,18 @@ export default function RootLayout({
             <Header />
             <MarketStatusBar />
             {/* Responsive clearance:
-                - Mobile (<md): bottom dock at `bottom-3` → need `pb-24` (96px) clearance
-                - Desktop (md+): left rail at `left-3.5` → need `pl-20` (80px) clearance
+                - Mobile (<md): bottom dock at `bottom-3` â†’ need `pb-24` (96px) clearance
+                - Desktop (md+): left rail at `left-3.5` â†’ need `pl-20` (80px) clearance
                 - `min-h-[calc(100vh-3.5rem)]` reserves the `h-14` utility header */}
             <main className="flex-1 min-h-[calc(100vh-3.5rem)] py-6 pr-4 sm:pr-8 pl-4 md:pl-20 pb-24 md:pb-8">{children}</main>
             <Footer />
-            {/* GLOBAL MODULE DOCK — mounted once, as the last node before
+            {/* GLOBAL MODULE DOCK â€” mounted once, as the last node before
                 `</body>`, so the launcher floats above every route instead of
                 being re-declared per page. It sits inside <LanguageProvider> so
                 its seven labels resolve through the shared `t()` dictionary. */}
             <FloatingDock />
-            {/* GLOBAL COMMAND PALETTE — mounted once at root, behind every route.
-                Listens for ⌘/Ctrl+K, / (when focus is not in an input), and ESC. */}
+            {/* GLOBAL COMMAND PALETTE â€” mounted once at root, behind every route.
+                Listens for âŒ˜/Ctrl+K, / (when focus is not in an input), and ESC. */}
             <CommandPalette />
           </BaseCurrencyProvider>
         </LanguageProvider>
@@ -143,3 +143,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+

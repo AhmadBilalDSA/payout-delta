@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
-import { comparePlatformArbitrage } from "@/src/lib/engine/arbitrage";
-import type { ArbitrageBreakdown } from "@/src/lib/engine/arbitrage";
+import { comparePlatformArbitrage } from '../../lib/engine/arbitrage';
+import type { ArbitrageBreakdown } from '../../lib/engine/arbitrage';
 
 interface ArbitrageMatrixProps {
   grossAmount: number;
@@ -68,7 +68,7 @@ function BreakdownRow({
         {fmtPct(platform.fxSpreadPercent)}
       </td>
       <td className="px-3 py-2 text-xs text-slate-300 tabular-nums font-mono">
-        ${fmtUsd(totalFeeUsd)} · {fmtPct(effectiveLossPercent)}
+        ${fmtUsd(totalFeeUsd)} Â· {fmtPct(effectiveLossPercent)}
       </td>
       <td className="px-3 py-2 text-xs tabular-nums font-mono">
         <span
@@ -111,7 +111,7 @@ export default function ArbitrageMatrix({
         </h2>
         <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
           {optimal
-            ? `Best route: ${optimal.platform.name} — lands ${fmtLanded(optimal.landedAmountTarget, targetCurrency)}`
+            ? `Best route: ${optimal.platform.name} â€” lands ${fmtLanded(optimal.landedAmountTarget, targetCurrency)}`
             : `Compare ${rows.length} rails for $${fmtUsd(grossAmount)} at ${exchangeRate.toFixed(4)} ${targetCurrency}/USD`}
         </p>
       </div>
@@ -138,7 +138,7 @@ export default function ArbitrageMatrix({
             </tr>
           </thead>
           <tbody className="font-mono text-xs tabular-nums">
-            {rows.map((row) => (
+            {rows.map((row: any) => (
               <BreakdownRow
                 key={row.platform.id}
                 row={row}
@@ -151,3 +151,5 @@ export default function ArbitrageMatrix({
     </section>
   );
 }
+
+

@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
-import { resolveHopChain } from "@/src/lib/engine/swiftHop";
-import type { SwiftHopNode } from "@/src/lib/engine/swiftHop";
+import { resolveHopChain } from '../../lib/engine/swiftHop';
+import type { SwiftHopNode } from '../../lib/engine/swiftHop';
 
 interface RouteHopTracerProps {
   originBank?: string;
@@ -59,7 +59,7 @@ function NodeCard({ node }: { node: SwiftHopNode }) {
               </span>
             ) : (
               <span className="inline-flex items-center rounded-full border border-amber-500/50 bg-amber-500/15 px-2 py-px text-[10px] font-bold uppercase tracking-widest text-amber-400">
-                Deduction Point: −${node.deductEstimateUsd.toFixed(2)} USD (Estimated)
+                Deduction Point: âˆ’${node.deductEstimateUsd.toFixed(2)} USD (Estimated)
               </span>
             )}
           </div>
@@ -89,8 +89,8 @@ function Arrow() {
  * Horizontal/vertical responsive pipeline showing the 4-node SWIFT hop chain.
  *
  * Node 2 (Correspondent Gateway) dynamically highlights based on charge-code:
- *   - OUR → green "Deduct Absorbed" badge
- *   - SHA/BEN → amber "Deduction Point" badge
+ *   - OUR â†’ green "Deduct Absorbed" badge
+ *   - SHA/BEN â†’ amber "Deduction Point" badge
  */
 export default function RouteHopTracer({
   originBank,
@@ -120,7 +120,7 @@ export default function RouteHopTracer({
         SWIFT Wire Hop Tracer
       </h2>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-        {nodes.map((node, i) => (
+        {nodes.map((node: any, i: number) => (
           <div key={node.id} className="flex items-center sm:flex-col sm:flex-1">
             <NodeCard node={node} />
             {i < nodes.length - 1 && <Arrow />}
@@ -129,9 +129,11 @@ export default function RouteHopTracer({
       </div>
       <p className="mt-3 font-mono text-[10px] text-zinc-500">
         {isOurRoute
-          ? "OUR charge code — intermediary fees absorbed by remitter"
-          : "SHA/BEN charge code — intermediary fees deducted from principal"}
+          ? "OUR charge code â€” intermediary fees absorbed by remitter"
+          : "SHA/BEN charge code â€” intermediary fees deducted from principal"}
       </p>
     </section>
   );
 }
+
+
