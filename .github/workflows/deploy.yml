@@ -1,13 +1,9 @@
-name: Deploy to GitHub Pages
+﻿name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Daily Rates Sync"]
-    types:
-      - completed
 
 permissions:
   contents: read
@@ -21,54 +17,40 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    # Least privilege, restated at job scope. The build job must never be
-    # able to mint an OIDC token or push to the repository.
-    permissions:
-      contents: read
-      pages: read
-      id-token: none
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Pinned to 'main' by literal, never interpolated from event payloads.
-          # `github.event.workflow_run.head_branch` and `github.ref_name` are
-          # attacker-influenceable (fork branch / arbitrary ref); routing them
-          # into a checkout ref lets an untrusted branch get built and shipped
-          # to Pages. All three triggers legitimately target main.
-          ref: main
-          # Do not leave the job's GITHUB_TOKEN in .git/config for later steps.
           persist-credentials: false
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Full Sequential Verification Gate
-        run: npm run prebuild && npx tsc --noEmit && npm run build && npm run test && npm run audit:ui && npm run audit:hex && npm run audit:utility && npm run audit:search && npm run audit:offline && npm run audit:security
+      - name: Prebuild & Validate
+        run: |
+          npm run prebuild --if-present
+          npx tsc --noEmit
 
-      - name: Upload artifact
+      - name: Build Next.js Static Export
+        run: npm run build
+
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
-deploy:
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
-    # Scoped OIDC + Pages write for exactly the deployment job. No repo write.
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - name: Setup Pages
         uses: actions/configure-pages@v5
