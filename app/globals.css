@@ -962,3 +962,12 @@ body {
 .animate-calc-pulse {
   animation: pulse-ring 220ms ease-out forwards;
 }
+
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}

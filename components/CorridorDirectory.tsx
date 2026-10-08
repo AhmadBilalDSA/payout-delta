@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Corridor } from "@/lib/types";
+import TiltCard from "@/src/components/ui/TiltCard";
+import AnimatedNumber from "@/src/components/ui/AnimatedNumber";
 
 /**
  * Phase 9 — de-bloated homepage corridor hub.
@@ -243,60 +245,63 @@ export default function CorridorDirectory({
             const drift = driftPercent(corridor.slug);
             const up = drift >= 0;
             return (
-              <Link
-                key={corridor.slug}
-                href={`/calculator/${corridor.slug}`}
-                className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm shadow-slate-900/5 transition-colors hover:border-emerald-500 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md dark:hover:border-emerald-400/60"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <span
-                      aria-hidden="true"
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm dark:bg-white/10"
-                    >
-                      {flagOf(corridor.countryCode)}
+              <TiltCard key={corridor.slug} className="w-full" tiltIntensity={6}>
+                <Link
+                  href={`/calculator/${corridor.slug}`}
+                  className="group block rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm shadow-slate-900/5 transition-colors hover:border-emerald-500 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md dark:hover:border-emerald-400/60"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span
+                        aria-hidden="true"
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm dark:bg-white/10"
+                      >
+                        {flagOf(corridor.countryCode)}
+                      </span>
+                      <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                        {corridor.country}
+                      </span>
                     </span>
-                    <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-                      {corridor.country}
+                    <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium tabular-nums text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                      {corridor.from} → {corridor.to}
                     </span>
-                  </span>
-                  <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium tabular-nums text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                    {corridor.from} → {corridor.to}
-                  </span>
-                </div>
+                  </div>
 
-                <p className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                  <span className="text-base font-semibold tabular-nums text-slate-900 dark:text-white">
-                    1 {corridor.from} ={" "}
-                    {corridor.rate.toLocaleString("en-US", {
-                      maximumFractionDigits: corridor.rate >= 100 ? 2 : 4,
-                    })}{" "}
-                    {corridor.to}
-                  </span>
-                  <span
-                    className={`text-xs font-semibold tabular-nums ${
-                      up
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-rose-600 dark:text-rose-400"
-                    }`}
-                  >
-                    {up ? "+" : ""}
-                    {drift.toFixed(1)}% 30d
-                  </span>
-                </p>
-
-                <p className="mt-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                  <span className="inline-flex items-center gap-1">
-                    Audit fee leakage
-                    <span
-                      aria-hidden="true"
-                      className="transition-transform duration-200 ease-out group-hover:translate-x-0.5"
-                    >
-                      →
+                  <p className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                    <span className="text-base font-semibold tabular-nums text-slate-900 dark:text-white">
+                      1 {corridor.from} ={" "}
+                      <AnimatedNumber
+                        value={corridor.rate}
+                        decimals={corridor.rate >= 100 ? 2 : 4}
+                        className="text-emerald-600 dark:text-emerald-400"
+                      />{" "}
+                      {corridor.to}
                     </span>
-                  </span>
-                </p>
-              </Link>
+                    <span
+                      className={`text-xs font-semibold tabular-nums ${
+                        up
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-rose-600 dark:text-rose-400"
+                      }`}
+                    >
+                      {up ? "+" : ""}
+                      {drift.toFixed(1)}% 30d
+                    </span>
+                  </p>
+
+                  <p className="mt-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                    <span className="inline-flex items-center gap-1">
+                      Audit fee leakage
+                      <span
+                        aria-hidden="true"
+                        className="transition-transform duration-200 ease-out group-hover:translate-x-0.5"
+                      >
+                        →
+                      </span>
+                    </span>
+                  </p>
+                </Link>
+              </TiltCard>
             );
           })}
         </div>

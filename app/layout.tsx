@@ -10,6 +10,7 @@ import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { BaseCurrencyProvider } from "@/components/providers/BaseCurrencyProvider";
 import { SovereignHeader } from "@/components/hud/SovereignHeader";
 import { KeyboardDock } from "@/components/hud/KeyboardDock";
+import CommandPalette from "@/components/navigation/CommandPalette";
 import { SITE_URL } from "@/lib/seoSchemas";
 import "./globals.css";
 
@@ -133,6 +134,9 @@ export default function RootLayout({
                 being re-declared per page. It sits inside <LanguageProvider> so
                 its seven labels resolve through the shared `t()` dictionary. */}
             <FloatingDock />
+            {/* GLOBAL COMMAND PALETTE — mounted once at root, behind every route.
+                Listens for ⌘/Ctrl+K, / (when focus is not in an input), and ESC. */}
+            <CommandPalette />
           </BaseCurrencyProvider>
         </LanguageProvider>
       </body>

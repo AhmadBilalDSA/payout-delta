@@ -52,6 +52,8 @@ import PrcLetterModal from "@/components/compliance/PrcLetterModal";
 import EmbedSnippetModal from "@/components/EmbedSnippetModal";
 import SwiftRouteInspector from "@/components/compliance/SwiftRouteInspector";
 import AlternativeRailsCard from "@/components/AlternativeRailsCard";
+import ArbitrageMatrix from "@/src/components/calculator/ArbitrageMatrix";
+import RouteHopTracer from "@/src/components/calculator/RouteHopTracer";
 import AuditSheetModal from "@/components/AuditSheetModal";
 import type { PrcLetterPrefill } from "@/lib/prcLetterEngine";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -906,6 +908,23 @@ export default function Calculator({
               ? inverseRoute.verdict.best?.channelId
               : route.verdict.best?.channelId
           }
+        />
+
+        {/* Multi-platform arbitrage comparison matrix */}
+        <ArbitrageMatrix
+          grossAmount={amount}
+          exchangeRate={corridor.rate}
+          targetCurrency={corridor.to}
+        />
+
+        {/* SWIFT hop chain visualiser — mirrors the active route & charge-code */}
+        <RouteHopTracer
+          originBank={senderLabel}
+          intermediaryBic={regulation.intermediaryTransitCuts[0]?.swiftCode}
+          clearingSystem={regulation.localSettlementRail.rail}
+          destBank={settlementBank?.name ?? corridor.country}
+          destBic={settlementBank?.swiftCode}
+          isOurRoute={regulation.field71A.code === "OUR"}
         />
           </>
         ) : (
