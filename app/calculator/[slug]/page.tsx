@@ -40,6 +40,8 @@ import CorridorCard from "@/components/CorridorCard";
 import BlufSummary from "@/components/BlufSummary";
 import { FinancialSchema } from "@/src/components/seo/FinancialSchema";
 import { CorridorFaqSchema } from "@/src/components/seo/CorridorFaqSchema";
+import ComparisonDeltaTable from "@/src/components/seo/ComparisonDeltaTable";
+import CorridorMeshLinks from "@/src/components/seo/CorridorMeshLinks";
 import AeoFaqSection from "@/components/AeoFaqSection";
 import ComplianceGuide from "@/components/ComplianceGuide";
 import CurrencyTrendSparkline from "@/components/CurrencyTrendSparkline";
@@ -93,6 +95,7 @@ export async function generateMetadata({
       alternates: {
         canonical: `${BREADCRUMB_ORIGIN}/calculator/${slug}/`,
       },
+      keywords: [`${longTail.label} ${parsed.sourceCurrency} to ${parsed.targetCurrency} bank transfer fees`, "intermediary bank fee", "SWIFT wire deductions", `statutory tax withholding ${parsed.targetCurrency}`],
       openGraph: {
         type: "website",
         siteName: "PayoutDelta",
@@ -111,18 +114,20 @@ export async function generateMetadata({
 
   const content = getCorridorContent(corridor.slug);
   const ogDescription = `Benchmark SWIFT intermediary deductions (CHASUS33/CITIUS33), retail FX spreads, and tax purpose codes for ${corridor.from} to ${corridor.to} on PayoutDelta.`;
+  const seoTitle = `${corridor.from} to ${corridor.to} SWIFT Deduction & Tax Calculator | PayoutDelta`;
   return {
-    title: `${corridor.from} to ${corridor.to} — Payout Fee Audit (${corridor.country})`,
+    title: seoTitle,
     description: `${content.overview.slice(0, 150)}`,
     alternates: {
       canonical: `${SITE_URL}/calculator/${corridor.slug}/`,
       ...(languages ? { languages } : {}),
     },
+    keywords: [`${corridor.from} to ${corridor.to} bank transfer fees`, "intermediary bank fee", "SWIFT wire deductions", `statutory tax withholding ${corridor.to}`],
     openGraph: {
       type: "website",
       siteName: "PayoutDelta",
       url: `${SITE_URL}/calculator/${corridor.slug}/`,
-      title: `${corridor.from}→${corridor.to} payout fee audit`,
+      title: seoTitle,
       description: ogDescription,
       locale: "en_US",
     },
@@ -371,6 +376,13 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
         </ErrorBoundary>
       </div>
 
+      {/* Static cost-comparison delta table — three-scenario benchmark (OUR / SHA / PayoutDelta) for a $1,000 baseline. */}
+      <ComparisonDeltaTable
+        sourceCurrency={corridor.from}
+        targetCurrency={corridor.to}
+        rate={corridor.rate}
+      />
+
       {/* Milestone UX — annualize the friction: slider projects silent
           banking leakage over a year and pushes the Invoice Studio CTA. */}
       <div className="mt-8">
@@ -503,6 +515,9 @@ export default async function CorridorPage({ params }: CorridorPageProps) {
           </Link>
           .
         </p>
+
+        {/* Internal cross-linking mesh — sibling corridors sharing source currency or target region. */}
+        <CorridorMeshLinks slug={slug} />
       </div>
     </div>
   );
