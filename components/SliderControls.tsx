@@ -105,21 +105,21 @@ export default function SliderControls({
   return (
     <section
       aria-labelledby="audit-inputs"
-      className="w-full min-w-0 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-md dark:backdrop-blur-md sm:p-8"
+      className="relative w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.08] bg-zinc-950/70 p-6 shadow-2xl backdrop-blur-xl sm:p-8 after:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-emerald-500/40 after:to-transparent dark:border-white/[0.08]"
     >
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h2
           id="audit-inputs"
-          className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40"
+          className="text-[11px] font-mono font-semibold uppercase tracking-[0.12em] text-zinc-400"
         >
           {t("auditInputs")}
         </h2>
 
-        {/* iOS-style operating-mode capsule */}
+        {/* iOS-style operating-mode capsule — elevated zinc deck. */}
         <div
           role="group"
           aria-label={t("calculatorMode")}
-          className="inline-flex gap-1 rounded-full bg-[#F2F2F7] p-1 dark:bg-neutral-900"
+          className="inline-flex gap-1 rounded-xl border border-zinc-800 bg-zinc-900/90 p-1"
         >
           {(
             [
@@ -134,10 +134,10 @@ export default function SliderControls({
                 type="button"
                 aria-pressed={isActive}
                 onClick={() => onModeChange(value)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ease-out ${
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ease-out ${
                   isActive
-                    ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-                    : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
+                    ? "bg-zinc-800 text-white shadow-sm font-medium"
+                    : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
                 {t(key)}
@@ -155,10 +155,10 @@ export default function SliderControls({
                 ? t("targetTakeHomeLabel", { currency: corridor.to })
                 : t("grossClientPayment")}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-xl border border-black/10 bg-black/[0.04] px-3 py-1.5 transition focus-within:ring-2 focus-within:ring-emerald-500/50 dark:border-white/10 dark:bg-white/[0.06]">
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-950/20 px-4 py-2 transition focus-within:ring-2 focus-within:ring-emerald-500/50 dark:border-emerald-500/30 dark:bg-emerald-950/30">
               <span
                 aria-hidden="true"
-                className="font-mono text-sm font-semibold text-black/40 tabular-nums dark:text-white/40"
+                className="font-mono text-sm font-semibold text-emerald-500/70 tabular-nums"
               >
                 {prefix}
               </span>
@@ -174,7 +174,7 @@ export default function SliderControls({
                 onFocus={startEditing}
                 onBlur={stopEditing}
                 onChange={(event) => commitDraft(event.currentTarget.value)}
-                className="w-24 bg-transparent text-right font-mono text-lg font-bold tabular-nums text-black outline-none sm:w-32 dark:text-white"
+                className="w-28 bg-transparent font-mono text-3xl font-extrabold tracking-tight text-white outline-none selection:bg-emerald-500/30 sm:w-36 sm:text-4xl dark:text-emerald-300"
               />
             </span>
           </legend>
@@ -196,10 +196,10 @@ export default function SliderControls({
                       onAmountChange(clampGrossUSD(preset));
                     }
                   }}
-                  className={`rounded-full px-3.5 py-1.5 text-sm font-medium tabular-nums transition-all duration-200 ease-out ${
+                  className={`rounded-lg border px-3 py-1 text-xs font-mono transition-all duration-150 ease-out ${
                     active
-                      ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-                      : "bg-[#F2F2F7] text-black/60 hover:text-black dark:bg-neutral-800 dark:text-white/60 dark:hover:text-white"
+                      ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300 shadow-sm"
+                      : "border-zinc-700/70 bg-zinc-900/60 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
                   }`}
                 >
                   {isTargetGoal
@@ -262,10 +262,10 @@ export default function SliderControls({
                   type="button"
                   aria-pressed={isActive}
                   onClick={() => onPlatformChange(item.id)}
-                  className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium tabular-nums transition-all duration-200 ease-out ${
+                  className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium tabular-nums transition-all duration-200 ease-out ${
                     isActive
-                      ? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
-                      : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 shadow-sm"
+                      : "border-zinc-800/80 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
                   }`}
                 >
                   {t(platformUiKey(item.id))}

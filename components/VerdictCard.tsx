@@ -322,10 +322,10 @@ if (mode === "net-to-gross") {
           })}
         </p>
 
-        <p className="mt-5 text-xs font-medium uppercase tracking-widest text-white/40">
+        <p className="mt-5 text-xs font-mono font-semibold uppercase tracking-widest text-emerald-500/70">
           {t("netTakeHome")}
         </p>
-        <p className="mt-1 font-mono text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
+        <p className="mt-1 font-mono text-3xl font-extrabold tracking-tight tabular-nums text-emerald-400 sm:text-4xl" style={{ textShadow: "0 0 12px rgba(52,211,153,0.15)" }}>
           {formatLocal(best.localAmount, corridor)}
         </p>
 

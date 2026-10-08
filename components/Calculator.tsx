@@ -79,6 +79,10 @@ function defaultTargetNet(corridor: Corridor): number {
   return Math.max(1, Math.round(DEFAULT_GROSS_USD * corridor.rate));
 }
 
+/** Fixed settlement notice copied by the "Copy SWIFT Invoice Note" action. */
+const SWIFT_INVOICE_NOTE =
+  "Settlement Notice: Please instruct your remitting bank to transmit via SWIFT Charge Code OUR. Intermediary correspondent deductions are not absorbed by beneficiary.";
+
 export default function Calculator({
   corridor: rawCorridor,
   platforms,
@@ -156,6 +160,13 @@ export default function Calculator({
   // Hotfix — segmented deck: "Payout Fee Comparison" (live audit rail) vs
   // "Local Bank & Tax Settlement" (statutory waterfall + tax + compliance).
   const [activeTab, setActiveTab] = useState<"audit" | "settlement">("audit");
+
+  // Quick-action bar — clipboard feedback states (2-second toast).
+  const [swipeCopied, setSwipeCopied] = useState(false);
+  const [auditCopied, setAuditCopied] = useState(false);
+
+  // Waterfall audit accordion.
+  const [waterfallOpen, setWaterfallOpen] = useState(false);
 
   const platform =
     platforms.find((item) => item.id === platformId) ?? platforms[0];
@@ -397,6 +408,73 @@ export default function Calculator({
 
   const targetBounds = useMemo(() => localSliderBounds(corridor), [corridor]);
 
+  // Quick-pills — dollar-amount preset setter with clamp.
+  const selectPreset = (value: number) => {
+    setAmount(clampGrossUSD(value));
+  };
+
+  // Copy SWIFT invoice notice with 2s feedback; guarded off main thread so
+  // `navigator.clipboard` is always available and SSR never warns.
+  useEffect(() => {
+    if (!swipeCopied) {
+      return;
+    }
+    const id = window.setTimeout(() => setSwipeCopied(false), 2000);
+    return () => window.clearTimeout(id);
+  }, [swipeCopied]);
+
+  useEffect(() => {
+    if (!auditCopied) {
+      return;
+    }
+    const id = window.setTimeout(() => setAuditCopied(false), 2000);
+    return () => window.clearTimeout(id);
+  }, [auditCopied]);
+
+  const copySwifNote = async () => {
+    if (typeof navigator === "undefined" || !navigator.clipboard) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(SWIFT_INVOICE_NOTE);
+      setSwipeCopied(true);
+    } catch {
+      setSwipeCopied(false);
+    }
+  };
+
+  const copyAuditLink = async () => {
+    if (typeof window === "undefined" || typeof navigator === "undefined" || !navigator.clipboard) {
+      return;
+    }
+    const params = new URLSearchParams();
+    if (isTarget) {
+      const best = inverseRoute.verdict.best;
+      if (!best) {
+        return;
+      }
+      params.set("mode", "target");
+      params.set("platform", platformId);
+      params.set("target", String(Math.round(best.targetNetLocal)));
+    } else {
+      const best = route.verdict.best;
+      if (!best) {
+        return;
+      }
+      params.set("mode", "quote");
+      params.set("platform", platformId);
+      params.set("gross", String(Math.round(best.grossUSD)));
+    }
+    try {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}${window.location.pathname}?${params.toString()}`
+      );
+      setAuditCopied(true);
+    } catch {
+      setAuditCopied(false);
+    }
+  };
+
   // Phase 8 — the TransactionCostingWidget anchors its 7-step settlement
   // waterfall on whatever quote the active mode already declared "best"
   // (matching the TaxImpactCard), so every figure agrees with the verdict.
@@ -589,6 +667,49 @@ export default function Calculator({
           corridor={corridor}
         />
 
+        {/* Quick-action pill bar — dollar presets + clipboard utilities. The
+            active pill keeps a soft emerald ring so the user's choice remains
+            legible after state settles. */}
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-800/80 bg-slate-900/70 px-3 py-2.5 shadow-sm backdrop-blur-md">
+          {([500, 1000, 2500, 5000, 10000] as const).map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => selectPreset(preset)}
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition-all duration-150 ease-out ${
+                amount === preset
+                  ? "border-emerald-500 bg-emerald-500/20 text-emerald-300 shadow-sm"
+                  : "border-slate-700/70 bg-slate-800/70 text-slate-300 hover:border-slate-600 hover:bg-slate-800"
+              }`}
+            >
+              {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(preset)}
+            </button>
+          ))}
+          <span
+            className="mx-1 h-4 w-px bg-slate-700/80"
+            aria-hidden="true"
+          />
+          <button
+            type="button"
+            onClick={copySwifNote}
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-950/20 px-2.5 py-1.5 text-xs font-mono text-emerald-400 transition-all duration-150 ease-out hover:border-emerald-400 hover:bg-emerald-950/30"
+          >
+            {swipeCopied ? "✓ Copied SWIFT Note" : "SWIFT OUR Note"}
+          </button>
+          <button
+            type="button"
+            onClick={copyAuditLink}
+            className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-900/60 px-2.5 py-1.5 text-xs font-mono text-zinc-300 transition-all duration-150 ease-out hover:border-zinc-500 hover:bg-zinc-900/80"
+          >
+            {auditCopied ? "✓ Link Copied" : "Share Audit State"}
+          </button>
+        </div>
+
         {/* Engine audit (src/lib/engine/math.ts) — the correspondent layer is
             recomputed through the pure, invariant-checked waterfall on every
             slider move. R2 renders the explicit absorption warning when the
@@ -645,6 +766,27 @@ export default function Calculator({
             )}
           </div>
         )}
+
+        {/* TRUE LANDED CASH waterfall accordion — expands the canonical fee
+            lineages so the recipient sees exactly where the invoice dollars go.
+            `engineAudit?.forward` is the single source of truth for the net
+            landing, intermediary deduct, FX spread and statutory withholding. */}
+        <WaterfallAccordion
+          open={waterfallOpen}
+          onToggle={() => setWaterfallOpen((open) => !open)}
+          grossAmount={amount}
+          intermediaryDeduct={
+            engineAudit?.forward.intermediaryDeduct ?? 0
+          }
+          chargeCode={
+            engineAudit?.intermediaryRoute.chargeCode ??
+            regulation.field71A.code
+          }
+          fxSpreadCost={engineAudit?.forward.fxSpreadCost ?? 0}
+          taxDeduct={engineAudit?.forward.statutoryTax ?? 0}
+          netLanding={engineAudit?.forward.netLanding ?? 0}
+          corridor={corridor}
+        />
 
         {/* Reverse target-gross invoice solver callout — Mode B only. Shows the
             exact USD invoice the solver grossed up for the current target and
@@ -1031,6 +1173,102 @@ function StatLine({ label, value }: { label: string; value?: string }) {
       <span className="text-xs font-medium leading-snug text-slate-200">
         {value}
       </span>
+    </div>
+  );
+}
+
+/** TRUE LANDED CASH fee waterfall / audit log accordion. */
+function WaterfallAccordion({
+  open,
+  onToggle,
+  grossAmount,
+  intermediaryDeduct,
+  chargeCode,
+  fxSpreadCost,
+  taxDeduct,
+  netLanding,
+  corridor,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  grossAmount: number;
+  intermediaryDeduct: number;
+  chargeCode: string;
+  fxSpreadCost: number;
+  taxDeduct: number;
+  netLanding: number;
+  corridor: Corridor;
+}) {
+  const effectiveNetRetention =
+    grossAmount > 0
+      ? Math.min(100, (netLanding / grossAmount) * 100)
+      : 0;
+
+  return (
+    <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/80 shadow-sm backdrop-blur-md">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="group flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-white/[0.04]"
+      >
+        <span className="text-xs font-semibold tracking-widest uppercase text-slate-400 transition-colors group-hover:text-slate-200">
+          + View Complete Fee Waterfall / Audit Log
+        </span>
+        <span
+          aria-hidden="true"
+          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-700 text-xs text-slate-400 transition-all duration-200 ${
+            open ? "rotate-45 border-emerald-500/60 text-emerald-400" : ""
+          }`}
+        >
+          +
+        </span>
+      </button>
+
+      {open && (
+        <dl className="mx-4 mb-3 grid grid-cols-1 gap-x-5 gap-y-2 border-t border-slate-800/80 pt-3 font-mono text-[11px] leading-relaxed tabular-nums tracking-tight text-white/70 sm:grid-cols-2 md:grid-cols-3">
+          <div>
+            <dt className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+              Gross Sent
+            </dt>
+            <dd className="mt-0.5 text-xs font-semibold text-white tabular-nums tracking-tight">
+              {formatCurrency(grossAmount, corridor.from)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+              Correspondent Bank Deduct ({chargeCode})
+            </dt>
+            <dd className="mt-0.5 text-xs font-semibold text-red-400 tabular-nums tracking-tight">
+              -{formatCurrency(intermediaryDeduct, corridor.from)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+              FX Mid-Market Variance / Markup
+            </dt>
+            <dd className="mt-0.5 text-xs font-semibold text-orange-400 tabular-nums tracking-tight">
+              -{formatCurrency(fxSpreadCost, corridor.from)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+              Withholding Tax (Statutory Export Exemption Applicable)
+            </dt>
+            <dd className="mt-0.5 text-xs font-semibold text-amber-400 tabular-nums tracking-tight">
+              -{formatCurrency(taxDeduct, corridor.from)}
+            </dd>
+          </div>
+          <div className="sm:col-span-2 md:col-span-1">
+            <dt className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+              Net Verified Landing
+            </dt>
+            <dd className="mt-0.5 text-xs font-bold text-emerald-400 tabular-nums tracking-tight">
+              {effectiveNetRetention.toFixed(2)}%
+            </dd>
+          </div>
+        </dl>
+      )}
     </div>
   );
 }

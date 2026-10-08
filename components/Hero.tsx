@@ -2,9 +2,8 @@ import { GlobalSearchTrigger } from "@/components/search/CorridorSearch";
 import CorridorSelector from "@/components/CorridorSelector";
 
 /**
- * Minimalist Apple-style hero — large tracking-tight typography, a single
- * emerald savings callout, and the corridor capsule. Server component; the
- * only client island is the selector below it.
+ * Institutional hero — authoritative headline, precise sub-heading, and a
+ * meta-stats strip (audited corridors / zero-tracking / tax-aware).
  */
 export default function Hero() {
   return (
@@ -22,17 +21,23 @@ export default function Hero() {
           cross-border withdrawals.
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg dark:text-white/60">
-          Independent fee and spread auditor benchmarked against real-time
-          interbank foreign exchange rates.
+          Independent fee and spread auditor benchmarked against real-time interbank foreign exchange rates.
         </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-mono tabular-nums tracking-tight text-slate-500 dark:text-slate-400">
+          <span>208 Audited Payout Corridors</span>
+          <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+          <span>0ms Client-Side Evaluation (Zero Tracking)</span>
+          <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+          <span>FBR Sec 154A & Section 195 Tax-Aware</span>
+        </div>
         <div className="mt-8 flex flex-col items-center gap-6">
           {/* Hero Search Trigger */}
           <div className="w-full max-w-md">
             <GlobalSearchTrigger standalone className="w-full justify-between py-3 px-4 text-sm bg-zinc-900/50 hover:bg-zinc-800/80 shadow-inner" />
           </div>
           <div className="flex justify-center">
-          <CorridorSelector />
-        </div>
+            <CorridorSelector />
+          </div>
         </div>
       </div>
     </section>

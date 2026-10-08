@@ -3,10 +3,8 @@
 import { createPortal } from "react-dom";
 import { TransitionLink as Link } from "@/components/nav/TransitionLink";
 import CorridorSwitcher from "@/components/CorridorSwitcher";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
 import BaseCurrencySwitcher from "@/components/BaseCurrencySwitcher";
-import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useHeaderDropdownActive } from "@/components/headerDropdownLayer";
 import SearchTriggerButton from "@/components/nav/SearchTriggerButton";
 import OmnibarModal from "@/components/search/OmnibarModal";
@@ -14,46 +12,21 @@ import OmnibarModal from "@/components/search/OmnibarModal";
 const GITHUB_URL = "https://github.com/AhmadBilalDSA/payout-delta";
 
 /**
- * Pure utility header — no route navigation.
+ * Minimalist institutional header.
  *
- * Primary navigation is owned exclusively by the global `<Dock />`
- * (`components/dashboard/Dock.tsx`), so this bar deliberately carries NO route
- * links: the former centre region (Terminal, Invoice, Tax Ledger, Challengers)
- * was a duplicate of the Dock's left rail and has been removed. The Dock is the
- * single source of truth for "where can I go"; the Header is the single source
- * of truth for "how is this session configured".
+ * Two regions inside one h-14 flex row:
+ *   1. BRAND — Δ PayoutDelta wordmark + corridor quick search (⌘K).
+ *   2. UTILITIES — theme toggle + base-currency switcher + GitHub source link.
  *
- * Two regions, both `shrink-0`, inside one `h-14` flex row:
- *
- *   1. BRAND     — `Δ PayoutDelta` wordmark → `/`, plus the corridor selector.
- *   2. UTILITIES — settlement-currency switcher, language switcher, trust
- *      indicator, theme toggle and the Open Data link.
- *
- * No region wraps (`whitespace-nowrap`) and neither may overlap, so horizontal
- * overflow stays structurally impossible: `shrink-0` on both sides plus
- * `justify-between` on the row. The switchers keep their own `relative` roots
- * so their absolute dropdown panels resolve against themselves.
- *
- * PHASE 2 — LAYER OWNERSHIP
- * `sticky top-0 z-40` puts this bar above the Dock's `z-30` stacking context, so
- * the bar can never be overlapped by the launcher. Because a positioned element
- * with a z-index owns a stacking context, the popovers it triggers cannot be
- * painted above a scrim rendered *next to* the header: the whole header would
- * paint as one z-40 layer. So the scrim and the panels are both lifted to
- * `document.body` (see `components/headerDropdownLayer.ts`) and the order there
- * is explicit — Dock z-30 < scrim z-60 < menu z-70 — which is what removes the
- * screenshot collisions between a wide corridor menu and the dock.
+ * Advisory / client-side-badge removed; they belonged to a previous design.
  */
 export default function Header() {
-  const { t } = useLanguage();
   const dropdownActive = useHeaderDropdownActive();
 
   return (
     <>
       <header className="w-full border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur-xl sticky top-0 z-40 h-14 flex items-center justify-between px-4 sm:px-6 [view-transition-name:site-header]">
-        {/* 1 — BRAND. `shrink-0` keeps the wordmark + corridor selector at their
-            intrinsic width; the selector's own `relative` root means its absolute
-            dropdown resolves against itself and is never clipped by this row. */}
+        {/* 1 — BRAND + corridor search trigger */}
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href="/"
@@ -69,9 +42,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* 2 — UTILITIES. `shrink-0` + `whitespace-nowrap` on every child; the
-            trust indicator stays a compact pulsing pill at every width so the row
-            never has to give ground. */}
+        {/* 2 — UTILITIES */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
           <span className="shrink-0">
             <SearchTriggerButton />
@@ -79,36 +50,24 @@ export default function Header() {
           <span className="hidden shrink-0 sm:inline-flex">
             <BaseCurrencySwitcher />
           </span>
-          <div className="shrink-0">
-            <LanguageSwitcher />
-          </div>
-          <span
-            aria-hidden="true"
-            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-neutral-800/80 bg-neutral-900/60 px-2.5 py-1 font-mono text-[11px] text-neutral-400"
-            title={t("clientSideBadge")}
-          >
-            <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
-            <span className="hidden lg:inline">{t("clientSideBadge")}</span>
-          </span>
           <span className="shrink-0">
             <ThemeToggle />
           </span>
           <Link
-            href="/advisory"
-            className="hidden shrink-0 items-center whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20 dark:text-emerald-400 lg:inline-flex gap-1.5"
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-800/60 px-2.5 py-1.5 text-[11px] font-mono text-neutral-300 transition-colors hover:border-neutral-500 hover:bg-neutral-800 hover:text-neutral-100"
           >
-            Lead Systems Architect • Advisory & Custom Deployment ↗
+            <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+            </svg>
+            Source
           </Link>
         </div>
       </header>
 
-      {/* Click-scrim. `aria-hidden` and inert by construction: dismissal is owned
-          by each popover's own outside-pointerdown listener, so the scrim only
-          has to darken the page behind the menu and make the overlap legible.
-          Portalled to <body> so it clears the header's z-40 context. No mount
-          guard is needed: `dropdownActive` is `false` on the server and on the
-          first client paint, and a popover can only be opened by a click, so
-          `document` always exists on any render that reaches the portal. */}
+      {/* Click-scrim — portalled to <body> so it clears the header's z-40 context. */}
       {dropdownActive
         ? createPortal(
             <div
