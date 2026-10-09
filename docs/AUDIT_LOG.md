@@ -9,3 +9,4 @@
 [2026-10-09 23:40:52] - Commit #7 : docs(faq): clarify difference between OUR and SHA field 71A codes
 [2026-10-09 23:40:52] - Commit #8 : style(palette): tighten monospace padding in Ctrl+K search list
 [2026-10-09 23:40:52] - Commit #9 : refactor(types): extend corridor payload schema definitions
+[2026-10-09 23:40:53] - Commit #10 : docs(readme): add arbitrage comparison methodology section
