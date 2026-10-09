@@ -29,3 +29,4 @@
 [2026-10-09 23:41:00] - Commit #27 : docs(tax): annotate Section 195 withholding tax threshold rules
 [2026-10-09 23:41:01] - Commit #28 : style(table): align monospace numbers with tabular-nums
 [2026-10-09 23:41:01] - Commit #29 : chore(manifest): verify public static fee manifest integrity
+[2026-10-09 23:41:01] - Commit #30 : docs(audit): update nostro account settlement timing benchmarks
