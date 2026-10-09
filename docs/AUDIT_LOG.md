@@ -6,3 +6,4 @@
 [2026-10-09 23:40:51] - Commit #4 : docs(corridor): document CHASUS33 deduction rules for USD-PKR
 [2026-10-09 23:40:51] - Commit #5 : feat(engine): add statutory benchmark verification timestamp
 [2026-10-09 23:40:51] - Commit #6 : chore(config): refine static export cache-control headers
+[2026-10-09 23:40:52] - Commit #7 : docs(faq): clarify difference between OUR and SHA field 71A codes
