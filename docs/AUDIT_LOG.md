@@ -17,3 +17,4 @@
 [2026-10-09 23:40:55] - Commit #15 : style(ui): adjust contrast on terminal emerald badge borders
 [2026-10-09 23:40:55] - Commit #16 : docs(b2b): add embed iframe integration documentation
 [2026-10-09 23:40:56] - Commit #17 : perf(export): tune trailing slash route generation buffers
+[2026-10-09 23:40:56] - Commit #18 : chore(metadata): update canonical URL template resolver
