@@ -52,3 +52,4 @@
 [2026-10-10 23:21:07] - Commit #10 : docs(readme): add programmatic API usage examples for fee benchmarks
 [2026-10-10 23:21:08] - Commit #11 : perf(render): defer off-screen corridor table row repaints
 [2026-10-10 23:21:08] - Commit #12 : chore(types): strengthen return types on statutory fee matrices
+[2026-10-10 23:21:09] - Commit #13 : docs(corridor): map direct RTGS settlement rails for USD-BDT
