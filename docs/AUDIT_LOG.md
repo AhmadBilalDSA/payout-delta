@@ -77,3 +77,4 @@
 [2026-10-10 23:21:29] - Commit #35 : style(shell): balance obsidian background contrast gradients
 [2026-10-10 23:21:30] - Commit #36 : chore(deps): prune unreferenced type definitions across components
 [2026-10-10 23:21:30] - Commit #37 : docs(privacy): document client-side zero-logging calculation policy
+[2026-10-10 23:21:31] - Commit #38 : refactor(engine): assert non-negative constraints on landed cash
