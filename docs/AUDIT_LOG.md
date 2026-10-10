@@ -78,3 +78,4 @@
 [2026-10-10 23:21:30] - Commit #36 : chore(deps): prune unreferenced type definitions across components
 [2026-10-10 23:21:30] - Commit #37 : docs(privacy): document client-side zero-logging calculation policy
 [2026-10-10 23:21:31] - Commit #38 : refactor(engine): assert non-negative constraints on landed cash
+[2026-10-10 23:21:32] - Commit #39 : docs(changelog): record v1.1.2 engine optimization updates
