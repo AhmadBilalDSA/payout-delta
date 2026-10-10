@@ -61,3 +61,4 @@
 [2026-10-10 23:21:15] - Commit #19 : docs(b2b): update iframe embedding instructions for client portals
 [2026-10-10 23:21:16] - Commit #20 : refactor(slip): fine-tune print styles for A4 statement downloads
 [2026-10-10 23:21:17] - Commit #21 : docs(corridor): update correspondent clearing notes for EUR-EGP
+[2026-10-10 23:21:18] - Commit #22 : style(badge): standardize emerald tone on fee-absorption warnings
