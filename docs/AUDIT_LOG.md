@@ -54,3 +54,4 @@
 [2026-10-10 23:21:08] - Commit #12 : chore(types): strengthen return types on statutory fee matrices
 [2026-10-10 23:21:09] - Commit #13 : docs(corridor): map direct RTGS settlement rails for USD-BDT
 [2026-10-10 23:21:11] - Commit #14 : refactor(arbitrage): bound platform loss calculations within safe margins
+[2026-10-10 23:21:11] - Commit #15 : style(palette): adjust command palette backdrop blur parameters
