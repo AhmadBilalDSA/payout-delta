@@ -82,3 +82,4 @@
 [2026-10-10 23:21:32] - Commit #40 : chore(ci): verify static export generation integrity
 [2026-10-10 23:21:34] - Commit #41 : docs(corridor): verify correspondent routing tables for USD-VND
 [2026-10-10 23:21:36] - Commit #42 : refactor(tracer): add aria labels for pipeline accessibility
+[2026-10-10 23:21:37] - Commit #43 : style(table): align currency columns to monospace grid
