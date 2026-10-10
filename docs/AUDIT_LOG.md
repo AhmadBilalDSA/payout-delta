@@ -42,3 +42,4 @@
 [2026-10-09 23:41:05] - Commit #40 : chore(release): bump benchmark engine definition version to 1.1.0
 [2026-10-10 23:20:56] - Commit #1 : docs(corridor): calibrate correspondent clearing windows for USD-PHP
 [2026-10-10 23:20:58] - Commit #2 : refactor(engine): tighten float rounding tolerances on R3 precision checks
+[2026-10-10 23:20:59] - Commit #3 : perf(cache): memoize corridor tariff calculation results
