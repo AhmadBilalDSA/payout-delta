@@ -63,3 +63,4 @@
 [2026-10-10 23:21:17] - Commit #21 : docs(corridor): update correspondent clearing notes for EUR-EGP
 [2026-10-10 23:21:18] - Commit #22 : style(badge): standardize emerald tone on fee-absorption warnings
 [2026-10-10 23:21:19] - Commit #23 : chore(sitemap): audit priority scores across static corridor URLs
+[2026-10-10 23:21:22] - Commit #24 : docs(math): formalize R1 to R4 mathematical invariant definitions
