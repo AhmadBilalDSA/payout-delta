@@ -44,3 +44,4 @@
 [2026-10-10 23:20:58] - Commit #2 : refactor(engine): tighten float rounding tolerances on R3 precision checks
 [2026-10-10 23:20:59] - Commit #3 : perf(cache): memoize corridor tariff calculation results
 [2026-10-10 23:21:00] - Commit #4 : docs(tax): annotate Section 195 withholding thresholds for freelancers
+[2026-10-10 23:21:01] - Commit #5 : feat(engine): add strict BIC checksum validator for SWIFT transit codes
