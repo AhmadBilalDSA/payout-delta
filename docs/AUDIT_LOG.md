@@ -46,3 +46,4 @@
 [2026-10-10 23:21:00] - Commit #4 : docs(tax): annotate Section 195 withholding thresholds for freelancers
 [2026-10-10 23:21:01] - Commit #5 : feat(engine): add strict BIC checksum validator for SWIFT transit codes
 [2026-10-10 23:21:02] - Commit #6 : chore(config): synchronize static build paths across route exports
+[2026-10-10 23:21:03] - Commit #7 : docs(faq): add MT103 field 71A charge breakdown explanation
