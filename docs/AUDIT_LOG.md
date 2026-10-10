@@ -40,3 +40,4 @@
 [2026-10-09 23:41:04] - Commit #38 : refactor(engine): ensure R2 fee absorption invariants strictly clamp
 [2026-10-09 23:41:05] - Commit #39 : docs(changelog): record v1.1 institutional benchmark release notes
 [2026-10-09 23:41:05] - Commit #40 : chore(release): bump benchmark engine definition version to 1.1.0
+[2026-10-10 23:20:56] - Commit #1 : docs(corridor): calibrate correspondent clearing windows for USD-PHP
