@@ -69,3 +69,4 @@
 [2026-10-10 23:21:25] - Commit #27 : docs(tax): add PSEB registration requirements for FBR 154A
 [2026-10-10 23:21:26] - Commit #28 : style(cards): adjust tilt sensitivity thresholds on desktop hover
 [2026-10-10 23:21:27] - Commit #29 : chore(manifest): verify public JSON fee feeds match engine constants
+[2026-10-10 23:21:27] - Commit #30 : docs(audit): document intermediary deduction patterns for CITIUS33
