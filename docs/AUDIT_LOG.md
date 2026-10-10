@@ -80,3 +80,4 @@
 [2026-10-10 23:21:31] - Commit #38 : refactor(engine): assert non-negative constraints on landed cash
 [2026-10-10 23:21:32] - Commit #39 : docs(changelog): record v1.1.2 engine optimization updates
 [2026-10-10 23:21:32] - Commit #40 : chore(ci): verify static export generation integrity
+[2026-10-10 23:21:34] - Commit #41 : docs(corridor): verify correspondent routing tables for USD-VND
